@@ -26,23 +26,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const cors_1 = __importDefault(require("cors"));
-const body_parser_1 = __importDefault(require("body-parser"));
-const morgan_1 = __importDefault(require("morgan"));
+const mysql_1 = __importDefault(require("mysql"));
 const dotenv = __importStar(require("dotenv"));
-const database_1 = __importDefault(require("./database"));
 dotenv.config();
-const app = (0, express_1.default)();
-const PORT = process.env.PORT || 5000;
-app.use(body_parser_1.default.json());
-app.use((0, cors_1.default)({ origin: "http://localhost:3000" }));
-app.use((0, morgan_1.default)("tiny"));
-database_1.default.connect((error) => {
-    if (error)
-        throw error;
-    console.log("Connected to MySQL Server!");
+const database = mysql_1.default.createConnection({
+    host: "localhost",
+    user: `${process.env.USER}`,
+    password: process.env.PASSWORD,
+    database: `${process.env.DATABASE}`,
 });
-app.listen(PORT, () => {
-    console.log("Connected", PORT);
-});
+exports.default = database;
