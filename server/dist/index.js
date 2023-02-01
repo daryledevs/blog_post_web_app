@@ -32,12 +32,16 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const morgan_1 = __importDefault(require("morgan"));
 const dotenv = __importStar(require("dotenv"));
 const database_1 = __importDefault(require("./database"));
+const User_1 = __importDefault(require("./router/User"));
 dotenv.config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 5000;
+const API = process.env.API;
 app.use(body_parser_1.default.json());
 app.use((0, cors_1.default)({ origin: "http://localhost:3000" }));
 app.use((0, morgan_1.default)("tiny"));
+// Routes
+app.use(`${API}/users`, User_1.default);
 database_1.default.connect((error) => {
     if (error)
         throw error;
