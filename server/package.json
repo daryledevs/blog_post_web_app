@@ -14,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/body-parser": "^1.19.2",
+    "@types/cookie-parser": "^1.4.3",
     "@types/jsonwebtoken": "^9.0.0",
     "@types/morgan": "^1.9.3",
     "@types/nodemon": "^1.19.2",
@@ -23,6 +24,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "express-jwt": "^8.4.0",
     "jsonwebtoken": "^9.0.0",
     "morgan": "^1.10.0",
     "mysql": "^2.18.1",
