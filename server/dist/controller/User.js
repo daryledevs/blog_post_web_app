@@ -8,11 +8,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Login = exports.Register = void 0;
+exports.Logout = exports.Login = exports.Register = void 0;
 const database_1 = __importDefault(require("../database"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -56,8 +67,12 @@ const Login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const secret = process.env.JWT_SECRET;
         [userDetails] = data;
         if (bcrypt_1.default.compareSync(password, userDetails.password)) {
-            const token = jsonwebtoken_1.default.sign({ user_id: userDetails.id, admin: userDetails.admin = 0 ? false : true }, secret, { expiresIn: "1d" });
-            res.cookie("authorization_key", token, { httpOnly: true }).status(200).send({ message: "Login successfully" });
+            const token = jsonwebtoken_1.default.sign({ user_id: userDetails.id, admin: userDetails.roles }, secret, { expiresIn: "1d" });
+            const { password } = userDetails, rest = __rest(userDetails, ["password"]);
+            res
+                .cookie("authorization_key", token, { httpOnly: true })
+                .status(200)
+                .send({ message: "Login successfully", user_data: rest });
             return;
         }
         else {
@@ -66,3 +81,10 @@ const Login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     });
 });
 exports.Login = Login;
+const Logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    res.clearCookie("authorization_key", {
+        sameSite: "none",
+        secure: true
+    }).status(200).send({ message: "Logout successfully" });
+});
+exports.Logout = Logout;

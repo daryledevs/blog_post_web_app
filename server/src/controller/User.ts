@@ -57,16 +57,16 @@ const Login = async (req: Request, res: Response) => {
 
       if(bcrypt.compareSync(password, userDetails.password)){
         const token = jwt.sign(
-          { user_id: userDetails.id, admin: userDetails.admin = 0 ? false : true },
+          { user_id: userDetails.id, admin: userDetails.roles },
           secret,
           { expiresIn: "1d" }
         );
 
-        res.cookie(
-          "authorization_key", 
-          token,
-          { httpOnly: true }
-        ).status(200).send({ message: "Login successfully" });
+        const { password, ...rest } = userDetails;
+        res
+          .cookie("authorization_key", token, { httpOnly: true })
+          .status(200)
+          .send({ message: "Login successfully", user_data: rest });
 
         return; 
       } else {
@@ -76,7 +76,15 @@ const Login = async (req: Request, res: Response) => {
   );
 };
 
+const Logout = async (req: Request, res: Response) => {
+  res.clearCookie("authorization_key", {
+    sameSite: "none",
+    secure: true
+  }).status(200).send({ message: "Logout successfully" });
+};
+
 export {
   Register,
-  Login
+  Login,
+  Logout,
 };
