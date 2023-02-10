@@ -1,80 +1,47 @@
 import React, { useState } from 'react'
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import logo from "../../assets/images/dee-logo.png";
 import burger from "../../assets/icons/hamburger.png";
-import home_check from "../../assets/icons/house_check.png";
-import home_uncheck from "../../assets/icons/house_uncheck.png";
-import search_check from "../../assets/icons/search_check.png";
-import search_uncheck from "../../assets/icons/search_uncheck.png";
-import explore_check from "../../assets/icons/explore_check.png";
-import explore_uncheck from "../../assets/icons/explore_uncheck.png";
-import message_check from "../../assets/icons/message_check.png";
-import message_uncheck from "../../assets/icons/message_uncheck.png";
-import create_check from "../../assets/icons/create_post_check.png";
-import create_uncheck from "../../assets/icons/create_post_uncheck.png";
-import avatar from "../../assets/icons/avatar.png";
+import Links from '../../assets/data/nav_links';
 
 function NavigationBar() {
-  const [clickedLink, setClickedLink] = useState("");
+  const { hash, pathname, search } = useLocation();
+  const [clickedLink, setClickedLink] = useState(pathname);
+  const navigate = useNavigate();
 
-  let nav_links: any = [
-    {
-      name: "Home",
-      icon: {
-        check: home_check,
-        uncheck: home_uncheck,
-      },
-    },
-    {
-      name: "Search",
-      icon: {
-        check: search_check,
-        uncheck: search_uncheck,
-      },
-    },
-    {
-      name: "Explore",
-      icon: {
-        check: explore_check,
-        uncheck: explore_uncheck,
-      },
-    },
-    {
-      name: "Message",
-      icon: {
-        check: message_check,
-        uncheck: message_uncheck,
-      },
-    },
-    {
-      name: "Create",
-      icon: {
-        check: create_check,
-        uncheck: create_uncheck,
-      },
-    },
-    {
-      name: "Profile",
-      icon: {
-        check: avatar,
-      },
-    },
-  ];
-
-  nav_links = nav_links.map((item: any, index: any) => {
+  const nav_links = Links.map((item: any, index: any) => {
     return (
       <li key={index}>
-        <div onClick={() => setClickedLink(item.name)}>
+        <div
+          onClick={() => {
+            if (item.link !== "none"){
+              setClickedLink(item.link);
+              navigate(item.link);
+              return 
+            };
+            setClickedLink(item.name);
+            console.log(item.name, clickedLink);
+          }}
+        >
           <img
             src={
-              item.name === "Profile"
+              item.link === "/profile"
                 ? item.icon.check
                 : clickedLink === item.name
+                ? item.icon.check
+                : clickedLink === item.link
                 ? item.icon.check
                 : item.icon.uncheck
             }
           />
-          <span>{item.name}</span>
+          <span
+            style={{
+              textDecoration: "none",
+              color: "black",
+            }}
+          >
+            {item.name}
+          </span>
         </div>
       </li>
     );
