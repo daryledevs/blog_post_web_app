@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { login } from '../redux/action/auth';
-import { useAppDispatch } from '../redux/store';
+import { useAppDispatch } from '../redux/hooks/hooks';
 
 function Login() {
   const [username, setUsername] = useState('');
