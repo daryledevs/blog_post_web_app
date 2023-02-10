@@ -70,7 +70,7 @@ const Login = async (req: Request, res: Response) => {
 
         return; 
       } else {
-        return res.status(404).send("Invalid email or password");
+        return res.status(404).send({ message: "Password is incorrect" });
       }
     }
   );

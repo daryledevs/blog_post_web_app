@@ -76,7 +76,7 @@ const Login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             return;
         }
         else {
-            return res.status(404).send("Invalid email or password");
+            return res.status(404).send({ message: "Invalid email or password" });
         }
     });
 });
