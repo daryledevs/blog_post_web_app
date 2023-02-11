@@ -1,8 +1,9 @@
 @import "./_colors";
-@import "../styles/pages/Feed.scss";
+@import "../styles/pages/_Feed";
 
 // shared
 @import "./shared/base/_NavigationBar";
+@import "./shared/modals/CreatePost";
 
 *{
   box-sizing: border-box;

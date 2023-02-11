@@ -1,24 +1,23 @@
-.navigation-container{
+.navigation__container{
   display: flex; 
   flex-direction: row;
-  position: relative;
 
-  .navigation-parent{
+  .navigation__parent{
     display: inherit;
     flex-direction: column;
     height: 100vh;
     border-right: 1px solid #ccc;
     width: 15%;
     position: fixed;
-    z-index: 9999;
+    z-index: 5555;
 
-    .navigation-parent__logo{
+    .navigation__parent-logo{
       display: block;
       margin: 0 auto;
       width: 10vw;
     }
 
-    .navigation-parent__links{
+    .navigation__parent-links{
       display: inherit;
       flex-direction: column;
 
@@ -51,7 +50,7 @@
       }
     }
 
-    .navigation-parent__burger{
+    .navigation__parent-burger{
       width: 13%;
       margin: auto auto 15% auto; // centered at the bottom of the page with a margin of 1vh bottom
       cursor: pointer;
