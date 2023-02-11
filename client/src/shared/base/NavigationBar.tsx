@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/images/dee-logo.png";
 import burger from "../../assets/icons/hamburger.png";
-import Links from '../../assets/data/nav_links';
+import Links from "../../assets/data/nav_links";
+import CreatePost from "../modals/CreatePost";
 
 function NavigationBar() {
   const { hash, pathname, search } = useLocation();
@@ -14,11 +15,11 @@ function NavigationBar() {
       <li key={index}>
         <div
           onClick={() => {
-            if (item.link !== "none"){
+            if (item.link !== "none") {
               setClickedLink(item.link);
               navigate(item.link);
-              return 
-            };
+              return;
+            }
             setClickedLink(item.name);
             console.log(item.name, clickedLink);
           }}
@@ -26,12 +27,12 @@ function NavigationBar() {
           <img
             src={
               item.link === "/profile"
-                ? item.icon.check
-                : clickedLink === item.name
-                ? item.icon.check
-                : clickedLink === item.link
-                ? item.icon.check
-                : item.icon.uncheck
+              ? item.icon.check
+              : clickedLink === item.name
+              ? item.icon.check
+              : clickedLink === item.link
+              ? item.icon.check
+              : item.icon.uncheck
             }
           />
           <span
@@ -48,13 +49,19 @@ function NavigationBar() {
   });
 
   return (
-    <div className="navigation-container">
-      <div className="navigation-parent">
-        <img src={logo} className="navigation-parent__logo" alt='Social-media-logo'/>
-        <ul className='navigation-parent__links'>
-          {nav_links}
-        </ul>
-        <img src={burger} className="navigation-parent__burger" />
+    <div className="navigation__container">
+      {clickedLink === "Create" && <CreatePost setClickedLink={setClickedLink} />}
+      <div className="navigation__parent">
+        <img
+          src={logo}
+          className="navigation__parent-logo"
+          alt="Social-media-logo"
+        />
+        <ul className="navigation__parent-links">{nav_links}</ul>
+        <img
+          src={burger}
+          className="navigation__parent-burger"
+        />
       </div>
       <Outlet />
     </div>
