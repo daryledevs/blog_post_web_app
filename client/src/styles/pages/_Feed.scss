@@ -7,11 +7,11 @@
 
 .feed-container{
   display: inherit;
-  justify-content: center;
   align-items: center;
-  position: relative;
   flex-direction: column;
   padding: 3vh 0 3vh 0;
+  height: 100%;
+  width: 100%;
 
    // PostCard.tsx
   .post-card-container{
@@ -67,11 +67,6 @@
     .post-card__details{
       padding: 1% 0.5vw;
 
-      .post-card__details-caption{
-        display: flex;
-        gap: 1%;
-      }
-
       .post-card__details-meta{
         color: #9c9c9c;
         p:nth-child(2){
@@ -79,7 +74,6 @@
           font-size: 0.7em;
         }
       }
-      
     }
 
     .post-card__comment{

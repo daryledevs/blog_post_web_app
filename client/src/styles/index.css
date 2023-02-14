@@ -1,10 +1,10 @@
 .feed-container {
   display: inherit;
-  justify-content: center;
   align-items: center;
-  position: relative;
   flex-direction: column;
   padding: 3vh 0 3vh 0;
+  height: 100%;
+  width: 100%;
 }
 .feed-container .post-card-container {
   border: 1px solid #ccc;
@@ -54,10 +54,6 @@
 .feed-container .post-card-container .post-card__details {
   padding: 1% 0.5vw;
 }
-.feed-container .post-card-container .post-card__details .post-card__details-caption {
-  display: flex;
-  gap: 1%;
-}
 .feed-container .post-card-container .post-card__details .post-card__details-meta {
   color: #9c9c9c;
 }
@@ -83,39 +79,50 @@
   flex: 1;
 }
 
-.navigation__container {
+.index__container {
   display: flex;
-  flex-direction: row;
+  position: relative;
 }
-.navigation__container .navigation__parent {
+
+.index__container-condition {
+  display: flex;
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.sidebar__container {
   display: inherit;
   flex-direction: column;
   height: 100vh;
   border-right: 1px solid #ccc;
   width: 15%;
-  position: fixed;
+  position: sticky;
   z-index: 5555;
+  overflow: hidden;
+  background-color: white;
+  top: 0;
 }
-.navigation__container .navigation__parent .navigation__parent-logo {
+.sidebar__container .sidebar__logo {
   display: block;
   margin: 0 auto;
   width: 10vw;
 }
-.navigation__container .navigation__parent .navigation__parent-links {
+.sidebar__container .sidebar__links {
   display: inherit;
   flex-direction: column;
 }
-.navigation__container .navigation__parent .navigation__parent-links li {
+.sidebar__container .sidebar__links li {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 2vh 1vw;
 }
-.navigation__container .navigation__parent .navigation__parent-links li img {
+.sidebar__container .sidebar__links li img {
   max-width: 12%;
 }
-.navigation__container .navigation__parent .navigation__parent-links li div {
+.sidebar__container .sidebar__links li div {
   cursor: pointer;
   width: 100%;
   height: 5vh;
@@ -125,10 +132,10 @@
   gap: 3%;
   padding-left: 4%;
 }
-.navigation__container .navigation__parent .navigation__parent-links div:hover {
+.sidebar__container .sidebar__links div:hover {
   background-color: rgb(249, 249, 251);
 }
-.navigation__container .navigation__parent .navigation__parent-burger {
+.sidebar__container .sidebar__burger {
   width: 13%;
   margin: auto auto 15% auto;
   cursor: pointer;
@@ -139,7 +146,7 @@
   width: 100%;
   height: 100%;
   z-index: 88888;
-  position: absolute;
+  position: fixed;
   display: flex;
   justify-content: center;
   align-items: center;
