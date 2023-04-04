@@ -1,37 +1,39 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import api from "../../assets/data/api";
-
-type AuthData = {
-  message: string;
-};
-
-interface AuthFetchError {
-  errorType: string;
-  errorMessage: string;
-}
+import { getUserData } from "../reducer/user";
+import { getChatThunk } from "../action/chat";
+import { IEAuthData, IEAuthFetchError } from "../reduxIntface";
 
 const checkAccess = createAsyncThunk<
-  AuthData,
+  IEAuthData,
   void,
-  { rejectValue: AuthFetchError }
->("auth/checkAccess", async (_, { fulfillWithValue, rejectWithValue }) => {
-  try {
-    const response = await api.get("/check-token");
-    return fulfillWithValue(response.data);
-  } catch (error) {
-    if (error instanceof AxiosError) {
-      return rejectWithValue({
-        errorType: error?.response?.data.error,
-        errorMessage: error?.response?.data.message,
-      });
+  { rejectValue: IEAuthFetchError }
+>(
+  "auth/checkAccess",
+  async (_, { dispatch, fulfillWithValue, rejectWithValue }) => {
+    try {
+      const response = await api.get("/check-token");
+      const data = response.data;
+
+      dispatch(getChatThunk(data.user_data.user_id));
+      dispatch(getUserData(data.user_data));
+
+      return fulfillWithValue(data);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue({
+          errorType: error?.response?.data.error,
+          errorMessage: error?.response?.data.message,
+        });
+      }
+      throw error;
     }
-    throw error;
   }
-});
+);
 
 const login = createAsyncThunk<
-  AuthData,
+  IEAuthData,
   { username: string; password: string },
   {
     rejectValue: {
