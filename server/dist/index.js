@@ -37,7 +37,7 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const JWT_1 = __importDefault(require("./middleware/JWT"));
 const socket_1 = __importDefault(require("./socket"));
 const ErrorHandler_1 = require("./helper/ErrorHandler");
-const Message_1 = require("./controller/Message");
+const Chat_1 = require("./controller/Chat");
 dotenv.config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 5000;
@@ -51,10 +51,10 @@ app.use((0, morgan_1.default)("tiny"));
 // Routes
 app.use(`${API}/check-token`, ErrorHandler_1.checkToken);
 app.use(`${API}/users`, User_1.default);
-app.use(`${API}/chat/:sender_id`, Message_1.getAllConversation);
-app.use(`${API}/chat`, Message_1.newConversation);
-app.use(`${API}/message/:conversation_id`, Message_1.getMessage);
-app.use(`${API}/message`, Message_1.newMessage);
+app.use(`${API}/chat/:length/:sender_id`, Chat_1.getAllChats);
+app.use(`${API}/chat`, Chat_1.newConversation);
+app.use(`${API}/message/:conversation_id`, Chat_1.getMessage);
+app.use(`${API}/message`, Chat_1.newMessage);
 database_1.default.connect((error) => {
     if (error)
         throw error;

@@ -9,7 +9,12 @@ import cookieParser from 'cookie-parser';
 import authJWT from "./middleware/JWT";
 import socketController from "./socket";
 import { ErrorHandler, checkToken } from "./helper/ErrorHandler";
-import { getAllConversation, newConversation, getMessage, newMessage } from "./controller/Message";
+import {
+  newConversation,
+  getMessage,
+  newMessage,
+  getAllChats,
+} from "./controller/Chat";
 dotenv.config();
 
 const app = express();
@@ -26,7 +31,7 @@ app.use(morgan("tiny"));
 // Routes
 app.use(`${API}/check-token`, checkToken);
 app.use(`${API}/users`, userRoutes);
-app.use(`${API}/chat/:sender_id`, getAllConversation);
+app.use(`${API}/chat/:length/:sender_id`, getAllChats);
 app.use(`${API}/chat`, newConversation);
 app.use(`${API}/message/:conversation_id`, getMessage);
 app.use(`${API}/message`, newMessage);
