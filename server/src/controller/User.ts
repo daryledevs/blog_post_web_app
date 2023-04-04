@@ -57,16 +57,15 @@ const Login = async (req: Request, res: Response) => {
 
       if(bcrypt.compareSync(password, userDetails.password)){
         const token = jwt.sign(
-          { user_id: userDetails.id, admin: userDetails.roles },
+          { user_id: userDetails.user_id, roles: userDetails.roles },
           secret,
           { expiresIn: "1d" }
         );
 
-        const { password, ...rest } = userDetails;
         res
           .cookie("authorization_key", token, { httpOnly: true })
           .status(200)
-          .send({ message: "Login successfully", user_data: rest });
+          .send({ message: "Login successfully" });
 
         return; 
       } else {

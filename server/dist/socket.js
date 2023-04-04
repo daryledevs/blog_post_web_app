@@ -17,8 +17,6 @@ const removeUser = (socketId) => {
 const getUser = (userId) => {
     return users.find((user) => user.userId === userId);
 };
-// export { addUser, removeUser, getUser, users };
-// export default socketIO;
 function socketController() {
     socketIO.on("connection", (socket) => {
         console.log("a user connected");
