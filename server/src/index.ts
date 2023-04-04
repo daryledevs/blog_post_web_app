@@ -7,7 +7,9 @@ import database from "./database";
 import userRoutes from "./router/User";
 import cookieParser from 'cookie-parser';
 import authJWT from "./middleware/JWT";
+import socketController from "./socket";
 import { ErrorHandler, checkToken } from "./helper/ErrorHandler";
+import { getAllConversation, newConversation, getMessage, newMessage } from "./controller/Message";
 dotenv.config();
 
 const app = express();
@@ -24,6 +26,10 @@ app.use(morgan("tiny"));
 // Routes
 app.use(`${API}/check-token`, checkToken);
 app.use(`${API}/users`, userRoutes);
+app.use(`${API}/chat/:sender_id`, getAllConversation);
+app.use(`${API}/chat`, newConversation);
+app.use(`${API}/message/:conversation_id`, getMessage);
+app.use(`${API}/message`, newMessage);
 
 database.connect((error) => {
   if(error) throw error;
@@ -31,5 +37,6 @@ database.connect((error) => {
 });
 
 app.listen(PORT, () => {
+  socketController();
   console.log("Connected", PORT);
 });

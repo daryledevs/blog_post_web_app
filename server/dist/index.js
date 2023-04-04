@@ -35,7 +35,9 @@ const database_1 = __importDefault(require("./database"));
 const User_1 = __importDefault(require("./router/User"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const JWT_1 = __importDefault(require("./middleware/JWT"));
+const socket_1 = __importDefault(require("./socket"));
 const ErrorHandler_1 = require("./helper/ErrorHandler");
+const Message_1 = require("./controller/Message");
 dotenv.config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 5000;
@@ -49,11 +51,16 @@ app.use((0, morgan_1.default)("tiny"));
 // Routes
 app.use(`${API}/check-token`, ErrorHandler_1.checkToken);
 app.use(`${API}/users`, User_1.default);
+app.use(`${API}/chat/:sender_id`, Message_1.getAllConversation);
+app.use(`${API}/chat`, Message_1.newConversation);
+app.use(`${API}/message/:conversation_id`, Message_1.getMessage);
+app.use(`${API}/message`, Message_1.newMessage);
 database_1.default.connect((error) => {
     if (error)
         throw error;
     console.log("Connected to MySQL Server!");
 });
 app.listen(PORT, () => {
+    (0, socket_1.default)();
     console.log("Connected", PORT);
 });
