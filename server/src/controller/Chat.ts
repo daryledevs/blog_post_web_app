@@ -3,40 +3,56 @@ import database from "../database";
 
 const getAllChats = async (req: Request, res: Response) => {
   const length: number = parseInt(req.params.length);
-  const getData: any[] = [];
+  let getData: any[] = [];
+  let main_arr: any[] = [];
   const limit = length + 4;
   const sql = `
-              SELECT 
-                  m.sender_id,
-                  m.text_message,
-                  c.receiver_id,
-                  u.username,
-                  u.first_name,
-                  u.last_name,
-                  c.conversation_id,
-                  m.time_sent
-              FROM
-                  messages m
-                      LEFT JOIN
-                  conversations c ON c.conversation_id = m.conversation_id
-                      RIGHT JOIN
-                  users u ON u.user_id = c.receiver_id
-              WHERE
-                u.user_id != m.sender_id
-              ORDER BY m.time_sent ASC;
-          `;
+                SELECT * FROM conversations WHERE user_one = (?);
+                SELECT 
+                    c.conversation_id,
+                    m.message_id,
+                    c.user_one,
+                    m.sender_id,
+                    m.text_message,
+                    c.user_two,
+                    u.username,
+                    u.first_name,
+                    u.last_name,
+                    m.time_sent
+                FROM
+                    messages m
+                LEFT JOIN
+                    conversations c ON c.conversation_id = m.conversation_id
+                INNER JOIN
+                    users u ON u.user_id = c.user_two
+                WHERE 
+                  c.user_one = (?) OR c.user_two = (?)
+                ORDER BY c.conversation_id ASC;
+            `;
 
-  database.query(sql, [req.params.sender_id], (error, data) => {
-    if (error) res.status(500).send({ message: error.message });
+  database.query(sql, [
+    [req.params.user_one],
+    req.params.user_one, req.params.user_one
+  ], (error, data) => {
+    if (error) res.status(500).send({ message: error });
     if (data.length === 0) res.status(200).send({ data: data });
 
-    // we provide only 5 chat's per request to divide the data and prevent the long query
-    for (let i = length; i < limit; i++) {
-      if (length > limit || data.length <= length + i) break;
-      else getData.push(data[i]);
+    for(let i = 0; i < data[0].length; i++){
+      let sub_arr: any[] = [];
+      for(let j = 0; j < data[1].length; j++){
+        if(data[0][i].conversation_id === data[1][j].conversation_id) sub_arr.push(data[1][j]);
+      }
+      main_arr.push(sub_arr);
     }
 
-    return res.status(200).send({ data: getData });
+    // will continue on this part next time
+    // we provide only 5 chat's per request to divide the data and prevent the long query
+    // for (let i = length; i < limit; i++) {
+    //   if (length > limit || data.length <= length + i) break;
+    //   else getData.push(data[i]);
+    // }
+    
+    return res.status(200).send({ data: main_arr });
   });
 };
 
@@ -65,7 +81,7 @@ const newConversation = (req: Request, res: Response) => {
 
 const getMessage = (req: Request, res: Response) => {
   const sql = "SELECT * FROM messages WHERE conversation_id = (?)";
-  
+
   database.query(sql, [req.params.conversation_id], (error, data) => {
     if (error) res.status(500).send({ message: error });
     return res.status(200).send({ chats: data });
