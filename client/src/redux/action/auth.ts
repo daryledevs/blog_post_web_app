@@ -16,7 +16,7 @@ const checkAccess = createAsyncThunk<
       const response = await api.get("/check-token");
       const data = response.data;
 
-      dispatch(getChatThunk(data.user_data.user_id));
+      dispatch(getChatThunk({ user_id: data.user_data.user_id, length: 0}));
       dispatch(getUserData(data.user_data));
 
       return fulfillWithValue(data);

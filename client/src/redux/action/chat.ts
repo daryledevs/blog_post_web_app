@@ -4,7 +4,7 @@ import { IEChatData } from "../reduxIntface";
 
 const getChatThunk = createAsyncThunk<
   IEChatData,
-  { user_id: any },
+  { user_id: any; length: any },
   {
     rejectValue: {
       message: string;
@@ -12,12 +12,12 @@ const getChatThunk = createAsyncThunk<
   }
 >(
   "chat/getChatThunk",
-  async (user_id, { fulfillWithValue, rejectWithValue }) => {
+  async ({ user_id, length}, { fulfillWithValue, rejectWithValue }) => {
     try {
-      const response = await api.get(`/chat/${user_id}`);
-      return fulfillWithValue(response.data.hist);
+      const response = await api.get(`/chats/${length}/${user_id}`);
+      return fulfillWithValue(response.data.data);
     } catch (error) {
-      return rejectWithValue({ message: error.response.data.message });
+      return rejectWithValue({ message: error.message });
     }
   }
 );
