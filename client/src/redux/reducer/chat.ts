@@ -19,6 +19,20 @@ const initialState: Array<Array<IEChatState>> = [
   ],
 ];
 
+const getIndex = (stateInstance:any, action:any) => {
+  let findState = stateInstance.find(function (state: any, index: any) {
+    if (state[0].conversation_id === action.payload.conversation_id)
+      return state;
+  });
+
+  let index = stateInstance.findIndex(
+    (state: any, index: any) =>
+      state[0].conversation_id === findState?.[0].conversation_id
+  );
+
+  return index;
+};
+
 const chatSlice = createSlice({
   name: "name",
   initialState,
@@ -26,19 +40,18 @@ const chatSlice = createSlice({
 
     addMessage: (state, action) =>{
       let stateInstance = [...current(state)];
-
-      let findState = stateInstance.find(function(state:any, index:any){
-        if (state[0].conversation_id === action.payload.conversation_id) return state;
-      });
-      
-      let index = stateInstance.findIndex(
-        (state: any, index: any) =>
-          state[0].conversation_id === findState?.[0].conversation_id
-      );
-
+      let index = getIndex(stateInstance, action);
       let stateContent = stateInstance[index];
       stateInstance[index] = [...stateContent, { ...action.payload }];
+      return [...stateInstance];
+    },
 
+    getMessage: (state, action) => {
+      let stateInstance = [...current(state)];
+      let index = getIndex(stateInstance, action);
+      let stateContent = stateInstance[index];
+      let { sender_id, text_message, conversation_id, ...rest } = stateContent[0];
+      stateInstance[index] = [...stateContent, { ...rest, ...action.payload }];
       return [...stateInstance];
     }
   },
@@ -54,5 +67,5 @@ const chatSlice = createSlice({
   },
 });
 
-export const { addMessage } = chatSlice.actions;
+export const { addMessage, getMessage } = chatSlice.actions;
 export default chatSlice.reducer;
