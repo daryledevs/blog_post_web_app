@@ -20,31 +20,36 @@ const getAllChats = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     let main_arr = [];
     const limit = length + 4;
     const sql = `
-                SELECT * FROM conversations WHERE user_one = (?);
+                SELECT * FROM conversations WHERE user_one = (?) OR user_two = (?);
                 SELECT 
-                    c.conversation_id,
-                    m.message_id,
-                    c.user_one,
-                    m.sender_id,
-                    m.text_message,
-                    c.user_two,
-                    u.username,
-                    u.first_name,
-                    u.last_name,
-                    m.time_sent
+                  c.conversation_id,
+                  m.message_id,
+                  c.user_one,
+                  m.sender_id,
+                  m.text_message,
+                  c.user_two,
+                  u.username,
+                  u.first_name,
+                  u.last_name,
+                  m.time_sent
                 FROM
-                    messages m
+                  messages m
                 LEFT JOIN
-                    conversations c ON c.conversation_id = m.conversation_id
+                  conversations c ON c.conversation_id = m.conversation_id
                 INNER JOIN
-                    users u ON u.user_id = c.user_two
+                  users u ON u.user_id = 
+                    CASE 
+                      WHEN c.user_one = (?) THEN c.user_two
+                          ELSE c.user_one
+                    END 
                 WHERE 
                   c.user_one = (?) OR c.user_two = (?)
                 ORDER BY c.conversation_id ASC;
             `;
     database_1.default.query(sql, [
-        [req.params.user_one],
-        req.params.user_one, req.params.user_one
+        // We check to see which of the two is the user's ID place in
+        req.params.user_id, req.params.user_id,
+        req.params.user_id, req.params.user_id, req.params.user_id
     ], (error, data) => {
         if (error)
             res.status(500).send({ message: error });
@@ -58,12 +63,6 @@ const getAllChats = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             }
             main_arr.push(sub_arr);
         }
-        // will continue on this part next time
-        // we provide only 5 chat's per request to divide the data and prevent the long query
-        // for (let i = length; i < limit; i++) {
-        //   if (length > limit || data.length <= length + i) break;
-        //   else getData.push(data[i]);
-        // }
         return res.status(200).send({ data: main_arr });
     });
 });
