@@ -35,11 +35,14 @@ function socketController() {
 
     socket.on("sendMessage", ({ conversation_id, senderId, receiverId, text }) => {
       const user = getUser(receiverId);
-      socket.to(user.socketId).emit("getMessage", {
-        conversation_id,
-        senderId,
-        text,
-      });
+     
+      if(user?.socketId){
+         socket.to(user.socketId).emit("getMessage", {
+           conversation_id,
+           senderId,
+           text,
+         });
+      }
 
     });
 

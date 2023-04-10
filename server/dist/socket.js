@@ -28,11 +28,13 @@ function socketController() {
         });
         socket.on("sendMessage", ({ conversation_id, senderId, receiverId, text }) => {
             const user = getUser(receiverId);
-            socket.to(user.socketId).emit("getMessage", {
-                conversation_id,
-                senderId,
-                text,
-            });
+            if (user === null || user === void 0 ? void 0 : user.socketId) {
+                socket.to(user.socketId).emit("getMessage", {
+                    conversation_id,
+                    senderId,
+                    text,
+                });
+            }
         });
         socket.on("disconnect", () => {
             console.log("user disconnected");
