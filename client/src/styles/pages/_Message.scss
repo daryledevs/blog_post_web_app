@@ -1,0 +1,111 @@
+.message__container{
+  width: 100%;
+  position: relative;
+
+  .message__parent{
+    border: 1px solid #ccc;
+    border-left: none;
+    position: absolute;
+    margin: auto;
+    inset: 0 0 0 0;
+    width: 70%;
+    height: 94%;
+    border-radius: 5px;
+    display: flex;
+
+      .message__sidebar{
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        .chat-header__container{
+        border: 1px solid #ccc;
+        border-bottom: none;
+        border-top: none;
+        flex: 1;
+        display: inherit;
+        flex-direction: row;  
+        justify-content: space-between;
+        align-items: center;
+        padding-right: 5px;
+
+        .chat-header__username{
+          display: flex;
+          width: 60%;
+          justify-content: center;
+          cursor: pointer;
+
+          p{
+            font-weight: 600;
+          }
+
+          .chat-header__username-icon{
+            width: 25px; 
+            height: 25px;
+          }
+        }
+
+        .chat-header__new-message-icon{
+          width: 25px; 
+          height: 25px;
+          cursor: pointer;
+        }
+      }
+      
+      .chat-history__container{
+        position: relative;
+        border: 1px solid #ccc;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 10;
+        // padding: 2% 0 2% 0;
+        
+        .chat-history__recipient{
+          position: relative;
+          width: 100%;
+          height: 10%;
+          cursor: pointer;
+          display: inherit;
+          align-items: center;
+
+        }
+        
+        .chat-history__recipient:hover{
+          background-color: rgb(240, 240, 240);
+        }
+      }
+    }
+
+    .message__conversation-container{
+      flex: 2;
+      position: relative;
+
+      .message__not-viewed{
+        color: #ccc;
+        font-size: 1.5rem;
+        text-align: center;
+      }
+
+      .chat__test{
+        border: 1px solid #ccc;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        height: 7%;
+
+        .input-box{
+          resize: none;
+          width: 100%;
+          padding: 1.5% .5%;
+          display: block;
+        }
+
+        .input-box-enter{
+          width: 10%;
+        }
+      }
+    }
+  }
+}
