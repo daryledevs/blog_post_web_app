@@ -7,6 +7,7 @@ const Chat_1 = require("../controller/Chat");
 const express_1 = __importDefault(require("express"));
 const router = express_1.default.Router();
 router.get("/:length/:user_id", Chat_1.getAllChats);
+router.get("/:user_id", Chat_1.getAllChatMember);
 router.post("/", Chat_1.newConversation);
 router.post("/message/:conversation_id", Chat_1.getMessage);
 router.post("/message", Chat_1.newMessage);

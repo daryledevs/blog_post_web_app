@@ -1,6 +1,30 @@
 import { Request, Response } from "express";
 import database from "../database";
 
+const getAllChatMember = async (req: Request, res: Response) => {
+  const { user_id } = req.params;
+  const values = Array(3).fill(user_id);
+  const sql = `
+              SELECT 
+                  c.*, u.username, u.first_name, u.last_name
+              FROM
+                  conversations c
+              INNER JOIN
+                  users u ON u.user_id = 
+                  CASE
+                      WHEN c.user_one = (?) THEN c.user_two
+                      ELSE c.user_one
+                  END
+              WHERE
+                  c.user_one = (?) OR c.user_two = (?);
+              `;
+  
+  database.query(sql, [...values], (error, data) => {
+    if (error) return res.status(500).send({ message: error });
+    res.status(200).send({ list: data });
+  });
+};
+
 const getAllChats = async (req: Request, res: Response) => {
   const length: number = parseInt(req.params.length);
   let getData: any[] = [];
@@ -57,9 +81,12 @@ const getAllChats = async (req: Request, res: Response) => {
 const newConversation = (req: Request, res: Response) => {
   const sql = `
                 INSERT INTO conversations (\`sender_id\`, \`receiver_id\`) VALUES (?);
-                INSERT INTO messages (\`sender_id\`, \`conversation_id\`, \`text_message\`, \`time_sent\`) VALUES 
-                (?, (SELECT LAST_INSERT_ID()), ?, ?);
+                INSERT INTO messages 
+                  (\`sender_id\`, \`conversation_id\`, \`text_message\`, \`time_sent\`) 
+                VALUES 
+                  (?, (SELECT LAST_INSERT_ID()), ?, ?);
               `;
+              
   const { sender_id, receiver_id, text_message } = req.body;
   const time_sent = new Date();
   database.query(
@@ -102,5 +129,11 @@ const newMessage = (req: Request, res: Response) => {
   );
 };
 
-export { getAllChats, newConversation, getMessage, newMessage };
+export {
+  getAllChats,
+  newConversation,
+  getMessage,
+  newMessage,
+  getAllChatMember,
+};
 
