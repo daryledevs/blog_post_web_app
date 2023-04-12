@@ -5,6 +5,16 @@ interface IEAuthData {
   user_data: object,
 };
 
+interface Name {
+  first_name: string;
+  last_name: string;
+}
+
+interface Members {
+  user_one: number;
+  user_two: number;
+}
+
 interface IEChatData extends Array<IEChatData> {
   [key: string]: any;
   conversation_id: number;
@@ -35,16 +45,22 @@ interface IEUserState {
 interface IEChatState {
   // [key: string]: any;
   conversation_id: number | null;
-  first_name: string | null;
-  last_name: string | null;
-  message_id: number | null;
   sender_id: number | null;
+  members: Members;
+  message_id: number | null;
+  username: any | null;
+  name: Name;
   text_message: string | null;
   time_sent: string | null;
-  user_one: number | null;
-  user_two: number | null;
-  username: any | null;
 }
+
+interface IEChatMemberState {
+  [key: string]: any;
+  conversation_id: number | null;
+  members: Members;
+  username: any | null;
+  name: Name;
+};
 
 // thunk error
 interface IEAuthFetchError {
@@ -58,4 +74,5 @@ export type {
   IEAuthFetchError,
   IEChatState,
   IEUserState,
+  IEChatMemberState,
 };
