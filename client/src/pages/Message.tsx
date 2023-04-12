@@ -9,33 +9,21 @@ function Message() {
   const [openConversation, setOpenConversation] = useState(null);
 
   function ChatList() {
-    const chats = useAppSelector((state) => state.chat);
     const user = useAppSelector((state) => state.user);
+    const chatMembers = useAppSelector((state) => state.chatMember);
 
     return (
       <div className="chat-history__container">
-        {chats.map((chat: any, index: number) => {
-          console.log("CHATS: ", chat);
+        {chatMembers.map((chat: any, index: number) => {
           return (
-            <div
-              key={chat?.[0]?.conversation_id}
-              className="chat-history__recipient"
-              onClick={() => setOpenConversation(chat?.[0]?.conversation_id)}
+            <div 
+              key={chat.conversation_id} className="chat-history__recipient"  
+              onClick={() => setOpenConversation(chat?.conversation_id)}
             >
-              <img
-                src={usersPicture}
-                width="10.6%"
-                height="29"
-              />
+              <img src={usersPicture} width="10.6%" height="29" />
               <div className="chat-history__details">
-                <p>
-                  {chat?.[0]?.first_name} {chat?.[0]?.last_name}
-                </p>
-                <p>
-                  {chat?.[chat.length - 1]?.sender_id === user.user_id &&
-                    "You: "}
-                  {chat?.[chat.length - 1]?.text_message}
-                </p>
+                <p>{chat.name.first_name} {chat.name.last_name}</p>
+                <p>{chat?.[chat.length - 1]?.sender_id === user.user_id && "You: "} {chat?.[chat.length - 1]?.text_message}</p>
               </div>
             </div>
           );
@@ -50,15 +38,9 @@ function Message() {
         <div />
         <div className="chat-header__username">
           <p>username</p>
-          <img
-            src={downArrow}
-            className="chat-header__username-icon"
-          />
+          <img  src={downArrow}  className="chat-header__username-icon" />
         </div>
-        <img
-          src={newMessage}
-          className="chat-header__new-message-icon"
-        />
+        <img src={newMessage} className="chat-header__new-message-icon" />
       </div>
     );
   }

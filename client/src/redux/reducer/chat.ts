@@ -6,15 +6,19 @@ const initialState: Array<Array<IEChatState>> = [
   [
     {
       conversation_id: null as any,
-      first_name: null as any,
-      last_name: null as any,
-      message_id: null as any,
       sender_id: null as any,
+      members: {
+        user_one: null as any,
+        user_two: null as any,
+      },
+      message_id: null as any,
+      username: null as any,
+      name: {
+        first_name: "",
+        last_name: "",
+      },
       text_message: null as any,
       time_sent: null as any,
-      user_one: null as any,
-      user_two: null as any,
-      username: null as any,
     },
   ],
 ];
@@ -62,7 +66,38 @@ const chatSlice = createSlice({
     });
 
     builder.addCase(getChatThunk.fulfilled, (state, action) => {
-      return [...action.payload]
+      const data = action.payload;
+      let organizedState: any[][] = [];
+
+      for (let i = 0; i < data.length; i++) {
+        organizedState[i] = [];
+
+        for(let j = 0; j < data[i].length; j++){
+
+          const members = {
+            user_one: data[i][j].user_one,
+            user_two: data[i][j].user_two,
+          };
+
+          const name = {
+            first_name: data[i][j].first_name,
+            last_name: data[i][j].last_name,
+          };
+
+          organizedState[i].push({
+            conversation_id: data[i][j].conversation_id,
+            sender_id: data[i][j].sender_id,
+            members,
+            message_id: data[i][j].message_id,
+            username: data[i][j].username,
+            name,
+            text_message: data[i][j].text_message,
+            time_sent: data[i][j].time_sent,
+          });
+        }
+      }
+      
+      return [...organizedState];
     });
   },
 });

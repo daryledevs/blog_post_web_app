@@ -4,6 +4,7 @@ import { useAppSelector } from "../redux/hooks/hooks";
 import { addMessage } from "../redux/reducer/chat";
 import { useDispatch } from "react-redux";
 import { io } from "socket.io-client";
+import api from "../assets/data/api";
 
 interface IEChatProps {
   openConversation: any;
@@ -16,7 +17,8 @@ function Chat({ openConversation }: IEChatProps) {
   // data
   const chats = useAppSelector((state) => state.chat);
   const userData = useAppSelector((state) => state.user);
-  const getData = chats.find( (chat: any) => chat[0].conversation_id === openConversation);
+  const getData = chats.find( (chat: any) => chat[0]?.conversation_id === openConversation);
+  const chatMember = useAppSelector((state) => state.chatMember);
   const messageData = getData?.[0];
 
   const [newMessage, setNewMessage] = useState<any>();
@@ -24,25 +26,30 @@ function Chat({ openConversation }: IEChatProps) {
 
   // functions
   const classNameChecker = (user_id: any) => user_id === userData.user_id ? "own" : "other";
-  const getReceiverId = () => getData?.[0].user_one !== userData.user_id ? getData?.[0].user_one : getData?.[0].user_two;
+  const getReceiverId = () => {
+    const members = chatMember.find((member) => member.conversation_id === openConversation);
+    return members?.members.user_one === userData.user_id
+      ? members?.members.user_two
+      : members?.members.user_one;
+  };
   
   useEffect(() => {
     setNewMessage(() => {
       return {
         conversation_id: openConversation,
-        first_name: messageData?.first_name,
-        last_name: messageData?.last_name,
+        first_name: messageData?.name.first_name,
+        last_name: messageData?.name.last_name,
         sender_id: userData.user_id,
         text_message: "",
-        user_one: messageData?.user_one,
-        user_two: messageData?.user_two,
+        user_one: messageData?.members.user_one,
+        user_two: messageData?.members.user_two,
         username: messageData?.username,
       };
     });
   }, [openConversation, clearMessage]);
 
-  const submitHandler = () => {
-
+  const submitHandler = async () => {
+    
     dispatch(addMessage(newMessage));
 
     socket.current.emit("sendMessage", {
@@ -51,6 +58,16 @@ function Chat({ openConversation }: IEChatProps) {
       receiverId: getReceiverId(),
       text: newMessage.text_message,
     });
+
+    try {
+      await api.post("/chats/message", {
+        conversation_id: openConversation,
+        sender_id: newMessage.sender_id,
+        text_message: newMessage.text_message,
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
 
     setClearMessage(!clearMessage);
   };
@@ -88,12 +105,7 @@ function Chat({ openConversation }: IEChatProps) {
             setNewMessage({ ...newMessage, text_message: event.target.value })
           }
         ></textarea>
-        <button
-          className="input-box-enter"
-          onClick={submitHandler}
-        >
-          Send
-        </button>
+        <button className="input-box-enter" onClick={submitHandler}>Send</button>
       </div>
     </>
   );
