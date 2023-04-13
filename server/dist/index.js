@@ -32,12 +32,13 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const morgan_1 = __importDefault(require("morgan"));
 const dotenv = __importStar(require("dotenv"));
 const database_1 = __importDefault(require("./database"));
-const User_1 = __importDefault(require("./router/User"));
+const auth_1 = __importDefault(require("./router/auth"));
+const user_1 = __importDefault(require("./router/user"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const JWT_1 = __importDefault(require("./middleware/JWT"));
 const socket_1 = __importDefault(require("./socket"));
-const ErrorHandler_1 = require("./helper/ErrorHandler");
-const Chat_1 = __importDefault(require("./router/Chat"));
+const errorHandler_1 = require("./helper/errorHandler");
+const chat_1 = __importDefault(require("./router/chat"));
 dotenv.config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 5000;
@@ -46,12 +47,12 @@ app.use(body_parser_1.default.json());
 app.use((0, cookie_parser_1.default)());
 app.use((0, cors_1.default)({ origin: "http://localhost:3000", credentials: true }));
 app.use((0, JWT_1.default)());
-app.use(ErrorHandler_1.ErrorHandler);
+app.use(errorHandler_1.ErrorHandler);
 app.use((0, morgan_1.default)("tiny"));
 // Routes
-app.use(`${API}/check-token`, ErrorHandler_1.checkToken);
-app.use(`${API}/users`, User_1.default);
-app.use(`${API}/chats`, Chat_1.default);
+app.use(`${API}/`, auth_1.default);
+app.use(`${API}/chats`, chat_1.default);
+app.use(`${API}/users`, user_1.default);
 database_1.default.connect((error) => {
     if (error)
         throw error;

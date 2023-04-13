@@ -4,12 +4,13 @@ import bodyParser from "body-parser";
 import morgan from "morgan";
 import * as dotenv from "dotenv";
 import database from "./database";
-import userRoutes from "./router/User";
+import authRoutes from "./router/auth";
+import userRoutes from './router/user';
 import cookieParser from 'cookie-parser';
 import authJWT from "./middleware/JWT";
 import socketController from "./socket";
-import { ErrorHandler, checkToken } from "./helper/ErrorHandler";
-import chatRoutes from "./router/Chat";
+import { ErrorHandler } from "./helper/errorHandler";
+import chatRoutes from "./router/chat";
 dotenv.config();
 
 const app = express();
@@ -24,9 +25,9 @@ app.use(ErrorHandler);
 app.use(morgan("tiny"));
 
 // Routes
-app.use(`${API}/check-token`, checkToken);
-app.use(`${API}/users`, userRoutes);
+app.use(`${API}/`, authRoutes);
 app.use(`${API}/chats`, chatRoutes);
+app.use(`${API}/users`, userRoutes);
 
 database.connect((error) => {
   if(error) throw error;

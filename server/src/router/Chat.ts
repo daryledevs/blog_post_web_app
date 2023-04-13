@@ -4,7 +4,7 @@ import {
   newMessage,
   getAllChats,
   getAllChatMember
-} from "../controller/Chat";
+} from "../controller/chat";
 import express from "express";
 
 const router = express.Router();
