@@ -28,14 +28,17 @@ const dotenv = __importStar(require("dotenv"));
 dotenv.config();
 // @ts-ignore
 function authJWT() {
-    const secret = process.env.JWT_SECRET;
-    const token = (req) => req.cookies.authorization_key;
+    const secret = process.env.REFRESH_TKN_SECRET;
+    const token = (req) => req.cookies.REFRESH_TOKEN;
     return (0, express_jwt_1.expressjwt)({
         secret: secret,
         getToken: token,
         algorithms: ["HS256"],
     }).unless({
-        path: [{ url: /\/api\/v1\/users\/login/, methods: ["GET", "POST"] }],
+        path: [
+            { url: /\/api\/v1\/login/, methods: ["GET", "POST"] },
+            { url: /\/api\/v1\/user\/register/, methods: ["POST"] },
+        ],
     });
 }
 exports.default = authJWT;
