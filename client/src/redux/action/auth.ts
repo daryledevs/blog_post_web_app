@@ -1,10 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import api from "../../assets/data/api";
-import { getUserData } from "../reducer/user";
-import { getChatThunk } from "../action/chat";
+import { userDataThunk } from "../action/user";
 import { IEAuthData, IEAuthFetchError } from "../reduxIntface";
-import { getChatMembers } from "./chatMember";
 
 
 const checkAccess = createAsyncThunk<
@@ -17,11 +15,7 @@ const checkAccess = createAsyncThunk<
     try {
       const response = await api.get("/check-token");
       const data = response.data;
-
-      dispatch(getChatThunk({ user_id: data.user_data.user_id, length: 0 }));
-      dispatch(getUserData(data.user_data));
-      dispatch(getChatMembers(data.user_data));
-
+      dispatch(userDataThunk(data.token));
       return fulfillWithValue(data);
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -47,7 +41,7 @@ const login = createAsyncThunk<
   "auth/login",
   async (userCredentials, { fulfillWithValue, rejectWithValue }) => {
     try {
-      const response = await api.post("/users/login", userCredentials);
+      const response = await api.post("/login", userCredentials);
       return fulfillWithValue(response.data);
     } catch (error) {
       return rejectWithValue({ message: error.response.data.message });

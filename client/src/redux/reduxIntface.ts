@@ -2,7 +2,7 @@
 // actions
 interface IEAuthData {
   message: string,
-  user_data: object,
+  token: any;
 };
 
 interface Name {
