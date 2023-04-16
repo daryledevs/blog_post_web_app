@@ -11,6 +11,7 @@ import authJWT from "./middleware/JWT";
 import socketController from "./socket";
 import { ErrorHandler } from "./helper/errorHandler";
 import chatRoutes from "./router/chat";
+import postRouter from "./router/post";
 dotenv.config();
 
 const app = express();
@@ -28,6 +29,7 @@ app.use(morgan("tiny"));
 app.use(`${API}/`, authRoutes);
 app.use(`${API}/chats`, chatRoutes);
 app.use(`${API}/users`, userRoutes);
+app.use(`${API}/posts`, postRouter)
 
 database.connect((error) => {
   if(error) throw error;

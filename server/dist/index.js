@@ -39,6 +39,7 @@ const JWT_1 = __importDefault(require("./middleware/JWT"));
 const socket_1 = __importDefault(require("./socket"));
 const errorHandler_1 = require("./helper/errorHandler");
 const chat_1 = __importDefault(require("./router/chat"));
+const post_1 = __importDefault(require("./router/post"));
 dotenv.config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 5000;
@@ -53,6 +54,7 @@ app.use((0, morgan_1.default)("tiny"));
 app.use(`${API}/`, auth_1.default);
 app.use(`${API}/chats`, chat_1.default);
 app.use(`${API}/users`, user_1.default);
+app.use(`${API}/posts`, post_1.default);
 database_1.default.connect((error) => {
     if (error)
         throw error;
