@@ -10,4 +10,5 @@ const router = express_1.default.Router();
 router.post("/register", user_1.register);
 router.use(checkTkn_1.default);
 router.get(`/`, user_1.userData);
+router.get(`/follow/:followed_id/:follower_id`, user_1.followUser);
 exports.default = router;

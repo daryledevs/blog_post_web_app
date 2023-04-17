@@ -23,7 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userData = exports.register = void 0;
+exports.followUser = exports.userData = exports.register = void 0;
 const database_1 = __importDefault(require("../database"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -59,3 +59,31 @@ const userData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     });
 });
 exports.userData = userData;
+const followUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let { followed_id, follower_id } = req.params;
+    const values = [parseInt(followed_id), parseInt(follower_id)];
+    const sql_get = "SELECT * FROM followers WHERE followed_id = (?) AND follower_id = (?);";
+    const sql_delete = "DELETE FROM followers WHERE followed_id = (?) AND follower_id = (?);";
+    const sql_create = "INSERT INTO followers (\`followed_id\`, \`follower_id\`) VALUES(?, ?);";
+    // Get all data from database if already existing
+    database_1.default.query(sql_get, [...values], (error, data) => {
+        if (error)
+            return res.status(500).send({ message: error });
+        // of existing then delete the data from database
+        if (data.length) {
+            database_1.default.query(sql_delete, [...values], (error, data) => {
+                if (error)
+                    return res.status(500).send({ message: "Unfollowed failed", error });
+                return res.status(200).send({ message: "Unfollowed user" });
+            });
+            return;
+        }
+        // if there is no data on database then, create one
+        database_1.default.query(sql_create, [...values], (error, data) => {
+            if (error)
+                return res.status(500).send({ message: "Unfollow failed", error });
+            res.status(200).send({ message: "Followed user" });
+        });
+    });
+});
+exports.followUser = followUser;
