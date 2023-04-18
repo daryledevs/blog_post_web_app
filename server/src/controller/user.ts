@@ -36,6 +36,33 @@ const userData = async (req: Request, res: Response) => {
   })
 };
 
+const findUser = async (req: Request, res: Response) => {
+  const { searchText } = req.body;
+  const sql = `
+              SELECT 
+                user_id,
+                username,
+                first_name,
+                last_name
+              FROM
+                  users
+              WHERE
+                  username LIKE (?) OR 
+                  first_name LIKE (?) OR 
+                  CONCAT(first_name, ' ', last_name) LIKE (?);
+              `;
+
+  database.query(sql, [
+      searchText + "%", 
+      searchText + "%", 
+      "%" + searchText + "%"
+    ], (error, data) => {
+    if(error) return res.status(500).send({ error });
+    if(!data.length) return res.status(401).send("No results found.");
+    res.status(200).send({ list: data });
+  });
+};
+
 const followUser = async (req: Request, res: Response) => {
   let { followed_id, follower_id } = req.params;
   const values = [parseInt(followed_id), parseInt(follower_id)];
@@ -103,4 +130,4 @@ const getFollowers = async (req: Request, res: Response) => {
   });
 };
 
-export { register, userData, followUser, getFollowers };
+export { register, userData, followUser, getFollowers, findUser };

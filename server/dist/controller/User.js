@@ -23,7 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getFollowers = exports.followUser = exports.userData = exports.register = void 0;
+exports.findUser = exports.getFollowers = exports.followUser = exports.userData = exports.register = void 0;
 const database_1 = __importDefault(require("../database"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -59,6 +59,34 @@ const userData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     });
 });
 exports.userData = userData;
+const findUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { searchText } = req.body;
+    const sql = `
+              SELECT 
+                user_id,
+                username,
+                first_name,
+                last_name
+              FROM
+                  users
+              WHERE
+                  username LIKE (?) OR 
+                  first_name LIKE (?) OR 
+                  CONCAT(first_name, ' ', last_name) LIKE (?);
+              `;
+    database_1.default.query(sql, [
+        searchText + "%",
+        searchText + "%",
+        "%" + searchText + "%"
+    ], (error, data) => {
+        if (error)
+            return res.status(500).send({ error });
+        if (!data.length)
+            return res.status(401).send("No results found.");
+        res.status(200).send({ list: data });
+    });
+});
+exports.findUser = findUser;
 const followUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let { followed_id, follower_id } = req.params;
     const values = [parseInt(followed_id), parseInt(follower_id)];
