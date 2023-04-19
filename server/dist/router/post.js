@@ -11,6 +11,7 @@ const uploadOption = (0, multer_1.default)("./uploads/post");
 const option_field = [{ name: "img", maxCount: 1 }, { name: "imgs", maxCount: 7 }];
 router.get("/:user_id", post_1.getUserPost);
 router.post("/", uploadOption.fields(option_field), post_1.newPost);
+router.patch("/:post_id", post_1.editPost);
+router.delete("/:post_id", post_1.deletePost);
 router.post("/like-post/:post_id/:user_id", post_1.likePost);
-router.patch("/edit-post/:post_id", post_1.editPost);
 exports.default = router;

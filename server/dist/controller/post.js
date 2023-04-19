@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.editPost = exports.likePost = exports.getUserPost = exports.newPost = void 0;
+exports.deletePost = exports.editPost = exports.likePost = exports.getUserPost = exports.newPost = void 0;
 const database_1 = __importDefault(require("../database"));
 const moment_1 = __importDefault(require("moment"));
 const cloudinary_1 = __importDefault(require("cloudinary"));
@@ -67,7 +67,7 @@ const getUserPost = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         if (error)
             return res.status(500).send({ error });
         if (!data.length)
-            return res.status(204).send({ message: "No posts yet" });
+            return res.status(404).send({ message: "No posts yet" });
         res.status(200).send({ post: data });
     });
 });
@@ -104,6 +104,16 @@ const editPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     });
 });
 exports.editPost = editPost;
+const deletePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { post_id } = req.params;
+    const sql = "DELETE FROM posts WHERE post_id = (?);";
+    database_1.default.query(sql, [parseInt(post_id)], (error, data) => {
+        if (error)
+            return res.status(500).send({ error });
+        res.status(200).send("Delete post successfully");
+    });
+});
+exports.deletePost = deletePost;
 const likePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { post_id, user_id } = req.params;
     const sql_get = "SELECT * FROM likes WHERE post_id = (?) AND user_id = (?);";

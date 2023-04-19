@@ -32,7 +32,7 @@ const getUserPost = async (req: Request, res: Response) => {
 
   database.query(sql, [user_id], (error, data) => {
     if (error) return res.status(500).send({ error });
-    if (!data.length) return res.status(204).send({ message: "No posts yet" });
+    if (!data.length) return res.status(404).send({ message: "No posts yet" });
 
     res.status(200).send({ post: data });
   });
@@ -75,6 +75,16 @@ const editPost = async (req: Request, res: Response) => {
   });
 }
 
+const deletePost =async (req: Request, res: Response) => {
+  const { post_id } = req.params;
+  const sql = "DELETE FROM posts WHERE post_id = (?);";
+  
+  database.query(sql, [parseInt(post_id)], (error, data) => {
+    if(error) return res.status(500).send({ error });
+    res.status(200).send("Delete post successfully");
+  });
+}
+
 const likePost = async (req: Request, res: Response) => {
   const { post_id, user_id } = req.params;
   const sql_get = "SELECT * FROM likes WHERE post_id = (?) AND user_id = (?);";
@@ -103,4 +113,4 @@ const likePost = async (req: Request, res: Response) => {
   });
 }
 
-export { newPost, getUserPost, likePost, editPost };
+export { newPost, getUserPost, likePost, editPost, deletePost };
