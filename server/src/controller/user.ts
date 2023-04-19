@@ -118,15 +118,12 @@ const getFollowers = async (req: Request, res: Response) => {
 
 
   database.query(sql, [user_id, user_id], (error, data) => {
-    console.log("TEST")
     if(error) return res.status(500).send({ error });
     
-    res
-      .status(200)
-      .send({
-        followers: data[0].length ? data[0] : 0,
-        following: data[1].length ? data[1] : 0,
-      });
+    res.status(200).send({
+      followers: data[0],
+      following: data[1],
+    });
   });
 };
 
