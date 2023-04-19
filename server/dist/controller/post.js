@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.likePost = exports.getUserPost = exports.newPost = void 0;
+exports.editPost = exports.likePost = exports.getUserPost = exports.newPost = void 0;
 const database_1 = __importDefault(require("../database"));
 const moment_1 = __importDefault(require("moment"));
 const cloudinary_1 = __importDefault(require("cloudinary"));
@@ -87,6 +87,23 @@ const newPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     });
 });
 exports.newPost = newPost;
+const editPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { post_id } = req.params;
+    const body = req.body;
+    let query = ``;
+    if (body.post_id || body.user_id)
+        return res.status(406).send({ message: "The following data cannot be change" });
+    Object.keys(body).forEach(function (key, index) {
+        query = `${key} = "${body[`${key}`]}"`;
+    });
+    const sql = `UPDATE posts SET ${query} WHERE post_id = (?);`;
+    database_1.default.query(sql, [parseInt(post_id)], (error, data) => {
+        if (error)
+            return res.status(500).send({ error });
+        res.status(200).send({ message: "Edit post successfully" });
+    });
+});
+exports.editPost = editPost;
 const likePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { post_id, user_id } = req.params;
     const sql_get = "SELECT * FROM likes WHERE post_id = (?) AND user_id = (?);";

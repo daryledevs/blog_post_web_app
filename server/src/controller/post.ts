@@ -56,7 +56,24 @@ const newPost = async(req: Request, res: Response) => {
   });
 };
 
+const editPost = async (req: Request, res: Response) => {
+  const { post_id } = req.params;
+  const body = req.body;
+  let query = ``
 
+  if(body.post_id || body.user_id) return res.status(406).send({ message: "The following data cannot be change" });
+
+  Object.keys(body).forEach(function(key, index){
+    query = `${key} = "${body[`${key}`]}"`;  
+  });
+
+  const sql = `UPDATE posts SET ${query} WHERE post_id = (?);`;
+  
+  database.query(sql, [parseInt(post_id)], (error, data) => {
+    if (error) return res.status(500).send({ error });
+    res.status(200).send({ message: "Edit post successfully" });
+  });
+}
 
 const likePost = async (req: Request, res: Response) => {
   const { post_id, user_id } = req.params;
@@ -86,4 +103,4 @@ const likePost = async (req: Request, res: Response) => {
   });
 }
 
-export { newPost, getUserPost, likePost };
+export { newPost, getUserPost, likePost, editPost };
