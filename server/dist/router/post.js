@@ -9,5 +9,7 @@ const post_1 = require("../controller/post");
 const router = express_1.default.Router();
 const uploadOption = (0, multer_1.default)("./uploads/post");
 const option_field = [{ name: "img", maxCount: 1 }, { name: "imgs", maxCount: 7 }];
-router.post("/new-post", uploadOption.fields(option_field), post_1.newPost);
+router.get("/:user_id", post_1.getUserPost);
+router.post("/", uploadOption.fields(option_field), post_1.newPost);
+router.post("/like-post/:post_id/:user_id", post_1.likePost);
 exports.default = router;

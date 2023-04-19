@@ -26,8 +26,20 @@ async function uploadAndDeleteLocal(path:any) {
   return { image_id: result.public_id, image_url: result.url };
 };
 
+const getUserPost = async (req: Request, res: Response) => {
+  const { user_id } = req.params;
+  const sql = "SELECT * FROM posts WHERE user_id = (?);";
+
+  database.query(sql, [user_id], (error, data) => {
+    if (error) return res.status(500).send({ error });
+    if (!data.length) return res.status(204).send({ message: "No posts yet" });
+
+    res.status(200).send({ post: data });
+  });
+};
+
 const newPost = async(req: Request, res: Response) => {
-  const sql = "INSERT INTO posts (`user_id`, `caption`, `image_id`, `image_url`, `post_date`) VALUES (?)";
+  const sql = "INSERT INTO posts (`user_id`, `caption`, `image_id`, `image_url`, `post_date`) VALUES (?);";
   const { img } = req.files as { [fieldname: string]: Express.Multer.File[] };
   const { user_id, caption } = req.body;
 
@@ -44,6 +56,34 @@ const newPost = async(req: Request, res: Response) => {
   });
 };
 
-export {
-  newPost
+
+
+const likePost = async (req: Request, res: Response) => {
+  const { post_id, user_id } = req.params;
+  const sql_get = "SELECT * FROM likes WHERE post_id = (?) AND user_id = (?);";
+  const sql_delete = "DELETE FROM likes WHERE post_id = (?) AND user_id = (?);";
+  const sql_create = "INSERT INTO likes (`post_id`, `user_id`) VALUES (?, ?);";
+
+  // check to see if the user is already like the post
+  database.query(sql_get, [post_id, user_id], (error, data) => {
+    if(error) return res.status(500).send({ error });
+    
+    // if the user has already liked the post, then delete or remove
+    if(data.length){
+      database.query(sql_delete, [post_id, user_id], (error, data) => {
+        if(error) return res.status(500).send({ message: "Delete row from likes table failed", error });
+        return res.status(200).send("Remove like from a post");
+      });
+
+      return;
+    }
+
+    // if the user hasn't like the post yet, then create or insert 
+    database.query(sql_create, [post_id, user_id], (error, data) => {
+      if(error) return res.status(500).send({ message: "Like post failed", error });
+      res.status(200).send("Liked post");
+    })
+  });
 }
+
+export { newPost, getUserPost, likePost };

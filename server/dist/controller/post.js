@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.newPost = void 0;
+exports.likePost = exports.getUserPost = exports.newPost = void 0;
 const database_1 = __importDefault(require("../database"));
 const moment_1 = __importDefault(require("moment"));
 const cloudinary_1 = __importDefault(require("cloudinary"));
@@ -60,8 +60,20 @@ function uploadAndDeleteLocal(path) {
     });
 }
 ;
+const getUserPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { user_id } = req.params;
+    const sql = "SELECT * FROM posts WHERE user_id = (?);";
+    database_1.default.query(sql, [user_id], (error, data) => {
+        if (error)
+            return res.status(500).send({ error });
+        if (!data.length)
+            return res.status(204).send({ message: "No posts yet" });
+        res.status(200).send({ post: data });
+    });
+});
+exports.getUserPost = getUserPost;
 const newPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const sql = "INSERT INTO posts (`user_id`, `caption`, `image_id`, `image_url`, `post_date`) VALUES (?)";
+    const sql = "INSERT INTO posts (`user_id`, `caption`, `image_id`, `image_url`, `post_date`) VALUES (?);";
     const { img } = req.files;
     const { user_id, caption } = req.body;
     const path = img[0].destination + "\\" + img[0].filename;
@@ -75,3 +87,30 @@ const newPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     });
 });
 exports.newPost = newPost;
+const likePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { post_id, user_id } = req.params;
+    const sql_get = "SELECT * FROM likes WHERE post_id = (?) AND user_id = (?);";
+    const sql_delete = "DELETE FROM likes WHERE post_id = (?) AND user_id = (?);";
+    const sql_create = "INSERT INTO likes (`post_id`, `user_id`) VALUES (?, ?);";
+    // check to see if the user is already like the post
+    database_1.default.query(sql_get, [post_id, user_id], (error, data) => {
+        if (error)
+            return res.status(500).send({ error });
+        // if the user has already liked the post, then delete or remove
+        if (data.length) {
+            database_1.default.query(sql_delete, [post_id, user_id], (error, data) => {
+                if (error)
+                    return res.status(500).send({ message: "Delete row from likes table failed", error });
+                return res.status(200).send("Remove like from a post");
+            });
+            return;
+        }
+        // if the user hasn't like the post yet, then create or insert 
+        database_1.default.query(sql_create, [post_id, user_id], (error, data) => {
+            if (error)
+                return res.status(500).send({ message: "Like post failed", error });
+            res.status(200).send("Liked post");
+        });
+    });
+});
+exports.likePost = likePost;
