@@ -19,7 +19,7 @@ function Chat({ openConversation }: IEChatProps) {
   const userData = useAppSelector((state) => state.user);
   const getData = chats.find( (chat: any) => chat[0]?.conversation_id === openConversation);
   const chatMember = useAppSelector((state) => state.chatMember);
-  const messageData = getData?.[0];
+  const members = chatMember.find((member) => member.conversation_id === openConversation);
 
   const [newMessage, setNewMessage] = useState<any>();
   const [clearMessage, setClearMessage] = useState<boolean>(false);
@@ -27,7 +27,6 @@ function Chat({ openConversation }: IEChatProps) {
   // functions
   const classNameChecker = (user_id: any) => user_id === userData.user_id ? "own" : "other";
   const getReceiverId = () => {
-    const members = chatMember.find((member) => member.conversation_id === openConversation);
     return members?.members.user_one === userData.user_id
       ? members?.members.user_two
       : members?.members.user_one;
@@ -37,13 +36,13 @@ function Chat({ openConversation }: IEChatProps) {
     setNewMessage(() => {
       return {
         conversation_id: openConversation,
-        first_name: messageData?.name.first_name,
-        last_name: messageData?.name.last_name,
+        first_name: members?.name.first_name,
+        last_name: members?.name.last_name,
         sender_id: userData.user_id,
         text_message: "",
-        user_one: messageData?.members.user_one,
-        user_two: messageData?.members.user_two,
-        username: messageData?.username,
+        user_one: members?.members.user_one,
+        user_two: members?.members.user_two,
+        username: members?.username,
       };
     });
   }, [openConversation, clearMessage]);

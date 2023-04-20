@@ -60,10 +60,7 @@ interface IEChatState {
   // [key: string]: any;
   conversation_id: number | null;
   sender_id: number | null;
-  members: Members;
   message_id: number | null;
-  username: any | null;
-  name: Name;
   text_message: string | null;
   time_sent: string | null;
 }
