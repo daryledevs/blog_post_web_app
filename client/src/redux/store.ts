@@ -4,6 +4,7 @@ import userReducer from "./reducer/user";
 import chatReducer from "./reducer/chat";
 import chatMemberReducer from "./reducer/chatMember";
 import followReducer from "./reducer/follower";
+import postReducer from "./reducer/post";
 
 const store = configureStore({
   reducer: {
@@ -11,7 +12,8 @@ const store = configureStore({
     user: userReducer,
     chat: chatReducer,
     chatMember: chatMemberReducer,
-    follow: followReducer
+    follow: followReducer,
+    post: postReducer,
   },
 });
 

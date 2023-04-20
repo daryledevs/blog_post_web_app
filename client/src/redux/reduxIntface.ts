@@ -76,6 +76,20 @@ interface IEChatMemberState {
   name: Name;
 };
 
+interface IEPost {
+  [key: string]: any;
+  post_id: number;
+  user_id: number;
+  caption: string;
+  image_id: string;
+  image_url: string;
+  post_date: string;
+}
+
+interface IEPostState {
+  post: Array<IEPost>
+}
+
 // thunk error
 interface IEAuthFetchError {
   errorType: string;
@@ -90,4 +104,5 @@ export type {
   IEUserState,
   IEChatMemberState,
   IEFollowState,
+  IEPostState,
 };

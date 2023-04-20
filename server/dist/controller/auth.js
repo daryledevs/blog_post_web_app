@@ -37,7 +37,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             res
                 .cookie("REFRESH_TOKEN", REFRESH_TKN, {
                 httpOnly: true,
-                // secure: true, // not https yet, so comment this out for now
+                secure: true,
                 sameSite: "none",
                 maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week (days, hours, mins, milliseconds)
             })
