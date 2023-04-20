@@ -4,6 +4,23 @@ import { IEUserState } from "../reduxIntface";
 import { getChatMembers } from "./chatMember";
 import { getChatThunk } from "./chat";
 import { setAccessStatus } from "../reducer/auth";
+import { getFollow } from "../reducer/follower";
+
+async function getFollowers(dispatch:any, user_id:any, token: any){
+  try {
+    const response = await api.get(`/users/followers/${user_id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+    });
+
+    dispatch(getFollow(response.data));
+    
+  } catch (error) {
+    console.log("follower: ", error)
+  }
+}
 
 const userDataThunk = createAsyncThunk<
   IEUserState,
@@ -27,6 +44,7 @@ const userDataThunk = createAsyncThunk<
 
       dispatch(getChatThunk({ user_id: user.user_id, length: 0 }));
       dispatch(getChatMembers(user));
+      getFollowers(dispatch, user.user_id, token);
 
       return fulfillWithValue(user);
     } catch (error) {

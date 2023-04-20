@@ -3,6 +3,7 @@ import authReducer from "./reducer/auth";
 import userReducer from "./reducer/user";
 import chatReducer from "./reducer/chat";
 import chatMemberReducer from "./reducer/chatMember";
+import followReducer from "./reducer/follower";
 
 const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ const store = configureStore({
     user: userReducer,
     chat: chatReducer,
     chatMember: chatMemberReducer,
+    follow: followReducer
   },
 });
 

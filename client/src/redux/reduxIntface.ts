@@ -42,6 +42,20 @@ interface IEUserState {
   birthday: string;
 }
 
+interface IEFollow {
+  followed_id: number;
+  follower_id: number;
+  user_id: number;
+  username: string;
+  first_name: string;
+  last_name: string;
+}
+
+interface IEFollowState {
+  followers: Array<IEFollow>;
+  following: Array<IEFollow>;
+}
+
 interface IEChatState {
   // [key: string]: any;
   conversation_id: number | null;
@@ -75,4 +89,5 @@ export type {
   IEChatState,
   IEUserState,
   IEChatMemberState,
+  IEFollowState,
 };
