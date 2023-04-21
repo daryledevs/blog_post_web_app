@@ -4,6 +4,7 @@ import { userDataThunk } from "../action/user";
 
 const initialState: IEUserState = {
   user_id: null as any,
+  avatar_url: "",
   first_name: "",
   last_name: "",
   username: "",
