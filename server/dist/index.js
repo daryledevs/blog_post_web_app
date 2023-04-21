@@ -46,7 +46,11 @@ const PORT = process.env.PORT || 5000;
 const API = process.env.API;
 app.use(body_parser_1.default.json());
 app.use((0, cookie_parser_1.default)());
-app.use((0, cors_1.default)({ origin: "http://localhost:3000", credentials: true }));
+app.use((0, cors_1.default)({
+    origin: [`${process.env.SERVER_URL_ONE}`, `${process.env.SERVER_URL_TWO}`],
+    methods: "GET,POST,PUT,DELETE,PATCH",
+    credentials: true,
+}));
 app.use((0, JWT_1.default)());
 app.use(errorHandler_1.ErrorHandler);
 app.use((0, morgan_1.default)("tiny"));
@@ -62,5 +66,5 @@ database_1.default.connect((error) => {
 });
 app.listen(PORT, () => {
     (0, socket_1.default)();
-    console.log("Connected", PORT);
+    console.log("Connected to", PORT, "in: ", app.settings.env);
 });

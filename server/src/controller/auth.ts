@@ -2,13 +2,19 @@ import database from "../database";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
+import * as dotenv from "dotenv";
 dotenv.config();
 
 interface ICheckToken {
   user_id: number;
   username: string;
 }
+
+const settings:any = function () {
+  return `${process.env.NODE_ENV}`.trim() === "development"
+    ? { secure: false, sameSite: "lax" }
+    : { secure: true, sameSite: "none" };
+};
 
 const login = async (req: Request, res: Response) => {
   const { username, email, password } = req.body;
@@ -40,12 +46,13 @@ const login = async (req: Request, res: Response) => {
           REFRESH_SECRET,
           { expiresIn: "7d" }
         );
-
+        
         res
           .cookie("REFRESH_TOKEN", REFRESH_TKN, {
             httpOnly: true,
-            secure: true,
-            sameSite: "none",
+            secure: settings().secure,
+            sameSite: settings().sameSite,
+            domain: "localhost",
             maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week (days, hours, mins, milliseconds)
           })
           .status(200)
@@ -96,7 +103,7 @@ const logout = async (req: Request, res: Response) => {
   res
     .clearCookie("REFRESH_TOKEN", {
       sameSite: "none",
-      // secure: true, // not https yet, so comment this out for now
+      secure: settings().secure,
       httpOnly: true,
     })
     .status(200)

@@ -32,8 +32,6 @@ const getUserPost = async (req: Request, res: Response) => {
 
   database.query(sql, [user_id], (error, data) => {
     if (error) return res.status(500).send({ error });
-    if (!data.length) return res.status(404).send({ message: "No posts yet" });
-
     res.status(200).send({ post: data });
   });
 };

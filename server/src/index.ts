@@ -20,7 +20,13 @@ const API = process.env.API;
 
 app.use(bodyParser.json());
 app.use(cookieParser());
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(
+  cors({
+    origin: [`${process.env.SERVER_URL_ONE}`, `${process.env.SERVER_URL_TWO}`],
+    methods: "GET,POST,PUT,DELETE,PATCH",
+    credentials: true,
+  })
+);
 app.use(authJWT());
 app.use(ErrorHandler);
 app.use(morgan("tiny"));
@@ -38,5 +44,5 @@ database.connect((error) => {
 
 app.listen(PORT, () => {
   socketController();
-  console.log("Connected", PORT);
+  console.log("Connected to", PORT, "in: ", app.settings.env);
 });

@@ -66,8 +66,6 @@ const getUserPost = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     database_1.default.query(sql, [user_id], (error, data) => {
         if (error)
             return res.status(500).send({ error });
-        if (!data.length)
-            return res.status(404).send({ message: "No posts yet" });
         res.status(200).send({ post: data });
     });
 });
