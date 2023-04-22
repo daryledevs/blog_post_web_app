@@ -84,13 +84,6 @@
   position: relative;
 }
 
-.index__container-condition {
-  display: flex;
-  position: relative;
-  height: 100vh;
-  overflow: hidden;
-}
-
 .sidebar__container {
   display: inherit;
   flex-direction: column;
@@ -144,9 +137,9 @@
 .create-post__parent {
   background: rgba(0, 0, 0, 0.5);
   width: 100%;
-  height: 100%;
+  height: 100vh;
   z-index: 88888;
-  position: fixed;
+  position: absolute;
   display: flex;
   justify-content: center;
   align-items: center;

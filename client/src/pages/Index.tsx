@@ -8,11 +8,7 @@ function Index() {
   const [clickedLink, setClickedLink] = useState(pathname);
 
   return (
-    <div
-      className={
-        clickedLink !== "Create" ? "index__container" : "index__container-condition"
-      }
-    >
+    <div className="index__container">
       {clickedLink === "Create" && (
         <CreatePost setClickedLink={setClickedLink} />
       )}

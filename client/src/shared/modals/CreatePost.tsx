@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import close from "../../assets/icons/close-modal.png";
 import image_gallery from "../../assets/icons/image-gallery.png";
@@ -12,6 +12,7 @@ interface Modal {
 }
 
 function CreatePost({ setClickedLink }: Modal) {
+  let rootElement: HTMLElement = document.querySelector<HTMLElement>("div")!;
   const { pathname } = useLocation();
   const [zoom, setZoom] = useState(1);
   const [images, setImage] = useState<any[]>([]);
@@ -32,6 +33,16 @@ function CreatePost({ setClickedLink }: Modal) {
     },
     []
   );
+
+  useEffect(() => {
+    rootElement.style.position = "fixed";
+    rootElement.style.overflow = "scroll";
+
+    return () => {
+      rootElement.style.removeProperty("position");
+      rootElement.style.removeProperty("overflow");
+    };
+  }, []);
 
   return (
     <div className="create-post__parent">
