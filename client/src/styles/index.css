@@ -139,7 +139,8 @@
   width: 100%;
   height: 100vh;
   z-index: 88888;
-  position: absolute;
+  position: fixed;
+  overflow-y: scroll;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -415,6 +416,15 @@
 .chat__container-own .chat__viewed-conversation-own .chat__message-status-own {
   font-size: 0.7rem;
   text-align: end;
+}
+
+.scrollView {
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollView::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
 }
 
 * {

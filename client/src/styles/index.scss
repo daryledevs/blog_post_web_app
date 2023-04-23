@@ -9,6 +9,15 @@
 @import "./pages/_Message";
 @import "./component/_Chat";
 
+.scrollView{
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollView::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
 *{
   box-sizing: border-box;
   padding: 0;

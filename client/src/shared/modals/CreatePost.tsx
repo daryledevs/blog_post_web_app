@@ -13,6 +13,8 @@ interface Modal {
 
 function CreatePost({ setClickedLink }: Modal) {
   let rootElement: HTMLElement = document.querySelector<HTMLElement>("div")!;
+  const win: Window = window;
+
   const { pathname } = useLocation();
   const [zoom, setZoom] = useState(1);
   const [images, setImage] = useState<any[]>([]);
@@ -35,12 +37,15 @@ function CreatePost({ setClickedLink }: Modal) {
   );
 
   useEffect(() => {
-    rootElement.style.position = "fixed";
-    rootElement.style.overflow = "scroll";
+    document.body.classList.add("scrollView");
+    rootElement.style.overflowY = "scroll";
+    const onScroll: EventListener = (event: Event) => event.preventDefault();
+    rootElement?.addEventListener("wheel", onScroll);
 
     return () => {
-      rootElement.style.removeProperty("position");
-      rootElement.style.removeProperty("overflow");
+      rootElement?.removeEventListener("wheel", onScroll);
+      rootElement.style.removeProperty("overflow-y");
+      document.body.classList.remove("scrollView");
     };
   }, []);
 
