@@ -3,12 +3,11 @@
     flex-direction: column;
     height: 100vh;
     border-right: 1px solid #ccc;
-    width: 15%;
-    position: sticky;
+    width: 197px;
+    position: fixed;
     z-index: 5555;
     overflow: hidden;
     background-color: white;
-    top: 0; // to make the sticky to work 
     
     .sidebar__logo{
       display: block;
