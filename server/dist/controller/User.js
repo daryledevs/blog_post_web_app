@@ -23,7 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findUser = exports.getFollowers = exports.followUser = exports.userData = exports.register = void 0;
+exports.getUserFeed = exports.findUser = exports.getFollowers = exports.followUser = exports.userData = exports.register = void 0;
 const database_1 = __importDefault(require("../database"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -59,6 +59,30 @@ const userData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     });
 });
 exports.userData = userData;
+const getUserFeed = (req, res) => {
+    const { user_id } = req.params;
+    const { post_id_arr } = req.body;
+    const values = post_id_arr.length ? post_id_arr : 0;
+    const sql = `
+              SELECT 
+                  f.followed_id, f.follower_id, p.*
+              FROM
+                  followers f
+              INNER JOIN
+                  posts p ON p.user_id = f.followed_id
+              WHERE
+                  f.follower_id = (?) AND 
+                  p.post_date > DATE_SUB(CURDATE(), INTERVAL 3 DAY) AND
+                  post_id NOT IN (?) 
+              ORDER BY RAND() LIMIT 3;
+          `;
+    database_1.default.query(sql, [user_id, values], (error, data) => {
+        if (error)
+            return res.status(500).send({ error });
+        res.status(200).send({ feed: data });
+    });
+};
+exports.getUserFeed = getUserFeed;
 const findUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { searchText } = req.body;
     const sql = `

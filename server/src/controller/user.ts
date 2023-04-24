@@ -1,6 +1,7 @@
 import database from "../database";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
+import moment from "moment";
 
 const register = async (req: Request, res: Response) => {
   const { email, username, password, first_name, last_name } = req.body;
@@ -34,6 +35,31 @@ const userData = async (req: Request, res: Response) => {
     
     res.status(200).send({ user: rest });
   })
+};
+
+const getUserFeed = (req: Request, res: Response) => {
+  const { user_id } = req.params;
+  const { post_id_arr } = req.body;
+  const values = post_id_arr.length ? post_id_arr : 0;
+
+  const sql = `
+              SELECT 
+                  f.followed_id, f.follower_id, p.*
+              FROM
+                  followers f
+              INNER JOIN
+                  posts p ON p.user_id = f.followed_id
+              WHERE
+                  f.follower_id = (?) AND 
+                  p.post_date > DATE_SUB(CURDATE(), INTERVAL 3 DAY) AND
+                  post_id NOT IN (?) 
+              ORDER BY RAND() LIMIT 3;
+          `;
+
+  database.query(sql, [user_id, values], (error, data) => {
+    if(error) return res.status(500).send({ error });
+    res.status(200).send({ feed: data });
+  });
 };
 
 const findUser = async (req: Request, res: Response) => {
@@ -81,7 +107,6 @@ const followUser = async (req: Request, res: Response) => {
             return res.status(200).send({ message: "Unfollowed user" });
           }
         );
-
         return;
       }
 
@@ -116,7 +141,6 @@ const getFollowers = async (req: Request, res: Response) => {
                   f.follower_id = (?);
               `;
 
-
   database.query(sql, [user_id, user_id], (error, data) => {
     if(error) return res.status(500).send({ error });
     
@@ -127,4 +151,4 @@ const getFollowers = async (req: Request, res: Response) => {
   });
 };
 
-export { register, userData, followUser, getFollowers, findUser };
+export { register, userData, followUser, getFollowers, findUser, getUserFeed };

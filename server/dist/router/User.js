@@ -13,4 +13,5 @@ router.get("/", user_1.userData);
 router.get("/follow/:followed_id/:follower_id", user_1.followUser);
 router.get("/followers/:user_id", user_1.getFollowers);
 router.get("/search", user_1.findUser);
+router.post("/feed/:user_id", user_1.getUserFeed);
 exports.default = router;
