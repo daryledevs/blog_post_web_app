@@ -38,8 +38,7 @@ const userData = async (req: Request, res: Response) => {
 };
 
 const getUserFeed = (req: Request, res: Response) => {
-  const { user_id } = req.params;
-  const { post_id_arr } = req.body;
+  const { post_id_arr, user_id } = req.body;
   const values = post_id_arr.length ? post_id_arr : 0;
 
   const sql = `
@@ -60,6 +59,24 @@ const getUserFeed = (req: Request, res: Response) => {
     if(error) return res.status(500).send({ error });
     res.status(200).send({ feed: data });
   });
+};
+
+const getTotalFeed =async (req: Request, res: Response) => {
+  const { user_id } = req.body;
+  const sql = `
+              SELECT 
+                  COUNT(*)
+              FROM
+                  posts
+              WHERE
+                  post_date > DATE_SUB(CURDATE(), INTERVAL 3 DAY)
+              ORDER BY RAND() LIMIT 3;
+              `;
+
+  database.query(sql, [user_id], (error, data) => {
+    if(error) return res.status(500).send({ error });
+    res.status(200).send({ count: data[0]["COUNT(*)"] });
+  })
 };
 
 const findUser = async (req: Request, res: Response) => {
@@ -151,4 +168,12 @@ const getFollowers = async (req: Request, res: Response) => {
   });
 };
 
-export { register, userData, followUser, getFollowers, findUser, getUserFeed };
+export {
+  register,
+  userData,
+  followUser,
+  getFollowers,
+  findUser,
+  getUserFeed,
+  getTotalFeed,
+};
