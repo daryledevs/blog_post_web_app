@@ -140,7 +140,7 @@ const getFollowers = async (req: Request, res: Response) => {
   const { user_id } = req.params;
   const sql = `
                 SELECT 
-                    f.*, u.user_id, u.username, u.first_name, u.last_name
+                    f.*, u.user_id, u.username, u.first_name, u.last_name, u.avatar_url
                 FROM
                     followers f
                 INNER JOIN
@@ -149,7 +149,7 @@ const getFollowers = async (req: Request, res: Response) => {
                     f.followed_id = (?);
 
               SELECT 
-                  f.*, u.user_id, u.username, u.first_name, u.last_name
+                  f.*, u.user_id, u.username, u.first_name, u.last_name,  u.avatar_url
               FROM
                   followers f
               INNER JOIN

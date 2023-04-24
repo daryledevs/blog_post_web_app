@@ -160,7 +160,7 @@ const getFollowers = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     const { user_id } = req.params;
     const sql = `
                 SELECT 
-                    f.*, u.user_id, u.username, u.first_name, u.last_name
+                    f.*, u.user_id, u.username, u.first_name, u.last_name, u.avatar_url
                 FROM
                     followers f
                 INNER JOIN
@@ -169,7 +169,7 @@ const getFollowers = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                     f.followed_id = (?);
 
               SELECT 
-                  f.*, u.user_id, u.username, u.first_name, u.last_name
+                  f.*, u.user_id, u.username, u.first_name, u.last_name,  u.avatar_url
               FROM
                   followers f
               INNER JOIN

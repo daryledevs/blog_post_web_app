@@ -48,6 +48,7 @@ interface IEFollow {
   follower_id: number;
   user_id: number;
   username: string;
+  avatar_url: string;
   first_name: string;
   last_name: string;
 }
