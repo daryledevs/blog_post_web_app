@@ -41,6 +41,7 @@ interface IEUserState {
   roles: string;
   age: number;
   birthday: string;
+  fetch_status: string;
 }
 
 interface IEFollow {

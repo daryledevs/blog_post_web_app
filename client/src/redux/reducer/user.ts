@@ -12,6 +12,7 @@ const initialState: IEUserState = {
   roles: "",
   age: null as any,
   birthday: "",
+  fetch_status: "",
 };
 
 
@@ -21,8 +22,12 @@ const userSlice = createSlice({
   reducers:{},
   extraReducers(builder) {
       builder.addCase(userDataThunk.fulfilled, (state, action) =>{
-        return { ...action.payload };
+        return { ...action.payload, fetch_status: "Get the user's data successfully" };
       })
+      
+      builder.addCase(userDataThunk.rejected, (state, action) => {
+        state.fetch_status = "Get the user's data failed";
+      });
   },
 });
 

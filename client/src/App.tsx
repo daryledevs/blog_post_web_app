@@ -13,16 +13,18 @@ import { getMessage } from "./redux/reducer/chat";
 import { userDataThunk } from "./redux/action/user";
 
 function App() {
-  const [isToken, setIsToken] = useState(false); // mock data
   const navigate = useNavigate();
   const appDispatch = useAppDispatch();
   const dispatch = useDispatch();
+  const isLoading = useAppSelector(state => state.auth.isLoading);
   const socket = useRef(io("ws://localhost:8900"));
   const access_status = useAppSelector((state) => state.auth.access_status);
   const token_status = useAppSelector((state) => state.auth.token_status);
   const userData = useAppSelector((state) => state.user);
+  const { fetch_status } = userData;
+  const [route, setRoute] = useState<any>(null);
   const [comingMessage, setComingMessage] = useState<any>();
-
+  
   // socket handler
   useEffect(() => {
     if (userData.user_id) {
@@ -38,7 +40,7 @@ function App() {
   }, [socket, userData]);
 
   useEffect(() => {
-    if (comingMessage) dispatch(getMessage(comingMessage));
+    if(comingMessage) dispatch(getMessage(comingMessage));
   }, [comingMessage]);
 
   useEffect(() => {
@@ -51,13 +53,10 @@ function App() {
       const milliseconds = Math.abs(currentTime.valueOf() - lastTime.valueOf());
       const hour = milliseconds / 36e5;
 
-      // If it's been 1 hour or more, then get a new token.
-      if (hour < 0) {
-        appDispatch(checkAccess());
-        return;
-      }
-      appDispatch(userDataThunk(token));
-      setIsToken(true);
+      // If it's been an hour or more, then get a new access token
+      if (hour < 0) appDispatch(checkAccess());
+      else appDispatch(userDataThunk(token));
+
     } else {
       appDispatch(checkAccess());
     }
@@ -65,91 +64,47 @@ function App() {
   }, [access_status]);
 
   useEffect(() => {
-    switch (access_status) {
+    switch (access_status || fetch_status) {
       case "Token is valid":
       case "Login successfully":
-        setIsToken(true);
-        navigate("/");
-        console.log(access_status);
+      case "Get the user's data successfully":
+        setRoute(routeElement(true));
         break;
 
       case "Token is not valid":
       case "Password is incorrect":
       case "User not found":
       case "Forbidden":
-        setIsToken(false);
-        console.log(access_status);
+      case "Get the user's data failed":
+        setRoute(routeElement(false));
         break;
     }
-  }, [access_status]);
+  }, [access_status, fetch_status]);
 
-  const ProtectedRoute = () => {
-    // to prevent them to go to homepage if not authenticated yet
-    // '/' in url will not be accessible
-    
-    return isToken ? (
-      <Outlet />
-    ) : (
-      <Navigate
-        to="/login"
-        replace
-      />
-    );
+  const routeElement = function (isToken:boolean) {
+    if (isToken) {
+      return (
+        <Route path="/" element={<Index />} >
+          <Route index element={<Feed />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/message" element={<Message />} />
+          <Route path="*" element={<div>404 Not Found Page</div>} />
+        </Route>
+      );
+    } else {
+      return (
+        <Route path="/">
+          <Route index path="/" element={<Login />} />
+          <Route path="/register" element={<div>Register Page</div>} />
+          <Route path="/reset" element={<div>Reset Password Page</div>} />
+          <Route path="*" element={<div>404 Not Found Page</div>} />
+        </Route>
+      );
+    }
   };
 
-  const AuthenticationRoute = () => {
-    // to prevent them to go to login page if already authenticated
-    // '/login' in url will not be accessible
-    return !isToken ? (
-      <Outlet />
-    ) : (
-      <Navigate
-        to="/"
-        replace
-      />
-    );
-  };
-
-  return (
-    <div className="App">
-      <Routes>
-        {/* Authenticated */}
-        <Route
-          path="/"
-          element={<ProtectedRoute />}
-        >
-          <Route
-            path="/"
-            element={<Index />}
-          >
-            <Route
-              index
-              element={<Feed />}
-            />
-            <Route
-              path="/profile"
-              element={<Profile />}
-            />
-            <Route
-              path="/message"
-              element={<Message />}
-            />
-          </Route>
-        </Route>
-
-        {/* Not yet Authenticated */}
-        <Route
-          path="/"
-          element={<AuthenticationRoute />}
-        >
-          <Route
-            path="/login"
-            element={<Login />}
-          />
-        </Route>
-      </Routes>
-    </div>
-  );
+  if(isLoading) return <></>;
+  return <Routes>{route}</Routes>;
 }
 
 export default App;
