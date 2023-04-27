@@ -15,38 +15,58 @@ cloudinary.v2.config({
 
 
 async function uploadAndDeleteLocal(path:any) {
-
   const result = await cloudinary.v2.uploader.upload(path, { unique_filename: true });
-
   fs.unlink(path, (err) => {
     if (err) throw err;
     console.log("Delete File successfully.");
   });
-
   return { image_id: result.public_id, image_url: result.url };
 };
 
 const getUserPost = async (req: Request, res: Response) => {
   const { user_id } = req.params;
-  const sql = "SELECT * FROM posts WHERE user_id = (?);";
+  const sql_posts = "SELECT * FROM posts WHERE user_id = (?);";
+  const sql_likes = "SELECT COUNT(*) FROM likes WHERE post_id = (?);";
+  const payload :any= []
 
-  database.query(sql, [user_id], (error, data) => {
-    if (error) return res.status(500).send({ error });
-    res.status(200).send({ post: data });
-  });
+  const selectPosts = async (payload:any, sql:any, values: any) => {
+    return new Promise((resolve, reject) => {
+      database.query(sql, values, (error, data) => {
+        if(error) reject(error);
+        payload.push(data);
+        resolve(payload);
+      });
+    })
+  };
+
+  const selectLikes = async (payload: any, sql:any, values: any) => {
+    return new Promise((resolve, reject) => {
+      database.query(sql, values, (error, data) => {
+        if (error) reject(error);
+        const [value] = values;
+        payload.push({ post_id: value, count: data[0]["COUNT(*)"] });
+        resolve(payload);
+      });
+    });
+  };
+
+  await selectPosts(payload, sql_posts, [user_id]);
+  const post_ids = payload[0].map(({ post_id }: any) => post_id);
+  for(let i = 0; i < post_ids.length; i++) await selectLikes(payload, sql_likes, [post_ids[i]]);
+  res.status(200).send(payload)
 };
 
 const newPost = async(req: Request, res: Response) => {
-  const sql = "INSERT INTO posts (`user_id`, `caption`, `image_id`, `image_url`, `post_date`) VALUES (?);";
-  const { img } = req.files as { [fieldname: string]: Express.Multer.File[] };
   const { user_id, caption } = req.body;
-
+  const { img } = req.files as { [fieldname: string]: Express.Multer.File[] };
   const path = img[0].destination + "\\" + img[0].filename;
+  
   const { image_id, image_url } = await uploadAndDeleteLocal(path);
   const post_date = moment(new Date(), "YYYY-MM-DD HH:mm:ss").format("YYYY/MM/DD HH:mm:ss");
-
   const values = [user_id, caption, image_id, image_url, post_date];
-
+  
+  
+  const sql = "INSERT INTO posts (`user_id`, `caption`, `image_id`, `image_url`, `post_date`) VALUES (?);";
   database.query(sql, [values], (error, data) => {
     if(error) return res.status(500).send({ message: "Post failed", error });
 
@@ -83,32 +103,4 @@ const deletePost =async (req: Request, res: Response) => {
   });
 }
 
-const likePost = async (req: Request, res: Response) => {
-  const { post_id, user_id } = req.params;
-  const sql_get = "SELECT * FROM likes WHERE post_id = (?) AND user_id = (?);";
-  const sql_delete = "DELETE FROM likes WHERE post_id = (?) AND user_id = (?);";
-  const sql_create = "INSERT INTO likes (`post_id`, `user_id`) VALUES (?, ?);";
-
-  // check to see if the user is already like the post
-  database.query(sql_get, [post_id, user_id], (error, data) => {
-    if(error) return res.status(500).send({ error });
-    
-    // if the user has already liked the post, then delete or remove
-    if(data.length){
-      database.query(sql_delete, [post_id, user_id], (error, data) => {
-        if(error) return res.status(500).send({ message: "Delete row from likes table failed", error });
-        return res.status(200).send("Remove like from a post");
-      });
-
-      return;
-    }
-
-    // if the user hasn't like the post yet, then create or insert 
-    database.query(sql_create, [post_id, user_id], (error, data) => {
-      if(error) return res.status(500).send({ message: "Like post failed", error });
-      res.status(200).send("Liked post");
-    })
-  });
-}
-
-export { newPost, getUserPost, likePost, editPost, deletePost };
+export { newPost, getUserPost, editPost, deletePost };

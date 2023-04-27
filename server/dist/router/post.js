@@ -13,5 +13,4 @@ router.get("/:user_id", post_1.getUserPost);
 router.post("/", uploadOption.fields(option_field), post_1.newPost);
 router.patch("/:post_id", post_1.editPost);
 router.delete("/:post_id", post_1.deletePost);
-router.post("/like-post/:post_id/:user_id", post_1.likePost);
 exports.default = router;
