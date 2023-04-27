@@ -6,6 +6,18 @@
   height: 100%;
   width: 100%;
 }
+.feed-container .img-loading {
+  width: 30px;
+  animation: loading 2s linear infinite;
+}
+@keyframes loading {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}
 .feed-container .post-card-container {
   border: 1px solid #ccc;
   width: 35%;

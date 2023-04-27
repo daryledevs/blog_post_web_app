@@ -5,6 +5,16 @@
   border-radius: 100%;
 };
 
+@mixin animate($animation,$duration,$method,$times){
+  animation: $animation $duration $method $times;
+}
+
+@mixin keyframes($name){
+  @keyframes #{$name}{
+      @content;
+  }
+}
+
 .feed-container{
   display: inherit;
   align-items: center;
@@ -12,6 +22,19 @@
   padding: 3vh 0 3vh 0;
   height: 100%;
   width: 100%;
+
+  .img-loading{
+    width: 30px;
+    @include keyframes(loading){
+        from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(359deg);
+      }
+    }
+    @include animate(loading, 2s, linear, infinite);
+  }
   
    // PostCard.tsx
   .post-card-container{
