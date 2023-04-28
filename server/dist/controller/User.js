@@ -64,7 +64,16 @@ const getUserFeed = (req, res) => {
     const values = post_id_arr.length ? post_id_arr : 0;
     const sql = `
               SELECT 
-                  f.followed_id, f.follower_id, p.*
+                  f.followed_id, 
+                  f.follower_id, 
+                  p.*, 
+                  (SELECT 
+                    COUNT(*)
+                  FROM
+                    likes l
+                  WHERE
+                    p.post_id = l.post_id
+                  ) AS "count"
               FROM
                   followers f
               INNER JOIN

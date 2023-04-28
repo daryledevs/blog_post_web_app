@@ -62,35 +62,26 @@ function uploadAndDeleteLocal(path) {
 ;
 const getUserPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { user_id } = req.params;
-    const sql_posts = "SELECT * FROM posts WHERE user_id = (?);";
-    const sql_likes = "SELECT COUNT(*) FROM likes WHERE post_id = (?);";
-    const payload = [];
-    const selectPosts = (payload, sql, values) => __awaiter(void 0, void 0, void 0, function* () {
-        return new Promise((resolve, reject) => {
-            database_1.default.query(sql, values, (error, data) => {
-                if (error)
-                    reject(error);
-                payload.push(data);
-                resolve(payload);
-            });
-        });
+    const sql = `
+              SELECT 
+                  p.*,
+                  (SELECT 
+                    COUNT(*)
+                  FROM
+                    likes l
+                  WHERE
+                    p.post_id = l.post_id
+                  ) AS "count"
+              FROM
+                  posts p
+              WHERE
+                  p.user_id = (?);  
+              `;
+    database_1.default.query(sql, [user_id], (error, data) => {
+        if (error)
+            return res.status(500).send({ error });
+        res.status(200).send({ post: data });
     });
-    const selectLikes = (payload, sql, values) => __awaiter(void 0, void 0, void 0, function* () {
-        return new Promise((resolve, reject) => {
-            database_1.default.query(sql, values, (error, data) => {
-                if (error)
-                    reject(error);
-                const [value] = values;
-                payload.push({ post_id: value, count: data[0]["COUNT(*)"] });
-                resolve(payload);
-            });
-        });
-    });
-    yield selectPosts(payload, sql_posts, [user_id]);
-    const post_ids = payload[0].map(({ post_id }) => post_id);
-    for (let i = 0; i < post_ids.length; i++)
-        yield selectLikes(payload, sql_likes, [post_ids[i]]);
-    res.status(200).send(payload);
 });
 exports.getUserPost = getUserPost;
 const newPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -135,3 +126,17 @@ const deletePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     });
 });
 exports.deletePost = deletePost;
+// Another way of getting data from a database
+// const getTotalLikes = async (post_ids: any, payload: any, sql: any) => {
+//   const selectLikes = async (values: any) => {
+//     return new Promise((resolve, reject) => {
+//       database.query(sql, values, (error, data) => {
+//         if (error) reject(error);
+//         const [value] = values;
+//         payload.push({ post_id: value, count: data[0]["COUNT(*)"] });
+//         resolve(payload);
+//       });
+//     });
+//   };
+//   for (let i = 0; i < post_ids.length; i++) await selectLikes([post_ids[i]]);
+// };

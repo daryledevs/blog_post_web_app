@@ -25,35 +25,26 @@ async function uploadAndDeleteLocal(path:any) {
 
 const getUserPost = async (req: Request, res: Response) => {
   const { user_id } = req.params;
-  const sql_posts = "SELECT * FROM posts WHERE user_id = (?);";
-  const sql_likes = "SELECT COUNT(*) FROM likes WHERE post_id = (?);";
-  const payload :any= []
-
-  const selectPosts = async (payload:any, sql:any, values: any) => {
-    return new Promise((resolve, reject) => {
-      database.query(sql, values, (error, data) => {
-        if(error) reject(error);
-        payload.push(data);
-        resolve(payload);
-      });
-    })
-  };
-
-  const selectLikes = async (payload: any, sql:any, values: any) => {
-    return new Promise((resolve, reject) => {
-      database.query(sql, values, (error, data) => {
-        if (error) reject(error);
-        const [value] = values;
-        payload.push({ post_id: value, count: data[0]["COUNT(*)"] });
-        resolve(payload);
-      });
-    });
-  };
-
-  await selectPosts(payload, sql_posts, [user_id]);
-  const post_ids = payload[0].map(({ post_id }: any) => post_id);
-  for(let i = 0; i < post_ids.length; i++) await selectLikes(payload, sql_likes, [post_ids[i]]);
-  res.status(200).send(payload)
+  const sql = `
+              SELECT 
+                  p.*,
+                  (SELECT 
+                    COUNT(*)
+                  FROM
+                    likes l
+                  WHERE
+                    p.post_id = l.post_id
+                  ) AS "count"
+              FROM
+                  posts p
+              WHERE
+                  p.user_id = (?);  
+              `;
+  
+  database.query(sql, [user_id], (error, data) => {
+    if(error) return res.status(500).send({ error });
+    res.status(200).send({ post: data });
+  });
 };
 
 const newPost = async(req: Request, res: Response) => {
@@ -104,3 +95,20 @@ const deletePost =async (req: Request, res: Response) => {
 }
 
 export { newPost, getUserPost, editPost, deletePost };
+
+// Another way of getting data from a database
+
+// const getTotalLikes = async (post_ids: any, payload: any, sql: any) => {
+//   const selectLikes = async (values: any) => {
+//     return new Promise((resolve, reject) => {
+//       database.query(sql, values, (error, data) => {
+//         if (error) reject(error);
+//         const [value] = values;
+//         payload.push({ post_id: value, count: data[0]["COUNT(*)"] });
+//         resolve(payload);
+//       });
+//     });
+//   };
+
+//   for (let i = 0; i < post_ids.length; i++) await selectLikes([post_ids[i]]);
+// };
