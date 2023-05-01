@@ -90,6 +90,17 @@ interface IEPostState {
   post: Array<IEPost>
 }
 
+interface IEFeed extends IEPost {
+  count: number;
+};
+
+interface IEFeeds {
+  [key: string]: any;
+  feeds: Array<IEFeed>;
+  feedStatus: boolean;
+  lastRequest: number;
+}
+
 // thunk error
 interface IEAuthFetchError {
   errorType: string;
@@ -105,4 +116,5 @@ export type {
   IEChatMemberState,
   IEFollowState,
   IEPostState,
+  IEFeeds,
 };
