@@ -13,6 +13,7 @@ import { ErrorHandler } from "./helper/errorHandler";
 import chatRoutes from "./router/chat";
 import postRouter from "./router/post";
 import likeRouter from "./router/like";
+import followRouter from "./router/follow";
 dotenv.config();
 
 const app = express();
@@ -36,8 +37,9 @@ app.use(morgan("tiny"));
 app.use(`${API}/`, authRoutes);
 app.use(`${API}/chats`, chatRoutes);
 app.use(`${API}/users`, userRoutes);
-app.use(`${API}/posts`, postRouter)
-app.use(`${API}/likes`, likeRouter)
+app.use(`${API}/posts`, postRouter);
+app.use(`${API}/likes`, likeRouter);
+app.use(`${API}/follow`, followRouter);
 
 database.connect((error) => {
   if(error) throw error;

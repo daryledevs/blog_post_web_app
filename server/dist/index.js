@@ -41,6 +41,7 @@ const errorHandler_1 = require("./helper/errorHandler");
 const chat_1 = __importDefault(require("./router/chat"));
 const post_1 = __importDefault(require("./router/post"));
 const like_1 = __importDefault(require("./router/like"));
+const follow_1 = __importDefault(require("./router/follow"));
 dotenv.config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 5000;
@@ -61,6 +62,7 @@ app.use(`${API}/chats`, chat_1.default);
 app.use(`${API}/users`, user_1.default);
 app.use(`${API}/posts`, post_1.default);
 app.use(`${API}/likes`, like_1.default);
+app.use(`${API}/follow`, follow_1.default);
 database_1.default.connect((error) => {
     if (error)
         throw error;
