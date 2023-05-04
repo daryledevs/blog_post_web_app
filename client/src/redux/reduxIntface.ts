@@ -105,6 +105,7 @@ interface IEFeeds {
   feeds: Array<IEFeed>;
   feedStatus: boolean;
   lastRequest: number;
+  setIsFirstLoad: boolean;
 }
 
 // thunk error

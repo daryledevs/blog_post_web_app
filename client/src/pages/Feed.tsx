@@ -10,6 +10,7 @@ function Feed() {
   const user = useAppSelector((state) => state.user);
   const feeds = useAppSelector((state) => state.feed.feeds);
   const feedStatus = useAppSelector((state) => state.feed.feedStatus);
+  const isFirstLoad = useAppSelector((state) => state.feed.isFirstLoad);
   const lastRequest = useAppSelector((state) => state.feed.lastRequest);
 
   const isMount = useRef(false);
@@ -18,7 +19,6 @@ function Feed() {
   const header = { headers: { Authorization: `Bearer ${token}` } };
 
   const [totalFeed, setTotalFeed] = useState<any>(0);
-  const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [addFeedTrigger, setAddFeedTrigger] = useState<boolean>(false);
@@ -58,13 +58,11 @@ function Feed() {
           { post_ids: getIds },
           header
         );
-        setIsFirstLoad(false);
         dispatch(getFeeds([...feeds, ...response.data.feed]));
       } catch (error) {
         console.log(error);
         return;
       } finally {
-        setIsFirstLoad(false);
         dispatch(changeStatus(true));
       }
     };

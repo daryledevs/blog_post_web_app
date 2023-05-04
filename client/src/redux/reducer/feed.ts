@@ -5,6 +5,7 @@ const initialState: IEFeeds = {
   feeds: [],
   feedStatus: false,
   lastRequest: null as any,
+  setIsFirstLoad: true,
 };
 
 const feedSlice = createSlice({
@@ -12,7 +13,7 @@ const feedSlice = createSlice({
   initialState,
   reducers:{
     getFeeds: (state, action) => {
-      return { ...state, feeds: [...action.payload] };
+      return { ...state, feeds: [...action.payload], setIsFirstLoad: false };
     },
     changeStatus: (state, action) => {
       state.feedStatus = action.payload;
