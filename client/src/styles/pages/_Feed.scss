@@ -121,3 +121,20 @@
     }
   } 
 }
+
+.first-load{
+  position: absolute;
+  margin: 0 auto;
+  inset: 20px 0 0 0;
+  width: 30px;
+  display: block;
+  @include keyframes(loading){
+      from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(359deg);
+    }
+  }
+  @include animate(loading, 2s, linear, infinite);
+}

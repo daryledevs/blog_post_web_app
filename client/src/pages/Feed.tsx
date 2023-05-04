@@ -18,7 +18,7 @@ function Feed() {
   const header = { headers: { Authorization: `Bearer ${token}` } };
 
   const [totalFeed, setTotalFeed] = useState<any>(0);
-  const [isFirstLoad, setIsFirstLoad] = useState<boolean>(feeds.length === 0);
+  const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [addFeedTrigger, setAddFeedTrigger] = useState<boolean>(false);
@@ -55,7 +55,7 @@ function Feed() {
       try {
         const response = await api.post(
           "users/feed",
-          { post_id_arr: getIds },
+          { post_ids: getIds },
           header
         );
         setIsFirstLoad(false);
@@ -136,7 +136,7 @@ function Feed() {
     return Math.floor(diff / 1000 / 60);
   }
 
-  if(isFirstLoad) return <></>;
+  if(isFirstLoad) return <img src={svg_loading} className="first-load" />;
 
   return (
     <div

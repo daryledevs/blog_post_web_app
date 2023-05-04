@@ -54,7 +54,13 @@ interface IEFollow {
   last_name: string;
 }
 
+interface IETotal {
+  followers: number;
+  following: number;
+}
+
 interface IEFollowState {
+  total: IETotal;
   followers: Array<IEFollow>;
   following: Array<IEFollow>;
 }

@@ -61,8 +61,8 @@ function Profile() {
           <h1 className="profile__header-username">{user.username}</h1>
           <div className="profile__header-numbers">
             <p>{posts.post.length} Pictures</p>
-            <p>{follows.followers.length} Followers</p>
-            <p>{follows.following.length} Following</p>
+            <p>{follows.total.followers} Followers</p>
+            <p>{follows.total.following} Following</p>
           </div>
         </div>
       </div>

@@ -4,22 +4,27 @@ import { IEUserState } from "../reduxIntface";
 import { getChatMembers } from "./chatMember";
 import { getChatThunk } from "./chat";
 import { setAccessStatus } from "../reducer/auth";
-import { getFollow } from "../reducer/follower";
+import { getFollow, getTotalFollow } from "../reducer/follower";
 import { getPost } from "../reducer/post";
 
-async function getFollowers(dispatch:Dispatch, user_id:any, token: any){
+async function totalFollow(dispatch:Dispatch, user_id:any){
   try {
-    const response = await api.get(`/users/followers/${user_id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json",
-      },
-    });
-
-    dispatch(getFollow(response.data));
-    
+    const response = await api.get(`/follow/count/${user_id}`);
+    dispatch(getTotalFollow(response.data));
   } catch (error) {
-    console.log("follower: ", error)
+    console.log(error)
+  }
+};
+
+export async function getFollowers(dispatch:Dispatch, user_id:any, follower:any[], following:any[]){
+  try {
+    const response = await api.post(`/follow/${user_id}`, {
+      follower_ids: follower,
+      following_ids: following,
+    });
+    dispatch(getFollow(response.data));
+  } catch (error) {
+    console.log(error)
   }
 };
 
@@ -28,7 +33,7 @@ async function getPosts(dispatch:Dispatch, user_id:number, token: any) {
     const response = await api.get(`/posts/${user_id}`);
     dispatch(getPost(response.data?.post))
   } catch (error) {
-    console.log("post: ", error)
+    console.log(error)
   }
 }
 
@@ -54,7 +59,8 @@ const userDataThunk = createAsyncThunk<
       
       dispatch(getChatThunk({ user_id: user.user_id, length: 0 }));
       dispatch(getChatMembers(user));
-      getFollowers(dispatch, user.user_id, token);
+      totalFollow(dispatch, user.user_id);
+      getFollowers(dispatch, user.user_id, [], []);
       getPosts(dispatch, user.user_id, token);
 
       return fulfillWithValue(user);
