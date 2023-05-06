@@ -2,12 +2,16 @@
 @import "../styles/pages/_Feed";
 
 // shared
-@import '../styles/pages/Index';
-@import "../styles/shared/base/_Sidebar";
-@import "./shared/modals/_CreatePost";
+
+@import "./component/_Chat";
+
 @import "./pages/_Profile";
 @import "./pages/_Message";
-@import "./component/_Chat";
+@import '../styles/pages/Index';
+
+@import "../styles/shared/base/_Sidebar";
+@import "./shared/modals/_CreatePost";
+@import "./shared/modals/FollowModal";
 
 .scrollView{
   -ms-overflow-style: none;  /* Internet Explorer 10+ */

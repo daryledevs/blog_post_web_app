@@ -109,118 +109,67 @@
   }
 }
 
-.index__container {
+.chat__container-other {
+  padding: 0.3%;
+}
+.chat__container-other .chat__viewed-conversation-other {
+  height: 100%;
+}
+.chat__container-other .chat__viewed-conversation-other .chat__message-container-other {
   display: flex;
-  position: relative;
-}
-
-.sidebar__container {
-  display: inherit;
-  flex-direction: column;
-  height: 100vh;
-  border-right: 1px solid #ccc;
-  width: 197px;
-  position: fixed;
-  z-index: 5555;
-  overflow: hidden;
-  background-color: white;
-}
-.sidebar__container .sidebar__logo {
-  display: block;
-  margin: 0 auto;
-  width: 10vw;
-}
-.sidebar__container .sidebar__links {
-  display: inherit;
-  flex-direction: column;
-}
-.sidebar__container .sidebar__links li {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  gap: 0.8%;
   align-items: center;
-  padding: 2vh 1vw;
 }
-.sidebar__container .sidebar__links li img {
-  max-width: 12%;
+.chat__container-other .chat__viewed-conversation-other .chat__message-container-other .chat__user-picture-other {
+  width: 4.6%;
+  height: 29px;
+  border-radius: 100%;
 }
-.sidebar__container .sidebar__links li div {
-  cursor: pointer;
-  width: 100%;
-  height: 5vh;
+.chat__container-other .chat__viewed-conversation-other .chat__message-container-other .chat__user-message-other {
+  background-color: #1d75ee;
+  border: 1px solid;
   border-radius: 15px;
-  display: inherit;
-  align-items: center;
-  gap: 3%;
-  padding-left: 4%;
+  color: white;
+  padding: 1%;
 }
-.sidebar__container .sidebar__links div:hover {
-  background-color: rgb(249, 249, 251);
+.chat__container-other .chat__viewed-conversation-other .chat__message-status-other {
+  font-size: 0.7rem;
 }
-.sidebar__container .sidebar__burger {
-  width: 13%;
-  margin: auto auto 15% auto;
-  cursor: pointer;
+.chat__container-other .chat__not-viewed-other {
+  color: #ccc;
+  font-size: 1.5rem;
+  text-align: center;
 }
 
-.create-post__parent {
-  background: rgba(0, 0, 0, 0.5);
+.chat__container-own {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.3%;
+}
+.chat__container-own .chat__viewed-conversation-own {
+  height: 100%;
   width: 100%;
-  height: 100vh;
-  z-index: 88888;
-  position: fixed;
-  overflow-y: scroll;
+}
+.chat__container-own .chat__viewed-conversation-own .chat__message-container-own {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  gap: 0.8%;
+  flex-direction: row-reverse;
 }
-.create-post__parent .create-post__close-modal {
-  position: absolute;
-  right: 0;
-  top: 0;
-  margin: 5px;
-  width: 40px;
-  cursor: pointer;
+.chat__container-own .chat__viewed-conversation-own .chat__message-container-own .chat__user-picture-own {
+  width: 4.6%;
+  height: 29px;
+  border-radius: 100%;
 }
-.create-post__parent .create-post__container {
-  width: 32%;
-  height: 68%;
-  border-radius: 2%;
-  background-color: white;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
-.create-post__parent .create-post__container .create-post__header {
-  border-bottom: 1px solid gray;
-  height: 40px;
-  display: inherit;
-  justify-content: center;
-  align-items: center;
-}
-.create-post__parent .create-post__container .create-post__header p {
-  font-weight: 500;
-}
-.create-post__parent .create-post__container .create-post__image-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  overflow: hidden;
-  gap: 1%;
-  flex: 1;
-}
-.create-post__parent .create-post__container .create-post__image-container .create-post__gallery-icon {
-  width: 70px;
-}
-.create-post__parent .create-post__container .create-post__image-container .create-post__select-image-btn {
-  border: none;
-  background-color: rgb(0, 149, 246);
+.chat__container-own .chat__viewed-conversation-own .chat__message-container-own .chat__user-message-own {
+  background-color: #1d75ee;
+  border: 1px solid;
+  border-radius: 15px;
   color: white;
-  border-radius: 10px;
-  padding: 2px 10px 5px 10px;
-  cursor: pointer;
+  padding: 1%;
+}
+.chat__container-own .chat__viewed-conversation-own .chat__message-status-own {
+  font-size: 0.7rem;
+  text-align: end;
 }
 
 .profile__container {
@@ -387,67 +336,161 @@
   width: 10%;
 }
 
-.chat__container-other {
-  padding: 0.3%;
-}
-.chat__container-other .chat__viewed-conversation-other {
-  height: 100%;
-}
-.chat__container-other .chat__viewed-conversation-other .chat__message-container-other {
+.index__container {
   display: flex;
-  gap: 0.8%;
-  align-items: center;
-}
-.chat__container-other .chat__viewed-conversation-other .chat__message-container-other .chat__user-picture-other {
-  width: 4.6%;
-  height: 29px;
-  border-radius: 100%;
-}
-.chat__container-other .chat__viewed-conversation-other .chat__message-container-other .chat__user-message-other {
-  background-color: #1d75ee;
-  border: 1px solid;
-  border-radius: 15px;
-  color: white;
-  padding: 1%;
-}
-.chat__container-other .chat__viewed-conversation-other .chat__message-status-other {
-  font-size: 0.7rem;
-}
-.chat__container-other .chat__not-viewed-other {
-  color: #ccc;
-  font-size: 1.5rem;
-  text-align: center;
+  position: relative;
 }
 
-.chat__container-own {
-  display: flex;
-  justify-content: flex-end;
-  padding: 0.3%;
+.sidebar__container {
+  display: inherit;
+  flex-direction: column;
+  height: 100vh;
+  border-right: 1px solid #ccc;
+  width: 197px;
+  position: fixed;
+  z-index: 5555;
+  overflow: hidden;
+  background-color: white;
 }
-.chat__container-own .chat__viewed-conversation-own {
-  height: 100%;
+.sidebar__container .sidebar__logo {
+  display: block;
+  margin: 0 auto;
+  width: 10vw;
+}
+.sidebar__container .sidebar__links {
+  display: inherit;
+  flex-direction: column;
+}
+.sidebar__container .sidebar__links li {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2vh 1vw;
+}
+.sidebar__container .sidebar__links li img {
+  max-width: 12%;
+}
+.sidebar__container .sidebar__links li div {
+  cursor: pointer;
   width: 100%;
-}
-.chat__container-own .chat__viewed-conversation-own .chat__message-container-own {
-  display: flex;
-  gap: 0.8%;
-  flex-direction: row-reverse;
-}
-.chat__container-own .chat__viewed-conversation-own .chat__message-container-own .chat__user-picture-own {
-  width: 4.6%;
-  height: 29px;
-  border-radius: 100%;
-}
-.chat__container-own .chat__viewed-conversation-own .chat__message-container-own .chat__user-message-own {
-  background-color: #1d75ee;
-  border: 1px solid;
+  height: 5vh;
   border-radius: 15px;
-  color: white;
-  padding: 1%;
+  display: inherit;
+  align-items: center;
+  gap: 3%;
+  padding-left: 4%;
 }
-.chat__container-own .chat__viewed-conversation-own .chat__message-status-own {
-  font-size: 0.7rem;
-  text-align: end;
+.sidebar__container .sidebar__links div:hover {
+  background-color: rgb(249, 249, 251);
+}
+.sidebar__container .sidebar__burger {
+  width: 13%;
+  margin: auto auto 15% auto;
+  cursor: pointer;
+}
+
+.create-post__parent {
+  background: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100vh;
+  z-index: 88888;
+  position: fixed;
+  overflow-y: scroll;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.create-post__parent .create-post__close-modal {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: 5px;
+  width: 40px;
+  cursor: pointer;
+}
+.create-post__parent .create-post__container {
+  width: 32%;
+  height: 68%;
+  border-radius: 2%;
+  background-color: white;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.create-post__parent .create-post__container .create-post__header {
+  border-bottom: 1px solid gray;
+  height: 40px;
+  display: inherit;
+  justify-content: center;
+  align-items: center;
+}
+.create-post__parent .create-post__container .create-post__header p {
+  font-weight: 500;
+}
+.create-post__parent .create-post__container .create-post__image-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  gap: 1%;
+  flex: 1;
+}
+.create-post__parent .create-post__container .create-post__image-container .create-post__gallery-icon {
+  width: 70px;
+}
+.create-post__parent .create-post__container .create-post__image-container .create-post__select-image-btn {
+  border: none;
+  background-color: rgb(0, 149, 246);
+  color: white;
+  border-radius: 10px;
+  padding: 2px 10px 5px 10px;
+  cursor: pointer;
+}
+
+.follow-modal__container {
+  width: 100%;
+  height: 100vh;
+  position: absolute;
+  z-index: 999999;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.follow-modal__container .follow-modal__parent {
+  background-color: white;
+  width: 26%;
+  height: 55%;
+  border-radius: 3%;
+  overflow: hidden;
+}
+.follow-modal__container .follow-modal__parent .follow-modal__title {
+  padding: 10px;
+  border-bottom: 1px #dfdfdf solid;
+  font-weight: 600;
+  text-align: center;
+  position: relative;
+}
+.follow-modal__container .follow-modal__parent .follow-modal__title img {
+  position: absolute;
+  right: 12px;
+  top: 8px;
+  cursor: pointer;
+}
+.follow-modal__container .follow-modal__parent .follow-modal__list-container {
+  overflow-y: auto;
+  height: 91.2%;
+}
+.follow-modal__container .follow-modal__parent .follow-modal__list-container .item-card {
+  margin: 5px;
+  display: flex;
+}
+.follow-modal__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__avatar {
+  width: 50px;
+  height: 40px;
 }
 
 .scrollView {
