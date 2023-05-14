@@ -109,67 +109,109 @@
   }
 }
 
-.chat__container-other {
-  padding: 0.3%;
-}
-.chat__container-other .chat__viewed-conversation-other {
+.chat__container {
+  display: flex;
+  flex-direction: column;
   height: 100%;
 }
-.chat__container-other .chat__viewed-conversation-other .chat__message-container-other {
+.chat__container .chat__message-list {
+  flex: 1;
+  overflow-y: auto;
+}
+.chat__container .chat__message-list .chat__other-container {
+  padding: 0.3%;
+}
+.chat__container .chat__message-list .chat__other-container .chat__other-message {
+  height: 100%;
   display: flex;
   gap: 0.8%;
   align-items: center;
 }
-.chat__container-other .chat__viewed-conversation-other .chat__message-container-other .chat__user-picture-other {
+.chat__container .chat__message-list .chat__other-container .chat__other-message .chat__other-picture {
   width: 4.6%;
   height: 29px;
   border-radius: 100%;
 }
-.chat__container-other .chat__viewed-conversation-other .chat__message-container-other .chat__user-message-other {
+.chat__container .chat__message-list .chat__other-container .chat__other-message .chat__other-text {
+  margin-right: 3%;
   background-color: #1d75ee;
   border: 1px solid;
   border-radius: 15px;
   color: white;
   padding: 1%;
 }
-.chat__container-other .chat__viewed-conversation-other .chat__message-status-other {
-  font-size: 0.7rem;
-}
-.chat__container-other .chat__not-viewed-other {
-  color: #ccc;
-  font-size: 1.5rem;
-  text-align: center;
-}
-
-.chat__container-own {
+.chat__container .chat__message-list .chat__own-container {
   display: flex;
   justify-content: flex-end;
   padding: 0.3%;
 }
-.chat__container-own .chat__viewed-conversation-own {
+.chat__container .chat__message-list .chat__own-container .chat__own-message {
   height: 100%;
   width: 100%;
-}
-.chat__container-own .chat__viewed-conversation-own .chat__message-container-own {
   display: flex;
   gap: 0.8%;
   flex-direction: row-reverse;
 }
-.chat__container-own .chat__viewed-conversation-own .chat__message-container-own .chat__user-picture-own {
+.chat__container .chat__message-list .chat__own-container .chat__own-message .chat__own-picture {
   width: 4.6%;
   height: 29px;
   border-radius: 100%;
 }
-.chat__container-own .chat__viewed-conversation-own .chat__message-container-own .chat__user-message-own {
+.chat__container .chat__message-list .chat__own-container .chat__own-message .chat__own-text {
   background-color: #1d75ee;
   border: 1px solid;
   border-radius: 15px;
   color: white;
   padding: 1%;
+  margin-left: 3%;
 }
-.chat__container-own .chat__viewed-conversation-own .chat__message-status-own {
-  font-size: 0.7rem;
-  text-align: end;
+.chat__container .chat__input-container {
+  border: 1px solid #ccc;
+  margin: 1%;
+  border-radius: 25px;
+  display: flex;
+  flex-direction: row;
+}
+.chat__container .chat__input-container form {
+  display: flex;
+  width: 100%;
+}
+.chat__container .chat__input-container .chat__input-box {
+  resize: none;
+  width: 100%;
+  overflow-x: hidden;
+  display: block;
+  outline: none;
+  border: none;
+  padding: 8px 9px;
+  height: 0px;
+}
+.chat__container .chat__input-container .chat__input-box-btn {
+  border: none;
+  cursor: pointer;
+  background-color: white;
+  height: -moz-max-content;
+  height: max-content;
+  width: -moz-max-content;
+  width: max-content;
+  align-self: center;
+  margin: 1%;
+}
+.chat__container .chat__input-container .chat__emoji-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 1%;
+}
+.chat__container .chat__input-container .chat__emoji-container .chat__emoji-modal {
+  width: 20px;
+  cursor: pointer;
+  margin: 0 5px;
+}
+.chat__container .chat__input-container .chat__emoji-container .chat__emoji-parent {
+  position: absolute;
+  top: -470px;
+  left: 20px;
 }
 
 .profile__container {
@@ -250,7 +292,7 @@
   position: absolute;
   margin: auto;
   inset: 0 0 0 0;
-  width: 70%;
+  width: 60%;
   height: 94%;
   border-radius: 5px;
   display: flex;
@@ -316,24 +358,6 @@
   color: #ccc;
   font-size: 1.5rem;
   text-align: center;
-}
-.message__container .message__parent .message__conversation-container .chat__test {
-  border: 1px solid #ccc;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  height: 7%;
-}
-.message__container .message__parent .message__conversation-container .chat__test .input-box {
-  resize: none;
-  width: 100%;
-  padding: 1.5% 0.5%;
-  display: block;
-}
-.message__container .message__parent .message__conversation-container .chat__test .input-box-enter {
-  width: 10%;
 }
 
 .index__container {

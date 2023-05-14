@@ -1,74 +1,120 @@
-.chat__container-other{
-  padding: 0.3%;
-  
-  .chat__viewed-conversation-other{
-    height: 100%;
-
-    .chat__message-container-other{
-      display: flex;
-      gap: 0.8%;
-      align-items: center;
-
-      .chat__user-picture-other{
-        width: 4.6%;
-        height: 29px;
-        border-radius: 100%;
-      }
-
-      .chat__user-message-other{
-        background-color: #1d75ee;
-        border: 1px solid;
-        border-radius: 15px;
-        color: white;
-        padding: 1%;
-      }
-    }
-
-    .chat__message-status-other{
-      font-size: 0.7rem;
-    }
-  }
-
-  .chat__not-viewed-other{
-    color: #ccc;
-    font-size: 1.5rem;
-    text-align: center;
-  }
-}
-
-.chat__container-own{
+.chat__container{
   display: flex;
-  justify-content: flex-end;
-  padding: 0.3%;
-  
-  .chat__viewed-conversation-own{
-    height: 100%;
-    width: 100%;
-    
-    .chat__message-container-own{
-      display: flex;
-      gap: 0.8%;
-      flex-direction: row-reverse;
+  flex-direction: column;
+  height: 100%;
 
-      .chat__user-picture-own{
-        width: 4.6%;
-        height: 29px;
-        border-radius: 100%;
-      }
+  .chat__message-list{
+    flex: 1;
+    overflow-y: auto;
 
-      .chat__user-message-own{
-        background-color: #1d75ee;
-        border: 1px solid;
-        border-radius: 15px;
-        color: white;
-        padding: 1%;
+    .chat__other-container{
+      padding: 0.3%;
+      
+      .chat__other-message{
+        height: 100%;
+        display: flex;
+        gap: 0.8%;
+        align-items: center;
+
+        .chat__other-picture{
+          width: 4.6%;
+          height: 29px;
+          border-radius: 100%;
+        }
+
+        .chat__other-text{
+          
+          margin-right: 3%;
+          background-color: #1d75ee;
+          border: 1px solid;
+          border-radius: 15px;
+          color: white;
+          padding: 1%;
+        }
       }
     }
 
-    .chat__message-status-own{
-      font-size: 0.7rem;
-      text-align: end;
+    .chat__own-container{
+      display: flex;
+      justify-content: flex-end;
+      padding: 0.3%;
+      
+      .chat__own-message{
+        height: 100%;
+        width: 100%;
+        display: flex;
+        gap: 0.8%;
+        flex-direction: row-reverse;
+
+        .chat__own-picture{
+          width: 4.6%;
+          height: 29px;
+          border-radius: 100%;
+        }
+
+        .chat__own-text{
+          background-color: #1d75ee;
+          border: 1px solid;
+          border-radius: 15px;
+          color: white;
+          padding: 1%;
+          margin-left: 3%;
+        }
+      }
+    }
+  }
+
+
+  .chat__input-container{
+    border: 1px solid #ccc;
+    margin: 1%;
+    border-radius: 25px;
+    display: flex;
+    flex-direction: row;
+    
+    form {
+      display: flex;
+      width: 100%;
+    }
+
+    .chat__input-box{
+      resize: none;
+      width: 100%;
+      overflow-x: hidden;
+      display: block;
+      outline: none;
+      border: none;
+      padding: 8px 9px;
+      height: 0px;
+    }
+
+    .chat__input-box-btn{
+      border: none;
+      cursor: pointer;
+      background-color: white;
+      height: max-content;
+      width: max-content;
+      align-self: center;
+      margin: 1%;
+    }
+
+    .chat__emoji-container{
+      position: relative;
+      display: flex;
+      align-items: center;
+      margin: 1%;
+
+      .chat__emoji-modal{
+        width: 20px;
+        cursor: pointer;
+        margin: 0 5px;
+      }
+
+      .chat__emoji-parent {
+        position: absolute;
+        top: -470px;
+        left: 20px;
+      }
     }
   }
 }
-

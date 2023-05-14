@@ -152,7 +152,7 @@ function Feed() {
       {isLoading ? (
         <img src={svg_loading} className="img-loading" />
       ) : (
-        noPostTrigger && <>No Post To Show</>
+        (noPostTrigger || !feeds.length) && <>No Post To Show</>
       )}
     </div>
   );
