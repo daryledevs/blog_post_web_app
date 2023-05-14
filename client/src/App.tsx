@@ -11,6 +11,7 @@ import { useDispatch } from "react-redux";
 import { io } from "socket.io-client";
 import { getMessage } from "./redux/reducer/chat";
 import { userDataThunk } from "./redux/action/user";
+import { redirect } from "react-router-dom";
 
 function App() {
   const navigate = useNavigate();
@@ -80,23 +81,43 @@ function App() {
         break;
     }
   }, [access_status, fetch_status]);
-
+  
   const routeElement = function (isToken:boolean) {
+    const Redirect = () => <Navigate to="/" replace />;
+    const publicRoute: any[] = ["/login", "/register", "/reset"];
+    const privateRout:any[] = ["/home", "/profile", "/message"];
+
     if (isToken) {
       return (
         <Route path="/" element={<Index />} >
           <Route index element={<Feed />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/message" element={<Message />} />
+
+          {publicRoute.map((path: any) => (
+            <Route
+              path={path}
+              element={<Redirect />}
+            />
+          ))}
+
           <Route path="*" element={<div>404 Not Found Page</div>} />
         </Route>
       );
     } else {
       return (
-        <Route path="/">
-          <Route index path="/" element={<Login />} />
+        <Route path="/" element={<Login />}>
+          <Route path="/login" index element={<Login />} />
           <Route path="/register" element={<div>Register Page</div>} />
           <Route path="/reset" element={<div>Reset Password Page</div>} />
+
+           {privateRout.map((path: any) => (
+            <Route
+              path={path}
+              element={<Redirect />}
+            />
+          ))}
+
           <Route path="*" element={<div>404 Not Found Page</div>} />
         </Route>
       );
