@@ -93,14 +93,13 @@ function App() {
           <Route index element={<Feed />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/message" element={<Message />} />
-
-          {publicRoute.map((path: any) => (
+          {publicRoute.map((path: any, index:number) => (
             <Route
+              key={index}
               path={path}
               element={<Redirect />}
             />
           ))}
-
           <Route path="*" element={<div>404 Not Found Page</div>} />
         </Route>
       );
@@ -110,14 +109,13 @@ function App() {
           <Route path="/login" index element={<Login />} />
           <Route path="/register" element={<div>Register Page</div>} />
           <Route path="/reset" element={<div>Reset Password Page</div>} />
-
-           {privateRout.map((path: any) => (
+          {privateRout.map((path: any, index) => (
             <Route
+              key={index}
               path={path}
               element={<Redirect />}
             />
           ))}
-
           <Route path="*" element={<div>404 Not Found Page</div>} />
         </Route>
       );

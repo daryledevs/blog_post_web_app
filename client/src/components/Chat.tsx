@@ -70,8 +70,10 @@ function Chat({ openConversation }: IEChatProps) {
   }, [openConversation, clearMessage]);
 
   useEffect(() => {
-    if (messageRef.current) scrollToDown(messageRef.current);
-  }, []);
+    if (messageRef.current) {
+      scrollToDown(messageRef.current);
+    }
+  }, [openConversation]);
   
   useEffect(() => {
     if (inputRef.current) {
