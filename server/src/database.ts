@@ -8,6 +8,7 @@ const database = mysql.createConnection({
   password: process.env.PASSWORD,
   database: `${process.env.DATABASE}`,
   multipleStatements: true,
+  charset: "utf8mb4",
 });
 
 export default database;

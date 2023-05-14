@@ -35,5 +35,6 @@ const database = mysql_1.default.createConnection({
     password: process.env.PASSWORD,
     database: `${process.env.DATABASE}`,
     multipleStatements: true,
+    charset: "utf8mb4",
 });
 exports.default = database;
