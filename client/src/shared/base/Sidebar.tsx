@@ -4,6 +4,7 @@ import Links from "../../assets/data/nav_links";
 import logo from "../../assets/images/dee-logo.png";
 
 import { useNavigate } from "react-router-dom";
+import { useAppSelector } from '../../redux/hooks/hooks';
 
 interface IProps {
   clickedLink: string;
@@ -12,6 +13,8 @@ interface IProps {
 
 function Sidebar({ clickedLink, setClickedLink }: IProps) {
   const navigate = useNavigate();
+  const userData = useAppSelector((state) => state.user);
+  const isProfile = (item:any) => item.link === "/profile" ? `/${userData.username}` : item.link;
 
   const nav_links = Links.map((item: any, index: any) => {
     return (
@@ -19,8 +22,9 @@ function Sidebar({ clickedLink, setClickedLink }: IProps) {
         <div
           onClick={() => {
             if (item.link !== "none") {
-              setClickedLink(item.link);
-              navigate(item.link);
+              const link = isProfile(item);
+              setClickedLink(link);
+              navigate(link);
               return;
             }
             setClickedLink(item.name);
@@ -28,6 +32,7 @@ function Sidebar({ clickedLink, setClickedLink }: IProps) {
           }}
         >
           <img
+            alt=""
             src={
               item.link === "/profile"
                 ? item.icon.check
@@ -62,6 +67,7 @@ function Sidebar({ clickedLink, setClickedLink }: IProps) {
       <img
         src={burger}
         className="sidebar__burger"
+        alt=''
       />
     </div>
   );
