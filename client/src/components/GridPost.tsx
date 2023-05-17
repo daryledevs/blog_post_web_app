@@ -1,12 +1,10 @@
 import React, { useState } from "react";
-import { useAppSelector } from "../redux/hooks/hooks";
 
-const GridPost = function () {
+const GridPost = function ({ posts }:any) {
   let organizedPost: any[][] = [];
-  const posts = useAppSelector((state) => state.post);
-
+  
   for (let i = 0; i < posts.post.length; i++) {
-    if (i % 2 == 0) {
+    if (i % 2 === 0) {
       const value = posts.post.slice(i === 0 ? i : i + 1, i + 3);
       organizedPost.push([value]);
     }
@@ -29,6 +27,7 @@ const GridPost = function () {
                         <img
                           src={item.image_url}
                           className="profile__image-post"
+                          alt="user's post"
                         />
                       </div>
                     );
