@@ -23,9 +23,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTotalFeed = exports.getUserFeed = exports.findUser = exports.userData = exports.register = void 0;
+exports.findUsername = exports.getTotalFeed = exports.getUserFeed = exports.findUser = exports.userData = exports.register = void 0;
 const database_1 = __importDefault(require("../database"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const getUserData = (data) => {
+    const [user] = data;
+    const { password } = user, rest = __rest(user, ["password"]);
+    return rest;
+};
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, username, password, first_name, last_name } = req.body;
     const sql = "SELECT * FROM users WHERE email = ? OR username = ?";
@@ -53,8 +58,7 @@ const userData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             return res.status(500).send({ message: error });
         if (!data.length)
             return res.status(404).send({ message: "User not found" });
-        const [user] = data;
-        const { password } = user, rest = __rest(user, ["password"]);
+        const rest = getUserData(data);
         res.status(200).send({ user: rest });
     });
 });
@@ -137,3 +141,16 @@ const findUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     });
 });
 exports.findUser = findUser;
+const findUsername = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { username } = req.params;
+    const sql = "SELECT * FROM users WHERE username = (?);";
+    database_1.default.query(sql, [username], (error, data) => {
+        if (error)
+            return res.status(500).send({ error });
+        if (!data.length)
+            return res.status(404).send({ message: "The user doesn't exist" });
+        const rest = getUserData(data);
+        return res.status(200).send({ user: rest });
+    });
+});
+exports.findUsername = findUsername;

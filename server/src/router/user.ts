@@ -1,5 +1,5 @@
 import express from "express";
-import { findUser, getTotalFeed, getUserFeed, register, userData } from "../controller/user";
+import { findUser, findUsername, getTotalFeed, getUserFeed, register, userData } from "../controller/user";
 import checkTkn from "../middleware/checkTkn";
 const router = express.Router();
 
@@ -9,5 +9,6 @@ router.post("/feed", getUserFeed);
 router.get("/", userData);
 router.get("/search", findUser);
 router.get("/feed/count", getTotalFeed);
+router.get("/:username", findUsername);
 
 export default router;

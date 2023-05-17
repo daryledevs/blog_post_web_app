@@ -3,6 +3,12 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import moment from "moment";
 
+const getUserData = (data:any) => {
+  const [user] = data;
+  const { password, ...rest } = user;
+  return rest;
+};
+
 const register = async (req: Request, res: Response) => {
   const { email, username, password, first_name, last_name } = req.body;
   const sql = "SELECT * FROM users WHERE email = ? OR username = ?";
@@ -29,10 +35,7 @@ const userData = async (req: Request, res: Response) => {
   database.query(sql, [user_id], (error, data) =>{
     if(error) return res.status(500).send({ message: error });
     if(!data.length) return res.status(404).send({ message: "User not found" });
-
-    const [user] = data;
-    const { password, ...rest } = user;
-    
+    const rest = getUserData(data);
     res.status(200).send({ user: rest });
   })
 };
@@ -115,6 +118,17 @@ const findUser = async (req: Request, res: Response) => {
   });
 };
 
+const findUsername = async (req:Request, res:Response) => {
+  const { username } = req.params;
+  const sql = "SELECT * FROM users WHERE username = (?);";
+
+  database.query(sql, [username], (error, data) => {
+    if(error) return res.status(500).send({ error });
+    if(!data.length) return res.status(404).send({ message: "The user doesn't exist" });
+    const rest = getUserData(data);
+    return res.status(200).send({ user: rest });
+  });
+};
 
 export {
   register,
@@ -122,4 +136,5 @@ export {
   findUser,
   getUserFeed,
   getTotalFeed,
+  findUsername,
 };

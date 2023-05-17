@@ -13,4 +13,5 @@ router.post("/feed", user_1.getUserFeed);
 router.get("/", user_1.userData);
 router.get("/search", user_1.findUser);
 router.get("/feed/count", user_1.getTotalFeed);
+router.get("/:username", user_1.findUsername);
 exports.default = router;
