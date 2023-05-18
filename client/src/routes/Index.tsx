@@ -47,15 +47,6 @@ function routeElement(isToken:boolean) {
   }
 };
 
-const NotFound = function(){
-  return (
-    <React.Fragment key={2}>
-      <Route path="/404" element={<div>404 Not Found Page</div>}/>
-      <Route path="*" element={<Navigate  to="/404" replace/>}/> 
-    </React.Fragment>
-  )
-};
-
 function RouteIndex() {
   const access_status = useAppSelector((state) => state.auth.access_status);
   const userData = useAppSelector((state) => state.user);
@@ -67,7 +58,7 @@ function RouteIndex() {
       case "Token is valid":
       case "Login successfully":
       case "Get the user's data successfully":
-        setRoute([routeElement(true), NotFound()]);
+        setRoute(routeElement(true));
         break;
 
       case "Token is not valid":
@@ -75,7 +66,7 @@ function RouteIndex() {
       case "User not found":
       case "Forbidden":
       case "Get the user's data failed":
-        setRoute([routeElement(false), NotFound()]);
+        setRoute(routeElement(false));
         break;
     }
   }, [access_status, fetch_status]);

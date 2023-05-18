@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { checkAccess } from "./redux/action/auth";
 import { useAppDispatch, useAppSelector } from "./redux/hooks/hooks";
 import { useDispatch } from "react-redux";
@@ -18,7 +18,8 @@ function App() {
   const token_status = useAppSelector((state) => state.auth.token_status);
   const userData = useAppSelector((state) => state.user);
   const [comingMessage, setComingMessage] = useState<any>();
-
+  const routes = RouteIndex();
+  
   // socket handler
   useEffect(() => {
     if (userData.user_id) {
@@ -58,11 +59,13 @@ function App() {
   
   
 
-  if(isLoading) return <></>;
+  if(isLoading || !routes) return <></>;
 
   return (
     <Routes>
-      {RouteIndex()}
+      {routes}
+      <Route path="/404" element={<div>404 Not Found Page</div>}/>
+      <Route path="*" element={<div>404 Not Found Page</div>}/> 
     </Routes>
   );
 }
