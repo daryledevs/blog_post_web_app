@@ -56,12 +56,14 @@ const userDataThunk = createAsyncThunk<
       });
 
       const user = response.data.user;
-      
-      await dispatch(getChatThunk({ user_id: user.user_id, length: 0 }));
-      await dispatch(getChatMembers(user));
-      await totalFollow(dispatch, user.user_id);
-      await getFollowers(dispatch, user.user_id, [], []);
-      await getPosts(dispatch, user.user_id, token);
+
+      await Promise.all([
+        dispatch(getChatThunk({ user_id: user.user_id, length: 0 })),
+        dispatch(getChatMembers(user)),
+        totalFollow(dispatch, user.user_id),
+        getFollowers(dispatch, user.user_id, [], []),
+        getPosts(dispatch, user.user_id, token),
+      ]);
 
       return fulfillWithValue(user);
     } catch (error) {
