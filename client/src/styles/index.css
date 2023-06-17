@@ -1,10 +1,12 @@
 .feed-container {
-  display: inherit;
+  display: flex;
   align-items: center;
   flex-direction: column;
   padding: 3vh 0 3vh 0;
   height: 100%;
   width: 100%;
+  overflow-y: scroll;
+  align-items: center;
 }
 .feed-container .img-loading {
   width: 30px;
@@ -216,7 +218,6 @@
   width: 100%;
   height: 100vh;
   position: relative;
-  margin-left: 197px;
   overflow-y: scroll;
 }
 .profile__container .profile__header {
@@ -361,15 +362,19 @@
 .index__container {
   display: flex;
   position: relative;
+  overflow: hidden;
+}
+.index__container .index__outlet-container {
+  overflow: hidden;
+  height: 100vh;
+  width: 100%;
 }
 
 .sidebar__container {
   display: inherit;
   flex-direction: column;
-  height: 100vh;
   border-right: 1px solid #ccc;
-  width: 197px;
-  position: fixed;
+  width: 13%;
   z-index: 5555;
   overflow: hidden;
   background-color: white;
@@ -418,7 +423,6 @@
   height: 100vh;
   z-index: 88888;
   position: fixed;
-  overflow-y: scroll;
   display: flex;
   justify-content: center;
   align-items: center;

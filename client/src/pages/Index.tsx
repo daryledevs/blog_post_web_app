@@ -16,7 +16,9 @@ function Index() {
         clickedLink={clickedLink}
         setClickedLink={setClickedLink}
       />
-      <Outlet />
+      <div className="index__outlet-container">
+        <Outlet />
+      </div>
     </div>
   );
 }

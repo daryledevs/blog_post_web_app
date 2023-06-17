@@ -37,22 +37,23 @@ function CreatePost({ setClickedLink }: Modal) {
   );
 
   useEffect(() => {
-    document.body.classList.add("scrollView");
-    rootElement.style.overflowY = "scroll";
-    const onScroll: EventListener = (event: Event) => event.preventDefault();
-    rootElement?.addEventListener("wheel", onScroll);
+    // document.body.classList.add("scrollView");
+    // rootElement.style.overflowY = "scroll";
+    // const onScroll: EventListener = (event: Event) => event.preventDefault();
+    // rootElement?.addEventListener("wheel", onScroll);
 
-    return () => {
-      rootElement?.removeEventListener("wheel", onScroll);
-      rootElement.style.removeProperty("overflow-y");
-      document.body.classList.remove("scrollView");
-    };
+    // return () => {
+    //   rootElement?.removeEventListener("wheel", onScroll);
+    //   rootElement.style.removeProperty("overflow-y");
+    //   document.body.classList.remove("scrollView");
+    // };
   }, []);
 
   return (
     <div className="create-post__parent">
       <img
         src={close}
+        alt=""
         className="create-post__close-modal"
         onClick={() => setClickedLink(pathname)}
       />
@@ -71,6 +72,7 @@ function CreatePost({ setClickedLink }: Modal) {
               }}
             >
               <img
+                alt=""
                 src={arrow_left}
                 style={{ width: 24, cursor: "pointer" }}
                 onClick={() => {
