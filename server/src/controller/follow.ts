@@ -27,8 +27,8 @@ const totalFollow = async (req: Request, res: Response) => {
     const [followers] = data[0];
     const [following] = data[1];
     res.status(200).send({ 
-      followers: followers.count, 
-      following: following.count 
+      followers: followers?.count ? followers.count : 0, 
+      following: following?.count ? following.count : 0,
     });
   });
 };

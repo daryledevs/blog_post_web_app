@@ -55,11 +55,13 @@ interface IEFollow {
 }
 
 interface IETotal {
+  [key: string]: any;
   followers: number;
   following: number;
 }
 
 interface IEFollowState {
+  [key: string]: any;
   total: IETotal;
   followers: Array<IEFollow>;
   following: Array<IEFollow>;

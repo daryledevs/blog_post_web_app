@@ -52,8 +52,18 @@ const followSlice = createSlice({
         },
       };
     },
+    updateList: (state, action) => {
+      return {
+        ...state,
+        total: {
+          ...state.total,
+          [action.payload.name]: action.payload.total,
+        },
+        [action.payload.name]: action.payload.value,
+      };
+    }
   }
 });
 
-export const { getFollow, getTotalFollow } = followSlice.actions;
+export const { getFollow, getTotalFollow, updateList } = followSlice.actions;
 export default followSlice.reducer;

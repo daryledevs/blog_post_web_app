@@ -41,8 +41,8 @@ const totalFollow = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const [followers] = data[0];
         const [following] = data[1];
         res.status(200).send({
-            followers: followers.count,
-            following: following.count
+            followers: (followers === null || followers === void 0 ? void 0 : followers.count) ? followers.count : 0,
+            following: (following === null || following === void 0 ? void 0 : following.count) ? following.count : 0,
         });
     });
 });

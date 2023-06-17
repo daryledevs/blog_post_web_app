@@ -9,7 +9,7 @@ import userRoutes from './router/user';
 import cookieParser from 'cookie-parser';
 import authJWT from "./middleware/JWT";
 import socketController from "./socket";
-import { ErrorHandler } from "./helper/errorHandler";
+import { ErrorHandler } from "./helper/ErrorHandler";
 import chatRoutes from "./router/chat";
 import postRouter from "./router/post";
 import likeRouter from "./router/like";
