@@ -28,7 +28,6 @@ function Sidebar({ clickedLink, setClickedLink }: IProps) {
               return;
             }
             setClickedLink(item.name);
-            console.log(item.name, clickedLink);
           }}
         >
           <img

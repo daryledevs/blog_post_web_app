@@ -2,10 +2,13 @@
   display: inherit;
   flex-direction: column;
   border-right: 1px solid #ccc;
-  width: 13%;
+  width: 12%;
   z-index: 5555;
-  overflow: hidden;
   background-color: white;
+  height: 100vh;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
   
   .sidebar__logo{
     display: block;

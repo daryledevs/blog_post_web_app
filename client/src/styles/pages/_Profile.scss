@@ -1,8 +1,9 @@
 .profile__container{
-  width: 100%;
+  flex: 1;
+  display: flex;
   height: 100vh;
-  position: relative;
   overflow-y: scroll;
+  flex-direction: column;
   
   .profile__header{
     display: flex;

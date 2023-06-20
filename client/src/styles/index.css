@@ -4,7 +4,7 @@
   flex-direction: column;
   padding: 3vh 0 3vh 0;
   height: 100%;
-  width: 100%;
+  flex: 1;
   overflow-y: scroll;
   align-items: center;
 }
@@ -215,10 +215,11 @@
 }
 
 .profile__container {
-  width: 100%;
+  flex: 1;
+  display: flex;
   height: 100vh;
-  position: relative;
   overflow-y: scroll;
+  flex-direction: column;
 }
 .profile__container .profile__header {
   display: flex;
@@ -280,7 +281,7 @@
 }
 
 .message__container {
-  width: 100%;
+  flex: 1;
   height: 100vh;
   overflow-y: scroll;
   display: flex;
@@ -360,23 +361,20 @@
 
 .index__container {
   display: flex;
-  position: relative;
-  overflow: hidden;
-}
-.index__container .index__outlet-container {
-  overflow: hidden;
   height: 100vh;
-  width: 100%;
 }
 
 .sidebar__container {
   display: inherit;
   flex-direction: column;
   border-right: 1px solid #ccc;
-  width: 13%;
+  width: 12%;
   z-index: 5555;
-  overflow: hidden;
   background-color: white;
+  height: 100vh;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
 }
 .sidebar__container .sidebar__logo {
   display: block;
@@ -478,7 +476,7 @@
 .follow-modal__container {
   width: 100%;
   height: 100vh;
-  position: absolute;
+  position: fixed;
   z-index: 999999;
   background: rgba(0, 0, 0, 0.5);
   display: flex;

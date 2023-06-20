@@ -1,11 +1,5 @@
 .index__container{
   display: flex; 
-  position: relative;
-  overflow: hidden;
-
-  .index__outlet-container{
-    overflow: hidden;
-    height: 100vh;
-    width: 100%;
-  }
+  // overflow: hidden;
+  height: 100vh;
 }
