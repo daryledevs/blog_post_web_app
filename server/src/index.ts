@@ -7,13 +7,13 @@ import database from "./database";
 import authRoutes from "./router/auth";
 import userRoutes from './router/user';
 import cookieParser from 'cookie-parser';
-import authJWT from "./middleware/JWT";
 import socketController from "./socket";
-import { ErrorHandler } from "./helper/ErrorHandler";
 import chatRoutes from "./router/chat";
 import postRouter from "./router/post";
 import likeRouter from "./router/like";
 import followRouter from "./router/follow";
+import corsOptions from "./config/corsOption";
+import refreshToken from "./middleware/refreshToken";
 dotenv.config();
 
 const app = express();
@@ -22,15 +22,8 @@ const API = process.env.API;
 
 app.use(bodyParser.json());
 app.use(cookieParser());
-app.use(
-  cors({
-    origin: [`${process.env.SERVER_URL_ONE}`, `${process.env.SERVER_URL_TWO}`],
-    methods: "GET,POST,PUT,DELETE,PATCH",
-    credentials: true,
-  })
-);
-app.use(authJWT());
-app.use(ErrorHandler);
+app.use(cors(corsOptions));
+app.use(refreshToken);
 app.use(morgan("tiny"));
 
 // Routes
