@@ -19,10 +19,7 @@ const getUser = (userId) => {
 };
 function socketController() {
     socketIO.on("connection", (socket) => {
-        console.log("a user connected");
-        // socket.emit("Welcome", "Hello this is socket server!");
         socket.on("addUser", (userId) => {
-            console.log("ADD USER");
             addUser(userId, socket.id);
             socket.emit("getUsers", users);
         });
@@ -35,9 +32,9 @@ function socketController() {
                     text,
                 });
             }
+            ;
         });
         socket.on("disconnect", () => {
-            console.log("user disconnected");
             removeUser(socket.id);
         });
     });
