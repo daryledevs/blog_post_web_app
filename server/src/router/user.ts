@@ -1,12 +1,11 @@
 import express from "express";
-import { findUser, findUsername, getTotalFeed, getUserFeed, register, userData } from "../controller/user";
-import checkTkn from "../middleware/checkTkn";
+import { findUser, findUsername, getTotalFeed, getUserFeed, userData } from "../controller/user";
 const router = express.Router();
+import accessToken from "../middleware/accessToken";
 
-router.use(checkTkn);
-router.post("/register", register);
-router.post("/feed", getUserFeed);
+router.use(accessToken);
 router.get("/", userData);
+router.post("/feed", getUserFeed);
 router.get("/search", findUser);
 router.get("/feed/count", getTotalFeed);
 router.get("/:username", findUsername);

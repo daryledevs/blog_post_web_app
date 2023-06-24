@@ -23,33 +23,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findUsername = exports.getTotalFeed = exports.getUserFeed = exports.findUser = exports.userData = exports.register = void 0;
+exports.findUsername = exports.getTotalFeed = exports.getUserFeed = exports.findUser = exports.userData = void 0;
 const database_1 = __importDefault(require("../database"));
-const bcrypt_1 = __importDefault(require("bcrypt"));
 const getUserData = (data) => {
     const [user] = data;
     const { password } = user, rest = __rest(user, ["password"]);
     return rest;
 };
-const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, username, password, first_name, last_name } = req.body;
-    const sql = "SELECT * FROM users WHERE email = ? OR username = ?";
-    database_1.default.query(sql, [email, username], (err, data) => {
-        if (err)
-            return res.status(500).send(err);
-        if (data.length)
-            return res.status(409).send({ message: "User is already exists" });
-        const sql = "INSERT INTO users(`username`, `email`, `password`, `first_name`, `last_name`) VALUES (?)";
-        const hashPassword = bcrypt_1.default.hashSync(password, bcrypt_1.default.genSaltSync(10));
-        const values = [username, email, hashPassword, first_name, last_name];
-        database_1.default.query(sql, [values], (error, data) => {
-            if (error)
-                return res.status(500).send(error);
-            return res.status(200).send({ message: "Registration is successful" });
-        });
-    });
-});
-exports.register = register;
 const userData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { user_id } = req.body;
     const sql = "SELECT * FROM users WHERE user_id = (?);";

@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import * as dotenv from "dotenv";
+import cookieOptions from "../config/cookieOptions";
 dotenv.config();
 
 interface ICheckToken {
@@ -10,10 +11,25 @@ interface ICheckToken {
   username: string;
 }
 
-const settings:any = function () {
-  return `${process.env.NODE_ENV}`.trim() === "development"
-    ? { secure: false, sameSite: "lax" }
-    : { secure: true, sameSite: "none" };
+const register = async (req: Request, res: Response) => {
+  const { email, username, password, first_name, last_name } = req.body;
+  const sql = "SELECT * FROM users WHERE email = ? OR username = ?";
+
+  database.query(sql, [email, username], (err, data) => {
+    if (err) return res.status(500).send(err);
+    if (data.length)
+      return res.status(409).send({ message: "User is already exists" });
+
+    const sql =
+      "INSERT INTO users(`username`, `email`, `password`, `first_name`, `last_name`) VALUES (?)";
+    const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
+    const values = [username, email, hashPassword, first_name, last_name];
+
+    database.query(sql, [values], (error, data) => {
+      if (error) return res.status(500).send(error);
+      return res.status(200).send({ message: "Registration is successful" });
+    });
+  });
 };
 
 const login = async (req: Request, res: Response) => {
@@ -38,7 +54,7 @@ const login = async (req: Request, res: Response) => {
         const ACCESS_TOKEN = jwt.sign(
           { user_id: userDetails.user_id, roles: userDetails.roles },
           ACCESS_SECRET,
-          { expiresIn: "1hr" }
+          { expiresIn: "15m" }
         );
 
         const REFRESH_TKN = jwt.sign(
@@ -48,13 +64,7 @@ const login = async (req: Request, res: Response) => {
         );
         
         res
-          .cookie("REFRESH_TOKEN", REFRESH_TKN, {
-            httpOnly: true,
-            secure: settings().secure,
-            sameSite: settings().sameSite,
-            domain: "localhost",
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week (days, hours, mins, milliseconds)
-          })
+          .cookie("REFRESH_TOKEN", REFRESH_TKN, cookieOptions)
           .status(200)
           .send({ message: "Login successfully", token: ACCESS_TOKEN });
 
@@ -66,48 +76,15 @@ const login = async (req: Request, res: Response) => {
   );
 };
 
-const checkToken = (req: Request, res: Response) => {
-  if (!req.cookies?.REFRESH_TOKEN) return res.status(401).send({ message: "Unauthorized" });
-
-  jwt.verify(
-    req.cookies?.REFRESH_TOKEN,
-    process.env.REFRESH_TKN_SECRET!,
-    async (err: any, decoded: any) => {
-      if (err) return res.status(500).send({ error: err });
-
-      const { user_id, username } = decoded as ICheckToken;
-      const sql = "SELECT * FROM users WHERE user_id = ?";
-
-      database.query(sql, [user_id], (error, data) => {
-        if (error) return res.status(500).send(error);
-        if (!data.length) return res.status(404).send({ message: "User not found" });
-
-        let [userDetails] = data;
-        const ACCESS_SECRET = process.env.ACCESS_TKN_SECRET!;
-
-         const ACCESS_TOKEN = jwt.sign(
-           { user_id: userDetails.user_id, roles: userDetails.roles },
-           ACCESS_SECRET,
-           { expiresIn: "1d" }
-         );
-
-        res
-          .status(200)
-          .send({ message: "Token is valid", token: ACCESS_TOKEN });
-      });
-    }
-  );
-};
-
 const logout = async (req: Request, res: Response) => {
   res
     .clearCookie("REFRESH_TOKEN", {
       sameSite: "none",
-      secure: settings().secure,
+      secure: cookieOptions.secure,
       httpOnly: true,
     })
     .status(200)
     .send({ message: "Logout successfully" });
 };
 
-export { login, logout, checkToken };
+export { register, login, logout };
