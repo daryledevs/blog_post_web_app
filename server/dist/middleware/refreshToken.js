@@ -31,20 +31,18 @@ const dotenv = __importStar(require("dotenv"));
 const cookieOptions_1 = __importDefault(require("../config/cookieOptions"));
 const routeException_1 = __importDefault(require("../helper/routeException"));
 dotenv.config();
-;
 const refreshToken = (req, res, next) => {
     if ((0, routeException_1.default)(req.path))
         return next();
     const secret = process.env.REFRESH_TKN_SECRET;
     const cookieToken = req.cookies.REFRESH_TOKEN;
-    jsonwebtoken_1.default.verify(cookieToken, secret, { ignoreExpiration: true }, (error, decoded) => {
+    jsonwebtoken_1.default.verify(cookieToken, secret, (error) => {
         if ((error === null || error === void 0 ? void 0 : error.name) === "UnauthorizedError")
             return res.status(401).send({ error, message: "Token is not valid" });
         if ((error === null || error === void 0 ? void 0 : error.name) === "JsonWebTokenError")
             return res.status(401).send({ error, message: "Token is unknown" });
         if ((error === null || error === void 0 ? void 0 : error.name) === "TokenExpiredError") {
-            req.refreshToken = true;
-            const { user_id, username } = decoded;
+            const { user_id, username } = jsonwebtoken_1.default.decode(cookieToken);
             const REFRESH_TKN = jsonwebtoken_1.default.sign({ user_id, username, }, secret, { expiresIn: "7d" });
             res.cookie("REFRESH_TOKEN", REFRESH_TKN, cookieOptions_1.default);
         }

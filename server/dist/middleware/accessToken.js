@@ -29,22 +29,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv = __importStar(require("dotenv"));
 dotenv.config();
-;
 const accessToken = (req, res, next) => {
     var _a;
     const secret = process.env.ACCESS_TKN_SECRET;
     const accessToken = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(" ")[1];
     if (!accessToken)
         return res.status(401).send({ message: "Unauthorized" });
-    jsonwebtoken_1.default.verify(accessToken, secret, { ignoreExpiration: true }, (error, decoded) => {
-        const { user_id, roles } = decoded;
+    jsonwebtoken_1.default.verify(accessToken, secret, (error) => {
+        const { user_id, roles } = jsonwebtoken_1.default.decode(accessToken);
         req.body.user_id = user_id;
         req.body.roles = roles;
-        if (error === "UnauthorizedError")
+        if ((error === null || error === void 0 ? void 0 : error.name) === "UnauthorizedError")
             return res.status(401).send({ error, message: "Token is not valid" });
-        if (error === "JsonWebTokenError")
+        if ((error === null || error === void 0 ? void 0 : error.name) === "JsonWebTokenError")
             return res.status(401).send({ error, message: "Token is unknown" });
-        if ((error === null || error === void 0 ? void 0 : error.name) === "TokenExpiredError" && req.refreshToken) {
+        if ((error === null || error === void 0 ? void 0 : error.name) === "TokenExpiredError") {
             const ACCESS_SECRET = process.env.ACCESS_TKN_SECRET;
             const ACCESS_TOKEN = jsonwebtoken_1.default.sign({ user_id, roles }, ACCESS_SECRET, { expiresIn: "15m" });
             return res.status(200).send({ accessToken: ACCESS_TOKEN });
