@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { checkAccess, login } from "../action/auth";
+import { login } from "../action/auth";
 
 export interface IAuthState {
   access_status: string;
@@ -24,23 +24,6 @@ const authSlice = createSlice({
     }
   },
   extraReducers(builder) {
-    // checkAccess
-    builder.addCase(checkAccess.fulfilled, (state, action) => {
-      state.token_status = "";
-      state.isLoading = false;
-      state.access_status = action.payload.message;
-      sessionStorage.setItem("token", action.payload.token);
-      sessionStorage.setItem("sessionTime", new Date().toString());
-    });
-
-    builder.addCase(checkAccess.rejected, (state, action) => {
-      if (action.payload) {
-        state.access_status = action.payload.errorMessage;
-      }
-    });
-
-    // login
-
     builder.addCase(login.fulfilled, (state, action) => {
       state.isLoading = false;
       state.access_status = action.payload.message;

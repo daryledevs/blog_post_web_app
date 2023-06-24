@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
-import { checkAccess } from "./redux/action/auth";
+import { Route, Routes } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "./redux/hooks/hooks";
 import { useDispatch } from "react-redux";
 import { io } from "socket.io-client";
@@ -49,11 +48,11 @@ function App() {
       const hour = milliseconds / 36e5;
 
       // If it's been an hour or more, then get a new access token
-      if (hour < 0) appDispatch(checkAccess());
+      if (hour < 0) appDispatch(userDataThunk(token));
       else appDispatch(userDataThunk(token));
 
     } else {
-      appDispatch(checkAccess());
+      appDispatch(userDataThunk(token));
     }
   }, [access_status]);
   

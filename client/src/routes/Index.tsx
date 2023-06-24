@@ -66,6 +66,7 @@ function RouteIndex() {
       case "User not found":
       case "Forbidden":
       case "Get the user's data failed":
+      case "Unauthorized":
         setRoute(routeElement(false));
         break;
     }
