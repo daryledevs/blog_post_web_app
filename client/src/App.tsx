@@ -6,6 +6,7 @@ import { io } from "socket.io-client";
 import { getMessage } from "./redux/reducer/chat";
 import { userDataThunk } from "./redux/action/user";
 import RouteIndex from "./routes/Index";
+import api from "./assets/data/api";
 
 
 function App() {
@@ -37,23 +38,35 @@ function App() {
     if(comingMessage) dispatch(getMessage(comingMessage));
   }, [comingMessage]);
 
+
   useEffect(() => {
-    const token: any = sessionStorage.getItem("token");
-    const sessionTime = sessionStorage.getItem("sessionTime");
-    
-    if (sessionTime && token && token_status === "") {
-      const currentTime = new Date();
-      const lastTime = new Date(sessionTime);
-      const milliseconds = Math.abs(currentTime.valueOf() - lastTime.valueOf());
-      const hour = milliseconds / 36e5;
+    //  const currentTime = new Date();
+    //  const lastTime = new Date(sessionTime);
+    //  const milliseconds = Math.abs(currentTime.valueOf() - lastTime.valueOf());
+    //  const hour = milliseconds / 36e5;
+    async function performRequest() {
+      try {
+        const token: any = sessionStorage.getItem("token");
+        const response = await api.get("/users", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-      // If it's been an hour or more, then get a new access token
-      if (hour < 0) appDispatch(userDataThunk(token));
-      else appDispatch(userDataThunk(token));
+        // if access token is expired
+        if (response.data.accessToken) {
+          sessionStorage.setItem("token", response.data.accessToken);
+          await performRequest();
+        }
 
-    } else {
-      appDispatch(userDataThunk(token));
+        // else proceed to API call for user's information
+        if (token && token_status === "") appDispatch(userDataThunk(token));
+      } catch (error) {
+        console.log(error);
+      }
     }
+
+    performRequest();
   }, [access_status]);
   
   
