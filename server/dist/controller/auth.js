@@ -117,10 +117,10 @@ const resetPasswordForm = (req, res) => __awaiter(void 0, void 0, void 0, functi
 exports.resetPasswordForm = resetPasswordForm;
 const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, user_id, password, confirmPassword } = req.body;
-    const isMatch = password !== confirmPassword;
-    const errMsg = "Password does not match confirm password";
-    if (isMatch)
-        return res.status(401).send({ message: errMsg });
+    if (password !== confirmPassword)
+        return res.status(401).send({ message: "Password does not match confirm password" });
+    if (password.length <= 5)
+        return res.status(400).json({ error: "Password should be at least 5 characters long." });
     const hashPassword = bcrypt_1.default.hashSync(password, bcrypt_1.default.genSaltSync(10));
     const sql = `
     SELECT * FROM users WHERE email = (?) AND user_id = (?);
