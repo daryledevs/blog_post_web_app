@@ -91,12 +91,20 @@ const resetPasswordForm =  async (req: Request, res: Response) => {
 
 const resetPassword = async (req: Request, res: Response) => {
   const { email, user_id, password, confirmPassword } = req.body;
+  const isMatch = password !== confirmPassword;
+  const errMsg = "Password does not match confirm password";
+  if(isMatch) return res.status(401).send({ message: errMsg });
   const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
-  const sql = "UPDATE users SET password = (?) WHERE email = (?) AND user_id = (?);";
-  database.query(sql, [hashPassword, email, user_id], (error, data) => {
+  const sql = `
+    SELECT * FROM users WHERE email = (?) AND user_id = (?);
+    UPDATE users SET password = (?) WHERE email = (?) AND user_id = (?);
+  `;
+  database.query(sql, [
+    email, user_id,
+    hashPassword, email, user_id
+  ], (error, data) => {
     if(error) return res.status(500).send({ message: "Reset password failed", error });
     if(!data.length) return res.status(404).send({ message: "User not found" });
-    if(password !== confirmPassword) return res.status(401).send({ message: "Password does not match confirm password" });
     res.status(200).send({ message: "Reset password successfully" });
   });
 };

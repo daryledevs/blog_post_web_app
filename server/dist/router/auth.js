@@ -10,5 +10,6 @@ router.post("/register", auth_1.register);
 router.post("/login", auth_1.login);
 router.post("/forgot-password", auth_1.forgotPassword);
 router.get("/reset-password-form", auth_1.resetPasswordForm);
+router.post("/reset-password", auth_1.resetPassword);
 router.get("/logout", auth_1.logout);
 exports.default = router;
