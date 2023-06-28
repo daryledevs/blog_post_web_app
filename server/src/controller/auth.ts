@@ -60,8 +60,6 @@ const login = async (req: Request, res: Response) => {
   }
 };
 
-
-
 const forgotPassword = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
@@ -90,8 +88,8 @@ const forgotPassword = async (req: Request, res: Response) => {
 };
 
 const resetPasswordForm =  async (req: Request, res: Response) => {
-  const encodedToken = req.query.token as string;
-  const decodedToken = decodeURIComponent(encodedToken);
+  const token = req.query.token as string;
+  const decodedToken = decodeURIComponent(token);
   const sqlSelect = "SELECT * FROM reset_password_token WHERE id = (?);";
 
   // Check if the token (id) exists in the database.
@@ -108,24 +106,28 @@ const resetPasswordForm =  async (req: Request, res: Response) => {
 
 const resetPassword = async (req: Request, res: Response) => {
   try {
+    const token = req.query.token as string;
+    const decodedToken = decodeURIComponent(token);
     const { email, user_id, password, confirmPassword } = req.body;
     if(password !== confirmPassword) return res.status(422).send({ message: "Password does not match confirm password" });
     if(password.length <= 5) return res.status(400).json({ error: "Password should be at least 5 characters long." });
 
     const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
     const sqlSelect = "SELECT * FROM users WHERE email = (?) AND user_id = (?);";
-    const sqlUpdate = "UPDATE users SET password = (?) WHERE email = (?) AND user_id = (?);"
+    const sqlUpdate = "UPDATE users SET password = (?) WHERE email = (?) AND user_id = (?);";
+    const sqlDelete = "DELETE reset_password_token WHERE id = ?;";
 
     // Check if the user exists.
     const [user] = await db(sqlSelect, [email, user_id]);
     if(!user) return res.status(404).send({ message: "User not found" });
 
-    // Update the user's password/
+    // Update the user's password and delete the reset password token from the database.
     await db(sqlUpdate, [hashPassword, email, user_id]);
+    await db(sqlDelete, [decodedToken]);
     res.status(200).send({ message: "Reset password successfully" });
   } catch (error) {
     res.status(500).send({ message: "Reset password failed", error });
-  }
+  };
 };
 
 const logout = async (req: Request, res: Response) => {

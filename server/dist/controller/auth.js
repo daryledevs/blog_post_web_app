@@ -119,8 +119,8 @@ const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
 });
 exports.forgotPassword = forgotPassword;
 const resetPasswordForm = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const encodedToken = req.query.token;
-    const decodedToken = decodeURIComponent(encodedToken);
+    const token = req.query.token;
+    const decodedToken = decodeURIComponent(token);
     const sqlSelect = "SELECT * FROM reset_password_token WHERE id = (?);";
     // Check if the token (id) exists in the database.
     const [data] = yield (0, query_1.default)(sqlSelect, [decodedToken]);
@@ -136,6 +136,8 @@ const resetPasswordForm = (req, res) => __awaiter(void 0, void 0, void 0, functi
 exports.resetPasswordForm = resetPasswordForm;
 const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const token = req.query.token;
+        const decodedToken = decodeURIComponent(token);
         const { email, user_id, password, confirmPassword } = req.body;
         if (password !== confirmPassword)
             return res.status(422).send({ message: "Password does not match confirm password" });
@@ -144,17 +146,20 @@ const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         const hashPassword = bcrypt_1.default.hashSync(password, bcrypt_1.default.genSaltSync(10));
         const sqlSelect = "SELECT * FROM users WHERE email = (?) AND user_id = (?);";
         const sqlUpdate = "UPDATE users SET password = (?) WHERE email = (?) AND user_id = (?);";
+        const sqlDelete = "DELETE reset_password_token WHERE id = ?;";
         // Check if the user exists.
         const [user] = yield (0, query_1.default)(sqlSelect, [email, user_id]);
         if (!user)
             return res.status(404).send({ message: "User not found" });
-        // Update the user's password/
+        // Update the user's password and delete the reset password token from the database.
         yield (0, query_1.default)(sqlUpdate, [hashPassword, email, user_id]);
+        yield (0, query_1.default)(sqlDelete, [decodedToken]);
         res.status(200).send({ message: "Reset password successfully" });
     }
     catch (error) {
         res.status(500).send({ message: "Reset password failed", error });
     }
+    ;
 });
 exports.resetPassword = resetPassword;
 const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
