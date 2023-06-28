@@ -3,7 +3,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import morgan from "morgan";
 import * as dotenv from "dotenv";
-import database from "./database";
+import database from "./database/database";
 import authRoutes from "./router/auth";
 import userRoutes from './router/user';
 import cookieParser from 'cookie-parser';
