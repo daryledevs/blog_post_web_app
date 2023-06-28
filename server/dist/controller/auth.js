@@ -36,49 +36,50 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.logout = exports.resetPassword = exports.resetPasswordForm = exports.forgotPassword = exports.login = exports.register = void 0;
-const database_1 = __importDefault(require("../database"));
+const authTokens_1 = require("../util/authTokens");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv = __importStar(require("dotenv"));
 const cookieOptions_1 = __importDefault(require("../config/cookieOptions"));
 const nodemailer_1 = __importDefault(require("../config/nodemailer"));
+const encrypt_1 = __importDefault(require("../util/encrypt"));
+const decrypt_1 = __importDefault(require("../util/decrypt"));
+const query_1 = __importDefault(require("../database/query"));
 dotenv.config();
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, username, password, first_name, last_name } = req.body;
-    const sql = "SELECT * FROM users WHERE email = ? OR username = ?";
-    database_1.default.query(sql, [email, username], (err, data) => {
-        if (err)
-            return res.status(500).send(err);
-        if (data.length)
-            return res.status(409).send({ message: "User is already exists" });
-        const sql = "INSERT INTO users(`username`, `email`, `password`, `first_name`, `last_name`) VALUES (?)";
+    try {
+        const { email, username, password, first_name, last_name } = req.body;
         const hashPassword = bcrypt_1.default.hashSync(password, bcrypt_1.default.genSaltSync(10));
-        const values = [username, email, hashPassword, first_name, last_name];
-        database_1.default.query(sql, [values], (error, data) => {
-            if (error)
-                return res.status(500).send(error);
-            return res.status(200).send({ message: "Registration is successful" });
-        });
-    });
+        const sqlSelect = "SELECT * FROM users WHERE email = ? OR username = ?";
+        const sqlInsert = "INSERT INTO users(`username`, `email`, `password`, `first_name`, `last_name`) VALUES (?)";
+        // Check to see if the user is already in the database.
+        const [user] = yield (0, query_1.default)(sqlSelect, [email, username]);
+        if (user)
+            return res.status(409).send({ message: "User is already exists" });
+        // Save the user to the database
+        yield (0, query_1.default)(sqlInsert, [username, email, hashPassword, first_name, last_name]);
+        return res.status(200).send({ message: "Registration is successful" });
+    }
+    catch (error) {
+        res.status(500).send({ message: "Registration failed", error });
+    }
+    ;
 });
 exports.register = register;
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { username, email, password } = req.body;
-    const sql = "SELECT * FROM users WHERE username = (?) OR email =(?)";
-    database_1.default.query(sql, [username, email], (error, data) => {
-        if (error)
-            return res.status(500).send(error);
-        if (!data.length)
+    try {
+        const { username, email, password } = req.body;
+        const sql = "SELECT * FROM users WHERE username = (?) OR email = (?)";
+        // Check if the user is exists.
+        const [user] = yield (0, query_1.default)(sql, [username, email]);
+        if (!user)
             return res.status(404).send({ message: "User not found" });
-        let [userDetails] = data;
-        // '!' non-null assertion operator 
-        const ACCESS_SECRET = process.env.ACCESS_TKN_SECRET;
-        const REFRESH_SECRET = process.env.REFRESH_TKN_SECRET;
-        if (bcrypt_1.default.compareSync(password, userDetails.password)) {
-            const ACCESS_TOKEN = jsonwebtoken_1.default.sign({ user_id: userDetails.user_id, roles: userDetails.roles }, ACCESS_SECRET, { expiresIn: "15m" });
-            const REFRESH_TKN = jsonwebtoken_1.default.sign({ user_id: userDetails.user_id, username: userDetails.username }, REFRESH_SECRET, { expiresIn: "7d" });
+        // Compare the password from database and from request body.
+        if (bcrypt_1.default.compareSync(password, user.password)) {
+            const ACCESS_TOKEN = (0, authTokens_1.generateAccessToken)(user);
+            const REFRESH_TOKEN = (0, authTokens_1.generateRefreshToken)(user);
             res
-                .cookie("REFRESH_TOKEN", REFRESH_TKN, cookieOptions_1.default)
+                .cookie("REFRESH_TOKEN", REFRESH_TOKEN, cookieOptions_1.default)
                 .status(200)
                 .send({ message: "Login successfully", token: ACCESS_TOKEN });
             return;
@@ -86,28 +87,46 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         else {
             return res.status(404).send({ message: "Password is incorrect" });
         }
-    });
+    }
+    catch (error) {
+        return res.status(500).send({ message: "Login failed", error });
+    }
 });
 exports.login = login;
 const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email } = req.body;
-    const sql = "SELECT * FROM users WHERE email = (?);";
-    database_1.default.query(sql, [email], (error, data) => {
-        if (error)
-            return res.status(500).send({ error, message: "Forgot password failed" });
-        if (!data.length)
-            return res.status(404).send({ error, message: "User doesn't exists" });
-        let [user] = data;
-        const token = jsonwebtoken_1.default.sign({ email: user.email, user_id: user.user_id }, process.env.RESET_PWD_TKN_SECRET, { expiresIn: "1hr", });
-        (0, nodemailer_1.default)(email, "Reset Password", token);
+    try {
+        const { email } = req.body;
+        const sqlSelect = "SELECT * FROM users WHERE email = ?;";
+        const sqlInsert = "INSERT INTO reset_password_token (id, encrypted) VALUES (?, ?);";
+        // Check if user exists
+        const [user] = yield (0, query_1.default)(sqlSelect, [email]);
+        if (!user)
+            return res.status(404).send({ message: "User doesn't exist" });
+        // Generate tokens
+        const token = (0, authTokens_1.generateResetToken)(user);
+        const shortToken = yield (0, authTokens_1.referenceToken)();
+        const encryptedToken = (0, encrypt_1.default)(token);
+        const encodedToken = encodeURIComponent(shortToken);
+        // Save token to the database
+        yield (0, query_1.default)(sqlInsert, [shortToken, encryptedToken]);
+        // Send reset password email
+        (0, nodemailer_1.default)(email, "Reset Password", encodedToken);
         res.json({ message: "Password reset email sent" });
-    });
+    }
+    catch (error) {
+        res.status(500).send({ message: "Forgot password failed", error });
+    }
 });
 exports.forgotPassword = forgotPassword;
 const resetPasswordForm = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // need this because of the query parameter can be a single value or an array of values
-    const token = req.query.token;
-    jsonwebtoken_1.default.verify(token, process.env.RESET_PWD_TKN_SECRET, (error, decode) => {
+    const encodedToken = req.query.token;
+    const decodedToken = decodeURIComponent(encodedToken);
+    const sqlSelect = "SELECT * FROM reset_password_token WHERE id = (?);";
+    // Check if the token (id) exists in the database.
+    const [data] = yield (0, query_1.default)(sqlSelect, [decodedToken]);
+    const decryptedToken = (0, decrypt_1.default)(data.encrypted);
+    // then decrypt the code to check if it is still valid.
+    jsonwebtoken_1.default.verify(decryptedToken, process.env.RESET_PWD_TKN_SECRET, (error, decode) => {
         if (error)
             return res.status(500).send({ message: "Cannot access the reset password form", error });
         const { email, user_id } = decode;
@@ -116,26 +135,26 @@ const resetPasswordForm = (req, res) => __awaiter(void 0, void 0, void 0, functi
 });
 exports.resetPasswordForm = resetPasswordForm;
 const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, user_id, password, confirmPassword } = req.body;
-    if (password !== confirmPassword)
-        return res.status(401).send({ message: "Password does not match confirm password" });
-    if (password.length <= 5)
-        return res.status(400).json({ error: "Password should be at least 5 characters long." });
-    const hashPassword = bcrypt_1.default.hashSync(password, bcrypt_1.default.genSaltSync(10));
-    const sql = `
-    SELECT * FROM users WHERE email = (?) AND user_id = (?);
-    UPDATE users SET password = (?) WHERE email = (?) AND user_id = (?);
-  `;
-    database_1.default.query(sql, [
-        email, user_id,
-        hashPassword, email, user_id
-    ], (error, data) => {
-        if (error)
-            return res.status(500).send({ message: "Reset password failed", error });
-        if (!data.length)
+    try {
+        const { email, user_id, password, confirmPassword } = req.body;
+        if (password !== confirmPassword)
+            return res.status(422).send({ message: "Password does not match confirm password" });
+        if (password.length <= 5)
+            return res.status(400).json({ error: "Password should be at least 5 characters long." });
+        const hashPassword = bcrypt_1.default.hashSync(password, bcrypt_1.default.genSaltSync(10));
+        const sqlSelect = "SELECT * FROM users WHERE email = (?) AND user_id = (?);";
+        const sqlUpdate = "UPDATE users SET password = (?) WHERE email = (?) AND user_id = (?);";
+        // Check if the user exists.
+        const [user] = yield (0, query_1.default)(sqlSelect, [email, user_id]);
+        if (!user)
             return res.status(404).send({ message: "User not found" });
+        // Update the user's password/
+        yield (0, query_1.default)(sqlUpdate, [hashPassword, email, user_id]);
         res.status(200).send({ message: "Reset password successfully" });
-    });
+    }
+    catch (error) {
+        res.status(500).send({ message: "Reset password failed", error });
+    }
 });
 exports.resetPassword = resetPassword;
 const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {

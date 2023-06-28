@@ -1,88 +1,105 @@
-import database from "../database";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  generateResetToken,
+  referenceToken,
+} from "../util/authTokens";
 import { Request, Response, query } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import * as dotenv from "dotenv";
 import cookieOptions from "../config/cookieOptions";
 import sendEmail from "../config/nodemailer";
+import encryptData from "../util/encrypt";
+import decryptData from "../util/decrypt";
+import db from "../database/query";
 dotenv.config();
 
 const register = async (req: Request, res: Response) => {
-  const { email, username, password, first_name, last_name } = req.body;
-  const sql = "SELECT * FROM users WHERE email = ? OR username = ?";
-  database.query(sql, [email, username], (err, data) => {
-    if(err) return res.status(500).send(err);
-    if(data.length) return res.status(409).send({ message: "User is already exists" });
-    const sql = "INSERT INTO users(`username`, `email`, `password`, `first_name`, `last_name`) VALUES (?)";
+  try {
+    const { email, username, password, first_name, last_name } = req.body;
     const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
-    const values = [username, email, hashPassword, first_name, last_name];
-    database.query(sql, [values], (error, data) => {
-      if(error) return res.status(500).send(error);
-      return res.status(200).send({ message: "Registration is successful" });
-    });
-  });
+    const sqlSelect = "SELECT * FROM users WHERE email = ? OR username = ?";
+    const sqlInsert = "INSERT INTO users(`username`, `email`, `password`, `first_name`, `last_name`) VALUES (?)";
+
+    // Check to see if the user is already in the database.
+    const [user] = await db(sqlSelect, [email, username]);
+    if(user) return res.status(409).send({ message: "User is already exists" });
+
+    // Save the user to the database
+    await db(sqlInsert, [username, email, hashPassword, first_name, last_name]);
+    return res.status(200).send({ message: "Registration is successful" });
+  } catch (error) {
+    res.status(500).send({ message: "Registration failed", error });
+  };
 };
 
 const login = async (req: Request, res: Response) => {
-  const { username, email, password } = req.body;
-  const sql = "SELECT * FROM users WHERE username = (?) OR email =(?)";
-  database.query(
-    sql,
-    [username, email],
-    (error, data) =>{
-      if(error) return res.status(500).send(error);
-      if(!data.length) return res.status(404).send({ message: "User not found" });
-      let [userDetails] = data;
-      // '!' non-null assertion operator 
-      const ACCESS_SECRET = process.env.ACCESS_TKN_SECRET!;
-      const REFRESH_SECRET = process.env.REFRESH_TKN_SECRET!;
-      if(bcrypt.compareSync(password, userDetails.password)){
+  try {
+    const { username, email, password } = req.body;
+    const sql = "SELECT * FROM users WHERE username = (?) OR email = (?)";
+    
+    // Check if the user is exists.
+    const [user] = await db(sql, [username, email]);
+    if (!user) return res.status(404).send({ message: "User not found" });
 
-        const ACCESS_TOKEN = jwt.sign(
-          { user_id: userDetails.user_id, roles: userDetails.roles },
-          ACCESS_SECRET,
-          { expiresIn: "15m" }
-        );
-        const REFRESH_TKN = jwt.sign(
-          { user_id: userDetails.user_id, username: userDetails.username },
-          REFRESH_SECRET,
-          { expiresIn: "7d" }
-        );
-        
-        res
-          .cookie("REFRESH_TOKEN", REFRESH_TKN, cookieOptions)
-          .status(200)
-          .send({ message: "Login successfully", token: ACCESS_TOKEN });
-
-        return; 
-      } else {
-        return res.status(404).send({ message: "Password is incorrect" });
-      }
+    // Compare the password from database and from request body.
+    if (bcrypt.compareSync(password, user.password)) {
+      const ACCESS_TOKEN = generateAccessToken(user);
+      const REFRESH_TOKEN = generateRefreshToken(user);
+      res
+        .cookie("REFRESH_TOKEN", REFRESH_TOKEN, cookieOptions)
+        .status(200)
+        .send({ message: "Login successfully", token: ACCESS_TOKEN });
+      return;
+    } else {
+      return res.status(404).send({ message: "Password is incorrect" });
     }
-  );
+  } catch (error) {
+    return res.status(500).send({ message: "Login failed", error });
+  }
 };
 
+
+
 const forgotPassword = async (req: Request, res: Response) => {
-  const { email } = req.body;
-  const sql = "SELECT * FROM users WHERE email = (?);";
-  database.query(sql, [email], (error, data) => {
-    if(error) return res.status(500).send({ error, message: "Forgot password failed" });
-    if(!data.length) return res.status(404).send({ error, message: "User doesn't exists" });
-    let [user] = data;
-    const token = jwt.sign(
-      { email: user.email, user_id: user.user_id },
-      process.env.RESET_PWD_TKN_SECRET!,
-      { expiresIn: "1hr", }
-    );
-    sendEmail(email, "Reset Password", token);
+  try {
+    const { email } = req.body;
+    const sqlSelect = "SELECT * FROM users WHERE email = ?;";
+    const sqlInsert = "INSERT INTO reset_password_token (id, encrypted) VALUES (?, ?);";
+    
+    // Check if user exists
+    const [user] = await db(sqlSelect, [email]);
+    if (!user) return res.status(404).send({ message: "User doesn't exist" });
+    
+    // Generate tokens
+    const token = generateResetToken(user);
+    const shortToken = await referenceToken();
+    const encryptedToken = encryptData(token);
+    const encodedToken = encodeURIComponent(shortToken);
+
+    // Save token to the database
+    await db(sqlInsert, [shortToken, encryptedToken]);
+
+    // Send reset password email
+    sendEmail(email, "Reset Password", encodedToken);
     res.json({ message: "Password reset email sent" });
-  });
+  } catch (error) {
+    res.status(500).send({ message: "Forgot password failed", error });
+  }
 };
 
 const resetPasswordForm =  async (req: Request, res: Response) => {
-  // need this because of the query parameter can be a single value or an array of values
-  const token: string | string[] | undefined = req.query.token as string;
-  jwt.verify(token, process.env.RESET_PWD_TKN_SECRET!, (error, decode) => {
+  const encodedToken = req.query.token as string;
+  const decodedToken = decodeURIComponent(encodedToken);
+  const sqlSelect = "SELECT * FROM reset_password_token WHERE id = (?);";
+
+  // Check if the token (id) exists in the database.
+  const [data] = await db(sqlSelect, [decodedToken]); 
+  const decryptedToken = decryptData(data.encrypted);
+
+  // then decrypt the code to check if it is still valid.
+  jwt.verify(decryptedToken, process.env.RESET_PWD_TKN_SECRET!, (error, decode) => {
     if(error) return res.status(500).send({ message: "Cannot access the reset password form", error });
     const { email, user_id } = decode as { email: any, user_id:any };
     res.status(200).render("resetPassword", { email, user_id });
@@ -90,23 +107,25 @@ const resetPasswordForm =  async (req: Request, res: Response) => {
 };
 
 const resetPassword = async (req: Request, res: Response) => {
-  const { email, user_id, password, confirmPassword } = req.body;
-  if(password !== confirmPassword) return res.status(401).send({ message: "Password does not match confirm password" });
-  if(password.length <= 5) return res.status(400).json({ error: "Password should be at least 5 characters long." });
+  try {
+    const { email, user_id, password, confirmPassword } = req.body;
+    if(password !== confirmPassword) return res.status(422).send({ message: "Password does not match confirm password" });
+    if(password.length <= 5) return res.status(400).json({ error: "Password should be at least 5 characters long." });
 
-  const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
-  const sql = `
-    SELECT * FROM users WHERE email = (?) AND user_id = (?);
-    UPDATE users SET password = (?) WHERE email = (?) AND user_id = (?);
-  `;
-  database.query(sql, [
-    email, user_id,
-    hashPassword, email, user_id
-  ], (error, data) => {
-    if(error) return res.status(500).send({ message: "Reset password failed", error });
-    if(!data.length) return res.status(404).send({ message: "User not found" });
+    const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
+    const sqlSelect = "SELECT * FROM users WHERE email = (?) AND user_id = (?);";
+    const sqlUpdate = "UPDATE users SET password = (?) WHERE email = (?) AND user_id = (?);"
+
+    // Check if the user exists.
+    const [user] = await db(sqlSelect, [email, user_id]);
+    if(!user) return res.status(404).send({ message: "User not found" });
+
+    // Update the user's password/
+    await db(sqlUpdate, [hashPassword, email, user_id]);
     res.status(200).send({ message: "Reset password successfully" });
-  });
+  } catch (error) {
+    res.status(500).send({ message: "Reset password failed", error });
+  }
 };
 
 const logout = async (req: Request, res: Response) => {
