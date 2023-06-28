@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deletePost = exports.editPost = exports.getUserPost = exports.newPost = void 0;
-const database_1 = __importDefault(require("../database"));
+const database_1 = __importDefault(require("../database/database"));
 const moment_1 = __importDefault(require("moment"));
 const cloudinary_1 = __importDefault(require("cloudinary"));
 const dotenv = __importStar(require("dotenv"));

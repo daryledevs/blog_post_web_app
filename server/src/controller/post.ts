@@ -1,5 +1,5 @@
 import { Response, Request } from "express";
-import database from "../database";
+import database from "../database/database";
 import moment from "moment";
 import cloudinary from "cloudinary";
 import * as dotenv from "dotenv";

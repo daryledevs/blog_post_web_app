@@ -1,5 +1,5 @@
 import { Response, Request } from "express";
-import database from "../database";
+import database from "../database/database";
 
 const postAllLikes = async (req: Request, res: Response) => {
   const { post_id } = req.params;

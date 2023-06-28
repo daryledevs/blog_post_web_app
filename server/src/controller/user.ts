@@ -1,4 +1,4 @@
-import database from "../database";
+import database from "../database/database";
 import { Request, Response } from "express";
 
 const getUserData = (data:any) => {

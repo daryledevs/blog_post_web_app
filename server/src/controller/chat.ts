@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import database from "../database";
+import database from "../database/database";
 
 const getAllChatMember = async (req: Request, res: Response) => {
   const { user_id } = req.params;

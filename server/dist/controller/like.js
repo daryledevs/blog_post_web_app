@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.likeStatus = exports.postAllLikes = exports.likePost = void 0;
-const database_1 = __importDefault(require("../database"));
+const database_1 = __importDefault(require("../database/database"));
 const postAllLikes = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { post_id } = req.params;
     const sql = "SELECT COUNT(*) FROM likes WHERE post_id = (?);";

@@ -24,7 +24,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.findUsername = exports.getTotalFeed = exports.getUserFeed = exports.findUser = exports.userData = void 0;
-const database_1 = __importDefault(require("../database"));
+const database_1 = __importDefault(require("../database/database"));
 const getUserData = (data) => {
     const [user] = data;
     const { password } = user, rest = __rest(user, ["password"]);
