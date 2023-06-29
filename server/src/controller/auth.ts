@@ -106,16 +106,15 @@ const resetPasswordForm =  async (req: Request, res: Response) => {
 
 const resetPassword = async (req: Request, res: Response) => {
   try {
-    const token = req.query.token as string;
-    const decodedToken = decodeURIComponent(token);
-    const { email, user_id, password, confirmPassword } = req.body;
+    const { tokenId, user_id, email, password, confirmPassword } = req.body;
     if(password !== confirmPassword) return res.status(422).send({ message: "Password does not match confirm password" });
     if(password.length <= 5) return res.status(400).json({ error: "Password should be at least 5 characters long." });
-
+    
+    const decodedTokenId = decodeURIComponent(tokenId);
     const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
     const sqlSelect = "SELECT * FROM users WHERE email = (?) AND user_id = (?);";
     const sqlUpdate = "UPDATE users SET password = (?) WHERE email = (?) AND user_id = (?);";
-    const sqlDelete = "DELETE reset_password_token WHERE id = ?;";
+    const sqlDelete = "DELETE FROM reset_password_token WHERE id = (?) LIMIT 1;"; // Used limit here due to "safe update mode" error.
 
     // Check if the user exists.
     const [user] = await db(sqlSelect, [email, user_id]);
@@ -123,7 +122,7 @@ const resetPassword = async (req: Request, res: Response) => {
 
     // Update the user's password and delete the reset password token from the database.
     await db(sqlUpdate, [hashPassword, email, user_id]);
-    await db(sqlDelete, [decodedToken]);
+    await db(sqlDelete, [decodedTokenId]);
     res.status(200).send({ message: "Reset password successfully" });
   } catch (error) {
     res.status(500).send({ message: "Reset password failed", error });

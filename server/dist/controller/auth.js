@@ -136,24 +136,23 @@ const resetPasswordForm = (req, res) => __awaiter(void 0, void 0, void 0, functi
 exports.resetPasswordForm = resetPasswordForm;
 const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const token = req.query.token;
-        const decodedToken = decodeURIComponent(token);
-        const { email, user_id, password, confirmPassword } = req.body;
+        const { tokenId, user_id, email, password, confirmPassword } = req.body;
         if (password !== confirmPassword)
             return res.status(422).send({ message: "Password does not match confirm password" });
         if (password.length <= 5)
             return res.status(400).json({ error: "Password should be at least 5 characters long." });
+        const decodedTokenId = decodeURIComponent(tokenId);
         const hashPassword = bcrypt_1.default.hashSync(password, bcrypt_1.default.genSaltSync(10));
         const sqlSelect = "SELECT * FROM users WHERE email = (?) AND user_id = (?);";
         const sqlUpdate = "UPDATE users SET password = (?) WHERE email = (?) AND user_id = (?);";
-        const sqlDelete = "DELETE reset_password_token WHERE id = ?;";
+        const sqlDelete = "DELETE FROM reset_password_token WHERE id = (?) LIMIT 1;"; // Used limit here due to "safe update mode" error.
         // Check if the user exists.
         const [user] = yield (0, query_1.default)(sqlSelect, [email, user_id]);
         if (!user)
             return res.status(404).send({ message: "User not found" });
         // Update the user's password and delete the reset password token from the database.
         yield (0, query_1.default)(sqlUpdate, [hashPassword, email, user_id]);
-        yield (0, query_1.default)(sqlDelete, [decodedToken]);
+        yield (0, query_1.default)(sqlDelete, [decodedTokenId]);
         res.status(200).send({ message: "Reset password successfully" });
     }
     catch (error) {
