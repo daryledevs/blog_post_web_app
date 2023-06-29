@@ -7,6 +7,7 @@ import { getMessage } from "./redux/reducer/chat";
 import { userDataThunk } from "./redux/action/user";
 import RouteIndex from "./routes/Index";
 import api from "./assets/data/api";
+import { setAccessStatus } from "./redux/reducer/auth";
 
 
 function App() {
@@ -62,7 +63,7 @@ function App() {
         // else proceed to API call for user's information
         if (token && token_status === "") appDispatch(userDataThunk(token));
       } catch (error) {
-        console.log(error);
+        appDispatch(setAccessStatus(error.response.data));
       }
     }
 

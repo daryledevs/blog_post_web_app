@@ -18,8 +18,8 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setAccessStatus: (state, action) =>{
-      state.access_status = action.payload.message;
-      state.token_status = action.payload.error.message
+      state.access_status = action.payload?.message;
+      state.token_status = action.payload?.error?.message
       sessionStorage.setItem("token", "");
     }
   },
