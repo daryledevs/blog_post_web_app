@@ -4,7 +4,7 @@ import {
   generateResetToken,
   referenceToken,
 } from "../util/authTokens";
-import { Request, Response, query } from "express";
+import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import * as dotenv from "dotenv";
@@ -88,20 +88,24 @@ const forgotPassword = async (req: Request, res: Response) => {
 };
 
 const resetPasswordForm =  async (req: Request, res: Response) => {
-  const token = req.query.token as string;
-  const decodedToken = decodeURIComponent(token);
-  const sqlSelect = "SELECT * FROM reset_password_token WHERE id = (?);";
+  try {  
+    const token = req.query.token as string;
+    const decodedToken = decodeURIComponent(token);
+    const sqlSelect = "SELECT * FROM reset_password_token WHERE id = (?);";
 
-  // Check if the token (id) exists in the database.
-  const [data] = await db(sqlSelect, [decodedToken]); 
-  const decryptedToken = decryptData(data.encrypted);
+    // Check if the token (id) exists in the database.
+    const [data] = await db(sqlSelect, [decodedToken]); 
+    const decryptedToken = decryptData(data.encrypted);
 
-  // then decrypt the code to check if it is still valid.
-  jwt.verify(decryptedToken, process.env.RESET_PWD_TKN_SECRET!, (error, decode) => {
-    if(error) return res.status(500).send({ message: "Cannot access the reset password form", error });
-    const { email, user_id } = decode as { email: any, user_id:any };
-    res.status(200).render("resetPassword", { email, user_id });
-  });
+    // then decrypt the code to check if it is still valid.
+    jwt.verify(decryptedToken, process.env.RESET_PWD_TKN_SECRET!, (error, decode) => {
+      if(error) return res.status(500).send({ message: "Cannot access the reset password form", error });
+      const { email, user_id } = decode as { email: any, user_id:any };
+      res.status(200).render("resetPassword", { email, user_id });
+    });
+  } catch (error) {
+    res.status(500).send({ message: "The token must be expired", error });
+  }
 };
 
 const resetPassword = async (req: Request, res: Response) => {

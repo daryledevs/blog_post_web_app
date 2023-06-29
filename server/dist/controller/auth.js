@@ -119,19 +119,24 @@ const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
 });
 exports.forgotPassword = forgotPassword;
 const resetPasswordForm = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const token = req.query.token;
-    const decodedToken = decodeURIComponent(token);
-    const sqlSelect = "SELECT * FROM reset_password_token WHERE id = (?);";
-    // Check if the token (id) exists in the database.
-    const [data] = yield (0, query_1.default)(sqlSelect, [decodedToken]);
-    const decryptedToken = (0, decrypt_1.default)(data.encrypted);
-    // then decrypt the code to check if it is still valid.
-    jsonwebtoken_1.default.verify(decryptedToken, process.env.RESET_PWD_TKN_SECRET, (error, decode) => {
-        if (error)
-            return res.status(500).send({ message: "Cannot access the reset password form", error });
-        const { email, user_id } = decode;
-        res.status(200).render("resetPassword", { email, user_id });
-    });
+    try {
+        const token = req.query.token;
+        const decodedToken = decodeURIComponent(token);
+        const sqlSelect = "SELECT * FROM reset_password_token WHERE id = (?);";
+        // Check if the token (id) exists in the database.
+        const [data] = yield (0, query_1.default)(sqlSelect, [decodedToken]);
+        const decryptedToken = (0, decrypt_1.default)(data.encrypted);
+        // then decrypt the code to check if it is still valid.
+        jsonwebtoken_1.default.verify(decryptedToken, process.env.RESET_PWD_TKN_SECRET, (error, decode) => {
+            if (error)
+                return res.status(500).send({ message: "Cannot access the reset password form", error });
+            const { email, user_id } = decode;
+            res.status(200).render("resetPassword", { email, user_id });
+        });
+    }
+    catch (error) {
+        res.status(500).send({ message: "The token must be expired", error });
+    }
 });
 exports.resetPasswordForm = resetPasswordForm;
 const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
