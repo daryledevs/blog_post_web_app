@@ -36,94 +36,88 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deletePost = exports.editPost = exports.getUserPost = exports.newPost = void 0;
-const database_1 = __importDefault(require("../database/database"));
-const moment_1 = __importDefault(require("moment"));
-const cloudinary_1 = __importDefault(require("cloudinary"));
 const dotenv = __importStar(require("dotenv"));
-const fs = __importStar(require("fs"));
+const query_1 = __importDefault(require("../database/query"));
+const cloudinary_1 = __importDefault(require("../config/cloudinary"));
 dotenv.config();
-cloudinary_1.default.v2.config({
-    cloud_name: process.env.STORAGE_NAME,
-    api_key: process.env.STORAGE_API_KEY,
-    api_secret: process.env.STORAGE_API_SECRET,
-    secure: true,
-});
-function uploadAndDeleteLocal(path) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const result = yield cloudinary_1.default.v2.uploader.upload(path, { unique_filename: true });
-        fs.unlink(path, (err) => {
-            if (err)
-                throw err;
-            console.log("Delete File successfully.");
-        });
-        return { image_id: result.public_id, image_url: result.url };
-    });
-}
-;
 const getUserPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { user_id } = req.params;
-    const sql = `
-              SELECT 
-                  p.*,
-                  (SELECT 
-                    COUNT(*)
-                  FROM
-                    likes l
-                  WHERE
-                    p.post_id = l.post_id
-                  ) AS "count"
-              FROM
-                  posts p
-              WHERE
-                  p.user_id = (?);  
-              `;
-    database_1.default.query(sql, [user_id], (error, data) => {
-        if (error)
-            return res.status(500).send({ error });
+    try {
+        const { user_id } = req.params;
+        const sql = `
+      SELECT 
+        P.*,
+        (
+          SELECT 
+            COUNT(*)
+          FROM
+            LIKES L
+          WHERE
+            P.POST_ID = L.POST_ID
+        ) AS "COUNT"
+      FROM
+          POSTS P
+      WHERE
+          P.USER_ID = (?);
+    `;
+        const [data] = yield (0, query_1.default)(sql, [user_id]);
+        if (!data)
+            return res.status(500).send({ error: "No post found" });
         res.status(200).send({ post: data });
-    });
+    }
+    catch (error) {
+        res.status(500).send({ message: "An error occurred", error });
+    }
 });
 exports.getUserPost = getUserPost;
 const newPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { user_id, caption } = req.body;
-    const { img } = req.files;
-    const path = img[0].destination + "\\" + img[0].filename;
-    const { image_id, image_url } = yield uploadAndDeleteLocal(path);
-    const post_date = (0, moment_1.default)(new Date(), "YYYY-MM-DD HH:mm:ss").format("YYYY/MM/DD HH:mm:ss");
-    const values = [user_id, caption, image_id, image_url, post_date];
-    const sql = "INSERT INTO posts (`user_id`, `caption`, `image_id`, `image_url`, `post_date`) VALUES (?);";
-    database_1.default.query(sql, [values], (error, data) => {
-        if (error)
-            return res.status(500).send({ message: "Post failed", error });
+    try {
+        const { user_id, caption } = req.body;
+        const { img } = req.files;
+        const path = img[0].destination + "\\" + img[0].filename;
+        const { image_id, image_url } = yield (0, cloudinary_1.default)(path);
+        const values = [user_id, caption, image_id, image_url];
+        const sql = `
+      INSERT INTO POSTS 
+      (USER_ID, CAPTION, IMAGE_ID, IMAGE_URL) VALUES (?);
+    `;
+        yield (0, query_1.default)(sql, [values]);
         res.status(200).send({ message: "Post has been posted" });
-    });
+    }
+    catch (error) {
+        res.status(500).send({ message: "An error occurred", error });
+    }
 });
 exports.newPost = newPost;
 const editPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { post_id } = req.params;
-    const body = req.body;
-    let query = ``;
-    if (body.post_id || body.user_id)
-        return res.status(406).send({ message: "The following data cannot be change" });
-    Object.keys(body).forEach(function (key, index) {
-        query = `${key} = "${body[`${key}`]}"`;
-    });
-    const sql = `UPDATE posts SET ${query} WHERE post_id = (?);`;
-    database_1.default.query(sql, [parseInt(post_id)], (error, data) => {
-        if (error)
-            return res.status(500).send({ error });
+    try {
+        const { post_id } = req.params;
+        const body = req.body;
+        if (body === null || body === void 0 ? void 0 : body.user_id)
+            return res.status(406).send({ message: "The following data cannot be changed" });
+        // Get all the keys and values that are going to be changed.
+        let query = ``;
+        Object.keys(body).forEach(function (key, index) {
+            query = `${key} = "${body[`${key}`]}"`;
+        });
+        const sql = `UPDATE POSTS SET ${query} WHERE POST_ID = (?);`;
+        yield (0, query_1.default)(sql, [parseInt(post_id)]);
         res.status(200).send({ message: "Edit post successfully" });
-    });
+    }
+    catch (error) {
+        res.status(500).send({ message: "An error occurred", error });
+    }
 });
 exports.editPost = editPost;
 const deletePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { post_id } = req.params;
-    const sql = "DELETE FROM posts WHERE post_id = (?);";
-    database_1.default.query(sql, [parseInt(post_id)], (error, data) => {
-        if (error)
-            return res.status(500).send({ error });
+    try {
+        const { post_id } = req.params;
+        const sql = "DELETE FROM POSTS WHERE POST_ID = (?);";
+        yield (0, query_1.default)(sql, [parseInt(post_id)]);
         res.status(200).send("Delete post successfully");
-    });
+    }
+    catch (error) {
+        res.status(500).send({ message: "An error occurred", error });
+    }
 });
 exports.deletePost = deletePost;
 // Another way of getting data from a database

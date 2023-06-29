@@ -12,115 +12,125 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getFollowers = exports.followUser = exports.totalFollow = void 0;
-const database_1 = __importDefault(require("../database/database"));
+exports.followUser = exports.getFollowers = exports.totalFollow = void 0;
+const query_1 = __importDefault(require("../database/query"));
 const totalFollow = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { user_id } = req.params;
-    const sql = `
-              SELECT 
-                COUNT(f.followed_id) AS \`count\`
-              FROM
-                followers f
-              INNER JOIN
-                users u ON f.follower_id = u.user_id
-              WHERE
-                f.followed_id = (?) GROUP BY f.followed_id;
+    try {
+        const { user_id } = req.params;
+        const sql = `
+      SELECT 
+        COUNT(F.FOLLOWED_ID) AS \`COUNT\`
+      FROM
+        FOLLOWERS F
+      INNER JOIN
+        USERS U ON F.FOLLOWER_ID = U.USER_ID
+      WHERE
+        F.FOLLOWED_ID = (?)
+      GROUP BY F.FOLLOWED_ID;
 
-              SELECT 
-                COUNT(f.followed_id) AS \`count\`
-              FROM
-                followers f
-              INNER JOIN
-                users u ON f.followed_id = u.user_id
-              WHERE
-                f.follower_id = (?) GROUP BY f.follower_id;
-            `;
-    database_1.default.query(sql, [user_id, user_id], (error, data) => {
-        if (error)
-            return res.status(500).send({ error });
+      SELECT 
+        COUNT(F.FOLLOWED_ID) AS \`COUNT\`
+      FROM
+        FOLLOWERS F
+      INNER JOIN
+        USERS U ON F.FOLLOWED_ID = U.USER_ID
+      WHERE
+        F.FOLLOWER_ID = (?)
+      GROUP BY F.FOLLOWER_ID;
+    `;
+        const [data] = yield (0, query_1.default)(sql, [user_id, user_id]);
         const [followers] = data[0];
         const [following] = data[1];
         res.status(200).send({
             followers: (followers === null || followers === void 0 ? void 0 : followers.count) ? followers.count : 0,
             following: (following === null || following === void 0 ? void 0 : following.count) ? following.count : 0,
         });
-    });
+    }
+    catch (error) {
+        res.status(500).send({ message: "An error occurred", error });
+    }
 });
 exports.totalFollow = totalFollow;
 const getFollowers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { user_id } = req.params;
-    const { follower_ids, following_ids } = req.body;
-    const isEmpty = (arr) => (arr.length ? arr : 0);
-    const followers = isEmpty(follower_ids);
-    const following = isEmpty(following_ids);
-    const sql = `
-              SELECT 
-                  f.*, 
-                  u.user_id, 
-                  u.username, 
-                  u.first_name, 
-                  u.last_name, 
-                  u.avatar_url
-              FROM
-                followers f
-              INNER JOIN
-                users u ON f.follower_id = u.user_id
-              WHERE
-                f.followed_id = (?) AND f.follower_id NOT IN (?)
-              LIMIT 3;
+    try {
+        const { user_id } = req.params;
+        const { follower_ids, following_ids } = req.body;
+        const isEmpty = (arr) => (arr.length ? arr : 0);
+        const followers = isEmpty(follower_ids);
+        const following = isEmpty(following_ids);
+        const sql = `
+      SELECT 
+        F.*, 
+        U.USER_ID, 
+        U.USERNAME, 
+        U.FIRST_NAME, 
+        U.LAST_NAME, 
+        U.AVATAR_URL
+      FROM
+        FOLLOWERS F
+      INNER JOIN
+        USERS U ON F.FOLLOWER_ID = U.USER_ID
+      WHERE
+        F.FOLLOWED_ID = (?) AND F.FOLLOWER_ID NOT IN (?)
+      LIMIT 3;
 
-              SELECT 
-                  f.*, 
-                  u.user_id, 
-                  u.username, 
-                  u.first_name, 
-                  u.last_name,  
-                  u.avatar_url
-              FROM
-                  followers f
-              INNER JOIN
-                  users u ON f.followed_id = u.user_id
-              WHERE
-                  f.follower_id = (?) AND f.followed_id NOT IN (?)
-              LIMIT 3;
-            `;
-    database_1.default.query(sql, [
-        user_id, followers,
-        user_id, following
-    ], (error, data) => {
-        if (error)
-            return res.status(500).send({ error });
-        res.status(200).send({
-            followers: data[0],
-            following: data[1],
-        });
-    });
+      SELECT 
+        F.*, 
+        U.USER_ID, 
+        U.USERNAME, 
+        U.FIRST_NAME, 
+        U.LAST_NAME,  
+        U.AVATAR_URL
+      FROM
+        FOLLOWERS F
+      INNER JOIN
+        USERS U ON F.FOLLOWED_ID = U.USER_ID
+      WHERE
+        F.FOLLOWER_ID = (?) AND F.FOLLOWED_ID NOT IN (?)
+      LIMIT 3;
+    `;
+        const [followersData, followingData] = yield (0, query_1.default)(sql, [
+            user_id, followers, user_id, following,
+        ]);
+        res.status(200).send({ followers: followersData, following: followingData });
+    }
+    catch (error) {
+        res.status(500).send({ message: "An error occurred", error });
+    }
 });
 exports.getFollowers = getFollowers;
 const followUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let { followed_id, follower_id } = req.params;
-    const values = [parseInt(followed_id), parseInt(follower_id)];
-    const sql_get = "SELECT * FROM followers WHERE followed_id = (?) AND follower_id = (?);";
-    const sql_delete = "DELETE FROM followers WHERE followed_id = (?) AND follower_id = (?);";
-    const sql_create = "INSERT INTO followers (`followed_id`, `follower_id`) VALUES(?, ?);";
-    // Get all the data from the database to see if it is already there
-    database_1.default.query(sql_get, [...values], (error, data) => {
-        if (error)
-            return res.status(500).send({ message: error });
+    try {
+        let { followed_id, follower_id } = req.params;
+        const values = [parseInt(followed_id), parseInt(follower_id)];
+        const sqlCreate = `
+      INSERT INTO FOLLOWERS 
+      (FOLLOWED_ID, FOLLOWER_ID) VALUES (?, ?);
+    `;
+        const sqlGet = `
+      SELECT * 
+      FROM FOLLOWERS 
+      WHERE FOLLOWED_ID = (?) AND FOLLOWER_ID = (?);
+    `;
+        const sqlDelete = `
+      DELETE FROM FOLLOWERS 
+      WHERE FOLLOWED_ID = (?) AND FOLLOWER_ID = (?);
+    `;
+        // Get all the data from the database to see if it is already there
+        const [data] = yield (0, query_1.default)(sqlGet, [...values]);
         // If it already exists, delete the data from the database
         if (data.length) {
-            return database_1.default.query(sql_delete, [...values], (error, data) => {
-                if (error)
-                    return res.status(500).send({ message: "Unfollowed failed", error });
-                res.status(200).send({ message: "Unfollowed user" });
-            });
+            yield (0, query_1.default)(sqlDelete, [...values]);
+            res.status(200).send({ message: "Unfollowed user" });
         }
-        // if there is no data on database then, create one
-        database_1.default.query(sql_create, [...values], (error, data) => {
-            if (error)
-                return res.status(500).send({ message: "Unfollow failed", error });
+        else {
+            // if there is no data in the database, create one
+            yield (0, query_1.default)(sqlCreate, [...values]);
             res.status(200).send({ message: "Followed user" });
-        });
-    });
+        }
+    }
+    catch (error) {
+        res.status(500).send({ message: "An error occurred", error });
+    }
 });
 exports.followUser = followUser;

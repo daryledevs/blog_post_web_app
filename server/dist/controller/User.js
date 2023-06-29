@@ -24,113 +24,123 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.findUsername = exports.getTotalFeed = exports.getUserFeed = exports.findUser = exports.userData = void 0;
-const database_1 = __importDefault(require("../database/database"));
+const query_1 = __importDefault(require("../database/query"));
 const getUserData = (data) => {
     const [user] = data;
     const { password } = user, rest = __rest(user, ["password"]);
     return rest;
 };
 const userData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { user_id } = req.body;
-    const sql = "SELECT * FROM users WHERE user_id = (?);";
-    database_1.default.query(sql, [user_id], (error, data) => {
-        if (error)
-            return res.status(500).send({ message: error });
+    try {
+        const { user_id } = req.body;
+        const sql = "SELECT * FROM USERS WHERE USER_ID = (?);";
+        const [data] = yield (0, query_1.default)(sql, [user_id]);
         if (!data.length)
             return res.status(404).send({ message: "User not found" });
         const rest = getUserData(data);
         res.status(200).send({ user: rest });
-    });
+    }
+    catch (error) {
+        res.status(500).send({ message: "An error occurred", error });
+    }
 });
 exports.userData = userData;
-const getUserFeed = (req, res) => {
-    const { post_ids, user_id } = req.body;
-    const values = post_ids.length ? post_ids : 0;
-    const sql = `
-              SELECT 
-                  f.followed_id, 
-                  f.follower_id, 
-                  p.*, 
-                  (SELECT 
-                    COUNT(*)
-                  FROM
-                    likes l
-                  WHERE
-                    p.post_id = l.post_id
-                  ) AS "count"
-              FROM
-                  followers f
-              INNER JOIN
-                  posts p ON p.user_id = f.followed_id
-              WHERE
-                  f.follower_id = (?) AND 
-                  p.post_date > DATE_SUB(CURDATE(), INTERVAL 3 DAY) AND
-                  post_id NOT IN (?) 
-              ORDER BY RAND() LIMIT 3;
-          `;
-    database_1.default.query(sql, [user_id, values], (error, data) => {
-        if (error)
-            return res.status(500).send({ error });
+const getUserFeed = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { post_ids, user_id } = req.body;
+        const values = post_ids.length ? post_ids : 0;
+        const sql = `
+      SELECT 
+          F.FOLLOWED_ID, 
+          F.FOLLOWER_ID, 
+          P.*, 
+          (SELECT 
+            COUNT(*)
+          FROM
+            LIKES L
+          WHERE
+            P.POST_ID = L.POST_ID
+          ) AS "COUNT"
+      FROM
+          FOLLOWERS F
+      INNER JOIN
+          POSTS P ON P.USER_ID = F.FOLLOWED_ID
+      WHERE
+          F.FOLLOWER_ID = (?) AND 
+          P.POST_DATE > DATE_SUB(CURDATE(), INTERVAL 3 DAY) AND
+          POST_ID NOT IN (?) 
+      ORDER BY RAND() LIMIT 3;
+   `;
+        const data = yield (0, query_1.default)(sql, [user_id, values]);
         res.status(200).send({ feed: data });
-    });
-};
+    }
+    catch (error) {
+        res.status(500).send({ message: "An error occurred", error });
+    }
+});
 exports.getUserFeed = getUserFeed;
 const getTotalFeed = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { user_id } = req.body;
-    const sql = `
-              SELECT 
-                  COUNT(*)
-              FROM
-                  posts
-              WHERE
-                  post_date > DATE_SUB(CURDATE(), INTERVAL 3 DAY)
-              ORDER BY RAND() LIMIT 3;
-              `;
-    database_1.default.query(sql, [user_id], (error, data) => {
-        if (error)
-            return res.status(500).send({ error });
-        res.status(200).send({ count: data[0]["COUNT(*)"] });
-    });
+    try {
+        const { user_id } = req.body;
+        const sql = `
+      SELECT 
+          COUNT(*)
+      FROM
+          POSTS
+      WHERE
+          POST_DATE > DATE_SUB(CURDATE(), INTERVAL 3 DAY)
+      ORDER BY RAND() LIMIT 3;
+    `;
+        const [data] = yield (0, query_1.default)(sql, [user_id]);
+        res.status(200).send({ count: data["COUNT(*)"] });
+    }
+    catch (error) {
+        res.status(500).send({ message: "An error occurred", error });
+    }
 });
 exports.getTotalFeed = getTotalFeed;
 const findUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { searchText } = req.body;
-    const sql = `
-              SELECT 
-                user_id,
-                username,
-                first_name,
-                last_name
-              FROM
-                  users
-              WHERE
-                  username LIKE (?) OR 
-                  first_name LIKE (?) OR 
-                  CONCAT(first_name, ' ', last_name) LIKE (?);
-              `;
-    database_1.default.query(sql, [
-        searchText + "%",
-        searchText + "%",
-        "%" + searchText + "%"
-    ], (error, data) => {
-        if (error)
-            return res.status(500).send({ error });
+    try {
+        const { searchText } = req.body;
+        const sql = `
+      SELECT 
+        USER_ID,
+        USERNAME,
+        FIRST_NAME,
+        LAST_NAME
+      FROM
+          USERS
+      WHERE
+          USERNAME LIKE (?) OR 
+          FIRST_NAME LIKE (?) OR 
+          CONCAT(FIRST_NAME, ' ', LAST_NAME) LIKE (?);
+    `;
+        const data = yield (0, query_1.default)(sql, [
+            searchText + "%",
+            searchText + "%",
+            "%" + searchText + "%",
+        ]);
         if (!data.length)
             return res.status(401).send("No results found.");
         res.status(200).send({ list: data });
-    });
+    }
+    catch (error) {
+        res.status(500).send({ message: "An error occurred", error });
+    }
 });
 exports.findUser = findUser;
 const findUsername = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { username } = req.params;
-    const sql = "SELECT * FROM users WHERE username = (?);";
-    database_1.default.query(sql, [username], (error, data) => {
-        if (error)
-            return res.status(500).send({ error });
+    try {
+        const { username } = req.params;
+        const sql = "SELECT * FROM USERS WHERE USERNAME = (?);";
+        const [data] = yield (0, query_1.default)(sql, [username]);
         if (!data.length)
             return res.status(404).send({ message: "The user doesn't exist" });
         const rest = getUserData(data);
-        return res.status(200).send({ user: rest });
-    });
+        res.status(200).send({ user: rest });
+    }
+    catch (error) {
+        res.status(500).send({ message: "An error occurred", error });
+    }
 });
 exports.findUsername = findUsername;

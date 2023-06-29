@@ -1,98 +1,85 @@
 import { Response, Request } from "express";
-import database from "../database/database";
-import moment from "moment";
-import cloudinary from "cloudinary";
 import * as dotenv from "dotenv";
-import * as fs from "fs";
+import db from "../database/query";
+import uploadAndDeleteLocal from "../config/cloudinary";
 dotenv.config();
 
-cloudinary.v2.config({
-  cloud_name: process.env.STORAGE_NAME,
-  api_key: process.env.STORAGE_API_KEY,
-  api_secret: process.env.STORAGE_API_SECRET,
-  secure: true,
-});
-
-
-async function uploadAndDeleteLocal(path:any) {
-  const result = await cloudinary.v2.uploader.upload(path, { unique_filename: true });
-  fs.unlink(path, (err) => {
-    if (err) throw err;
-    console.log("Delete File successfully.");
-  });
-  return { image_id: result.public_id, image_url: result.url };
-};
-
 const getUserPost = async (req: Request, res: Response) => {
-  const { user_id } = req.params;
-  const sql = `
-              SELECT 
-                  p.*,
-                  (SELECT 
-                    COUNT(*)
-                  FROM
-                    likes l
-                  WHERE
-                    p.post_id = l.post_id
-                  ) AS "count"
-              FROM
-                  posts p
-              WHERE
-                  p.user_id = (?);  
-              `;
-  
-  database.query(sql, [user_id], (error, data) => {
-    if(error) return res.status(500).send({ error });
+  try {
+    const { user_id } = req.params;
+    const sql = 
+    `
+      SELECT 
+        P.*,
+        (
+          SELECT 
+            COUNT(*)
+          FROM
+            LIKES L
+          WHERE
+            P.POST_ID = L.POST_ID
+        ) AS "COUNT"
+      FROM
+          POSTS P
+      WHERE
+          P.USER_ID = (?);
+    `;
+    const [data] = await db(sql, [user_id]);
+    if (!data) return res.status(500).send({ error: "No post found" });
     res.status(200).send({ post: data });
-  });
+  } catch (error) {
+    res.status(500).send({ message: "An error occurred", error });
+  }
 };
 
-const newPost = async(req: Request, res: Response) => {
-  const { user_id, caption } = req.body;
-  const { img } = req.files as { [fieldname: string]: Express.Multer.File[] };
-  const path = img[0].destination + "\\" + img[0].filename;
-  
-  const { image_id, image_url } = await uploadAndDeleteLocal(path);
-  const post_date = moment(new Date(), "YYYY-MM-DD HH:mm:ss").format("YYYY/MM/DD HH:mm:ss");
-  const values = [user_id, caption, image_id, image_url, post_date];
-  
-  
-  const sql = "INSERT INTO posts (`user_id`, `caption`, `image_id`, `image_url`, `post_date`) VALUES (?);";
-  database.query(sql, [values], (error, data) => {
-    if(error) return res.status(500).send({ message: "Post failed", error });
-
+const newPost = async (req: Request, res: Response) => {
+  try {
+    const { user_id, caption } = req.body;
+    const { img } = req.files as { [fieldname: string]: Express.Multer.File[] };
+    const path = img[0].destination + "\\" + img[0].filename;
+    const { image_id, image_url } = await uploadAndDeleteLocal(path);
+    const values = [user_id, caption, image_id, image_url];
+    const sql = 
+    `
+      INSERT INTO POSTS 
+      (USER_ID, CAPTION, IMAGE_ID, IMAGE_URL) VALUES (?);
+    `;
+    await db(sql, [values]);
     res.status(200).send({ message: "Post has been posted" });
-  });
+  } catch (error) {
+    res.status(500).send({ message: "An error occurred", error });
+  }
 };
 
 const editPost = async (req: Request, res: Response) => {
-  const { post_id } = req.params;
-  const body = req.body;
-  let query = ``
-
-  if(body.post_id || body.user_id) return res.status(406).send({ message: "The following data cannot be change" });
-
-  Object.keys(body).forEach(function(key, index){
-    query = `${key} = "${body[`${key}`]}"`;  
-  });
-
-  const sql = `UPDATE posts SET ${query} WHERE post_id = (?);`;
-  
-  database.query(sql, [parseInt(post_id)], (error, data) => {
-    if (error) return res.status(500).send({ error });
+  try {
+    const { post_id } = req.params;
+    const body = req.body;
+    if(body?.user_id) return res.status(406).send({ message: "The following data cannot be changed" });
+    // Get all the keys and values that are going to be changed.
+    let query = ``;
+    Object.keys(body).forEach(function (key, index) {
+      query = `${key} = "${body[`${key}`]}"`;
+    });
+    
+    const sql = `UPDATE POSTS SET ${query} WHERE POST_ID = (?);`;
+    await db(sql, [parseInt(post_id)]);
     res.status(200).send({ message: "Edit post successfully" });
-  });
-}
+  } catch (error) {
+    res.status(500).send({ message: "An error occurred", error });
+  }
+};
 
-const deletePost =async (req: Request, res: Response) => {
-  const { post_id } = req.params;
-  const sql = "DELETE FROM posts WHERE post_id = (?);";
-  
-  database.query(sql, [parseInt(post_id)], (error, data) => {
-    if(error) return res.status(500).send({ error });
+const deletePost = async (req: Request, res: Response) => {
+  try {
+    const { post_id } = req.params;
+    const sql = "DELETE FROM POSTS WHERE POST_ID = (?);";
+    await db(sql, [parseInt(post_id)]);
     res.status(200).send("Delete post successfully");
-  });
-}
+  } catch (error) {
+    res.status(500).send({ message: "An error occurred", error });
+  }
+};
 
 export { newPost, getUserPost, editPost, deletePost };
 

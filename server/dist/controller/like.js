@@ -13,52 +13,75 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.likeStatus = exports.postAllLikes = exports.likePost = void 0;
-const database_1 = __importDefault(require("../database/database"));
+const query_1 = __importDefault(require("../database/query"));
 const postAllLikes = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { post_id } = req.params;
-    const sql = "SELECT COUNT(*) FROM likes WHERE post_id = (?);";
-    database_1.default.query(sql, [post_id], (error, data) => {
-        if (error)
-            return res.status(500).send({ error });
-        res.status(200).send({ count: data[0]["COUNT(*)"] });
-    });
+    try {
+        const { post_id } = req.params;
+        const sql = `
+      SELECT 
+        COUNT(*) AS COUNT
+      FROM
+        LIKES
+      WHERE
+        POST_ID = ?
+    `;
+        const [data] = yield (0, query_1.default)(sql, [post_id]);
+        res.status(200).send({ count: data.COUNT });
+    }
+    catch (error) {
+        res.status(500).send({ message: "An error occurred", error });
+    }
 });
 exports.postAllLikes = postAllLikes;
 const likeStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { post_id, user_id } = req.params;
-    const sql = "SELECT * FROM likes WHERE post_id = (?) AND user_id = (?);";
-    database_1.default.query(sql, [post_id, user_id], (error, data) => {
-        if (error)
-            return res.status(500).send({ error });
+    try {
+        const { post_id, user_id } = req.params;
+        const sql = `
+      SELECT * 
+      FROM LIKES 
+      WHERE POST_ID = ? AND USER_ID = ?
+    `;
+        const [data] = yield (0, query_1.default)(sql, [post_id, user_id]);
         if (!data.length)
             return res.status(200).send({ status: false });
         res.status(200).send({ status: true });
-    });
+    }
+    catch (error) {
+        res.status(500).send({ message: "An error occurred", error });
+    }
 });
 exports.likeStatus = likeStatus;
 const likePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { post_id, user_id } = req.params;
-    const sql_get = "SELECT * FROM likes WHERE post_id = (?) AND user_id = (?);";
-    const sql_delete = "DELETE FROM likes WHERE post_id = (?) AND user_id = (?);";
-    const sql_create = "INSERT INTO likes (`post_id`, `user_id`) VALUES (?, ?);";
-    // check to see if the user is already like the post
-    database_1.default.query(sql_get, [post_id, user_id], (error, data) => {
-        if (error)
-            return res.status(500).send({ error });
-        // if the user has already liked the post, then delete or remove
+    try {
+        const { post_id, user_id } = req.params;
+        const sql_get = `
+      SELECT * 
+      FROM LIKES 
+      WHERE POST_ID = ? AND USER_ID = ?;
+    `;
+        const sql_delete = `
+      DELETE FROM LIKES 
+      WHERE POST_ID = ? AND USER_ID = ?;
+    `;
+        const sql_create = `
+      INSERT INTO LIKES (POST_ID, USER_ID) 
+      VALUES (?, ?);
+    `;
+        // check to see if the user already likes the post
+        const [data] = yield (0, query_1.default)(sql_get, [post_id, user_id]);
         if (data.length) {
-            return database_1.default.query(sql_delete, [post_id, user_id], (error, data) => {
-                if (error)
-                    return res.status(500).send({ message: "Delete row from likes table failed", error });
-                return res.status(200).send("Remove like from a post");
-            });
+            // if the user has already liked the post, then delete or remove
+            yield (0, query_1.default)(sql_delete, [post_id, user_id]);
+            return res.status(200).send("Removed like from a post");
         }
-        // if the user hasn't like the post yet, then create or insert
-        database_1.default.query(sql_create, [post_id, user_id], (error, data) => {
-            if (error)
-                return res.status(500).send({ message: "Like post failed", error });
-            res.status(200).send("Liked post");
-        });
-    });
+        else {
+            // if the user hasn't liked the post yet, then create or insert
+            yield (0, query_1.default)(sql_create, [post_id, user_id]);
+            return res.status(200).send("Liked post");
+        }
+    }
+    catch (error) {
+        res.status(500).send({ message: "An error occurred", error });
+    }
 });
 exports.likePost = likePost;

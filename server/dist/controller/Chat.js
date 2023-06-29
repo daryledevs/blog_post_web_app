@@ -13,123 +13,137 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getAllChatMember = exports.newMessage = exports.getMessage = exports.newConversation = exports.getAllChats = void 0;
-const database_1 = __importDefault(require("../database/database"));
+const query_1 = __importDefault(require("../database/query"));
 const getAllChatMember = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { user_id } = req.params;
-    const values = Array(3).fill(user_id);
-    const sql = `
-              SELECT 
-                  c.*, u.username, u.first_name, u.last_name
-              FROM
-                  conversations c
-              INNER JOIN
-                  users u ON u.user_id = 
-                  CASE
-                      WHEN c.user_one = (?) THEN c.user_two
-                      ELSE c.user_one
-                  END
-              WHERE
-                  c.user_one = (?) OR c.user_two = (?);
-              `;
-    database_1.default.query(sql, [...values], (error, data) => {
-        if (error)
-            return res.status(500).send({ message: error });
+    try {
+        const { user_id } = req.params;
+        const values = Array(3).fill(user_id);
+        const sql = `
+      SELECT 
+        C.*,
+        U.USERNAME,
+        U.FIRST_NAME,
+        U.LAST_NAME
+      FROM
+        CONVERSATIONS C
+      INNER JOIN
+        USERS U ON U.USER_ID = 
+        CASE
+          WHEN C.USER_ONE = (?) THEN C.USER_TWO
+          ELSE C.USER_ONE
+        END
+      WHERE
+        C.USER_ONE = (?) OR C.USER_TWO = (?);
+    `;
+        const [data] = yield (0, query_1.default)(sql, [...values]);
         res.status(200).send({ list: data });
-    });
+    }
+    catch (error) {
+        res.status(500).send({ message: "An error occurred", error });
+    }
 });
 exports.getAllChatMember = getAllChatMember;
 const getAllChats = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const length = parseInt(req.params.length);
-    let getData = [];
-    let main_arr = [];
-    const limit = length + 4;
-    const sql = `
-                SELECT * FROM conversations WHERE user_one = (?) OR user_two = (?);
-                SELECT 
-                  c.conversation_id,
-                  m.message_id,
-                  c.user_one,
-                  m.sender_id,
-                  m.text_message,
-                  c.user_two,
-                  u.username,
-                  u.first_name,
-                  u.last_name,
-                  m.time_sent
-                FROM
-                  messages m
-                LEFT JOIN
-                  conversations c ON c.conversation_id = m.conversation_id
-                INNER JOIN
-                  users u ON u.user_id = 
-                    CASE 
-                      WHEN c.user_one = (?) THEN c.user_two
-                          ELSE c.user_one
-                    END 
-                WHERE 
-                  c.user_one = (?) OR c.user_two = (?)
-                ORDER BY c.conversation_id ASC;
-            `;
-    database_1.default.query(sql, [
-        // We check to see which of the two is the user's ID place in
-        req.params.user_id, req.params.user_id,
-        req.params.user_id, req.params.user_id, req.params.user_id
-    ], (error, data) => {
-        if (error)
-            res.status(500).send({ message: error });
-        if (data.length === 0)
-            res.status(200).send({ data: data });
-        for (let i = 0; i < data[0].length; i++) {
+    try {
+        let main_arr = [];
+        const length = parseInt(req.params.length);
+        const limit = length + 4;
+        const values = Array(5).fill(req.params.user_id);
+        const sql = `
+      SELECT * FROM CONVERSATIONS WHERE USER_ONE = (?) OR USER_TWO = (?);
+      SELECT 
+        C.CONVERSATION_ID,
+        M.MESSAGE_ID,
+        C.USER_ONE,
+        M.SENDER_ID,
+        M.TEXT_MESSAGE,
+        C.USER_TWO,
+        U.USERNAME,
+        U.FIRST_NAME,
+        U.LAST_NAME,
+        M.TIME_SENT
+      FROM
+        MESSAGES M
+      LEFT JOIN
+        CONVERSATION C ON C.CONVERSATION_ID = M.CONVERSATION_ID
+      INNER JOIN
+        USERS U ON U.USER_ID = 
+          CASE 
+            WHEN C.USER_ONE = (?) THEN C.USER_TWO
+            ELSE C.USER_ONE
+          END 
+      WHERE 
+        C.USER_ONE = (?) OR C.USER_TWO = (?);
+    `;
+        const [data] = yield (0, query_1.default)(sql, [...values]);
+        if (!data.length)
+            return res.status(200).send({ data: data });
+        for (const dataOne in data[0]) {
             let sub_arr = [];
-            for (let j = 0; j < data[1].length; j++) {
-                if (data[0][i].conversation_id === data[1][j].conversation_id)
-                    sub_arr.push(data[1][j]);
+            for (const dataTwo in data[1]) {
+                const isEqual = data[0][dataOne].conversation_id === data[1][dataTwo].conversation_id;
+                if (isEqual)
+                    sub_arr.push(data[1][dataTwo]);
             }
             main_arr.push(sub_arr);
         }
         return res.status(200).send({ data: main_arr });
-    });
+    }
+    catch (error) {
+        res.status(500).send({ message: "An error occurred", error });
+    }
 });
 exports.getAllChats = getAllChats;
-const newConversation = (req, res) => {
-    const sql = `
-                INSERT INTO conversations (\`sender_id\`, \`receiver_id\`) VALUES (?);
-                INSERT INTO messages 
-                  (\`sender_id\`, \`conversation_id\`, \`text_message\`, \`time_sent\`) 
-                VALUES 
-                  (?, (SELECT LAST_INSERT_ID()), ?, ?);
-              `;
-    const { sender_id, receiver_id, text_message } = req.body;
-    const time_sent = new Date();
-    database_1.default.query(sql, [
-        [sender_id, receiver_id],
-        sender_id, text_message, time_sent
-    ], (error, data) => {
-        if (error)
-            res.status(500).send({ message: error });
-        return res
+const newConversation = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { sender_id, receiver_id, text_message } = req.body;
+        const sql = `
+      INSERT INTO CONVERSATIONS 
+      (SENDER_ID, RECEIVER_ID) VALUES (?);
+
+      INSERT INTO MESSAGES 
+      (SENDER_ID, CONVERSATION_ID, TEXT_MESSAGE) VALUES (?, LAST_INSERT_ID(), ?);
+    `;
+        const [data] = yield (0, query_1.default)(sql, [
+            [sender_id, receiver_id],
+            sender_id,
+            text_message,
+        ]);
+        res
             .status(200)
             .send({ message: "New conversation created", data: data[0].insertId });
-    });
-};
+    }
+    catch (error) {
+        res.status(500).send({ message: "An error occurred", error });
+    }
+});
 exports.newConversation = newConversation;
-const getMessage = (req, res) => {
-    const sql = "SELECT * FROM messages WHERE conversation_id = (?)";
-    database_1.default.query(sql, [req.params.conversation_id], (error, data) => {
-        if (error)
-            res.status(500).send({ message: error });
-        return res.status(200).send({ chats: data });
-    });
-};
+const getMessage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const sql = `
+      SELECT * FROM MESSAGES 
+      WHERE CONVERSATION_ID = (?);
+    `;
+        const [data] = yield (0, query_1.default)(sql, [req.params.conversation_id]);
+        res.status(200).send({ chats: data });
+    }
+    catch (error) {
+        res.status(500).send({ message: "An error occurred", error });
+    }
+});
 exports.getMessage = getMessage;
-const newMessage = (req, res) => {
-    const sql = "INSERT INTO messages (`sender_id`, `conversation_id`, `text_message`, `time_sent`) VALUES (?, ?, ?, ?)";
-    const time_sent = new Date();
-    const { sender_id, text_message, conversation_id } = req.body;
-    database_1.default.query(sql, [sender_id, conversation_id, text_message, time_sent], (error, data) => {
-        if (error)
-            res.status(500).send({ message: error });
-        return res.status(200).send({ message: "New message created" });
-    });
-};
+const newMessage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const sql = `
+      INSERT INTO MESSAGES 
+      (SENDER_ID, CONVERSATION_ID, TEXT_MESSAGE) VALUES (?, ?, ?);
+    `;
+        const { sender_id, text_message, conversation_id } = req.body;
+        const data = yield (0, query_1.default)(sql, [sender_id, conversation_id, text_message]);
+        res.status(200).send({ message: "New message created" });
+    }
+    catch (error) {
+        res.status(500).send({ message: "An error occurred", error });
+    }
+});
 exports.newMessage = newMessage;
