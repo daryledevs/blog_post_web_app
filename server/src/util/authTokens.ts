@@ -7,25 +7,25 @@ const REFRESH_TOKEN_EXPIRATION = "7d";
 const ACCESS_TOKEN_EXPIRATION = "15m";
 const RESET_TOKEN_EXPIRATION = "1hr";
 
-function generateRefreshToken({ user_id, username }: { user_id: string; username: string }): string {
+function generateRefreshToken({ USER_ID, USERNAME }: { USER_ID: string; USERNAME: string }): string {
   const REFRESH_SECRET = process.env.REFRESH_TKN_SECRET!;
-  const details = { user_id, username };
+  const details = { user_id: USER_ID, username: USERNAME };
   const expiration = { expiresIn: REFRESH_TOKEN_EXPIRATION };
   const token = jwt.sign(details, REFRESH_SECRET, expiration);
   return token;
 };
 
-function generateAccessToken({ user_id, roles }: { user_id: string; roles: string }): string {
+function generateAccessToken({ USER_ID, ROLES }: { USER_ID: string; ROLES: string }): string {
   const ACCESS_SECRET = process.env.ACCESS_TKN_SECRET!;
-  const details = { user_id, roles };
+  const details = { user_id: USER_ID, roles: ROLES };
   const expiration = { expiresIn: ACCESS_TOKEN_EXPIRATION };
   const token = jwt.sign(details, ACCESS_SECRET, expiration);
   return token;
 };
 
-function generateResetToken({ email, user_id }: { email: string; user_id: string }): string {
+function generateResetToken({ EMAIL, USER_ID }: { EMAIL: string; USER_ID: string }): string {
   const RESET_SECRET = process.env.RESET_PWD_TKN_SECRET!;
-  const details = { email, user_id };
+  const details = { email: EMAIL, user_id: USER_ID };
   const expiration = { expiresIn: RESET_TOKEN_EXPIRATION };
   const token = jwt.sign(details, RESET_SECRET, expiration);
   return token;

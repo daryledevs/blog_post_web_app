@@ -50,8 +50,8 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, username, password, first_name, last_name } = req.body;
         const hashPassword = bcrypt_1.default.hashSync(password, bcrypt_1.default.genSaltSync(10));
-        const sqlSelect = "SELECT * FROM users WHERE email = ? OR username = ?";
-        const sqlInsert = "INSERT INTO users(`username`, `email`, `password`, `first_name`, `last_name`) VALUES (?)";
+        const sqlSelect = "SELECT * FROM USERS WHERE EMAIL = ? OR USERNAME = ?";
+        const sqlInsert = "INSERT INTO USERS (USERNAME, EMAIL, PASSWORD, FIRST_NAME, LAST_NAME) VALUES (?, ?, ?, ?, ?)";
         // Check to see if the user is already in the database.
         const [user] = yield (0, query_1.default)(sqlSelect, [email, username]);
         if (user)
@@ -61,7 +61,7 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return res.status(200).send({ message: "Registration is successful" });
     }
     catch (error) {
-        res.status(500).send({ message: "Registration failed", error });
+        res.status(500).send({ message: "An error occurred", error });
     }
     ;
 });
@@ -69,13 +69,16 @@ exports.register = register;
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { username, email, password } = req.body;
-        const sql = "SELECT * FROM users WHERE username = (?) OR email = (?)";
+        const isMissing = (!req.body || (!username && !email) || !password);
+        const sql = "SELECT * FROM USERS WHERE (USERNAME = ? OR EMAIL = ?)";
+        if (isMissing)
+            return res.status(400).send({ message: "Missing required fields" });
         // Check if the user is exists.
-        const [user] = yield (0, query_1.default)(sql, [username, email]);
+        const [user] = yield (0, query_1.default)(sql, [username || "", email || ""]);
         if (!user)
             return res.status(404).send({ message: "User not found" });
         // Compare the password from database and from request body.
-        if (bcrypt_1.default.compareSync(password, user.password)) {
+        if (bcrypt_1.default.compareSync(password, user.PASSWORD)) {
             const ACCESS_TOKEN = (0, authTokens_1.generateAccessToken)(user);
             const REFRESH_TOKEN = (0, authTokens_1.generateRefreshToken)(user);
             res
@@ -89,15 +92,15 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
     }
     catch (error) {
-        return res.status(500).send({ message: "Login failed", error });
+        return res.status(500).send({ message: "An error occurred", error });
     }
 });
 exports.login = login;
 const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email } = req.body;
-        const sqlSelect = "SELECT * FROM users WHERE email = ?;";
-        const sqlInsert = "INSERT INTO reset_password_token (id, encrypted) VALUES (?, ?);";
+        const sqlSelect = "SELECT * FROM USERS WHERE EMAIL = ?;";
+        const sqlInsert = "INSERT INTO RESET_PASSWORD_TOKEN (TOKEN_ID, ENCRYPTED) VALUES (?, ?);";
         // Check if user exists
         const [user] = yield (0, query_1.default)(sqlSelect, [email]);
         if (!user)
@@ -114,7 +117,7 @@ const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.json({ message: "Password reset email sent" });
     }
     catch (error) {
-        res.status(500).send({ message: "Forgot password failed", error });
+        res.status(500).send({ message: "An error occurred", error });
     }
 });
 exports.forgotPassword = forgotPassword;
@@ -122,10 +125,10 @@ const resetPasswordForm = (req, res) => __awaiter(void 0, void 0, void 0, functi
     try {
         const token = req.query.token;
         const decodedToken = decodeURIComponent(token);
-        const sqlSelect = "SELECT * FROM reset_password_token WHERE id = (?);";
+        const sqlSelect = "SELECT * FROM RESET_PASSWORD_TOKEN WHERE TOKEN_ID = (?);";
         // Check if the token (id) exists in the database.
         const [data] = yield (0, query_1.default)(sqlSelect, [decodedToken]);
-        const decryptedToken = (0, decrypt_1.default)(data.encrypted);
+        const decryptedToken = (0, decrypt_1.default)(data.ENCRYPTED);
         // then decrypt the code to check if it is still valid.
         jsonwebtoken_1.default.verify(decryptedToken, process.env.RESET_PWD_TKN_SECRET, (error, decode) => {
             if (error)
@@ -135,7 +138,7 @@ const resetPasswordForm = (req, res) => __awaiter(void 0, void 0, void 0, functi
         });
     }
     catch (error) {
-        res.status(500).send({ message: "The token must be expired", error });
+        res.status(500).send({ message: "An error occurred", error });
     }
 });
 exports.resetPasswordForm = resetPasswordForm;
@@ -146,11 +149,12 @@ const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             return res.status(422).send({ message: "Password does not match confirm password" });
         if (password.length <= 5)
             return res.status(400).json({ error: "Password should be at least 5 characters long." });
+        // Used limit here due to "safe update mode" error.
+        const sqlDelete = "DELETE FROM RESET_PASSWORD_TOKEN WHERE id = (?) LIMIT 1;";
+        const sqlUpdate = "UPDATE USERS SET PASSWORD = (?) WHERE EMAIL = (?) AND USER_ID = (?);";
+        const sqlSelect = "SELECT * FROM USERS WHERE EMAIL = (?) AND USER_ID = (?);";
         const decodedTokenId = decodeURIComponent(tokenId);
         const hashPassword = bcrypt_1.default.hashSync(password, bcrypt_1.default.genSaltSync(10));
-        const sqlSelect = "SELECT * FROM users WHERE email = (?) AND user_id = (?);";
-        const sqlUpdate = "UPDATE users SET password = (?) WHERE email = (?) AND user_id = (?);";
-        const sqlDelete = "DELETE FROM reset_password_token WHERE id = (?) LIMIT 1;"; // Used limit here due to "safe update mode" error.
         // Check if the user exists.
         const [user] = yield (0, query_1.default)(sqlSelect, [email, user_id]);
         if (!user)
@@ -161,7 +165,7 @@ const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         res.status(200).send({ message: "Reset password successfully" });
     }
     catch (error) {
-        res.status(500).send({ message: "Reset password failed", error });
+        res.status(500).send({ message: "An error occurred", error });
     }
     ;
 });

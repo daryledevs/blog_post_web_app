@@ -43,27 +43,27 @@ dotenv.config();
 const REFRESH_TOKEN_EXPIRATION = "7d";
 const ACCESS_TOKEN_EXPIRATION = "15m";
 const RESET_TOKEN_EXPIRATION = "1hr";
-function generateRefreshToken({ user_id, username }) {
+function generateRefreshToken({ USER_ID, USERNAME }) {
     const REFRESH_SECRET = process.env.REFRESH_TKN_SECRET;
-    const details = { user_id, username };
+    const details = { user_id: USER_ID, username: USERNAME };
     const expiration = { expiresIn: REFRESH_TOKEN_EXPIRATION };
     const token = jsonwebtoken_1.default.sign(details, REFRESH_SECRET, expiration);
     return token;
 }
 exports.generateRefreshToken = generateRefreshToken;
 ;
-function generateAccessToken({ user_id, roles }) {
+function generateAccessToken({ USER_ID, ROLES }) {
     const ACCESS_SECRET = process.env.ACCESS_TKN_SECRET;
-    const details = { user_id, roles };
+    const details = { user_id: USER_ID, roles: ROLES };
     const expiration = { expiresIn: ACCESS_TOKEN_EXPIRATION };
     const token = jsonwebtoken_1.default.sign(details, ACCESS_SECRET, expiration);
     return token;
 }
 exports.generateAccessToken = generateAccessToken;
 ;
-function generateResetToken({ email, user_id }) {
+function generateResetToken({ EMAIL, USER_ID }) {
     const RESET_SECRET = process.env.RESET_PWD_TKN_SECRET;
-    const details = { email, user_id };
+    const details = { email: EMAIL, user_id: USER_ID };
     const expiration = { expiresIn: RESET_TOKEN_EXPIRATION };
     const token = jsonwebtoken_1.default.sign(details, RESET_SECRET, expiration);
     return token;

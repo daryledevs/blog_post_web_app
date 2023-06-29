@@ -19,8 +19,8 @@ const register = async (req: Request, res: Response) => {
   try {
     const { email, username, password, first_name, last_name } = req.body;
     const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
-    const sqlSelect = "SELECT * FROM users WHERE email = ? OR username = ?";
-    const sqlInsert = "INSERT INTO users(`username`, `email`, `password`, `first_name`, `last_name`) VALUES (?)";
+    const sqlSelect = "SELECT * FROM USERS WHERE EMAIL = ? OR USERNAME = ?";
+    const sqlInsert = "INSERT INTO USERS (USERNAME, EMAIL, PASSWORD, FIRST_NAME, LAST_NAME) VALUES (?, ?, ?, ?, ?)";
 
     // Check to see if the user is already in the database.
     const [user] = await db(sqlSelect, [email, username]);
@@ -30,21 +30,23 @@ const register = async (req: Request, res: Response) => {
     await db(sqlInsert, [username, email, hashPassword, first_name, last_name]);
     return res.status(200).send({ message: "Registration is successful" });
   } catch (error) {
-    res.status(500).send({ message: "Registration failed", error });
+    res.status(500).send({ message: "An error occurred", error });
   };
 };
 
 const login = async (req: Request, res: Response) => {
   try {
     const { username, email, password } = req.body;
-    const sql = "SELECT * FROM users WHERE username = (?) OR email = (?)";
+    const isMissing = (!req.body || (!username && !email) || !password);
+    const sql = "SELECT * FROM USERS WHERE (USERNAME = ? OR EMAIL = ?)";
+    if(isMissing) return res.status(400).send({ message: "Missing required fields" });
     
     // Check if the user is exists.
-    const [user] = await db(sql, [username, email]);
-    if (!user) return res.status(404).send({ message: "User not found" });
+    const [user] = await db(sql, [username || "", email || ""]);
+    if(!user) return res.status(404).send({ message: "User not found" });
 
     // Compare the password from database and from request body.
-    if (bcrypt.compareSync(password, user.password)) {
+    if(bcrypt.compareSync(password, user.PASSWORD)) {
       const ACCESS_TOKEN = generateAccessToken(user);
       const REFRESH_TOKEN = generateRefreshToken(user);
       res
@@ -56,19 +58,19 @@ const login = async (req: Request, res: Response) => {
       return res.status(404).send({ message: "Password is incorrect" });
     }
   } catch (error) {
-    return res.status(500).send({ message: "Login failed", error });
+    return res.status(500).send({ message: "An error occurred", error });
   }
 };
 
 const forgotPassword = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
-    const sqlSelect = "SELECT * FROM users WHERE email = ?;";
-    const sqlInsert = "INSERT INTO reset_password_token (id, encrypted) VALUES (?, ?);";
+    const sqlSelect = "SELECT * FROM USERS WHERE EMAIL = ?;";
+    const sqlInsert = "INSERT INTO RESET_PASSWORD_TOKEN (TOKEN_ID, ENCRYPTED) VALUES (?, ?);";
     
     // Check if user exists
     const [user] = await db(sqlSelect, [email]);
-    if (!user) return res.status(404).send({ message: "User doesn't exist" });
+    if(!user) return res.status(404).send({ message: "User doesn't exist" });
     
     // Generate tokens
     const token = generateResetToken(user);
@@ -83,7 +85,7 @@ const forgotPassword = async (req: Request, res: Response) => {
     sendEmail(email, "Reset Password", encodedToken);
     res.json({ message: "Password reset email sent" });
   } catch (error) {
-    res.status(500).send({ message: "Forgot password failed", error });
+    res.status(500).send({ message: "An error occurred", error });
   }
 };
 
@@ -91,11 +93,11 @@ const resetPasswordForm =  async (req: Request, res: Response) => {
   try {  
     const token = req.query.token as string;
     const decodedToken = decodeURIComponent(token);
-    const sqlSelect = "SELECT * FROM reset_password_token WHERE id = (?);";
+    const sqlSelect = "SELECT * FROM RESET_PASSWORD_TOKEN WHERE TOKEN_ID = (?);";
 
     // Check if the token (id) exists in the database.
     const [data] = await db(sqlSelect, [decodedToken]); 
-    const decryptedToken = decryptData(data.encrypted);
+    const decryptedToken = decryptData(data.ENCRYPTED);
 
     // then decrypt the code to check if it is still valid.
     jwt.verify(decryptedToken, process.env.RESET_PWD_TKN_SECRET!, (error, decode) => {
@@ -104,7 +106,7 @@ const resetPasswordForm =  async (req: Request, res: Response) => {
       res.status(200).render("resetPassword", { email, user_id });
     });
   } catch (error) {
-    res.status(500).send({ message: "The token must be expired", error });
+    res.status(500).send({ message: "An error occurred", error });
   }
 };
 
@@ -114,11 +116,12 @@ const resetPassword = async (req: Request, res: Response) => {
     if(password !== confirmPassword) return res.status(422).send({ message: "Password does not match confirm password" });
     if(password.length <= 5) return res.status(400).json({ error: "Password should be at least 5 characters long." });
     
+    // Used limit here due to "safe update mode" error.
+    const sqlDelete = "DELETE FROM RESET_PASSWORD_TOKEN WHERE id = (?) LIMIT 1;"; 
+    const sqlUpdate = "UPDATE USERS SET PASSWORD = (?) WHERE EMAIL = (?) AND USER_ID = (?);";
+    const sqlSelect = "SELECT * FROM USERS WHERE EMAIL = (?) AND USER_ID = (?);";
     const decodedTokenId = decodeURIComponent(tokenId);
     const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
-    const sqlSelect = "SELECT * FROM users WHERE email = (?) AND user_id = (?);";
-    const sqlUpdate = "UPDATE users SET password = (?) WHERE email = (?) AND user_id = (?);";
-    const sqlDelete = "DELETE FROM reset_password_token WHERE id = (?) LIMIT 1;"; // Used limit here due to "safe update mode" error.
 
     // Check if the user exists.
     const [user] = await db(sqlSelect, [email, user_id]);
@@ -129,7 +132,7 @@ const resetPassword = async (req: Request, res: Response) => {
     await db(sqlDelete, [decodedTokenId]);
     res.status(200).send({ message: "Reset password successfully" });
   } catch (error) {
-    res.status(500).send({ message: "Reset password failed", error });
+    res.status(500).send({ message: "An error occurred", error });
   };
 };
 
