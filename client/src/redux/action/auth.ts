@@ -34,6 +34,7 @@ const login = createAsyncThunk<
   { username: string; password: string },
   {
     rejectValue: {
+      status: any,
       message: string;
     };
   }
@@ -44,7 +45,10 @@ const login = createAsyncThunk<
       const response = await api.post("/login", userCredentials);
       return fulfillWithValue(response.data);
     } catch (error) {
-      return rejectWithValue({ message: error.response.data.message });
+      return rejectWithValue({
+        status: error.response.data.status,
+        message: error.response.data.message,
+      });
     }
   }
 );

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Route, Routes } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "./redux/hooks/hooks";
 import { useDispatch } from "react-redux";
+import { Socket } from "socket.io-client";
 import { io } from "socket.io-client";
 import { getMessage } from "./redux/reducer/chat";
 import { userDataThunk } from "./redux/action/user";
@@ -14,8 +15,8 @@ function App() {
   const appDispatch = useAppDispatch();
   const dispatch = useDispatch();
   const isLoading = useAppSelector(state => state.auth.isLoading);
-  const socket = useRef(io("ws://localhost:8900"));
-  const access_status = useAppSelector((state) => state.auth.access_status);
+  const socket = useRef<Socket | null>(null);
+  const { access_status, access_message } = useAppSelector((state) => state.auth);
   const token_status = useAppSelector((state) => state.auth.token_status);
   const userData = useAppSelector((state) => state.user);
   const [comingMessage, setComingMessage] = useState<any>();
@@ -23,15 +24,20 @@ function App() {
   
   // socket handler
   useEffect(() => {
-    if (userData.user_id) {
-      socket.current.emit("addUser", userData.user_id);
-      socket.current.on("getMessage", (data: any) => {
-        setComingMessage({
-          conversation_id: data.conversation_id,
-          sender_id: data.senderId,
-          text_message: data.text,
+    try {
+      if (userData.user_id && socket) {
+        socket.current = io("ws://localhost:8900");
+        socket.current.emit("addUser", userData.user_id);
+        socket.current.on("getMessage", (data: any) => {
+          setComingMessage({
+            conversation_id: data.conversation_id,
+            sender_id: data.senderId,
+            text_message: data.text,
+          });
         });
-      });
+      }
+    } catch (error) {
+      
     }
   }, [socket, userData]);
 
@@ -41,10 +47,6 @@ function App() {
 
 
   useEffect(() => {
-    //  const currentTime = new Date();
-    //  const lastTime = new Date(sessionTime);
-    //  const milliseconds = Math.abs(currentTime.valueOf() - lastTime.valueOf());
-    //  const hour = milliseconds / 36e5;
     async function performRequest() {
       try {
         const token: any = sessionStorage.getItem("token");
@@ -67,7 +69,7 @@ function App() {
       }
     }
 
-    performRequest();
+    if (String(access_status)[0] !== "4") performRequest();
   }, [access_status]);
   
   

@@ -48,13 +48,13 @@ function routeElement(isToken:boolean) {
 };
 
 function RouteIndex() {
-  const access_status = useAppSelector((state) => state.auth.access_status);
+  const { access_status, access_message } = useAppSelector((state) => state.auth);
   const userData = useAppSelector((state) => state.user);
   const { fetch_status } = userData;
   const [route, setRoute] = useState<any>(null);
 
   useEffect(() => {
-    switch (access_status || fetch_status) {
+    switch (access_message || fetch_status) {
       case "Token is valid":
       case "Login successfully":
       case "Get the user's data successfully":
@@ -70,7 +70,7 @@ function RouteIndex() {
         setRoute(routeElement(false));
         break;
     }
-  }, [access_status, fetch_status]);
+  }, [access_message, fetch_status]);
 
   return route;
 };

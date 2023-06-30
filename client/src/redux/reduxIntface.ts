@@ -2,6 +2,7 @@
 // actions
 interface IEAuthData {
   message: string,
+  status: number;
   token: any;
 };
 
