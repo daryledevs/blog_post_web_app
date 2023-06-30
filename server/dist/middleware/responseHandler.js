@@ -14,8 +14,9 @@ function responseHandler(req, res, next) {
         const originalSend = res.send;
         let isConverted = false;
         res.send = function (body) {
-            //It checks if the response's body is not a JSON format but in JS.
-            if (!isConverted && typeof body === "object" && !body.accessToken) {
+            const noAccessToken = typeof body === "object" && !(body === null || body === void 0 ? void 0 : body.accessToken);
+            const isSuccessStatus = res.statusCode >= 200 && res.statusCode <= 299;
+            if (!isConverted && noAccessToken && isSuccessStatus) {
                 isConverted = true;
                 const dataKeys = Object.keys(body);
                 const converted = destructureObject(body, dataKeys);
@@ -24,12 +25,10 @@ function responseHandler(req, res, next) {
             else {
                 return originalSend.call(res, body);
             }
-            ;
         };
         next();
     });
 }
-;
 function destructureObject(data, dataKeys) {
     let instance = {};
     for (const index in dataKeys) {

@@ -4,18 +4,19 @@ async function responseHandler(req: Request, res: Response, next: NextFunction) 
   const originalSend = res.send;
   let isConverted = false;
   res.send = function (body: any) {
-    //It checks if the response's body is not a JSON format but in JS.
-    if (!isConverted && typeof body === "object" && !body.accessToken) {
-       isConverted = true;
-       const dataKeys = Object.keys(body);
-       const converted: object = destructureObject(body, dataKeys);
-       return originalSend.call(res, converted);
+    const noAccessToken = typeof body === "object" && !body?.accessToken;
+    const isSuccessStatus = res.statusCode >= 200 && res.statusCode <= 299;
+    if (!isConverted && noAccessToken && isSuccessStatus) {
+      isConverted = true;
+      const dataKeys = Object.keys(body);
+      const converted: object = destructureObject(body, dataKeys);
+      return originalSend.call(res, converted);
     } else {
       return originalSend.call(res, body);
-    };
+    }
   };
   next();
-};
+}
 
 function destructureObject(data: any, dataKeys: any): object {
   let instance: object = {};
