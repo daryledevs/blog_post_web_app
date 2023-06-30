@@ -15,6 +15,7 @@ import followRouter from "./router/follow";
 import corsOptions from "./config/corsOption";
 import refreshToken from "./middleware/refreshToken";
 import rootPath from "./config/path";
+import responseHandler from "./middleware/responseHandler";
 dotenv.config();
 
 const app = express();
@@ -25,6 +26,7 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use(refreshToken);
+app.use(responseHandler);
 app.set("views", rootPath); // Set the views directory
 app.set('view engine', 'ejs'); // Set EJS as the template engine
 app.use(morgan("tiny"));

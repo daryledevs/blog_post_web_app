@@ -43,6 +43,7 @@ const follow_1 = __importDefault(require("./router/follow"));
 const corsOption_1 = __importDefault(require("./config/corsOption"));
 const refreshToken_1 = __importDefault(require("./middleware/refreshToken"));
 const path_1 = __importDefault(require("./config/path"));
+const responseHandler_1 = __importDefault(require("./middleware/responseHandler"));
 dotenv.config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 5000;
@@ -51,6 +52,7 @@ app.use(body_parser_1.default.json());
 app.use((0, cookie_parser_1.default)());
 app.use((0, cors_1.default)(corsOption_1.default));
 app.use(refreshToken_1.default);
+app.use(responseHandler_1.default);
 app.set("views", path_1.default); // Set the views directory
 app.set('view engine', 'ejs'); // Set EJS as the template engine
 app.use((0, morgan_1.default)("tiny"));
