@@ -25,9 +25,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.findUsername = exports.getTotalFeed = exports.getUserFeed = exports.findUser = exports.userData = void 0;
 const query_1 = __importDefault(require("../database/query"));
+const isObjEmpty_1 = __importDefault(require("../util/isObjEmpty"));
 const getUserData = (data) => {
-    const [user] = data;
-    const { password } = user, rest = __rest(user, ["password"]);
+    const { password } = data, rest = __rest(data, ["password"]);
     return rest;
 };
 const userData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -35,14 +35,15 @@ const userData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const { user_id } = req.body;
         const sql = "SELECT * FROM USERS WHERE USER_ID = (?);";
         const [data] = yield (0, query_1.default)(sql, [user_id]);
-        if (!data.length)
+        if ((0, isObjEmpty_1.default)(data))
             return res.status(404).send({ message: "User not found" });
         const rest = getUserData(data);
         res.status(200).send({ user: rest });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
+    ;
 });
 exports.userData = userData;
 const getUserFeed = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -75,8 +76,9 @@ const getUserFeed = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         res.status(200).send({ feed: data });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
+    ;
 });
 exports.getUserFeed = getUserFeed;
 const getTotalFeed = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -95,8 +97,9 @@ const getTotalFeed = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         res.status(200).send({ count: data["COUNT(*)"] });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
+    ;
 });
 exports.getTotalFeed = getTotalFeed;
 const findUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -120,13 +123,14 @@ const findUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             searchText + "%",
             "%" + searchText + "%",
         ]);
-        if (!data.length)
+        if ((0, isObjEmpty_1.default)(data))
             return res.status(401).send("No results found.");
         res.status(200).send({ list: data });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
+    ;
 });
 exports.findUser = findUser;
 const findUsername = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -134,13 +138,14 @@ const findUsername = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         const { username } = req.params;
         const sql = "SELECT * FROM USERS WHERE USERNAME = (?);";
         const [data] = yield (0, query_1.default)(sql, [username]);
-        if (!data.length)
+        if ((0, isObjEmpty_1.default)(data))
             return res.status(404).send({ message: "The user doesn't exist" });
         const rest = getUserData(data);
         res.status(200).send({ user: rest });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
+    ;
 });
 exports.findUsername = findUsername;

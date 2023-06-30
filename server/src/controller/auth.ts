@@ -29,8 +29,8 @@ const register = async (req: Request, res: Response) => {
     // Save the user to the database
     await db(sqlInsert, [username, email, hashPassword, first_name, last_name]);
     return res.status(200).send({ message: "Registration is successful" });
-  } catch (error) {
-    res.status(500).send({ message: "An error occurred", error });
+  } catch (error:any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
   };
 };
 
@@ -57,9 +57,9 @@ const login = async (req: Request, res: Response) => {
     } else {
       return res.status(404).send({ message: "Password is incorrect" });
     }
-  } catch (error) {
-    return res.status(500).send({ message: "An error occurred", error });
-  }
+  } catch (error:any) {
+    return res.status(500).send({ message: "An error occurred", error: error.message });
+  };
 };
 
 const forgotPassword = async (req: Request, res: Response) => {
@@ -84,9 +84,9 @@ const forgotPassword = async (req: Request, res: Response) => {
     // Send reset password email
     sendEmail(email, "Reset Password", encodedToken);
     res.json({ message: "Password reset email sent" });
-  } catch (error) {
-    res.status(500).send({ message: "An error occurred", error });
-  }
+  } catch (error:any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
+  };
 };
 
 const resetPasswordForm =  async (req: Request, res: Response) => {
@@ -105,9 +105,9 @@ const resetPasswordForm =  async (req: Request, res: Response) => {
       const { email, user_id } = decode as { email: any, user_id:any };
       res.status(200).render("resetPassword", { email, user_id });
     });
-  } catch (error) {
-    res.status(500).send({ message: "An error occurred", error });
-  }
+  } catch (error:any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
+  };
 };
 
 const resetPassword = async (req: Request, res: Response) => {
@@ -131,8 +131,8 @@ const resetPassword = async (req: Request, res: Response) => {
     await db(sqlUpdate, [hashPassword, email, user_id]);
     await db(sqlDelete, [decodedTokenId]);
     res.status(200).send({ message: "Reset password successfully" });
-  } catch (error) {
-    res.status(500).send({ message: "An error occurred", error });
+  } catch (error:any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
   };
 };
 

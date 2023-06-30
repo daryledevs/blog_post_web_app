@@ -35,8 +35,8 @@ const totalFollow = async (req: Request, res: Response) => {
       followers: followers?.count ? followers.count : 0,
       following: following?.count ? following.count : 0,
     });
-  } catch (error) {
-    res.status(500).send({ message: "An error occurred", error });
+  } catch (error:any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
   }
 };
 
@@ -45,9 +45,9 @@ const getFollowers = async (req: Request, res: Response) => {
     const { user_id } = req.params;
     const { follower_ids, following_ids } = req.body;
 
-    const isEmpty = (arr: any) => (arr.length ? arr : 0);
-    const followers = isEmpty(follower_ids);
-    const following = isEmpty(following_ids);
+    const isItEmpty = (arr: any) => (arr.length ? arr : 0);
+    const followers = isItEmpty(follower_ids);
+    const following = isItEmpty(following_ids);
 
     const sql = 
     `
@@ -81,14 +81,12 @@ const getFollowers = async (req: Request, res: Response) => {
         F.FOLLOWER_ID = (?) AND F.FOLLOWED_ID NOT IN (?)
       LIMIT 3;
     `;
-
     const [followersData, followingData] = await db(sql, [
       user_id, followers, user_id, following,
     ]);
-
     res.status(200).send({ followers: followersData, following: followingData });
-  } catch (error) {
-    res.status(500).send({ message: "An error occurred", error });
+  } catch (error:any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
   }
 };
 
@@ -124,8 +122,8 @@ const followUser = async (req: Request, res: Response) => {
       await db(sqlCreate, [...values]);
       res.status(200).send({ message: "Followed user" });
     }
-  } catch (error) {
-    res.status(500).send({ message: "An error occurred", error });
+  } catch (error:any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
   }
 };
 

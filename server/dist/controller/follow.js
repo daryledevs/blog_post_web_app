@@ -47,7 +47,7 @@ const totalFollow = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
 });
 exports.totalFollow = totalFollow;
@@ -55,9 +55,9 @@ const getFollowers = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     try {
         const { user_id } = req.params;
         const { follower_ids, following_ids } = req.body;
-        const isEmpty = (arr) => (arr.length ? arr : 0);
-        const followers = isEmpty(follower_ids);
-        const following = isEmpty(following_ids);
+        const isItEmpty = (arr) => (arr.length ? arr : 0);
+        const followers = isItEmpty(follower_ids);
+        const following = isItEmpty(following_ids);
         const sql = `
       SELECT 
         F.*, 
@@ -95,7 +95,7 @@ const getFollowers = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         res.status(200).send({ followers: followersData, following: followingData });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
 });
 exports.getFollowers = getFollowers;
@@ -130,7 +130,7 @@ const followUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         }
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
 });
 exports.followUser = followUser;

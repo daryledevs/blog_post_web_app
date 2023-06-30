@@ -1,9 +1,9 @@
 import db from "../database/query";
 import { Request, Response } from "express";
+import isEmpty from "../util/isObjEmpty";
 
 const getUserData = (data: any) => {
-  const [user] = data;
-  const { password, ...rest } = user;
+  const { password, ...rest } = data;
   return rest;
 };
 
@@ -12,13 +12,12 @@ const userData = async (req: Request, res: Response) => {
     const { user_id } = req.body;
     const sql = "SELECT * FROM USERS WHERE USER_ID = (?);";
     const [data] = await db(sql, [user_id]);
-    if (!data.length)
-      return res.status(404).send({ message: "User not found" });
+    if(isEmpty(data)) return res.status(404).send({ message: "User not found" });
     const rest = getUserData(data);
     res.status(200).send({ user: rest });
-  } catch (error) {
-    res.status(500).send({ message: "An error occurred", error });
-  }
+  } catch (error:any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
+  };
 };
 
 const getUserFeed = async (req: Request, res: Response) => {
@@ -50,9 +49,9 @@ const getUserFeed = async (req: Request, res: Response) => {
    `;
     const data = await db(sql, [user_id, values]);
     res.status(200).send({ feed: data });
-  } catch (error) {
-    res.status(500).send({ message: "An error occurred", error });
-  }
+  } catch (error:any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
+  };
 };
 
 const getTotalFeed = async (req: Request, res: Response) => {
@@ -69,9 +68,9 @@ const getTotalFeed = async (req: Request, res: Response) => {
     `;
     const [data] = await db(sql, [user_id]);
     res.status(200).send({ count: data["COUNT(*)"] });
-  } catch (error) {
-    res.status(500).send({ message: "An error occurred", error });
-  }
+  } catch (error:any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
+  };
 };
 
 const findUser = async (req: Request, res: Response) => {
@@ -96,11 +95,11 @@ const findUser = async (req: Request, res: Response) => {
       searchText + "%",
       "%" + searchText + "%",
     ]);
-    if(!data.length) return res.status(401).send("No results found.");
+    if(isEmpty(data)) return res.status(401).send("No results found.");
     res.status(200).send({ list: data });
-  } catch (error) {
-    res.status(500).send({ message: "An error occurred", error });
-  }
+  } catch (error:any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
+  };
 };
 
 const findUsername = async (req: Request, res: Response) => {
@@ -108,12 +107,12 @@ const findUsername = async (req: Request, res: Response) => {
     const { username } = req.params;
     const sql = "SELECT * FROM USERS WHERE USERNAME = (?);";
     const [data] = await db(sql, [username]);
-    if(!data.length) return res.status(404).send({ message: "The user doesn't exist" });
+    if(isEmpty(data)) return res.status(404).send({ message: "The user doesn't exist" });
     const rest = getUserData(data);
     res.status(200).send({ user: rest });
-  } catch (error) {
-    res.status(500).send({ message: "An error occurred", error });
-  }
+  } catch (error:any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
+  };
 };
 
 export { userData, findUser, getUserFeed, getTotalFeed, findUsername };

@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getAllChatMember = exports.newMessage = exports.getMessage = exports.newConversation = exports.getAllChats = void 0;
 const query_1 = __importDefault(require("../database/query"));
+const isObjEmpty_1 = __importDefault(require("../util/isObjEmpty"));
 const getAllChatMember = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { user_id } = req.params;
@@ -39,8 +40,9 @@ const getAllChatMember = (req, res) => __awaiter(void 0, void 0, void 0, functio
         res.status(200).send({ list: data });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
+    ;
 });
 exports.getAllChatMember = getAllChatMember;
 const getAllChats = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -76,7 +78,7 @@ const getAllChats = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         C.USER_ONE = (?) OR C.USER_TWO = (?);
     `;
         const [data] = yield (0, query_1.default)(sql, [...values]);
-        if (!data.length)
+        if ((0, isObjEmpty_1.default)(data))
             return res.status(200).send({ data: data });
         for (const dataOne in data[0]) {
             let sub_arr = [];
@@ -90,8 +92,9 @@ const getAllChats = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         return res.status(200).send({ data: main_arr });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
+    ;
 });
 exports.getAllChats = getAllChats;
 const newConversation = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -114,8 +117,9 @@ const newConversation = (req, res) => __awaiter(void 0, void 0, void 0, function
             .send({ message: "New conversation created", data: data[0].insertId });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
+    ;
 });
 exports.newConversation = newConversation;
 const getMessage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -128,8 +132,9 @@ const getMessage = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         res.status(200).send({ chats: data });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
+    ;
 });
 exports.getMessage = getMessage;
 const newMessage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -143,7 +148,8 @@ const newMessage = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         res.status(200).send({ message: "New message created" });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
+    ;
 });
 exports.newMessage = newMessage;

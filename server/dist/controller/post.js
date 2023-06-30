@@ -39,6 +39,7 @@ exports.deletePost = exports.editPost = exports.getUserPost = exports.newPost = 
 const dotenv = __importStar(require("dotenv"));
 const query_1 = __importDefault(require("../database/query"));
 const cloudinary_1 = __importDefault(require("../config/cloudinary"));
+const isObjEmpty_1 = __importDefault(require("../util/isObjEmpty"));
 dotenv.config();
 const getUserPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -60,12 +61,12 @@ const getUserPost = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
           P.USER_ID = (?);
     `;
         const [data] = yield (0, query_1.default)(sql, [user_id]);
-        if (!data)
+        if ((0, isObjEmpty_1.default)(data))
             return res.status(500).send({ error: "No post found" });
         res.status(200).send({ post: data });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
 });
 exports.getUserPost = getUserPost;
@@ -84,7 +85,7 @@ const newPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(200).send({ message: "Post has been posted" });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
 });
 exports.newPost = newPost;
@@ -104,7 +105,7 @@ const editPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(200).send({ message: "Edit post successfully" });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
 });
 exports.editPost = editPost;
@@ -116,7 +117,7 @@ const deletePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         res.status(200).send("Delete post successfully");
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
 });
 exports.deletePost = deletePost;

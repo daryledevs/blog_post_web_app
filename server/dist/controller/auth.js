@@ -61,7 +61,7 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return res.status(200).send({ message: "Registration is successful" });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
     ;
 });
@@ -92,8 +92,9 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
     }
     catch (error) {
-        return res.status(500).send({ message: "An error occurred", error });
+        return res.status(500).send({ message: "An error occurred", error: error.message });
     }
+    ;
 });
 exports.login = login;
 const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -117,8 +118,9 @@ const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.json({ message: "Password reset email sent" });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
+    ;
 });
 exports.forgotPassword = forgotPassword;
 const resetPasswordForm = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -138,8 +140,9 @@ const resetPasswordForm = (req, res) => __awaiter(void 0, void 0, void 0, functi
         });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
+    ;
 });
 exports.resetPasswordForm = resetPasswordForm;
 const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -165,7 +168,7 @@ const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         res.status(200).send({ message: "Reset password successfully" });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
     ;
 });

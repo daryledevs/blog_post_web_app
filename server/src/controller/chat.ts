@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import db from "../database/query";
+import isEmpty from "../util/isObjEmpty";
 
 const getAllChatMember = async (req: Request, res: Response) => {
   try {
@@ -24,9 +25,9 @@ const getAllChatMember = async (req: Request, res: Response) => {
     `;
     const [data] = await db(sql, [...values]);
     res.status(200).send({ list: data });
-  } catch (error) {
-    res.status(500).send({ message: "An error occurred", error });
-  }
+  } catch (error:any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
+  };
 };
 
 const getAllChats = async (req: Request, res: Response) => {
@@ -63,7 +64,7 @@ const getAllChats = async (req: Request, res: Response) => {
         C.USER_ONE = (?) OR C.USER_TWO = (?);
     `;
     const [data] = await db(sql, [...values]);
-    if (!data.length) return res.status(200).send({ data: data });
+    if (isEmpty(data)) return res.status(200).send({ data: data });
 
     for (const dataOne in data[0]) {
       let sub_arr: any[] = [];
@@ -74,9 +75,9 @@ const getAllChats = async (req: Request, res: Response) => {
       main_arr.push(sub_arr);
     }
     return res.status(200).send({ data: main_arr });
-  } catch (error) {
-    res.status(500).send({ message: "An error occurred", error });
-  }
+  } catch (error:any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
+  };
 };
 
 const newConversation = async (req: Request, res: Response) => {
@@ -98,9 +99,9 @@ const newConversation = async (req: Request, res: Response) => {
     res
       .status(200)
       .send({ message: "New conversation created", data: data[0].insertId });
-  } catch (error) {
-    res.status(500).send({ message: "An error occurred", error });
-  }
+  } catch (error:any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
+  };
 };
 
 const getMessage = async (req: Request, res: Response) => {
@@ -111,9 +112,9 @@ const getMessage = async (req: Request, res: Response) => {
     `;
     const [data] = await db(sql, [req.params.conversation_id]);
     res.status(200).send({ chats: data });
-  } catch (error) {
-    res.status(500).send({ message: "An error occurred", error });
-  }
+  } catch (error:any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
+  };
 };
 
 const newMessage = async (req: Request, res: Response) => {
@@ -125,9 +126,9 @@ const newMessage = async (req: Request, res: Response) => {
     const { sender_id, text_message, conversation_id } = req.body;
     const data = await db(sql, [sender_id, conversation_id, text_message]);
     res.status(200).send({ message: "New message created" });
-  } catch (error) {
-    res.status(500).send({ message: "An error occurred", error });
-  }
+  } catch (error:any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
+  };
 };
 
 export {

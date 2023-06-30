@@ -1,5 +1,6 @@
 import { Response, Request } from "express";
 import db from "../database/query";
+import isEmpty from "../util/isObjEmpty";
 
 const postAllLikes = async (req: Request, res: Response) => {
   try {
@@ -16,8 +17,8 @@ const postAllLikes = async (req: Request, res: Response) => {
 
     const [data] = await db(sql, [post_id]);
     res.status(200).send({ count: data.COUNT });
-  } catch (error) {
-    res.status(500).send({ message: "An error occurred", error });
+  } catch (error:any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
   }
 };
 
@@ -31,10 +32,10 @@ const likeStatus = async (req: Request, res: Response) => {
     `;
 
     const [data] = await db(sql, [post_id, user_id]);
-    if (!data.length) return res.status(200).send({ status: false });
+    if (isEmpty(data)) return res.status(200).send({ status: false });
     res.status(200).send({ status: true });
-  } catch (error) {
-    res.status(500).send({ message: "An error occurred", error });
+  } catch (error:any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
   }
 };
 
@@ -67,8 +68,8 @@ const likePost = async (req: Request, res: Response) => {
       await db(sql_create, [post_id, user_id]);
       return res.status(200).send("Liked post");
     }
-  } catch (error) {
-    res.status(500).send({ message: "An error occurred", error });
+  } catch (error:any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
   }
 };
 

@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.likeStatus = exports.postAllLikes = exports.likePost = void 0;
 const query_1 = __importDefault(require("../database/query"));
+const isObjEmpty_1 = __importDefault(require("../util/isObjEmpty"));
 const postAllLikes = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { post_id } = req.params;
@@ -29,7 +30,7 @@ const postAllLikes = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         res.status(200).send({ count: data.COUNT });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
 });
 exports.postAllLikes = postAllLikes;
@@ -42,12 +43,12 @@ const likeStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
       WHERE POST_ID = ? AND USER_ID = ?
     `;
         const [data] = yield (0, query_1.default)(sql, [post_id, user_id]);
-        if (!data.length)
+        if ((0, isObjEmpty_1.default)(data))
             return res.status(200).send({ status: false });
         res.status(200).send({ status: true });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
 });
 exports.likeStatus = likeStatus;
@@ -81,7 +82,7 @@ const likePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
 });
 exports.likePost = likePost;

@@ -2,6 +2,7 @@ import { Response, Request } from "express";
 import * as dotenv from "dotenv";
 import db from "../database/query";
 import uploadAndDeleteLocal from "../config/cloudinary";
+import isEmpty from "../util/isObjEmpty";
 dotenv.config();
 
 const getUserPost = async (req: Request, res: Response) => {
@@ -25,10 +26,10 @@ const getUserPost = async (req: Request, res: Response) => {
           P.USER_ID = (?);
     `;
     const [data] = await db(sql, [user_id]);
-    if (!data) return res.status(500).send({ error: "No post found" });
+    if (isEmpty(data)) return res.status(500).send({ error: "No post found" });
     res.status(200).send({ post: data });
-  } catch (error) {
-    res.status(500).send({ message: "An error occurred", error });
+  } catch (error:any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
   }
 };
 
@@ -46,8 +47,8 @@ const newPost = async (req: Request, res: Response) => {
     `;
     await db(sql, [values]);
     res.status(200).send({ message: "Post has been posted" });
-  } catch (error) {
-    res.status(500).send({ message: "An error occurred", error });
+  } catch (error:any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
   }
 };
 
@@ -65,8 +66,8 @@ const editPost = async (req: Request, res: Response) => {
     const sql = `UPDATE POSTS SET ${query} WHERE POST_ID = (?);`;
     await db(sql, [parseInt(post_id)]);
     res.status(200).send({ message: "Edit post successfully" });
-  } catch (error) {
-    res.status(500).send({ message: "An error occurred", error });
+  } catch (error:any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
   }
 };
 
@@ -76,8 +77,8 @@ const deletePost = async (req: Request, res: Response) => {
     const sql = "DELETE FROM POSTS WHERE POST_ID = (?);";
     await db(sql, [parseInt(post_id)]);
     res.status(200).send("Delete post successfully");
-  } catch (error) {
-    res.status(500).send({ message: "An error occurred", error });
+  } catch (error:any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
   }
 };
 
