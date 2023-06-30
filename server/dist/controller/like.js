@@ -68,15 +68,15 @@ const likePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
       INSERT INTO LIKES (POST_ID, USER_ID) 
       VALUES (?, ?);
     `;
-        // check to see if the user already likes the post
+        // Check to see if the user already likes the post.
         const [data] = yield (0, query_1.default)(sql_get, [post_id, user_id]);
-        if (data.length) {
-            // if the user has already liked the post, then delete or remove
+        if ((0, isObjEmpty_1.default)(data)) {
+            // If the user has already liked the post, then delete or remove.
             yield (0, query_1.default)(sql_delete, [post_id, user_id]);
             return res.status(200).send("Removed like from a post");
         }
         else {
-            // if the user hasn't liked the post yet, then create or insert
+            // If the user hasn't liked the post yet, then create or insert.
             yield (0, query_1.default)(sql_create, [post_id, user_id]);
             return res.status(200).send("Liked post");
         }
