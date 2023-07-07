@@ -6,8 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const user_1 = require("../controller/user");
 const router = express_1.default.Router();
-const accessToken_1 = __importDefault(require("../middleware/accessToken"));
-router.use(accessToken_1.default);
 router.get("/", user_1.userData);
 router.post("/feed", user_1.getUserFeed);
 router.get("/search", user_1.findUser);

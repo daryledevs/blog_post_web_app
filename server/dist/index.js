@@ -41,7 +41,7 @@ const post_1 = __importDefault(require("./router/post"));
 const like_1 = __importDefault(require("./router/like"));
 const follow_1 = __importDefault(require("./router/follow"));
 const corsOption_1 = __importDefault(require("./config/corsOption"));
-const refreshToken_1 = __importDefault(require("./middleware/refreshToken"));
+const tokenHandler_1 = __importDefault(require("./middleware/tokenHandler"));
 const path_1 = __importDefault(require("./config/path"));
 const responseHandler_1 = __importDefault(require("./middleware/responseHandler"));
 dotenv.config();
@@ -51,7 +51,7 @@ const API = process.env.API;
 app.use(body_parser_1.default.json());
 app.use((0, cookie_parser_1.default)());
 app.use((0, cors_1.default)(corsOption_1.default));
-app.use(refreshToken_1.default);
+app.use(tokenHandler_1.default);
 app.use(responseHandler_1.default);
 app.set("views", path_1.default); // Set the views directory
 app.set('view engine', 'ejs'); // Set EJS as the template engine

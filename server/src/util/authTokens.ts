@@ -7,6 +7,20 @@ const REFRESH_TOKEN_EXPIRATION = "7d";
 const ACCESS_TOKEN_EXPIRATION = "15m";
 const RESET_TOKEN_EXPIRATION = "1hr";
 
+function verifyToken(token: any, secret: any): Promise<any> {
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, secret, (error: any, decode: any) => {
+      resolve({ error, decode });
+    });
+  });
+};
+
+function errorName(name: any) {
+  if (name === "JsonWebTokenError") return true;
+  if (name === "UnauthorizedError") return true;
+  return false;
+};
+
 function generateRefreshToken({ USER_ID, USERNAME }: { USER_ID: string; USERNAME: string }): string {
   const REFRESH_SECRET = process.env.REFRESH_TKN_SECRET!;
   const details = { user_id: USER_ID, username: USERNAME };
@@ -37,6 +51,8 @@ async function referenceToken() {
 };
 
 export {
+  verifyToken,
+  errorName,
   generateAccessToken,
   generateRefreshToken,
   generateResetToken,

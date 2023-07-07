@@ -13,7 +13,7 @@ import postRouter from "./router/post";
 import likeRouter from "./router/like";
 import followRouter from "./router/follow";
 import corsOptions from "./config/corsOption";
-import refreshToken from "./middleware/refreshToken";
+import tokenHandler from "./middleware/tokenHandler";
 import rootPath from "./config/path";
 import responseHandler from "./middleware/responseHandler";
 dotenv.config();
@@ -25,7 +25,7 @@ const API = process.env.API;
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
-app.use(refreshToken);
+app.use(tokenHandler);
 app.use(responseHandler);
 app.set("views", rootPath); // Set the views directory
 app.set('view engine', 'ejs'); // Set EJS as the template engine

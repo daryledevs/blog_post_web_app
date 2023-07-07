@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.referenceToken = exports.generateResetToken = exports.generateRefreshToken = exports.generateAccessToken = void 0;
+exports.referenceToken = exports.generateResetToken = exports.generateRefreshToken = exports.generateAccessToken = exports.errorName = exports.verifyToken = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv = __importStar(require("dotenv"));
 const nanoid_1 = require("nanoid");
@@ -43,6 +43,24 @@ dotenv.config();
 const REFRESH_TOKEN_EXPIRATION = "7d";
 const ACCESS_TOKEN_EXPIRATION = "15m";
 const RESET_TOKEN_EXPIRATION = "1hr";
+function verifyToken(token, secret) {
+    return new Promise((resolve, reject) => {
+        jsonwebtoken_1.default.verify(token, secret, (error, decode) => {
+            resolve({ error, decode });
+        });
+    });
+}
+exports.verifyToken = verifyToken;
+;
+function errorName(name) {
+    if (name === "JsonWebTokenError")
+        return true;
+    if (name === "UnauthorizedError")
+        return true;
+    return false;
+}
+exports.errorName = errorName;
+;
 function generateRefreshToken({ USER_ID, USERNAME }) {
     const REFRESH_SECRET = process.env.REFRESH_TKN_SECRET;
     const details = { user_id: USER_ID, username: USERNAME };
