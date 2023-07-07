@@ -34,7 +34,7 @@ function destructureObject(data, dataKeys) {
     for (const index in dataKeys) {
         const key = dataKeys[index];
         const value = data[key];
-        if (data.hasOwnProperty(key)) {
+        if (data.hasOwnProperty(key) && value === "object" && value) {
             const result = destructureObject(value, dataKeys);
             const converted = convert(result);
             instance = Object.assign(Object.assign({}, instance), { [key]: converted });
