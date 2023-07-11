@@ -1,6 +1,5 @@
 import db from "../database/query";
 import { Request, Response } from "express";
-import isEmpty from "../util/isObjEmpty";
 
 const totalFollow = async (req: Request, res: Response) => {
   try {
@@ -29,8 +28,8 @@ const totalFollow = async (req: Request, res: Response) => {
     `;
 
     const [data] = await db(sql, [user_id, user_id]);
-    const [followers] = data[0];
-    const [following] = data[1];
+    const followers = data[0];
+    const following = data[1];
 
     res.status(200).send({
       followers: followers?.count ? followers.count : 0,
@@ -115,7 +114,7 @@ const followUser = async (req: Request, res: Response) => {
     const [data] = await db(sqlGet, [...values]);
 
     // If it already exists, delete the data from the database
-    if (isEmpty(data)) {
+    if (!data) {
       await db(sqlDelete, [...values]);
       res.status(200).send({ message: "Unfollowed user" });
     } else {

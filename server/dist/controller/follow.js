@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.followUser = exports.getFollowers = exports.totalFollow = void 0;
 const query_1 = __importDefault(require("../database/query"));
-const isObjEmpty_1 = __importDefault(require("../util/isObjEmpty"));
 const totalFollow = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { user_id } = req.params;
@@ -40,8 +39,8 @@ const totalFollow = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
       GROUP BY F.FOLLOWER_ID;
     `;
         const [data] = yield (0, query_1.default)(sql, [user_id, user_id]);
-        const [followers] = data[0];
-        const [following] = data[1];
+        const followers = data[0];
+        const following = data[1];
         res.status(200).send({
             followers: (followers === null || followers === void 0 ? void 0 : followers.count) ? followers.count : 0,
             following: (following === null || following === void 0 ? void 0 : following.count) ? following.count : 0,
@@ -120,7 +119,7 @@ const followUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         // Get all the data from the database to see if it is already there
         const [data] = yield (0, query_1.default)(sqlGet, [...values]);
         // If it already exists, delete the data from the database
-        if ((0, isObjEmpty_1.default)(data)) {
+        if (!data) {
             yield (0, query_1.default)(sqlDelete, [...values]);
             res.status(200).send({ message: "Unfollowed user" });
         }

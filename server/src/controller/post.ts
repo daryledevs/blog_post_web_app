@@ -2,7 +2,6 @@ import { Response, Request } from "express";
 import * as dotenv from "dotenv";
 import db from "../database/query";
 import uploadAndDeleteLocal from "../config/cloudinary";
-import isEmpty from "../util/isObjEmpty";
 dotenv.config();
 
 const getUserPost = async (req: Request, res: Response) => {
@@ -25,8 +24,7 @@ const getUserPost = async (req: Request, res: Response) => {
       WHERE
           P.USER_ID = (?);
     `;
-    const [data] = await db(sql, [user_id]);
-    if (isEmpty(data)) return res.status(500).send({ error: "No post found" });
+    const data = await db(sql, [user_id]);
     res.status(200).send({ post: data });
   } catch (error:any) {
     res.status(500).send({ message: "An error occurred", error: error.message });

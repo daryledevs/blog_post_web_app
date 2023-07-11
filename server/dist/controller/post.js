@@ -39,7 +39,6 @@ exports.deletePost = exports.editPost = exports.getUserPost = exports.newPost = 
 const dotenv = __importStar(require("dotenv"));
 const query_1 = __importDefault(require("../database/query"));
 const cloudinary_1 = __importDefault(require("../config/cloudinary"));
-const isObjEmpty_1 = __importDefault(require("../util/isObjEmpty"));
 dotenv.config();
 const getUserPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -60,9 +59,7 @@ const getUserPost = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
       WHERE
           P.USER_ID = (?);
     `;
-        const [data] = yield (0, query_1.default)(sql, [user_id]);
-        if ((0, isObjEmpty_1.default)(data))
-            return res.status(500).send({ error: "No post found" });
+        const data = yield (0, query_1.default)(sql, [user_id]);
         res.status(200).send({ post: data });
     }
     catch (error) {

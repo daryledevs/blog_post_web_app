@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getAllChatMember = exports.newMessage = exports.getMessage = exports.newConversation = exports.getAllChats = void 0;
 const query_1 = __importDefault(require("../database/query"));
-const isObjEmpty_1 = __importDefault(require("../util/isObjEmpty"));
 const getAllChatMember = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { user_id } = req.params;
@@ -36,7 +35,7 @@ const getAllChatMember = (req, res) => __awaiter(void 0, void 0, void 0, functio
       WHERE
         C.USER_ONE = (?) OR C.USER_TWO = (?);
     `;
-        const [data] = yield (0, query_1.default)(sql, [...values]);
+        const data = yield (0, query_1.default)(sql, [...values]);
         res.status(200).send({ list: data });
     }
     catch (error) {
@@ -67,7 +66,7 @@ const getAllChats = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
       FROM
         MESSAGES M
       LEFT JOIN
-        CONVERSATION C ON C.CONVERSATION_ID = M.CONVERSATION_ID
+        CONVERSATIONS C ON C.CONVERSATION_ID = M.CONVERSATION_ID
       INNER JOIN
         USERS U ON U.USER_ID = 
           CASE 
@@ -78,7 +77,8 @@ const getAllChats = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         C.USER_ONE = (?) OR C.USER_TWO = (?);
     `;
         const [data] = yield (0, query_1.default)(sql, [...values]);
-        if ((0, isObjEmpty_1.default)(data))
+        ;
+        if (!data)
             return res.status(200).send({ data: data });
         for (const dataOne in data[0]) {
             let sub_arr = [];

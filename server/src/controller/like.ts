@@ -1,6 +1,5 @@
 import { Response, Request } from "express";
 import db from "../database/query";
-import isEmpty from "../util/isObjEmpty";
 
 const postAllLikes = async (req: Request, res: Response) => {
   try {
@@ -32,8 +31,7 @@ const likeStatus = async (req: Request, res: Response) => {
     `;
 
     const [data] = await db(sql, [post_id, user_id]);
-    if (isEmpty(data)) return res.status(200).send({ status: false });
-    res.status(200).send({ status: true });
+    res.status(200).send({ status: data ? true : false });
   } catch (error:any) {
     res.status(500).send({ message: "An error occurred", error: error.message });
   }
@@ -59,7 +57,7 @@ const likePost = async (req: Request, res: Response) => {
     // Check to see if the user already likes the post.
     const [data] = await db(sql_get, [post_id, user_id]);
 
-    if (isEmpty(data)) {
+    if (!data) {
       // If the user has already liked the post, then delete or remove.
       await db(sql_delete, [post_id, user_id]);
       return res.status(200).send("Removed like from a post");

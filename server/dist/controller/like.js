@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.likeStatus = exports.postAllLikes = exports.likePost = void 0;
 const query_1 = __importDefault(require("../database/query"));
-const isObjEmpty_1 = __importDefault(require("../util/isObjEmpty"));
 const postAllLikes = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { post_id } = req.params;
@@ -43,9 +42,7 @@ const likeStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
       WHERE POST_ID = ? AND USER_ID = ?
     `;
         const [data] = yield (0, query_1.default)(sql, [post_id, user_id]);
-        if ((0, isObjEmpty_1.default)(data))
-            return res.status(200).send({ status: false });
-        res.status(200).send({ status: true });
+        res.status(200).send({ status: data ? true : false });
     }
     catch (error) {
         res.status(500).send({ message: "An error occurred", error: error.message });
@@ -70,7 +67,7 @@ const likePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     `;
         // Check to see if the user already likes the post.
         const [data] = yield (0, query_1.default)(sql_get, [post_id, user_id]);
-        if ((0, isObjEmpty_1.default)(data)) {
+        if (!data) {
             // If the user has already liked the post, then delete or remove.
             yield (0, query_1.default)(sql_delete, [post_id, user_id]);
             return res.status(200).send("Removed like from a post");

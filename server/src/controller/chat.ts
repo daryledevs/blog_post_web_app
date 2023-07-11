@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import db from "../database/query";
-import isEmpty from "../util/isObjEmpty";
 
 const getAllChatMember = async (req: Request, res: Response) => {
   try {
@@ -23,7 +22,7 @@ const getAllChatMember = async (req: Request, res: Response) => {
       WHERE
         C.USER_ONE = (?) OR C.USER_TWO = (?);
     `;
-    const [data] = await db(sql, [...values]);
+    const data = await db(sql, [...values]);
     res.status(200).send({ list: data });
   } catch (error:any) {
     res.status(500).send({ message: "An error occurred", error: error.message });
@@ -53,7 +52,7 @@ const getAllChats = async (req: Request, res: Response) => {
       FROM
         MESSAGES M
       LEFT JOIN
-        CONVERSATION C ON C.CONVERSATION_ID = M.CONVERSATION_ID
+        CONVERSATIONS C ON C.CONVERSATION_ID = M.CONVERSATION_ID
       INNER JOIN
         USERS U ON U.USER_ID = 
           CASE 
@@ -63,8 +62,8 @@ const getAllChats = async (req: Request, res: Response) => {
       WHERE 
         C.USER_ONE = (?) OR C.USER_TWO = (?);
     `;
-    const [data] = await db(sql, [...values]);
-    if (isEmpty(data)) return res.status(200).send({ data: data });
+    const [data] = await db(sql, [...values]);;
+    if (!data) return res.status(200).send({ data: data });
 
     for (const dataOne in data[0]) {
       let sub_arr: any[] = [];

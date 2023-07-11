@@ -25,7 +25,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.findUsername = exports.getTotalFeed = exports.getUserFeed = exports.findUser = exports.userData = void 0;
 const query_1 = __importDefault(require("../database/query"));
-const isObjEmpty_1 = __importDefault(require("../util/isObjEmpty"));
 const getUserData = (data) => {
     const { password } = data, rest = __rest(data, ["password"]);
     return rest;
@@ -35,7 +34,7 @@ const userData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const { user_id } = req.body;
         const sql = "SELECT * FROM USERS WHERE USER_ID = (?);";
         const [data] = yield (0, query_1.default)(sql, [user_id]);
-        if ((0, isObjEmpty_1.default)(data))
+        if (!data)
             return res.status(404).send({ message: "User not found" });
         const rest = getUserData(data);
         res.status(200).send({ user: rest });
@@ -123,7 +122,7 @@ const findUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             searchText + "%",
             "%" + searchText + "%",
         ]);
-        if ((0, isObjEmpty_1.default)(data))
+        if (!data)
             return res.status(401).send("No results found.");
         res.status(200).send({ list: data });
     }
@@ -138,7 +137,7 @@ const findUsername = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         const { username } = req.params;
         const sql = "SELECT * FROM USERS WHERE USERNAME = (?);";
         const [data] = yield (0, query_1.default)(sql, [username]);
-        if ((0, isObjEmpty_1.default)(data))
+        if (!data)
             return res.status(404).send({ message: "The user doesn't exist" });
         const rest = getUserData(data);
         res.status(200).send({ user: rest });
