@@ -43,21 +43,25 @@ dotenv.config();
 const REFRESH_TOKEN_EXPIRATION = "7d";
 const ACCESS_TOKEN_EXPIRATION = "15m";
 const RESET_TOKEN_EXPIRATION = "1hr";
-function verifyToken(token, secret) {
+function verifyToken(token, secret, tokenName) {
     return new Promise((resolve, reject) => {
-        jsonwebtoken_1.default.verify(token, secret, (error, decode) => {
-            resolve({ error, decode });
-        });
+        const errorField = `${tokenName}Error`;
+        const decodeField = `${tokenName}Decode`;
+        try {
+            const decodedToken = jsonwebtoken_1.default.verify(token, secret);
+            resolve({ [errorField]: null, [decodeField]: decodedToken });
+        }
+        catch (error) {
+            const decodedToken = jsonwebtoken_1.default.decode(token);
+            return resolve({ [errorField]: error === null || error === void 0 ? void 0 : error.name, [decodeField]: decodedToken });
+        }
     });
 }
 exports.verifyToken = verifyToken;
-;
 function errorName(name) {
-    if (name === "JsonWebTokenError")
-        return true;
-    if (name === "UnauthorizedError")
-        return true;
-    return false;
+    if (name === "TokenExpiredError")
+        return false;
+    return true;
 }
 exports.errorName = errorName;
 ;
