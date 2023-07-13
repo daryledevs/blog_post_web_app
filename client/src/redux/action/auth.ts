@@ -1,30 +1,27 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
-import { AxiosError } from "axios";
+import { createAsyncThunk, Dispatch } from "@reduxjs/toolkit";
 import api from "../../assets/data/api";
-import { userDataThunk } from "../action/user";
+import auth, { setAccessStatus } from '../reducer/auth';
 import { IEAuthData, IEAuthFetchError } from "../reduxIntface";
-
+import store, { RootState, AppDispatch } from '../store';
 
 const checkAccess = createAsyncThunk<
   IEAuthData,
-  void,
-  { rejectValue: IEAuthFetchError }
+  { apiRequest: () => Promise<any> },
+  { rejectValue: IEAuthFetchError, state: RootState, dispatch: AppDispatch  }
 >(
   "auth/checkAccess",
-  async (_, { dispatch, fulfillWithValue, rejectWithValue }) => {
+  async ({ apiRequest }, { dispatch, getState, fulfillWithValue, rejectWithValue }) => {
     try {
-      const response = await api.get("/check-token");
-      const data = response.data;
-      dispatch(userDataThunk(data.token));
-      return fulfillWithValue(data);
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        return rejectWithValue({
-          errorType: error?.response?.data.error,
-          errorMessage: error?.response?.data.message,
-        });
+      const response = await apiRequest();
+      // if access token is expired
+      if (response.data.accessToken) {
+        sessionStorage.setItem("token", response.data.accessToken);
+        await dispatch(checkAccess({ apiRequest }));
       }
-      throw error;
+      return fulfillWithValue(response);
+    } catch (error) {
+      dispatch(setAccessStatus(error.response.data));
+      rejectWithValue(error.response.data);
     }
   }
 );

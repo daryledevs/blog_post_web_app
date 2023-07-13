@@ -23,7 +23,6 @@ const authSlice = createSlice({
       state.access_status = action.payload?.status;
       state.access_message = action.payload?.message;
       state.token_status = action.payload?.error?.message
-      sessionStorage.setItem("token", "");
     }
   },
   extraReducers(builder) {

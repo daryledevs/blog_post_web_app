@@ -28,7 +28,7 @@ export async function getFollowers(dispatch:Dispatch, user_id:any, follower:any[
   }
 };
 
-async function getPosts(dispatch:Dispatch, user_id:number, token: any) {
+async function getPosts(dispatch:Dispatch, user_id:number) {
   try {
     const response = await api.get(`/posts/${user_id}`);
     dispatch(getPost(response.data?.post))
@@ -47,22 +47,16 @@ const userDataThunk = createAsyncThunk<
   }
 >(
   "user/userDataThunk",
-  async (token, { dispatch, fulfillWithValue, rejectWithValue }) => {
+  async (_, { dispatch, fulfillWithValue, rejectWithValue }) => {
     try {
-      const response = await api.get(`/users`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
+      const response = await api.get(`/users`);
       const user = response.data.user;
-
       await Promise.all([
         dispatch(getChatThunk({ user_id: user.user_id, length: 0 })),
         dispatch(getChatMembers(user)),
         totalFollow(dispatch, user.user_id),
         getFollowers(dispatch, user.user_id, [], []),
-        getPosts(dispatch, user.user_id, token),
+        getPosts(dispatch, user.user_id),
       ]);
 
       return fulfillWithValue(user);

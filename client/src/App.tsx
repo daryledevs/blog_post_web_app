@@ -9,6 +9,7 @@ import { userDataThunk } from "./redux/action/user";
 import RouteIndex from "./routes/Index";
 import api from "./assets/data/api";
 import { setAccessStatus } from "./redux/reducer/auth";
+import { checkAccess } from "./redux/action/auth";
 
 
 function App() {
@@ -21,7 +22,7 @@ function App() {
   const userData = useAppSelector((state) => state.user);
   const [comingMessage, setComingMessage] = useState<any>();
   const routes = RouteIndex();
-  
+
   // socket handler
   useEffect(() => {
     try {
@@ -46,31 +47,24 @@ function App() {
   }, [comingMessage]);
 
 
-  useEffect(() => {
-    async function performRequest() {
-      try {
-        const token: any = sessionStorage.getItem("token");
-        const response = await api.get("/users", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        // if access token is expired
-        if (response.data.accessToken) {
-          sessionStorage.setItem("token", response.data.accessToken);
-          await performRequest();
-        }
-
-        // else proceed to API call for user's information
-        if (token && token_status === "") appDispatch(userDataThunk(token));
-      } catch (error) {
-        appDispatch(setAccessStatus(error.response.data));
-      }
+  async function performRequest() {
+    try {
+      const token: any = sessionStorage.getItem("token") || "";
+      const response = await api.get("/users");
+      // if access token is expired, else proceed to API call for user's information
+      if (response.data.accessToken) return response;
+      if (token && token_status === "") appDispatch(userDataThunk(token));
+    } catch (error) {
+      appDispatch(setAccessStatus(error.response.data));
+      return error;
     }
+  }
 
-    if (String(access_status)[0] !== "4") performRequest();
-  }, [access_status]);
+  useEffect(() => {
+    if (String(access_status)[0] !== "4") {
+      appDispatch(checkAccess({ apiRequest: performRequest }));
+    }
+  }, [access_status, appDispatch]);
   
   
 
