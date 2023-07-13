@@ -37,7 +37,9 @@ function destructureObject(data, dataKeys) {
         if (data.hasOwnProperty(key) && typeof value === "object" && value) {
             const result = destructureObject(value, dataKeys);
             const converted = convert(result);
-            instance = Object.assign(Object.assign({}, instance), { [key]: converted });
+            const length = Object.keys(converted).length;
+            const newValue = Array.isArray(value) ? length ? [converted] : [] : converted;
+            instance = Object.assign(Object.assign({}, instance), { [key]: newValue });
         }
         else {
             instance = Object.assign(Object.assign({}, instance), data);

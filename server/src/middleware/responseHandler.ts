@@ -26,7 +26,9 @@ function destructureObject(data: any, dataKeys: any): object {
     if (data.hasOwnProperty(key) && typeof value === "object" && value) {
       const result = destructureObject(value, dataKeys);
       const converted = convert(result);
-      instance = { ...instance, [key]: converted };
+      const length = Object.keys(converted).length;
+      const newValue = Array.isArray(value) ? length ? [converted] : [] : converted;
+      instance = { ...instance, [key]: newValue };
     } else {
       instance = { ...instance, ...data };
     };
