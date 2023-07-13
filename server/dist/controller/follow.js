@@ -119,7 +119,7 @@ const followUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         // Get all the data from the database to see if it is already there
         const [data] = yield (0, query_1.default)(sqlGet, [...values]);
         // If it already exists, delete the data from the database
-        if (!data) {
+        if (data) {
             yield (0, query_1.default)(sqlDelete, [...values]);
             res.status(200).send({ message: "Unfollowed user" });
         }

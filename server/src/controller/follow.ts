@@ -114,7 +114,7 @@ const followUser = async (req: Request, res: Response) => {
     const [data] = await db(sqlGet, [...values]);
 
     // If it already exists, delete the data from the database
-    if (!data) {
+    if (data) {
       await db(sqlDelete, [...values]);
       res.status(200).send({ message: "Unfollowed user" });
     } else {

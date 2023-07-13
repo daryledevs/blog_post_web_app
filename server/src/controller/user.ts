@@ -94,7 +94,7 @@ const findUser = async (req: Request, res: Response) => {
       searchText + "%",
       "%" + searchText + "%",
     ]);
-    if(!data) return res.status(401).send("No results found.");
+    if(!data) return res.status(404).send("No results found.");
     res.status(200).send({ list: data });
   } catch (error:any) {
     res.status(500).send({ message: "An error occurred", error: error.message });

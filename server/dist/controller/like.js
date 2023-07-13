@@ -67,7 +67,7 @@ const likePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     `;
         // Check to see if the user already likes the post.
         const [data] = yield (0, query_1.default)(sql_get, [post_id, user_id]);
-        if (!data) {
+        if (data) {
             // If the user has already liked the post, then delete or remove.
             yield (0, query_1.default)(sql_delete, [post_id, user_id]);
             return res.status(200).send("Removed like from a post");
