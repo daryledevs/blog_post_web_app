@@ -4,7 +4,7 @@ import avatar from "../../assets/icons/avatar.png";
 import closeIcon from "../../assets/icons/x_icon.png";
 import { useAppSelector } from "../../redux/hooks/hooks";
 import { updateList } from "../../redux/reducer/follower";
-import api from "../../assets/data/api";
+import api from "../../config/api";
 
 function FollowModal({ user, list, name, close }: any) {
   const dispatch = useDispatch();

@@ -42,4 +42,5 @@ api.interceptors.response.use(null, (error) => {
   return Promise.reject(error);
 });
 
+export { ErrorHandler };
 export default api;

@@ -4,7 +4,7 @@ import { useAppSelector } from "../redux/hooks/hooks";
 import { addMessage } from "../redux/reducer/chat";
 import { useDispatch } from "react-redux";
 import { io } from "socket.io-client";
-import api from "../assets/data/api";
+import api from "../config/api";
 import emojiIcon from "../assets/icons/emoji-icon.png";
 import EmojiPicker, { Theme, EmojiClickData } from "emoji-picker-react";
 
@@ -27,8 +27,8 @@ function initial(members: any, userData: any, openConversation: any) {
 
 const eventFilter = (event: any) => {
   return (
-    event.key !== "Enter" && event.shiftKey === false || 
-    event.key === "Enter" && event.shiftKey === true || 
+    (event.key !== "Enter" && event.shiftKey === false) || 
+    (event.key === "Enter" && event.shiftKey === true) || 
     event.shiftKey
   );
 };
@@ -131,6 +131,7 @@ function Chat({ openConversation }: IEChatProps) {
                 <img
                   src={usersPicture}
                   className={`chat__${value}-picture`}
+                  alt=""
                 />
                 <p className={`chat__${value}-text`}>{data?.text_message}</p>
               </div>
@@ -144,6 +145,7 @@ function Chat({ openConversation }: IEChatProps) {
             src={emojiIcon}
             onClick={() => setEmojiModalTrigger(!emojiModalTrigger)}
             className="chat__emoji-modal"
+            alt=""
           />
           {emojiModalTrigger && (
             <div className="chat__emoji-parent">

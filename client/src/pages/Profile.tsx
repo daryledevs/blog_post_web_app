@@ -4,7 +4,7 @@ import { useAppSelector } from '../redux/hooks/hooks';
 import FollowModal from '../shared/modals/FollowModal';
 import GridPost from "../components/GridPost";
 import { useParams } from 'react-router-dom';
-import api from '../assets/data/api';
+import api from '../config/api';
 import axios from 'axios';
 
 function Profile() {
@@ -12,7 +12,7 @@ function Profile() {
   const posts = useAppSelector((state) => state.post);
   const follows = useAppSelector(state => state.follow);
   const user = useAppSelector(state => state.user);
-
+  
   const [followersTrigger, setFollowersTrigger] = useState(false);
   const [followingTrigger, setFollowingTrigger] = useState(false);
   const [loading, setLoading] = useState<any>(true);
@@ -22,7 +22,7 @@ function Profile() {
   const [followData, setFollowData] = useState<any>({ followers: [], following: [] });
   const [total, setTotal] = useState<any>({ followers: [], following: [] });
   const isUser = () => user.username === username;
-
+  
   useEffect(() => {
     if (username === user.username) {
       setProfileData(user);

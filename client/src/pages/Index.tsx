@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import CreatePost from "../shared/modals/CreatePost";
-import Sidebar from "../shared/base/Sidebar";
+import Sidebar from "../shared/components/Sidebar";
 
 function Index() {
   const { hash, pathname, search } = useLocation();

@@ -1,5 +1,5 @@
 import { Dispatch, createAsyncThunk } from "@reduxjs/toolkit";
-import api from "../../assets/data/api";
+import api from "../../config/api";
 import { IEUserState } from "../reduxIntface";
 import { getChatMembers } from "./chatMember";
 import { getChatThunk } from "./chat";

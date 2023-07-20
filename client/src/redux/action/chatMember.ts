@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import api from "../../assets/data/api";
+import api from "../../config/api";
 import { IEChatData } from "../reduxIntface";
 
 const getChatMembers = createAsyncThunk<

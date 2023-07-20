@@ -7,7 +7,7 @@ import { io } from "socket.io-client";
 import { getMessage } from "./redux/reducer/chat";
 import { userDataThunk } from "./redux/action/user";
 import RouteIndex from "./routes/Index";
-import api from "./assets/data/api";
+import api from "./config/api";
 import { setAccessStatus } from "./redux/reducer/auth";
 import { checkAccess } from "./redux/action/auth";
 
@@ -17,12 +17,12 @@ function App() {
   const dispatch = useDispatch();
   const isLoading = useAppSelector(state => state.auth.isLoading);
   const socket = useRef<Socket | null>(null);
-  const { access_status, access_message } = useAppSelector((state) => state.auth);
+  const { access_status } = useAppSelector((state) => state.auth);
   const token_status = useAppSelector((state) => state.auth.token_status);
   const userData = useAppSelector((state) => state.user);
   const [comingMessage, setComingMessage] = useState<any>();
   const routes = RouteIndex();
-
+ 
   // socket handler
   useEffect(() => {
     try {

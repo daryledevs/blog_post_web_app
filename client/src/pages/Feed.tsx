@@ -1,19 +1,19 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks/hooks";
 import svg_loading from "../assets/icons/loading.svg";
 import PostCard from "../components/PostCard";
-import api from "../assets/data/api";
+import api from "../config/api";
 import { changeStatus, getFeeds, changeTime } from "../redux/reducer/feed";
 
 function Feed() {
   const dispatch = useAppDispatch();
-  const user = useAppSelector((state) => state.user);
+  // const user = useAppSelector((state) => state.user);
   const feeds = useAppSelector((state) => state.feed.feeds);
   const feedStatus = useAppSelector((state) => state.feed.feedStatus);
   const isFirstLoad = useAppSelector((state) => state.feed.isFirstLoad);
   const lastRequest = useAppSelector((state) => state.feed.lastRequest);
 
-  const isMount = useRef(false);
+  // const isMount = useRef(false);
   const feedRef = useRef<HTMLDivElement>(null);
   const token: any = sessionStorage.getItem("token");
   const header = { headers: { Authorization: `Bearer ${token}` } };
@@ -134,7 +134,13 @@ function Feed() {
     return Math.floor(diff / 1000 / 60);
   }
 
-  if(isFirstLoad) return <img src={svg_loading} className="first-load" />;
+  if(isFirstLoad) return (
+    <img
+      src={svg_loading}
+      className="first-load"
+      alt=""
+    />
+  );
 
   return (
     <div
@@ -150,7 +156,11 @@ function Feed() {
         );
       })}
       {isLoading ? (
-        <img src={svg_loading} className="img-loading" />
+        <img
+          src={svg_loading}
+          className="img-loading"
+          alt=""
+        />
       ) : (
         (noPostTrigger || !feeds.length) && <>No Post To Show</>
       )}

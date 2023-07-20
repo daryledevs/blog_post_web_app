@@ -1,5 +1,5 @@
 import { createAsyncThunk, Dispatch } from "@reduxjs/toolkit";
-import api from "../../assets/data/api";
+import api from "../../config/api";
 import auth, { setAccessStatus } from '../reducer/auth';
 import { IEAuthData, IEAuthFetchError } from "../reduxIntface";
 import store, { RootState, AppDispatch } from '../store';
