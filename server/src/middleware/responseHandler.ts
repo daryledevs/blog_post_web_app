@@ -23,7 +23,12 @@ function destructureObject(data: any, dataKeys: any): object {
   for (const index in dataKeys) {
     const key = dataKeys[index];
     const value = data[key];
-    if (data.hasOwnProperty(key) && typeof value === "object" && value) {
+    if(value && Array.isArray(value)) {
+      // way to get the RowDataPacket's values
+      const parsedArr = value.map((item:any) => JSON.parse(JSON.stringify(item)));
+      const result = parsedArr.map((item: any) => convert(item));
+      instance = { ...instance, [key] : result };
+    } else if (data.hasOwnProperty(key) && typeof value === "object" && value) {
       const result = destructureObject(value, dataKeys);
       const converted = convert(result);
       const length = Object.keys(converted).length;
