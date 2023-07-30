@@ -32,8 +32,8 @@ const totalFollow = async (req: Request, res: Response) => {
     const following = data[1];
 
     res.status(200).send({
-      followers: followers?.count ? followers.count : 0,
-      following: following?.count ? following.count : 0,
+      followers: followers?.COUNT ? followers.COUNT : 0,
+      following: following?.COUNT ? following.COUNT : 0,
     });
   } catch (error:any) {
     res.status(500).send({ message: "An error occurred", error: error.message });

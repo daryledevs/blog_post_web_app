@@ -4,9 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const user_1 = require("../controller/user");
+const feed_1 = require("../controller/feed");
 const router = express_1.default.Router();
-router.get("/", user_1.userData);
-router.get("/search", user_1.findUser);
-router.get("/:username", user_1.findUsername);
+router.post("/user", feed_1.getUserFeed);
+router.get("/count", feed_1.getTotalFeed);
+router.get("/explore/:user_id", feed_1.getExploreFeed);
 exports.default = router;

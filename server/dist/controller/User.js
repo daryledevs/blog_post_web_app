@@ -23,7 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findUsername = exports.getTotalFeed = exports.getUserFeed = exports.findUser = exports.userData = void 0;
+exports.findUsername = exports.findUser = exports.userData = void 0;
 const query_1 = __importDefault(require("../database/query"));
 const getUserData = (data) => {
     const { password } = data, rest = __rest(data, ["password"]);
@@ -45,62 +45,6 @@ const userData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     ;
 });
 exports.userData = userData;
-const getUserFeed = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { post_ids, user_id } = req.body;
-        const values = post_ids.length ? post_ids : 0;
-        const sql = `
-      SELECT 
-          F.FOLLOWED_ID, 
-          F.FOLLOWER_ID, 
-          P.*, 
-          (SELECT 
-            COUNT(*)
-          FROM
-            LIKES L
-          WHERE
-            P.POST_ID = L.POST_ID
-          ) AS "COUNT"
-      FROM
-          FOLLOWERS F
-      INNER JOIN
-          POSTS P ON P.USER_ID = F.FOLLOWED_ID
-      WHERE
-          F.FOLLOWER_ID = (?) AND 
-          P.POST_DATE > DATE_SUB(CURDATE(), INTERVAL 3 DAY) AND
-          POST_ID NOT IN (?) 
-      ORDER BY RAND() LIMIT 3;
-   `;
-        const data = yield (0, query_1.default)(sql, [user_id, values]);
-        res.status(200).send({ feed: data });
-    }
-    catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
-    }
-    ;
-});
-exports.getUserFeed = getUserFeed;
-const getTotalFeed = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { user_id } = req.body;
-        const sql = `
-      SELECT 
-          COUNT(*)
-      FROM
-          POSTS
-      WHERE
-          POST_DATE > DATE_SUB(CURDATE(), INTERVAL 3 DAY)
-      ORDER BY RAND() LIMIT 3;
-    `;
-        const [data] = yield (0, query_1.default)(sql, [user_id]);
-        res.status(200).send({ count: data["COUNT(*)"] });
-    }
-    catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
-    }
-    ;
-});
-exports.getTotalFeed = getTotalFeed;
 const findUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { searchText } = req.body;

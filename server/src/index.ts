@@ -12,6 +12,7 @@ import chatRoutes from "./router/chat";
 import postRouter from "./router/post";
 import likeRouter from "./router/like";
 import followRouter from "./router/follow";
+import feedRouter from "./router/feed";
 import corsOptions from "./config/corsOption";
 import tokenHandler from "./middleware/tokenHandler";
 import rootPath from "./config/path";
@@ -38,6 +39,7 @@ app.use(`${API}/users`, userRoutes);
 app.use(`${API}/posts`, postRouter);
 app.use(`${API}/likes`, likeRouter);
 app.use(`${API}/follow`, followRouter);
+app.use(`${API}/feeds`, feedRouter);
 
 database.connect((error) => {
   if(error) throw error;
