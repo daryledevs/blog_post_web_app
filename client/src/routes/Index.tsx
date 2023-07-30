@@ -8,6 +8,7 @@ import Index from "../pages/Index";
 import Feed from "../pages/Feed";
 import Login from "../pages/Login";
 import { useAppSelector } from '../redux/hooks/hooks';
+import Explore from '../pages/Explore';
 
 function routeElement(isToken:boolean) {
   const Redirect = () => <Navigate to="/" replace />;
@@ -20,6 +21,7 @@ function routeElement(isToken:boolean) {
         <Route index element={<Feed />} />
         <Route path="/:username" element={<Profile />} />
         <Route path="/message" element={<Message />} />
+        <Route path="/explore" element={<Explore />} />
         {publicRoute.map((path: any, index:number) => (
           <Route
             key={index}

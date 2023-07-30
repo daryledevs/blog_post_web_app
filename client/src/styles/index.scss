@@ -1,15 +1,15 @@
 @import "./_colors";
 @import "../styles/pages/_Feed";
 
-// shared
 
 @import "./component/_Chat";
 
+@import "./pages/_Explore";
 @import "./pages/_Profile";
 @import "./pages/_Message";
 @import '../styles/pages/Index';
 
-@import "../styles/shared/base/_Sidebar";
+@import "../styles/shared/component/_Sidebar";
 @import "./shared/modals/_CreatePost";
 @import "./shared/modals/FollowModal";
 

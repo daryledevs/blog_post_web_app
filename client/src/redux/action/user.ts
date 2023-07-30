@@ -19,8 +19,8 @@ async function totalFollow(dispatch:Dispatch, user_id:any){
 export async function getFollowers(dispatch:Dispatch, user_id:any, follower:any[], following:any[]){
   try {
     const response = await api.post(`/follow/${user_id}`, {
-      follower_ids: follower,
-      following_ids: following,
+      follower_ids: follower.length,
+      following_ids: following.length,
     });
     dispatch(getFollow(response.data));
   } catch (error) {

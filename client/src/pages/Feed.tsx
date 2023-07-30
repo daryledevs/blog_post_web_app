@@ -54,7 +54,7 @@ function Feed() {
     const getUserFeed = async () => {
       try {
         const response = await api.post(
-          "users/feed",
+          "feeds/user",
           { post_ids: getIds },
           header
         );
@@ -85,7 +85,7 @@ function Feed() {
     
     const getTotalFeed = async () => {
       try {
-        const response = await api.get("users/feed/count", header);
+        const response = await api.get("/feeds/count", header);
         setIsLoading(false);
         return response.data.count;
       } catch (error) {
