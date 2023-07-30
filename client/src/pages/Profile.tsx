@@ -40,37 +40,31 @@ function Profile() {
   }, [username]);
 
   async function getUserData(username: any) {
-    const token = sessionStorage.getItem("token");
-    return await api.get(`/users/${username}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((response) => {
-        const user = response.data.user;
-        return axios
-          .all([
-            api.get(`/posts/${user.user_id}`),
-            api.post(`/follow/${user.user_id}`, {
-              user_id: user.user_id,
-              follower_ids: [], 
-              following_ids: [],
-            }),
-            api.get(`/follow/count/${user.user_id}`),
-          ])
-          .then(
-            axios.spread(function (postsResponse, followResponse, totalResponse) {
-              const post = postsResponse.data.post;
-              const follow = followResponse.data;
-              const total = totalResponse.data;
-              const data = { user, post, follow, total };
-              return Promise.resolve(data)
-          })
-        );
-      }).catch((error) => {
-        return Promise.reject(error);
-    });
+    try {
+      const response = await api.get(`/users/${username}`);
+      const userApi = response.data.user;
+
+      const [postsResponse, followResponse, totalResponse] = await axios.all([
+        api.get(`/posts/${userApi.user_id}`),
+        api.post(`/follow/${userApi.user_id}`, {
+          user_id: userApi.user_id,
+          follower_ids: [],
+          following_ids: [],
+        }),
+        api.get(`/follow/count/${userApi.user_id}`),
+      ]);
+
+      const post = postsResponse.data.post;
+      const follow = followResponse.data;
+      const total = totalResponse.data;
+
+      return { user: userApi, post, follow, total };
+    } catch (error) {
+      return Promise.reject(error);
+    };
   };
+
+
   
   if(loading) return <></>;
 
