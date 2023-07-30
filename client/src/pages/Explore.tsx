@@ -30,7 +30,7 @@ function Explore() {
     <div className="explore__container">
       {GridPost({
         posts: {
-          post: [...feedApi.feed],
+          post: feedApi.feed,
         },
       })}
     </div>
