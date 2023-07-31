@@ -25,10 +25,10 @@ const findUser = async (req: Request, res: Response) => {
     const sql = 
     `
       SELECT 
-        USER_ID,
-        USERNAME,
-        FIRST_NAME,
-        LAST_NAME
+          USER_ID,
+          USERNAME,
+          FIRST_NAME,
+          LAST_NAME
       FROM
           USERS
       WHERE
@@ -51,11 +51,20 @@ const findUser = async (req: Request, res: Response) => {
 const findUsername = async (req: Request, res: Response) => {
   try {
     const { username } = req.params;
-    const sql = "SELECT * FROM USERS WHERE USERNAME = (?);";
-    const [data] = await db(sql, [username]);
-    if(!data) return res.status(404).send({ message: "The user doesn't exist" });
-    const rest = getUserData(data);
-    res.status(200).send({ user: rest });
+    const sql = `
+    SELECT
+        U.USER_ID,
+        U.USERNAME,
+        U.AVATAR_URL,
+        U.FIRST_NAME,
+        U.LAST_NAME
+      FROM
+          USERS U
+      WHERE
+          USERNAME = (?);
+    `;
+    const data = await db(sql, [username]);
+    res.status(200).send({ people: data });
   } catch (error:any) {
     res.status(500).send({ message: "An error occurred", error: error.message });
   };
