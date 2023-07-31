@@ -11,7 +11,9 @@
 
 @import "../styles/shared/component/_Sidebar";
 @import "./shared/modals/_CreatePost";
-@import "./shared/modals/FollowModal";
+@import "./shared/modals/_FollowModal";
+@import "./shared/modals/_NewMessage";
+@import "./shared/component/_Recipients";
 
 .scrollView{
   -ms-overflow-style: none;  /* Internet Explorer 10+ */

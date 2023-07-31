@@ -69,7 +69,7 @@ function Profile() {
   if(loading) return <></>;
 
   return (
-    <>
+    <React.Fragment>
       {/* MODALS */}
       {followersTrigger && (
         <FollowModal
@@ -124,7 +124,7 @@ function Profile() {
 
         {GridPost({ posts: postsData })}
       </div>
-    </>
+    </React.Fragment>
   );
 }
 
