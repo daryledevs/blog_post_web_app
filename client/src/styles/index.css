@@ -610,12 +610,21 @@
   justify-content: center;
   align-items: center;
 }
-.new-message__container .new-message__parent > p {
+.new-message__container .new-message__parent .new-message__header {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 2%;
+  padding: 3%;
   font-weight: bold;
+  position: relative;
+  width: 100%;
+}
+.new-message__container .new-message__parent .new-message__header img {
+  position: absolute;
+  right: 1.2vh;
+  margin: 0 auto;
+  width: 6%;
+  cursor: pointer;
 }
 .new-message__container .new-message__parent .new-message__search-bar {
   display: flex;

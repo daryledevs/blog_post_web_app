@@ -14,7 +14,10 @@ function Message() {
   
   return (
     <React.Fragment>
-      {newMessageTrgger && <NewMessage/>}
+      <NewMessage
+        newMessageTrgger={newMessageTrgger}
+        setNewMessageTrgger={setNewMessageTrgger}
+      />
       <div className="message__container">
         <div className="message__parent">
           <div className="message__sidebar">

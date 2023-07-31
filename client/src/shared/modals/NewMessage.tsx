@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from "react";
 import api from "../../config/api";
 import avatar from "../../assets/icons/avatar.png";
+import closeModal from "../../assets/icons/close.png";
 import Recipients from "../components/Recipients";
 
-function NewMessage() {
+interface IENewMessage {
+  newMessageTrgger: boolean;
+  setNewMessageTrgger: (value: any) => void;
+};
+
+function NewMessage({ newMessageTrgger, setNewMessageTrgger }: IENewMessage) {
   const [search, setSearch] = useState<string>("");
   const [list, setList] = useState<any>({ people: [] });
   const [recipient, setRecipient] = useState<any>([]);
@@ -15,13 +21,22 @@ function NewMessage() {
         setList({ people: response.data.people });
       } catch (error) {
         console.log(error);
-      };
-    };
+      }
+    }
 
     searchApi();
   }, [search]);
 
-  function newMessageHandler(person:any){
+  useEffect(() => {
+    function handleEscapeKey(event: KeyboardEvent) {
+      if (event.code === "Escape") setNewMessageTrgger(!newMessageTrgger);
+    };
+
+    document.addEventListener("keydown", handleEscapeKey);
+    return () => document.removeEventListener("keydown", handleEscapeKey);
+  }, [newMessageTrgger, setNewMessageTrgger]);
+
+  function newMessageHandler(person: any) {
     if (recipient.some((item: any) => item.user_id === person.user_id)) return;
     let newArr = [...recipient];
     newArr.push(person);
@@ -29,10 +44,19 @@ function NewMessage() {
     setSearch("");
   };
 
+  if(!newMessageTrgger) return <></>;
+
   return (
     <div className="new-message__container">
       <div className="new-message__parent">
-        <p>New message</p>
+        <div className="new-message__header">
+          <p>New message</p>
+          <img
+            src={closeModal}
+            onClick={() => setNewMessageTrgger(!newMessageTrgger)}
+            alt=""
+          />
+        </div>
         <div className="new-message__search-bar">
           <label htmlFor="search">
             To:

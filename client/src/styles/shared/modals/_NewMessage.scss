@@ -9,13 +9,22 @@
     justify-content: center;
     align-items: center;
     
-    // to pick the first p element only without affecting others.
-    > p{
+    .new-message__header{
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 2%;
+      padding: 3%;
       font-weight: bold;
+      position: relative;
+      width: 100%;
+
+      img {
+        position: absolute;
+        right: 1.2vh;
+        margin: 0 auto;
+        width: 6%;
+        cursor: pointer;
+      }
     };
 
     .new-message__search-bar {
