@@ -1,0 +1,56 @@
+.switch-account__container{
+  @extend .follow-modal__container;
+   .switch-account__parent{
+    @extend .follow-modal__parent;
+    display: flex;
+    flex-direction: column;
+    
+    .switch-account__header{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 3%;
+      font-weight: bold;
+      position: relative;
+      width: 100%;
+      border-bottom: 1px solid #ccc;
+
+      img {
+        position: absolute;
+        right: 1.2vh;
+        margin: 0 auto;
+        width: 6%;
+        cursor: pointer;
+      }
+    }
+
+    .switch-account__existing-account{
+      display: flex;
+      align-items: center;
+      font-weight: 500;
+      padding: 2%;
+      img {
+        width: 13%;
+      }
+    }
+
+    .switch-account__footer{
+      display: inherit;
+      justify-content: center;
+      margin-top: auto;
+      padding: 3%;
+      border-top: 1px solid #ccc;
+      font-weight: 500;
+      color: rgb(0, 149, 246);
+      
+      p {
+        font-size: 2vh;
+        cursor: pointer;
+      }
+
+      :hover {
+        color: rgb(4, 71, 116);
+      }
+    }
+  }
+}

@@ -553,7 +553,7 @@
   font-size: 1.8vh;
 }
 
-.follow-modal__container, .new-message__container {
+.follow-modal__container, .switch-account__container, .new-message__container {
   width: 100%;
   height: 100vh;
   position: fixed;
@@ -563,47 +563,47 @@
   justify-content: center;
   align-items: center;
 }
-.follow-modal__container .follow-modal__parent, .new-message__container .follow-modal__parent, .new-message__container .new-message__parent {
+.follow-modal__container .follow-modal__parent, .switch-account__container .follow-modal__parent, .switch-account__container .switch-account__parent, .new-message__container .follow-modal__parent, .new-message__container .new-message__parent {
   background-color: white;
   width: 26%;
   height: 55%;
   border-radius: 3%;
   overflow: hidden;
 }
-.follow-modal__container .follow-modal__parent .follow-modal__title, .new-message__container .follow-modal__parent .follow-modal__title, .new-message__container .new-message__parent .follow-modal__title {
+.follow-modal__container .follow-modal__parent .follow-modal__title, .switch-account__container .follow-modal__parent .follow-modal__title, .switch-account__container .switch-account__parent .follow-modal__title, .new-message__container .follow-modal__parent .follow-modal__title, .new-message__container .new-message__parent .follow-modal__title {
   padding: 10px;
   border-bottom: 1px #dfdfdf solid;
   font-weight: 600;
   text-align: center;
   position: relative;
 }
-.follow-modal__container .follow-modal__parent .follow-modal__title img, .new-message__container .follow-modal__parent .follow-modal__title img, .new-message__container .new-message__parent .follow-modal__title img {
+.follow-modal__container .follow-modal__parent .follow-modal__title img, .switch-account__container .follow-modal__parent .follow-modal__title img, .switch-account__container .switch-account__parent .follow-modal__title img, .new-message__container .follow-modal__parent .follow-modal__title img, .new-message__container .new-message__parent .follow-modal__title img {
   position: absolute;
   right: 12px;
   top: 8px;
   cursor: pointer;
 }
-.follow-modal__container .follow-modal__parent .follow-modal__list-container, .new-message__container .follow-modal__parent .follow-modal__list-container, .new-message__container .new-message__parent .follow-modal__list-container {
+.follow-modal__container .follow-modal__parent .follow-modal__list-container, .switch-account__container .follow-modal__parent .follow-modal__list-container, .switch-account__container .switch-account__parent .follow-modal__list-container, .new-message__container .follow-modal__parent .follow-modal__list-container, .new-message__container .new-message__parent .follow-modal__list-container {
   overflow-y: auto;
   height: 91.2%;
   overflow-y: scroll;
 }
-.follow-modal__container .follow-modal__parent .follow-modal__list-container .item-card, .new-message__container .follow-modal__parent .follow-modal__list-container .item-card, .new-message__container .new-message__parent .follow-modal__list-container .item-card {
+.follow-modal__container .follow-modal__parent .follow-modal__list-container .item-card, .switch-account__container .follow-modal__parent .follow-modal__list-container .item-card, .switch-account__container .switch-account__parent .follow-modal__list-container .item-card, .new-message__container .follow-modal__parent .follow-modal__list-container .item-card, .new-message__container .new-message__parent .follow-modal__list-container .item-card {
   margin: 5px 15px;
   display: flex;
 }
-.follow-modal__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__avatar, .new-message__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__avatar, .new-message__container .new-message__parent .follow-modal__list-container .item-card .item-card__avatar {
+.follow-modal__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__avatar, .switch-account__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__avatar, .switch-account__container .switch-account__parent .follow-modal__list-container .item-card .item-card__avatar, .new-message__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__avatar, .new-message__container .new-message__parent .follow-modal__list-container .item-card .item-card__avatar {
   width: 50px;
   height: 40px;
 }
-.follow-modal__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item, .new-message__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item, .new-message__container .new-message__parent .follow-modal__list-container .item-card .item-card__item {
+.follow-modal__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item, .switch-account__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item, .switch-account__container .switch-account__parent .follow-modal__list-container .item-card .item-card__item, .new-message__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item, .new-message__container .new-message__parent .follow-modal__list-container .item-card .item-card__item {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex: 1;
   cursor: pointer;
 }
-.follow-modal__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item .item-card__flw-btn, .new-message__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item .item-card__flw-btn, .new-message__container .new-message__parent .follow-modal__list-container .item-card .item-card__item .item-card__flw-btn {
+.follow-modal__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item .item-card__flw-btn, .switch-account__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item .item-card__flw-btn, .switch-account__container .switch-account__parent .follow-modal__list-container .item-card .item-card__item .item-card__flw-btn, .new-message__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item .item-card__flw-btn, .new-message__container .new-message__parent .follow-modal__list-container .item-card .item-card__item .item-card__flw-btn {
   height: 100%;
   font-weight: 600;
   cursor: pointer;
@@ -615,7 +615,7 @@
   background-color: rgb(0, 149, 246);
   color: white;
 }
-.follow-modal__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmv-btn, .new-message__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmv-btn, .new-message__container .new-message__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmv-btn {
+.follow-modal__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmv-btn, .switch-account__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmv-btn, .switch-account__container .switch-account__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmv-btn, .new-message__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmv-btn, .new-message__container .new-message__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmv-btn {
   height: 100%;
   font-weight: 600;
   cursor: pointer;
@@ -625,7 +625,7 @@
   font-size: 0.9em;
   border-radius: 8px;
 }
-.follow-modal__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmved-btn, .new-message__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmved-btn, .new-message__container .new-message__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmved-btn {
+.follow-modal__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmved-btn, .switch-account__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmved-btn, .switch-account__container .switch-account__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmved-btn, .new-message__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmved-btn, .new-message__container .new-message__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmved-btn {
   height: 100%;
   font-weight: 600;
   cursor: pointer;
@@ -756,6 +756,53 @@
   border: none;
   margin-left: 1%;
   flex: 1;
+}
+
+.switch-account__container .switch-account__parent {
+  display: flex;
+  flex-direction: column;
+}
+.switch-account__container .switch-account__parent .switch-account__header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3%;
+  font-weight: bold;
+  position: relative;
+  width: 100%;
+  border-bottom: 1px solid #ccc;
+}
+.switch-account__container .switch-account__parent .switch-account__header img {
+  position: absolute;
+  right: 1.2vh;
+  margin: 0 auto;
+  width: 6%;
+  cursor: pointer;
+}
+.switch-account__container .switch-account__parent .switch-account__existing-account {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  padding: 2%;
+}
+.switch-account__container .switch-account__parent .switch-account__existing-account img {
+  width: 13%;
+}
+.switch-account__container .switch-account__parent .switch-account__footer {
+  display: inherit;
+  justify-content: center;
+  margin-top: auto;
+  padding: 3%;
+  border-top: 1px solid #ccc;
+  font-weight: 500;
+  color: rgb(0, 149, 246);
+}
+.switch-account__container .switch-account__parent .switch-account__footer p {
+  font-size: 2vh;
+  cursor: pointer;
+}
+.switch-account__container .switch-account__parent .switch-account__footer :hover {
+  color: rgb(4, 71, 116);
 }
 
 .scrollView {

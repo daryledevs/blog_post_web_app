@@ -5,9 +5,11 @@ import usersPicture from "../assets/icons/avatar.png";
 import downArrow from "../assets/icons/down-arrow.png";
 import newMessage from "../assets/icons/editing.png";
 import NewMessage from "../shared/modals/NewMessage";
+import SwitchAccount from "../shared/modals/SwitchAccount";
 
 function Message() {
   const [openConversation, setOpenConversation] = useState(null);
+  const [switchAccountTrggr, setSwitchAccountTrggr] = useState<boolean>(false);
   const [newMessageTrgger, setNewMessageTrgger] = useState<boolean>(false);
   const user = useAppSelector((state) => state.user);
   const chatMembers = useAppSelector((state) => state.chatMember);
@@ -18,12 +20,19 @@ function Message() {
         newMessageTrgger={newMessageTrgger}
         setNewMessageTrgger={setNewMessageTrgger}
       />
+      <SwitchAccount
+        switchAccountTrggr={switchAccountTrggr}
+        setSwitchAccountTrggr={setSwitchAccountTrggr}
+      />
       <div className="message__container">
         <div className="message__parent">
           <div className="message__sidebar">
             <div className="chat-header__container">
               <div />
-              <div className="chat-header__username">
+              <div
+                onClick={() => setSwitchAccountTrggr(!switchAccountTrggr)}
+                className="chat-header__username"
+              >
                 <p>{user.username}</p>
                 <img
                   src={downArrow}
