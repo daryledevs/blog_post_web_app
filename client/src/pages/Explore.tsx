@@ -7,6 +7,7 @@ function Explore() {
   const user = useAppSelector((state) => state.user);
   const [feedApi, setFeedApi] = useState<any>({ feed: [] });
   const [loading, setLoading] = useState<boolean>(true);
+  const [hover, setHover] = useState<any>({ post_id: null });
 
   useEffect(() => {
     const exploreApi = async () => {
@@ -21,18 +22,23 @@ function Explore() {
       }
     };
     exploreApi();
-  }, [user]);
-  
+  }, []);  
 
   if(loading) return <></>;
 
   return (
     <div className="explore__container">
-      {GridPost({
-        posts: {
-          post: feedApi.feed,
-        },
-      })}
+      <div className="explore__parent">
+        {feedApi.feed &&
+          feedApi.feed.length &&
+          GridPost({
+            posts: {
+              post: feedApi.feed,
+            },
+            hover,
+            setHover
+          })}
+      </div>
     </div>
   );
 }

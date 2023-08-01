@@ -16,6 +16,7 @@ function Profile() {
   const [followersTrigger, setFollowersTrigger] = useState(false);
   const [followingTrigger, setFollowingTrigger] = useState(false);
   const [loading, setLoading] = useState<any>(true);
+  const [hover, setHover] = useState<any>({ post_id: null });
 
   const [profileData, setProfileData] = useState<any>([]);
   const [postsData, setPostsData] = useState<any>({ post: [] });
@@ -122,7 +123,7 @@ function Profile() {
           </div>
         </div>
 
-        {GridPost({ posts: postsData })}
+        {GridPost({ posts: postsData, hover, setHover })}
       </div>
     </React.Fragment>
   );

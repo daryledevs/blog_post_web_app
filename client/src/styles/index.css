@@ -214,6 +214,57 @@
   left: 20px;
 }
 
+.grid-post__container {
+  display: grid;
+  height: max-content;
+  grid-template-columns: 32% 32% 32%;
+  grid-template-rows: 300px;
+  grid-gap: 15px;
+  width: 80%;
+  margin: 10px auto;
+  justify-content: center;
+}
+.grid-post__container .grid-post__card {
+  position: relative;
+  cursor: pointer;
+}
+.grid-post__container .grid-post__card .grid-post__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.grid-post__container .grid-post__card .grid-post__image-hover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.3s ease;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: rgb(0, 0, 0);
+}
+.grid-post__container .grid-post__card .grid-post__image-hover-details {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  color: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2%;
+}
+.grid-post__container .grid-post__card .grid-post__image-hover-details img {
+  width: 5%;
+}
+.grid-post__container .grid-post__card .grid-post__image-hover-details p {
+  font-size: 3vh;
+  color: white;
+}
+.grid-post__container .grid-post__card:hover .grid-post__image {
+  opacity: 0.4;
+}
+
 .profile__container, .explore__container {
   flex: 1;
   display: flex;
@@ -263,21 +314,6 @@
   width: 320px;
   display: flex;
   justify-content: space-between;
-}
-.profile__container .profile__post-container, .explore__container .profile__post-container, .profile__container .explore__container, .explore__container .explore__container {
-  display: grid;
-  height: max-content;
-  grid-template-columns: 32% 32% 32%;
-  grid-template-rows: 300px;
-  grid-gap: 15px;
-  width: 80%;
-  margin: 10px auto;
-  justify-content: center;
-}
-.profile__container .profile__post-container .profile__image-post, .explore__container .profile__post-container .profile__image-post, .profile__container .explore__container .profile__image-post, .explore__container .explore__container .profile__image-post {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 
 .message__container {
