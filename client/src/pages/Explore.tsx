@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import api from '../config/api';
 import GridPost from '../components/GridPost';
-import { useAppSelector } from '../redux/hooks/hooks';
+import { useAppDispatch, useAppSelector } from '../redux/hooks/hooks';
+import { checkAccess } from '../redux/action/auth';
 
 function Explore() {
+  const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const [feedApi, setFeedApi] = useState<any>({ feed: [] });
   const [loading, setLoading] = useState<boolean>(true);
@@ -14,6 +16,7 @@ function Explore() {
       try {
         const response = await api.get(`/feeds/explore/${user.user_id}`);
         const apiData = response.data;
+        if(apiData.accessToken) return response;
         setFeedApi({ feed: apiData.feed });
       } catch (error) {
         console.log(error);
@@ -21,7 +24,7 @@ function Explore() {
         setLoading(false);
       }
     };
-    exploreApi();
+    dispatch(checkAccess({ apiRequest: exploreApi }));
   }, []);  
 
   if(loading) return <></>;

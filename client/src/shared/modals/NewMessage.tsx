@@ -3,6 +3,8 @@ import api from "../../config/api";
 import avatar from "../../assets/icons/avatar.png";
 import closeModal from "../../assets/icons/close.png";
 import Recipients from "../components/Recipients";
+import { useAppDispatch } from "../../redux/hooks/hooks";
+import { checkAccess } from "../../redux/action/auth";
 
 interface IENewMessage {
   newMessageTrgger: boolean;
@@ -10,6 +12,7 @@ interface IENewMessage {
 };
 
 function NewMessage({ newMessageTrgger, setNewMessageTrgger }: IENewMessage) {
+  const dispatch = useAppDispatch();
   const [search, setSearch] = useState<string>("");
   const [list, setList] = useState<any>({ people: [] });
   const [recipient, setRecipient] = useState<any>([]);
@@ -18,18 +21,21 @@ function NewMessage({ newMessageTrgger, setNewMessageTrgger }: IENewMessage) {
     async function searchApi() {
       try {
         const response = await api.get(`/users/${search}`);
+        if(response.data.accessToken) return response;
         setList({ people: response.data.people });
       } catch (error) {
         console.log(error);
       }
     }
 
-    searchApi();
+    dispatch(checkAccess({ apiRequest: searchApi }));
   }, [search]);
 
   useEffect(() => {
     function handleEscapeKey(event: KeyboardEvent) {
-      if (event.code === "Escape") setNewMessageTrgger(!newMessageTrgger);
+      if (newMessageTrgger && event.code === "Escape") {
+        setNewMessageTrgger(!newMessageTrgger);
+      }  
     };
 
     document.addEventListener("keydown", handleEscapeKey);

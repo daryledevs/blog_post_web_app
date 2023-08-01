@@ -55,13 +55,13 @@ function App() {
       if (response.data.accessToken) return response;
       if (token && token_status === "") appDispatch(userDataThunk(token));
     } catch (error) {
-      appDispatch(setAccessStatus(error.response.data));
+      appDispatch(setAccessStatus(error.response));
       return error;
     }
   }
 
   useEffect(() => {
-    if (String(access_status)[0] !== "4") {
+    if (String(access_status)[0] !== "4" || String(access_status)[0] === "5") {
       appDispatch(checkAccess({ apiRequest: performRequest }));
     }
   }, [access_status, appDispatch]);
