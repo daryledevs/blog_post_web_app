@@ -16,13 +16,14 @@ const tokenHandler = async (req: Request, res: Response, next: NextFunction) => 
     const accessSecret = process.env.ACCESS_TKN_SECRET!;
     const sqlSelect = "SELECT USER_ID, ROLES FROM USERS WHERE USER_ID = (?);";
     if (!refreshToken) return res.status(401).send({ message: "Unauthorized" });
-
-    if (accessToken && refreshToken && !isNull(accessToken, refreshToken)) {
+    
+    if (accessToken && refreshToken && !isInvalidToken(accessToken, refreshToken)) {
+  
       const { refreshError, refreshDecode } = await verifyToken(refreshToken, refreshSecret, "refresh");
       const { accessError, accessDecode } = await verifyToken(accessToken, accessSecret, "access");
 
       const isError = errorName(refreshError) || errorName(accessError);
-      if (!isNull(refreshError, accessError) && isError) return res.status(401).send({ message: "Token is not valid" });
+      if (!isInvalidToken(refreshError, accessError) && isError) return res.status(401).send({ message: "Token is not valid" });
       
       const REFRESH_TKN = generateRefreshToken({ USER_ID: refreshDecode.user_id, USERNAME: refreshDecode.username });
       const ACCESS_TOKEN = generateAccessToken({ USER_ID: accessDecode.user_id, ROLES: accessDecode.roles });
@@ -33,23 +34,26 @@ const tokenHandler = async (req: Request, res: Response, next: NextFunction) => 
       req.body.user_id = refreshDecode.user_id;
       req.body.roles = accessDecode.roles;
       next();
-    }
-
-    if (!accessToken && refreshToken) {
+    } else if (refreshToken) {
       const { refreshError, refreshDecode } = await verifyToken(refreshToken, refreshSecret, "refresh");
       const [result] = await db(sqlSelect, [refreshDecode.user_id]);
       const ACCESS_TOKEN = generateAccessToken(result);
       return res.status(200).send({ accessToken: ACCESS_TOKEN });
+    } else {
+      throw new Error("Unknown");
     }
+
   } catch (error:any) {
     res.status(500).send({ message: "Something went wrong", error: error?.message });
   }
 };
 
 // an empty token returns null as a string when used sessionStorage.getItem(...) function
-function isNull(accessToken:any, refreshToken:any){
+function isInvalidToken(accessToken:any, refreshToken:any){
   if(accessToken === "null" || accessToken === null) return true;
+  if(accessToken === "undefined" || accessToken === undefined) return true;
   if(refreshToken === "null" || refreshToken === null) return true;
+  if(refreshToken === "undefined" || refreshToken === undefined) return true;
   return false;
 };
 

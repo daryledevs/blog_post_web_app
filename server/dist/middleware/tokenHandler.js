@@ -30,11 +30,11 @@ const tokenHandler = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         const sqlSelect = "SELECT USER_ID, ROLES FROM USERS WHERE USER_ID = (?);";
         if (!refreshToken)
             return res.status(401).send({ message: "Unauthorized" });
-        if (accessToken && refreshToken && !isNull(accessToken, refreshToken)) {
+        if (accessToken && refreshToken && !isInvalidToken(accessToken, refreshToken)) {
             const { refreshError, refreshDecode } = yield (0, authTokens_1.verifyToken)(refreshToken, refreshSecret, "refresh");
             const { accessError, accessDecode } = yield (0, authTokens_1.verifyToken)(accessToken, accessSecret, "access");
             const isError = (0, authTokens_1.errorName)(refreshError) || (0, authTokens_1.errorName)(accessError);
-            if (!isNull(refreshError, accessError) && isError)
+            if (!isInvalidToken(refreshError, accessError) && isError)
                 return res.status(401).send({ message: "Token is not valid" });
             const REFRESH_TKN = (0, authTokens_1.generateRefreshToken)({ USER_ID: refreshDecode.user_id, USERNAME: refreshDecode.username });
             const ACCESS_TOKEN = (0, authTokens_1.generateAccessToken)({ USER_ID: accessDecode.user_id, ROLES: accessDecode.roles });
@@ -46,11 +46,14 @@ const tokenHandler = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
             req.body.roles = accessDecode.roles;
             next();
         }
-        if (!accessToken && refreshToken) {
+        else if (refreshToken) {
             const { refreshError, refreshDecode } = yield (0, authTokens_1.verifyToken)(refreshToken, refreshSecret, "refresh");
             const [result] = yield (0, query_1.default)(sqlSelect, [refreshDecode.user_id]);
             const ACCESS_TOKEN = (0, authTokens_1.generateAccessToken)(result);
             return res.status(200).send({ accessToken: ACCESS_TOKEN });
+        }
+        else {
+            throw new Error("Unknown");
         }
     }
     catch (error) {
@@ -58,10 +61,14 @@ const tokenHandler = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 // an empty token returns null as a string when used sessionStorage.getItem(...) function
-function isNull(accessToken, refreshToken) {
+function isInvalidToken(accessToken, refreshToken) {
     if (accessToken === "null" || accessToken === null)
         return true;
+    if (accessToken === "undefined" || accessToken === undefined)
+        return true;
     if (refreshToken === "null" || refreshToken === null)
+        return true;
+    if (refreshToken === "undefined" || refreshToken === undefined)
         return true;
     return false;
 }
