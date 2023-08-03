@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import api from '../config/api';
-import GridPost from '../components/GridPost';
-import { useAppDispatch, useAppSelector } from '../redux/hooks/hooks';
-import { checkAccess } from '../redux/action/auth';
+import React, { useState, useEffect } from "react";
+import api from "../config/api";
+import GridPost from "../components/GridPost";
+import { useAppDispatch, useAppSelector } from "../redux/hooks/hooks";
+import { checkAccess } from "../redux/action/auth";
 
 function Explore() {
   const dispatch = useAppDispatch();
@@ -16,7 +16,7 @@ function Explore() {
       try {
         const response = await api.get(`/feeds/explore/${user.user_id}`);
         const apiData = response.data;
-        if(apiData.accessToken) return response;
+        if (apiData.accessToken) return response;
         setFeedApi({ feed: apiData.feed });
       } catch (error) {
         console.log(error);
@@ -25,25 +25,29 @@ function Explore() {
       }
     };
     dispatch(checkAccess({ apiRequest: exploreApi }));
-  }, []);  
+  }, []);
 
-  if(loading) return <></>;
+  if (loading) return <></>;
 
   return (
     <div className="explore__container">
       <div className="explore__parent">
-        {feedApi.feed &&
-          feedApi.feed.length &&
+        {feedApi.feed && feedApi.feed.length ? (
           GridPost({
             posts: {
               post: feedApi.feed,
             },
             hover,
-            setHover
-          })}
+            setHover,
+          })
+        ) : (
+          <p style={{ textAlign: "center", marginTop: "5vh" }}>
+            No Post To Show
+          </p>
+        )}
       </div>
     </div>
   );
 }
 
-export default Explore
+export default Explore;
