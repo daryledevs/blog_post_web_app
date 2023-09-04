@@ -15,11 +15,11 @@ const initialState: IEPostState = {
 };
 
 const postSlice = createSlice({
-  name: 'post',
+  name: 'posts',
   initialState,
   reducers: {
     getPost: (state, action) => {
-      return { post: [...action.payload] };
+      return { ...state, post: [...action.payload] };
     },
   }
 });

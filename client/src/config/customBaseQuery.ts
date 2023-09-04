@@ -15,10 +15,7 @@ const customBaseQuery: BaseQueryFn<string, unknown, FetchBaseQueryError> = async
   })(args, api, extraOptions);
 
   const { data, error } = result;
-  console.log("DATA: ", data)
-  const status = error?.status as number;
-
-  if (status >= 400 && status < 500) return ErrorHandler.handle(error);
+  
   if (data && typeof data === 'object' && 'accessToken' in data) {
     sessionStorage.setItem("token", data.accessToken as string);
     await customBaseQuery(args, api, extraOptions);

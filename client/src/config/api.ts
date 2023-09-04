@@ -3,8 +3,8 @@ import axios from "axios";
 class ErrorHandler {
   static handle(error:any){
     const errorData = {
-      message: error.response.message,
-      status: error.response.status
+      message: error.data?.message,
+      status: error?.status
     }
     console.log(errorData);
     return Promise.reject(error);

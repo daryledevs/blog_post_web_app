@@ -1,3 +1,5 @@
+import { SerializedError } from "@reduxjs/toolkit";
+import { FetchBaseQueryError } from "@reduxjs/toolkit/dist/query";
 
 // actions
 interface IEAuthData {
@@ -42,7 +44,7 @@ interface IEUserState {
   roles: string;
   age: number;
   birthday: string;
-  fetch_status: string;
+  fetch_status: FetchBaseQueryError | SerializedError;
 }
 
 interface IEFollow {

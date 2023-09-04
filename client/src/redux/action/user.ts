@@ -7,7 +7,7 @@ import { setAccessStatus } from "../reducer/auth";
 import { getFollow, getTotalFollow } from "../reducer/follower";
 import { getPost } from "../reducer/post";
 
-async function totalFollow(dispatch:Dispatch, user_id:any){
+export async function totalFollow(dispatch:Dispatch, user_id:any){
   try {
     const response = await api.get(`/follow/count/${user_id}`);
     dispatch(getTotalFollow(response.data));
@@ -28,9 +28,10 @@ export async function getFollowers(dispatch:Dispatch, user_id:any, follower:any[
   }
 };
 
-async function getPosts(dispatch:Dispatch, user_id:number) {
+export async function getPosts(dispatch:Dispatch, user_id:number) {
   try {
     const response = await api.get(`/posts/${user_id}`);
+    console.log("RESPONSE: ", response.data?.post);
     dispatch(getPost(response.data?.post))
   } catch (error) {
     console.log(error)
@@ -39,7 +40,7 @@ async function getPosts(dispatch:Dispatch, user_id:number) {
 
 const userDataThunk = createAsyncThunk<
   IEUserState,
-  { token: string },
+  void,
   {
     rejectValue: {
       message: string;

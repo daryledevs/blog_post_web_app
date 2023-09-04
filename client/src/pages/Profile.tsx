@@ -9,7 +9,7 @@ import axios from 'axios';
 
 function Profile() {
   const { username } = useParams();
-  const posts = useAppSelector((state) => state.post);
+  const posts = useAppSelector((state) => state.posts);
   const follows = useAppSelector(state => state.follow);
   const user = useAppSelector(state => state.user);
   
@@ -27,7 +27,7 @@ function Profile() {
   useEffect(() => {
     if (username === user.username) {
       setProfileData(user);
-      setPostsData(posts);
+      setPostsData({ post: posts.post });
       setLoading(false);
     } else {
       getUserData(username).then((response) => {
@@ -38,7 +38,7 @@ function Profile() {
         setLoading(false);
       })
     }
-  }, [username]);
+  }, [posts.post, user, username]);
 
   async function getUserData(username: any) {
     try {
@@ -105,7 +105,7 @@ function Profile() {
             <p>PROFILE</p>
             <h1 className="profile__header-username">{profileData.username}</h1>
             <div className="profile__header-numbers">
-              <p>{isUser() ? posts.post.length : postsData.length} Pictures</p>
+              <p>{isUser() ? posts.post?.length : postsData.post?.length} Pictures</p>
 
               <p
                 style={{ cursor: "pointer" }}

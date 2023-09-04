@@ -3,7 +3,7 @@ import heart from "../assets/icons/white-heart.png";
 
 const GridPost = function ({ posts, hover, setHover }: any) {
   let organizedPost: any[][] = [];
-
+  console.log("GRID", posts);
   for (let i = 0; i < posts.post.length; i++) {
     if (i % 2 === 0) {
       const value = posts.post.slice(i === 0 ? i : i + 1, i + 3);

@@ -5,11 +5,16 @@ import { useDispatch } from "react-redux";
 import { Socket } from "socket.io-client";
 import { io } from "socket.io-client";
 import { getMessage } from "./redux/reducer/chat";
-import { userDataThunk } from "./redux/action/user";
+import { getFollowers, getPosts, totalFollow, userDataThunk } from "./redux/action/user";
 import RouteIndex from "./routes/Index";
 import api from "./config/api";
 import { setAccessStatus } from "./redux/reducer/auth";
 import { checkAccess } from "./redux/action/auth";
+import { useFetchUserData } from "./redux/hooks/userApiHook";
+import { getChatMembers } from "./redux/action/chatMember";
+import { IEUserState } from "./redux/reduxIntface";
+import { getChatThunk } from "./redux/action/chat";
+import { getUserData, isRejected } from "./redux/reducer/user";
 
 
 function App() {
@@ -22,6 +27,24 @@ function App() {
   const userData = useAppSelector((state) => state.user);
   const [comingMessage, setComingMessage] = useState<any>();
   const routes = RouteIndex();
+  const appTest = useFetchUserData();
+
+  useEffect(() => {
+    if(appTest.isLoading) return;
+    if (appTest.error && "status" in appTest.error) {
+      const error = appTest.error.data;
+      console.log("TEST: ", error);
+      appDispatch(isRejected(error));
+      return
+    }
+    const users: IEUserState = appTest.data.user;
+    appDispatch(getChatMembers(users.user_id as any));
+    appDispatch(getChatThunk({ user_id: users.user_id as any, length: 0 }));
+    totalFollow(appDispatch, users.user_id);
+    getFollowers(appDispatch, users.user_id, [], []);
+    getPosts(appDispatch, users.user_id);
+    appDispatch(getUserData({ ...users }));
+  }, [appDispatch, appTest.data, appTest.isLoading])
  
   // socket handler
   useEffect(() => {
@@ -53,18 +76,18 @@ function App() {
       const response = await api.get("/users");
       // if access token is expired, else proceed to API call for user's information
       if (response.data.accessToken) return response;
-      if (token && token_status === "") appDispatch(userDataThunk(token));
+      if (token && token_status === "") appDispatch(userDataThunk());
     } catch (error) {
       appDispatch(setAccessStatus(error.response));
       return error;
     }
   }
 
-  useEffect(() => {
-    if (String(access_status)[0] !== "4" || String(access_status)[0] === "5") {
-      appDispatch(checkAccess({ apiRequest: performRequest }));
-    }
-  }, [access_status, appDispatch]);
+  // useEffect(() => {
+  //   if (String(access_status)[0] !== "4" || String(access_status)[0] === "5") {
+  //     appDispatch(checkAccess({ apiRequest: performRequest }));
+  //   }
+  // }, [access_status, appDispatch]);
   
   
 

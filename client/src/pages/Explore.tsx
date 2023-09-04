@@ -1,33 +1,25 @@
 import React, { useState, useEffect } from "react";
 import api from "../config/api";
 import GridPost from "../components/GridPost";
-import { useAppDispatch, useAppSelector } from "../redux/hooks/hooks";
-import { checkAccess } from "../redux/action/auth";
+import { useGetExploreFeedQuery, useGetUserDataQuery } from "../redux/api/FeedApi";
+import { useFetchUserData } from "../redux/hooks/userApiHook";
 
 function Explore() {
-  const dispatch = useAppDispatch();
-  const user = useAppSelector((state) => state.user);
   const [feedApi, setFeedApi] = useState<any>({ feed: [] });
-  const [loading, setLoading] = useState<boolean>(true);
   const [hover, setHover] = useState<any>({ post_id: null });
+  const userApiRequest = useFetchUserData();
+  const exploreApiRequest: any = useGetExploreFeedQuery(
+    userApiRequest.data?.user?.user_id, 
+    { skip: !userApiRequest.isSuccess }
+  );
 
   useEffect(() => {
-    const exploreApi = async () => {
-      try {
-        const response = await api.get(`/feeds/explore/${user.user_id}`);
-        const apiData = response.data;
-        if (apiData.accessToken) return response;
-        setFeedApi({ feed: apiData.feed });
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    dispatch(checkAccess({ apiRequest: exploreApi }));
-  }, []);
+    if (exploreApiRequest.isLoading || userApiRequest.isLoading) return;
+    setFeedApi({ feed: exploreApiRequest.data?.feed });
+  }, [exploreApiRequest, userApiRequest.isLoading]);
 
-  if (loading) return <></>;
+
+  if (exploreApiRequest.isLoading || userApiRequest.isLoading) return <></>;
 
   return (
     <div className="explore__container">

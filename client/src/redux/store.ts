@@ -6,6 +6,7 @@ import chatMemberReducer from "./reducer/chatMember";
 import followReducer from "./reducer/follower";
 import postReducer from "./reducer/post";
 import feedReducer from "./reducer/feed";
+import { feedApi, userApi } from "./api/FeedApi";
 
 const store = configureStore({
   reducer: {
@@ -14,9 +15,17 @@ const store = configureStore({
     chat: chatReducer,
     chatMember: chatMemberReducer,
     follow: followReducer,
-    post: postReducer,
-    feed: feedReducer
+    posts: postReducer,
+    feed: feedReducer,
+    [userApi.reducerPath]: userApi.reducer,
+    [feedApi.reducerPath]: feedApi.reducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware()
+    .concat([
+      userApi.middleware, 
+      feedApi.middleware
+    ]),
 });
 
 export type RootState = ReturnType<typeof store.getState>
