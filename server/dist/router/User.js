@@ -7,6 +7,6 @@ const express_1 = __importDefault(require("express"));
 const user_1 = require("../controller/user");
 const router = express_1.default.Router();
 router.get("/", user_1.userData);
-router.get("/search", user_1.findUser);
+router.get("/search/:person", user_1.findUser);
 router.get("/:username", user_1.findUsername);
 exports.default = router;

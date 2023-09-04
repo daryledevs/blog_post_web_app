@@ -21,7 +21,8 @@ const userData = async (req: Request, res: Response) => {
 
 const findUser = async (req: Request, res: Response) => {
   try {
-    const { searchText } = req.body;
+    const { person } = req.params;
+    const parameters = Array.from({ length: 3 }, () => person + "%");
     const sql = 
     `
       SELECT 
@@ -36,13 +37,8 @@ const findUser = async (req: Request, res: Response) => {
           FIRST_NAME LIKE (?) OR 
           CONCAT(FIRST_NAME, ' ', LAST_NAME) LIKE (?);
     `;
-    const data = await db(sql, [
-      searchText + "%",
-      searchText + "%",
-      "%" + searchText + "%",
-    ]);
-    if(!data) return res.status(404).send("No results found.");
-    res.status(200).send({ list: data });
+    const data = await db(sql, parameters);
+    res.status(200).send({ people: data });
   } catch (error:any) {
     res.status(500).send({ message: "An error occurred", error: error.message });
   };

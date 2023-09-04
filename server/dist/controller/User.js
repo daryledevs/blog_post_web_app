@@ -47,7 +47,8 @@ const userData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.userData = userData;
 const findUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { searchText } = req.body;
+        const { person } = req.params;
+        const parameters = Array.from({ length: 3 }, () => person + "%");
         const sql = `
       SELECT 
           USER_ID,
@@ -61,14 +62,8 @@ const findUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
           FIRST_NAME LIKE (?) OR 
           CONCAT(FIRST_NAME, ' ', LAST_NAME) LIKE (?);
     `;
-        const data = yield (0, query_1.default)(sql, [
-            searchText + "%",
-            searchText + "%",
-            "%" + searchText + "%",
-        ]);
-        if (!data)
-            return res.status(404).send("No results found.");
-        res.status(200).send({ list: data });
+        const data = yield (0, query_1.default)(sql, parameters);
+        res.status(200).send({ people: data });
     }
     catch (error) {
         res.status(500).send({ message: "An error occurred", error: error.message });

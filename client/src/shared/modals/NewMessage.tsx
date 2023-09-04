@@ -20,7 +20,7 @@ function NewMessage({ newMessageTrgger, setNewMessageTrgger }: IENewMessage) {
   useEffect(() => {
     async function searchApi() {
       try {
-        const response = await api.get(`/users/${search}`);
+        const response = await api.get(`/users/search/${search}`);
         if(response.data.accessToken) return response;
         setList({ people: response.data.people });
       } catch (error) {
@@ -29,7 +29,7 @@ function NewMessage({ newMessageTrgger, setNewMessageTrgger }: IENewMessage) {
     }
 
     dispatch(checkAccess({ apiRequest: searchApi }));
-  }, [search]);
+  }, [dispatch, search]);
 
   useEffect(() => {
     function handleEscapeKey(event: KeyboardEvent) {
