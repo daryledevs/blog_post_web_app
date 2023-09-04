@@ -31,7 +31,6 @@ export async function getFollowers(dispatch:Dispatch, user_id:any, follower:any[
 export async function getPosts(dispatch:Dispatch, user_id:number) {
   try {
     const response = await api.get(`/posts/${user_id}`);
-    console.log("RESPONSE: ", response.data?.post);
     dispatch(getPost(response.data?.post))
   } catch (error) {
     console.log(error)

@@ -44,7 +44,7 @@ function App() {
     getFollowers(appDispatch, users.user_id, [], []);
     getPosts(appDispatch, users.user_id);
     appDispatch(getUserData({ ...users }));
-  }, [appDispatch, appTest.data, appTest.isLoading])
+  }, [appDispatch, appTest.data, appTest.error, appTest.isLoading])
  
   // socket handler
   useEffect(() => {
@@ -67,29 +67,7 @@ function App() {
 
   useEffect(() => {
     if(comingMessage) dispatch(getMessage(comingMessage));
-  }, [comingMessage]);
-
-
-  async function performRequest() {
-    try {
-      const token: any = sessionStorage.getItem("token") || "";
-      const response = await api.get("/users");
-      // if access token is expired, else proceed to API call for user's information
-      if (response.data.accessToken) return response;
-      if (token && token_status === "") appDispatch(userDataThunk());
-    } catch (error) {
-      appDispatch(setAccessStatus(error.response));
-      return error;
-    }
-  }
-
-  // useEffect(() => {
-  //   if (String(access_status)[0] !== "4" || String(access_status)[0] === "5") {
-  //     appDispatch(checkAccess({ apiRequest: performRequest }));
-  //   }
-  // }, [access_status, appDispatch]);
-  
-  
+  }, [comingMessage, dispatch]);  
 
   if(isLoading || !routes) return <></>;
 
