@@ -18,7 +18,8 @@ const customBaseQuery: BaseQueryFn<string, unknown, FetchBaseQueryError> = async
   
   if (data && typeof data === 'object' && 'accessToken' in data) {
     sessionStorage.setItem("token", data.accessToken as string);
-    await customBaseQuery(args, api, extraOptions);
+    const newResult = await customBaseQuery(args, api, extraOptions);
+    return newResult;
   };
 
   return result;
