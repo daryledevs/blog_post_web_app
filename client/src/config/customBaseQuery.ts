@@ -1,8 +1,13 @@
 import { fetchBaseQuery, BaseQueryFn, FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
 import axiosApi, { ErrorHandler } from "../config/api";
+import { setAuthToken } from "../redux/reducer/auth";
 
 // reference for RTK query's custom base query
-const customBaseQuery: BaseQueryFn<string, unknown, FetchBaseQueryError> = async (args, api, extraOptions) => {
+const customBaseQuery: BaseQueryFn<
+  { method?: string; url: string; body?: any },
+  any,
+  FetchBaseQueryError
+> = async (args, api, extraOptions) => {
   const result = await fetchBaseQuery({
     baseUrl: axiosApi.defaults.baseURL,
     prepareHeaders: (headers) => {
@@ -15,12 +20,13 @@ const customBaseQuery: BaseQueryFn<string, unknown, FetchBaseQueryError> = async
   })(args, api, extraOptions);
 
   const { data, error } = result;
-  
-  if (data && typeof data === 'object' && 'accessToken' in data) {
+
+  if (data && typeof data === "object" && "accessToken" in data) {
+    setAuthToken(data.accessToken as string);
     sessionStorage.setItem("token", data.accessToken as string);
     const newResult = await customBaseQuery(args, api, extraOptions);
     return newResult;
-  };
+  }
 
   return result;
 };
