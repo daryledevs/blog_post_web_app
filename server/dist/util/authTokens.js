@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.referenceToken = exports.generateResetToken = exports.generateRefreshToken = exports.generateAccessToken = exports.errorName = exports.verifyToken = void 0;
+exports.referenceToken = exports.generateResetToken = exports.generateRefreshToken = exports.generateAccessToken = exports.verifyToken = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv = __importStar(require("dotenv"));
 const nanoid_1 = require("nanoid");
@@ -58,13 +58,6 @@ function verifyToken(token, secret, tokenName) {
     });
 }
 exports.verifyToken = verifyToken;
-function errorName(name) {
-    if (name === "TokenExpiredError")
-        return false;
-    return true;
-}
-exports.errorName = errorName;
-;
 function generateRefreshToken({ USER_ID, USERNAME }) {
     const REFRESH_SECRET = process.env.REFRESH_TKN_SECRET;
     const details = { user_id: USER_ID, username: USERNAME };

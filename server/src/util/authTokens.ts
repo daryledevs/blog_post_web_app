@@ -36,12 +36,6 @@ function verifyToken(token: any, secret: any, tokenName: string): Promise<any> {
   });
 }
 
-
-function errorName(name: any) {
-  if (name === "TokenExpiredError") return false;
-  return true
-};
-
 function generateRefreshToken({ USER_ID, USERNAME }: IERefreshToken): string {
   const REFRESH_SECRET = process.env.REFRESH_TKN_SECRET!;
   const details = { user_id: USER_ID, username: USERNAME };
@@ -73,7 +67,6 @@ async function referenceToken() {
 
 export {
   verifyToken,
-  errorName,
   generateAccessToken,
   generateRefreshToken,
   generateResetToken,

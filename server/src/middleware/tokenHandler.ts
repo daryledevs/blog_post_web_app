@@ -2,8 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 import cookieOptions from "../config/cookieOptions";
 import routeException from "../helper/routeException";
-import { errorName, generateAccessToken, generateRefreshToken, verifyToken } from "../util/authTokens";
 import db from "../database/query";
+import { generateAccessToken, generateRefreshToken, verifyToken } from "../util/authTokens";
 
 dotenv.config();
 
@@ -22,25 +22,29 @@ const tokenHandler = async (req: Request, res: Response, next: NextFunction) => 
       const { refreshError, refreshDecode } = await verifyToken(refreshToken, refreshSecret, "refresh");
       const { accessError, accessDecode } = await verifyToken(accessToken, accessSecret, "access");
 
-      const isError = errorName(refreshError) || errorName(accessError);
-      if (!isInvalidToken(refreshError, accessError) && isError) return res.status(401).send({ message: "Token is not valid" });
-      
-      const REFRESH_TKN = generateRefreshToken({ USER_ID: refreshDecode.user_id, USERNAME: refreshDecode.username });
-      const ACCESS_TOKEN = generateAccessToken({ USER_ID: accessDecode.user_id, ROLES: accessDecode.roles });
+      const isTokenError = [refreshError, accessError].some((status) => status === "JsonWebTokenError");
+      if (isTokenError) return res.status(401).send({ message: "Token is not valid" });
 
-      if (!errorName(refreshError)) res.cookie("REFRESH_TOKEN", REFRESH_TKN, cookieOptions);
-      if (!errorName(accessError)) return res.status(200).send({ accessToken: ACCESS_TOKEN });
+      if (refreshError === "TokenExpiredError" || accessError === "TokenExpiredError") {
+        const ACCESS_OPTION = { USER_ID: accessDecode.user_id, ROLES: accessDecode.roles };
+        const REFRESH_OPTION = { USER_ID: refreshDecode.user_id, USERNAME: refreshDecode.username };
+        const REFRESH_TKN = generateRefreshToken(REFRESH_OPTION);
+        const ACCESS_TOKEN = generateAccessToken(ACCESS_OPTION);
+        res.cookie("REFRESH_TOKEN", REFRESH_TKN, cookieOptions)
+        return res.status(200).send({ accessToken: ACCESS_TOKEN });
+      }
       
       req.body.user_id = refreshDecode.user_id;
       req.body.roles = accessDecode.roles;
       next();
     } else if (refreshToken) {
       const { refreshError, refreshDecode } = await verifyToken(refreshToken, refreshSecret, "refresh");
+      if (refreshError === "JsonWebTokenError") return res.status(401).send({ message: "Token is not valid" });
       const [result] = await db(sqlSelect, [refreshDecode.user_id]);
       const ACCESS_TOKEN = generateAccessToken(result);
       return res.status(200).send({ accessToken: ACCESS_TOKEN });
     } else {
-      throw new Error("Unknown");
+      throw new Error("Token: Unknown Error");
     }
 
   } catch (error:any) {
