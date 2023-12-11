@@ -3,7 +3,6 @@ import api from "../../config/api";
 import { IEUserState } from "../reduxIntface";
 import { getChatMembers } from "./chatMember";
 import { getChatThunk } from "./chat";
-import { setAccessStatus } from "../reducer/auth";
 import { getFollow, getTotalFollow } from "../reducer/follower";
 import { getPost } from "../reducer/post";
 
@@ -62,7 +61,6 @@ const userDataThunk = createAsyncThunk<
       return fulfillWithValue(user);
     } catch (error) {
       console.log(error);
-      dispatch(setAccessStatus(error.response.data));
       return rejectWithValue({ message: error.response.data.message });
     }
   }

@@ -1,79 +1,56 @@
 
 
-import React, { useEffect, useState } from 'react'
-import { Route, Navigate } from "react-router-dom";
-import Profile from "../pages/Profile";
-import Message from "../pages/Message";
-import Index from "../pages/Index";
-import Feed from "../pages/Feed";
-import Login from "../pages/Login";
+import { useEffect, useState } from 'react'
+import { useLoginMutation } from '../redux/api/AuthApi';
+import PublicRoute from "./PublicRoute";
+import PrivateRoute from "./PrivateRoute";
 import { useAppSelector } from '../redux/hooks/hooks';
-import Explore from '../pages/Explore';
-
-function routeElement(isToken:boolean) {
-  const Redirect = () => <Navigate to="/" replace />;
-  const publicRoute: any[] = ["/login", "/register", "/reset"];
-  const privateRout:any[] = ["/home", "/profile", "/message"];
-  
-  if (isToken) {
-    return (
-      <Route key={1} path="/" element={<Index />} >
-        <Route index element={<Feed />} />
-        <Route path="/:username" element={<Profile />} />
-        <Route path="/message" element={<Message />} />
-        <Route path="/explore" element={<Explore />} />
-        {publicRoute.map((path: any, index:number) => (
-          <Route
-            key={index}
-            path={path}
-            element={<Redirect />}
-          />
-        ))}
-      </Route>
-    );
-  } else {
-    return (
-      <Route key={1} path="/" element={<Login />}>
-        <Route path="/login" index element={<Login />} />
-        <Route path="/register" element={<div>Register Page</div>} />
-        <Route path="/reset" element={<div>Reset Password Page</div>} />
-        {privateRout.map((path: any, index) => (
-          <Route
-            key={index}
-            path={path}
-            element={<Redirect />}
-          />
-        ))}
-      </Route>
-    );
-  }
-};
 
 function RouteIndex() {
-  const { access_status, access_message } = useAppSelector((state) => state.auth);
-  const userData = useAppSelector((state) => state.user);
-  const { fetch_status } = userData;
   const [route, setRoute] = useState<any>(null);
+  const authToken = useAppSelector((state) => state.auth.authToken);
+
+  const [
+    login,
+    {
+      data: loginApiData,
+      isLoading: isLoginLoading,
+      isError: isLoginError,
+      error: loginError,
+    },
+  ] = useLoginMutation({ fixedCacheKey: "shared-update-post" }); 
 
   useEffect(() => {
-    switch (access_message || fetch_status) {
-      case "Token is valid":
-      case "Login successfully":
-      case "Get the user's data successfully":
-        setRoute(routeElement(true));
-        break;
+    const LOGIN_STATUS = "Login successfully";
+    const sessionToken = sessionStorage.getItem("token");
 
-      case "Token is not valid":
-      case "Password is incorrect":
-      case "User not found":
-      case "Forbidden":
-      case "Get the user's data failed":
-      case "Unauthorized":
-        setRoute(routeElement(false));
-        break;
+    if (isLoginLoading) return;
+
+    if (isLoginError) {
+      console.log("LOGIN ERROR: ", loginError);
+      setRoute(PublicRoute());
+      return;
     }
-  }, [access_message, fetch_status]);
 
+    if (loginApiData?.message === LOGIN_STATUS) {
+      sessionStorage.setItem("token", loginApiData.token);
+      setRoute(PrivateRoute());
+      return;
+    }
+
+    // Check for existing tokens
+    const result = [authToken, sessionToken].some(
+      (item) => item !== null && item !== undefined && item !== ""
+    );
+
+    if (result) {
+      setRoute(PrivateRoute());
+    } else {
+      setRoute(PublicRoute());
+    };
+
+  }, [loginApiData, authToken, isLoginLoading, isLoginError, loginError]);
+  
   return route;
 };
 

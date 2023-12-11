@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useGetUserDataQuery } from "../api/FeedApi";
+import { useGetUserDataQuery } from "../api/UserApi";
 
 // Custom hook to fetch and cache user data
 export function useFetchUserData() {
@@ -8,7 +8,7 @@ export function useFetchUserData() {
   useEffect(() => {
     // Fetch user data when the component mounts and store it in the cache
     data.refetch();
-  }, [data.refetch]);
+  }, [data, data.refetch]);
 
   return data;
 }

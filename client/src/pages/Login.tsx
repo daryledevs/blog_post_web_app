@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
-import { login } from '../redux/action/auth';
-import { useAppDispatch } from '../redux/hooks/hooks';
+import React, { useState, useEffect } from 'react';
+import { useLoginMutation } from '../redux/api/AuthApi';
+import { setAuthToken } from '../redux/reducer/auth';
 
 function Login() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const dispatch = useAppDispatch();
+  const [username, setUsername] = useState("daryledevs");
+  const [password, setPassword] = useState("password123");
+  const [login] = useLoginMutation({ fixedCacheKey: "shared-update-post" }); 
 
-  async function handleSubmit(event: React.FormEvent){
+  async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    dispatch(login({ username, password }));
-  };
+    login({ username, password });
+  }
 
   return (
     <div className="login-container">

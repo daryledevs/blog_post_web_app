@@ -8,36 +8,34 @@ import { getMessage } from "./redux/reducer/chat";
 import { getFollowers, getPosts, totalFollow, userDataThunk } from "./redux/action/user";
 import RouteIndex from "./routes/Index";
 import api from "./config/api";
-import { setAccessStatus } from "./redux/reducer/auth";
 import { checkAccess } from "./redux/action/auth";
 import { useFetchUserData } from "./redux/hooks/userApiHook";
 import { getChatMembers } from "./redux/action/chatMember";
 import { IEUserState } from "./redux/reduxIntface";
 import { getChatThunk } from "./redux/action/chat";
 import { getUserData, isRejected } from "./redux/reducer/user";
+import { useGetUserDataQuery } from "./redux/api/UserApi";
 
 
 function App() {
   const appDispatch = useAppDispatch();
   const dispatch = useDispatch();
-  const isLoading = useAppSelector(state => state.auth.isLoading);
   const socket = useRef<Socket | null>(null);
-  const { access_status } = useAppSelector((state) => state.auth);
-  const token_status = useAppSelector((state) => state.auth.token_status);
   const userData = useAppSelector((state) => state.user);
   const [comingMessage, setComingMessage] = useState<any>();
   const routes = RouteIndex();
-  const appTest = useFetchUserData();
+  const appTest = useGetUserDataQuery();
 
   useEffect(() => {
-    if(appTest.isLoading) return;
+    if (!appTest.data) return;
+    if (appTest.isLoading) return;
     if (appTest.error && "status" in appTest.error) {
       const error = appTest.error.data;
       console.log("TEST: ", error);
       appDispatch(isRejected(error));
       return
     }
-    const users: IEUserState = appTest.data.user;
+    const users: IEUserState = appTest?.data.user;
     appDispatch(getChatMembers(users.user_id as any));
     appDispatch(getChatThunk({ user_id: users.user_id as any, length: 0 }));
     totalFollow(appDispatch, users.user_id);
@@ -69,7 +67,7 @@ function App() {
     if(comingMessage) dispatch(getMessage(comingMessage));
   }, [comingMessage, dispatch]);  
 
-  if(isLoading || !routes) return <></>;
+  if(!routes) return <></>;
 
   return (
     <Routes>
