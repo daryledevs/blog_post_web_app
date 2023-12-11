@@ -1,41 +1,58 @@
 import React, { useState, useEffect } from "react";
-import api from "../config/api";
 import GridPost from "../components/GridPost";
-import { useGetExploreFeedQuery, useGetUserDataQuery } from "../redux/api/FeedApi";
-import { useFetchUserData } from "../redux/hooks/userApiHook";
+import { useGetExploreFeedQuery } from "../redux/api/FeedApi";
+import { useGetUserDataQuery } from "../redux/api/UserApi";
+
+type FeedApiData = {
+  feed: any[]; 
+};
+
+type HoverData = {
+  post_id: string | null; 
+};
 
 function Explore() {
-  const [feedApi, setFeedApi] = useState<any>({ feed: [] });
-  const [hover, setHover] = useState<any>({ post_id: null });
-  const userApiRequest = useFetchUserData();
-  const exploreApiRequest: any = useGetExploreFeedQuery(
-    userApiRequest.data?.user?.user_id, 
-    { skip: !userApiRequest.isSuccess }
-  );
+  const [feedApi, setFeedApi] = useState<FeedApiData>({ feed: [] });
+  const [hover, setHover] = useState<HoverData>({ post_id: null });
+
+  const {
+    data: userApiData,
+    isLoading: isUserApiLoading,
+    isError: isUserApiError,
+    error: userApiError,
+    isSuccess: isUserApiSuccess,
+  } = useGetUserDataQuery();
+
+  const {
+    data: exploreApiData,
+    isLoading: isExploreApiLoading,
+    isError: isExploreApiError,
+    error: exploreApiError,
+    isSuccess: isExploreApiSuccess,
+  } = useGetExploreFeedQuery(
+    userApiData?.user?.user_id, {
+    skip: !isUserApiSuccess,
+  });
 
   useEffect(() => {
-    if (exploreApiRequest.isLoading || userApiRequest.isLoading) return;
-    setFeedApi({ feed: exploreApiRequest.data?.feed });
-  }, [exploreApiRequest, userApiRequest.isLoading]);
+    if (isExploreApiLoading || isUserApiLoading) return;
+    setFeedApi({ feed: exploreApiData?.data?.feed || [] });
+  }, [exploreApiData, isExploreApiLoading, isUserApiLoading]);
 
-
-  if (exploreApiRequest.isLoading || userApiRequest.isLoading) return <></>;
-
+  
+  if (isUserApiError || isExploreApiError) {
+    console.log("USER ERROR: ", userApiError, " EXPLORE ERROR: ", exploreApiError);
+  }
+  
+  if (isExploreApiLoading || isUserApiLoading) return <></>;
+  
   return (
     <div className="explore__container">
       <div className="explore__parent">
         {feedApi.feed && feedApi.feed.length ? (
-          GridPost({
-            posts: {
-              post: feedApi.feed,
-            },
-            hover,
-            setHover,
-          })
+          <GridPost posts={{ post: feedApi.feed }} hover={hover} setHover={setHover} />
         ) : (
-          <p style={{ textAlign: "center", marginTop: "5vh" }}>
-            No Post To Show
-          </p>
+          <p style={{ textAlign: "center", marginTop: "5vh" }}>No Post To Show</p>
         )}
       </div>
     </div>
