@@ -4,28 +4,31 @@ import svg_loading from "../assets/icons/loading.svg";
 import PostCard from "../components/PostCard";
 import api from "../config/api";
 import { changeStatus, getFeeds, changeTime } from "../redux/reducer/feed";
+import { useGetUserFeedMutation, useGetTotalFeedMutation } from "../redux/api/FeedApi";
 
 function Feed() {
   const dispatch = useAppDispatch();
-  // const user = useAppSelector((state) => state.user);
-  const feeds = useAppSelector((state) => state.feed.feeds);
-  const feedStatus = useAppSelector((state) => state.feed.feedStatus);
-  const isFirstLoad = useAppSelector((state) => state.feed.isFirstLoad);
+  const feedRef = useRef<HTMLDivElement>(null);
   const lastRequest = useAppSelector((state) => state.feed.lastRequest);
 
-  // const isMount = useRef(false);
-  const feedRef = useRef<HTMLDivElement>(null);
-  const token: any = sessionStorage.getItem("token");
-  const header = { headers: { Authorization: `Bearer ${token}` } };
+  const [getUserFeed, { data: feedApiData, isLoading, status: feedStatus }] = useGetUserFeedMutation();
+  const [getTotalFeed, { data: totalFeedApiData, isLoading: isTotalFeedLoading, status: totalFeedStatus }] = useGetTotalFeedMutation({});
 
-  const [totalFeed, setTotalFeed] = useState<any>(0);
-
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [addFeedTrigger, setAddFeedTrigger] = useState<boolean>(false);
   const [noPostTrigger, setNoPostTrigger] = useState<boolean>(false);
+  const [hasShownLoading, setHasShownLoading] = useState<boolean>(false);
+  const [feeds, setFeeds] = useState<any>({ feed: [] });
+
+  useEffect(() => {
+    if (feedStatus === "fulfilled") {
+      setFeeds({ feed: [...feeds.feed, ...feedApiData.feed] });
+    }
+  }, [feedStatus]);
 
   useEffect(() => {
     const win: Window = window;
+    getUserFeed({ post_ids: [] });
+    getTotalFeed({});
 
     const getLastScroll = () => {
       const scrollPosition = sessionStorage.getItem("scrollPosition");
@@ -43,89 +46,48 @@ function Feed() {
 
     win?.addEventListener("scroll", onScroll);
     return () => win?.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [getTotalFeed, getUserFeed]);
 
   useEffect(() => {
-    if(feedStatus) return;
+    if (feedStatus !== "fulfilled") return;
 
-    const getIds = feeds.map((feed: any) => {
+    const getIds = feeds.feed?.map((feed: any) => {
       return feed.post_id;
     });
-    const getUserFeed = async () => {
-      try {
-        const response = await api.post(
-          "feeds/user",
-          { post_ids: getIds },
-          header
-        );
-        dispatch(getFeeds([...feeds, ...response.data.feed]));
-      } catch (error) {
-        console.log(error);
-        return;
-      } finally {
-        dispatch(changeStatus(true));
-      }
-    };
 
-    getUserFeed();
+    getUserFeed({ post_ids: [...getIds] });
   }, [addFeedTrigger]);
 
   useEffect(() => {
-    const win: Window = window;
-    const heightDimension = 1300;
-    const stateTriggers = () => {
-      dispatch(changeStatus(false));
-      setAddFeedTrigger(!addFeedTrigger);
-      setIsLoading(false);
-    };
-
     const isBottom = (element: any) => {
-      return element.getBoundingClientRect().bottom <= heightDimension;
-    };
-    
-    const getTotalFeed = async () => {
-      try {
-        const response = await api.get("/feeds/count", header);
-        setIsLoading(false);
-        return response.data.count;
-      } catch (error) {
-        console.log(error);
-      }
+      return element.scrollHeight - element.scrollTop === element.clientHeight;
     };
 
     const onScroll: EventListener = (event: Event) => {
-      if(isBottom(feedRef.current)) {
-        const feedLength = feeds.length;
+      if (isBottom(feedRef.current)) {
+        const feedLength = feeds.feed?.length ?? 0;
         // The purpose is to prevent the website to request every single time
-        if(totalFeed > feedLength && !noPostTrigger) {
-          getTotalFeed()
-            .then((response) => {
-              if(response > feedLength) {
-                setTotalFeed(response);
-                stateTriggers();
-              } else {
-                setNoPostTrigger(true);
-              }
-            })
-            .catch((error) => {
-              console.log(error);
-            });
+        if (totalFeedApiData?.count > feedLength && !noPostTrigger) {
+          getTotalFeed({});
+          const getIds = feeds.feed?.map((post: any) => post.post_id);
+          getUserFeed({ post_ids: [...getIds] });
+          setAddFeedTrigger(!addFeedTrigger);
         } else {
           const minutes = getMinutes();
-          if(lastRequest && minutes < 5) return setNoPostTrigger(true);
-          stateTriggers();
+          if (lastRequest && minutes < 5) return setNoPostTrigger(true);
           const value = new Date();
           dispatch(changeTime(value.getTime()));
         }
       }
     };
 
-    win?.addEventListener("scroll", onScroll);
-    return () => win?.removeEventListener("scroll", onScroll);
+    const currentFeedRef = feedRef.current;
+    currentFeedRef?.addEventListener("scroll", onScroll);
+    return () => currentFeedRef?.removeEventListener("scroll", onScroll);
 
     // Put userFeed here to let this handler know
     // that it has a new data update.
-  }, [feeds]);
+  }, [addFeedTrigger, feeds.feed, getTotalFeed, getUserFeed, totalFeedApiData?.count]);
 
   function getMinutes() {
     const last = new Date(lastRequest);
@@ -134,24 +96,27 @@ function Feed() {
     return Math.floor(diff / 1000 / 60);
   }
 
-  if(isFirstLoad) return (
-    <img
-      src={svg_loading}
-      className="first-load"
-      alt=""
-    />
-  );
+  if ((isLoading || isTotalFeedLoading) && !hasShownLoading) {
+    setHasShownLoading(true);
+    return (
+      <img
+        src={svg_loading}
+        className="first-load"
+        alt=""
+      />
+    );
+  }
 
   return (
     <div
       ref={feedRef}
       className={`feed-container ${isLoading && "test"}`}
     >
-      {feeds?.map((feed: any) => {
+      {feeds.feed.length && feeds.feed.map((feed: any, index: number) => {
         return (
           <PostCard
             postData={feed}
-            key={feed.post_id}
+            key={index}
           />
         );
       })}
@@ -162,7 +127,7 @@ function Feed() {
           alt=""
         />
       ) : (
-        (noPostTrigger || !feeds.length) && <>No Post To Show</>
+        (noPostTrigger || (feeds.length && feeds.feed.length)) && <>No Post To Show</>
       )}
     </div>
   );
