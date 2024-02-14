@@ -111,14 +111,18 @@ function Feed() {
       ref={feedRef}
       className={`feed-container ${isLoading && "test"}`}
     >
-      {feeds.feed.length ? feeds.feed.map((feed: any, index: number) => {
-        return (
-          <PostCard
-            postData={feed}
-            key={index}
-          />
-        );
-      }) : null}
+      {feeds.feed.length ? (
+        feeds.feed.map((feed: any, index: number) => {
+          return (
+            <PostCard
+              postData={feed}
+              key={index}
+            />
+          );
+        })
+      ) : (
+        <>No Post To Show</>
+      )}
 
       {isLoading ? (
         <img
@@ -126,9 +130,7 @@ function Feed() {
           className="img-loading"
           alt=""
         />
-      ) : (
-        (noPostTrigger || (feeds.length && feeds.feed.length)) && <>No Post To Show</>
-      )}
+      ) : null}
     </div>
   );
 }
