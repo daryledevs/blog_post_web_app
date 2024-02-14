@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks/hooks";
 import svg_loading from "../assets/icons/loading.svg";
 import PostCard from "../components/PostCard";
-import api from "../config/api";
-import { changeStatus, getFeeds, changeTime } from "../redux/reducer/feed";
+import {  changeTime } from "../redux/reducer/feed";
 import { useGetUserFeedMutation, useGetTotalFeedMutation } from "../redux/api/FeedApi";
 
 function Feed() {
@@ -112,14 +111,15 @@ function Feed() {
       ref={feedRef}
       className={`feed-container ${isLoading && "test"}`}
     >
-      {feeds.feed.length && feeds.feed.map((feed: any, index: number) => {
+      {feeds.feed.length ? feeds.feed.map((feed: any, index: number) => {
         return (
           <PostCard
             postData={feed}
             key={index}
           />
         );
-      })}
+      }) : null}
+
       {isLoading ? (
         <img
           src={svg_loading}
