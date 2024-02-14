@@ -48,10 +48,10 @@ function Chat({ openConversation }: IEChatProps) {
   const chats = useAppSelector((state) => state.chat);
   const userData = useAppSelector((state) => state.user);
   const chatMember = useAppSelector((state) => state.chatMember);
-  const getData = chats.find( (chat: any) => chat[0]?.conversation_id === openConversation);
-  const members = chatMember.find((member) => member.conversation_id === openConversation);
-  const stateInitial = initial(members, userData, openConversation);
-  const [newMessage, setNewMessage] = useState<any>(stateInitial);
+  
+  const [chatData, setChatData] = useState<any>();
+  const [members, setMembers] = useState<any>();
+  const [newMessage, setNewMessage] = useState<any>();
 
   // trigger
   const [clearMessage, setClearMessage] = useState<boolean>(false);
@@ -66,39 +66,56 @@ function Chat({ openConversation }: IEChatProps) {
   };
   
   useEffect(() => {
+    const stateInitial = initial(members, userData, openConversation);
     setNewMessage(stateInitial);
-  }, [openConversation, clearMessage]);
+  }, [openConversation, clearMessage, members, userData]);
 
   useEffect(() => {
     if (messageRef.current) {
       scrollToDown(messageRef.current);
     }
   }, [openConversation]);
-  
+
   useEffect(() => {
-    if (inputRef.current) {
-      if(!newMessage.text_message) inputRef.current.style.height = "0px";
-      if(inputRef.current.scrollHeight > 100) return;
-      const scrollHeight = inputRef.current.scrollHeight;
-      inputRef.current.style.height = scrollHeight + "px";
+    if(openConversation.isConversation){
+      const getData = chats.find((chat: any) => chat[0]?.conversation_id === openConversation.id);
+      const members = chatMember.find((member) => member.conversation_id === openConversation.id);
+      setChatData(getData);
+      setMembers(members);
+    } else {
+      // api request for chat data and members
     }
-  }, [inputRef, newMessage, clearMessage]);
-
+  }, [chatMember, chats, openConversation]);
+  
   const submitHandler = async () => {
+    let sendTo;
+    if (openConversation.isConversation) {
+      sendTo = openConversation.id;
+    } else {
+      try {
+        const response = await api.post("/chats", {
+          sender_id: userData.user_id,
+          receiver_id: openConversation.id,
+        });
+        sendTo = response.data.data.insertid;
+      } catch (error) {
+        console.log(error);
+      }
+    }
     dispatch(addMessage(newMessage));
-
+    
     socket.current.emit("sendMessage", {
-      conversation_id: openConversation,
+      conversation_id: sendTo,
       senderId: newMessage.sender_id,
       receiverId: getReceiverId(),
-      text: newMessage.text_message,
+      text: newMessage?.text_message,
     });
 
     try {
       await api.post("/chats/message", {
-        conversation_id: openConversation,
+        conversation_id: sendTo,
         sender_id: newMessage.sender_id,
-        text_message: newMessage.text_message,
+        text_message: newMessage?.text_message,
       });
     } catch (error) {
       console.log(error.message);
@@ -112,14 +129,23 @@ function Chat({ openConversation }: IEChatProps) {
     // setSelectedEmoji(emojiData.unified);
     setNewMessage({
       ...newMessage,
-      text_message: newMessage.text_message + emojiData.emoji,
+      text_message: newMessage?.text_message + emojiData.emoji,
     });
   }
+
+  useEffect(() => {
+    if (inputRef.current) {
+      if (!newMessage?.text_message) inputRef.current.style.height = "0px";
+      if (inputRef.current.scrollHeight > 100) return;
+      const scrollHeight = inputRef.current.scrollHeight;
+      inputRef.current.style.height = scrollHeight + "px";
+    }
+  }, [inputRef, newMessage, clearMessage]);
 
   return (
     <div className="chat__container">
       <div className="chat__message-list" ref={messageRef}>
-        {getData?.map((data: any, index: number) => {
+        {chatData?.map((data: any, index: number) => {
           let value = classNameChecker(data?.sender_id);
           // let time_sent = new Date(data.time_sent).getHours();
           return (
