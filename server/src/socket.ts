@@ -25,7 +25,7 @@ const getUser = (userId: any) => {
 function socketController() {
   socketIO.on("connection", (socket: Socket) => {
 
-    socket.on("addUser", (userId) => {
+    socket.on("addUser", (userId:string) => {
       addUser(userId, socket.id);
       socket.emit("getUsers", users);
     });
