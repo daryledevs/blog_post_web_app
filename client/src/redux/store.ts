@@ -19,8 +19,11 @@ const store = configureStore({
     feed: feedReducer,
     [baseApi.reducerPath]: baseApi.reducer,
   },
-   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat([baseApi.middleware]),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      immutableCheck: false,
+      serializableCheck: false,
+    }).concat([baseApi.middleware]),
 });
 
 export type RootState = ReturnType<typeof store.getState>

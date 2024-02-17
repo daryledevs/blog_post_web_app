@@ -5,10 +5,20 @@ import { useLoginMutation } from '../redux/api/AuthApi';
 import PublicRoute from "./PublicRoute";
 import PrivateRoute from "./PrivateRoute";
 import { useAppSelector } from '../redux/hooks/hooks';
+import useSocket from '../hooks/useSocketIO';
 
 function RouteIndex() {
   const [route, setRoute] = useState<any>(null);
   const authToken = useAppSelector((state) => state.auth.authToken);
+   const socket = useSocket("ws://localhost:8900");
+  const { onConnection, onDisconnect } = socket;
+
+  useEffect(() => {
+    onConnection();
+    return () => {
+      onDisconnect();
+    }
+  }, [])
 
   const [
     login,
@@ -34,7 +44,7 @@ function RouteIndex() {
 
     if (loginApiData?.message === LOGIN_STATUS) {
       sessionStorage.setItem("token", loginApiData.token);
-      setRoute(PrivateRoute());
+      setRoute(PrivateRoute({ socket }));
       return;
     }
 
@@ -44,7 +54,7 @@ function RouteIndex() {
     );
 
     if (result) {
-      setRoute(PrivateRoute());
+      setRoute(PrivateRoute({ socket }));
     } else {
       setRoute(PublicRoute());
     };
