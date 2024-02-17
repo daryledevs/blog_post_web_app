@@ -1,25 +1,33 @@
 import ChatHeader from './ChatHeader';
 import ChatHistory from './ChatHistory';
+import { Person } from '../interfaces/interface';
+import { useGetAllChatsQuery } from "../redux/api/ChatApi";
+import { IEOpenConversation } from "../interfaces/interface";
 
 type MessageSideBarProps = {
-  user: any,
-  chatMembers: any[]
-  newMessageTrgger: boolean,
-  switchAccountTrggr: boolean,
-  setSwitchAccountTrggr: (value: boolean) => void,
-  setNewMessageTrgger: (value: boolean) => void,
-  setOpenConversation: (id: string) => void,
-}
+  user: any;
+  newMessageTrgger: boolean;
+  switchAccountTrggr: boolean;
+  setSwitchAccountTrggr: (value: boolean) => void;
+  setNewMessageTrgger: (value: boolean) => void;
+  setOpenConversation: (value: IEOpenConversation | null) => void;
+};
 
 function MessageSideBar({
   user,
-  chatMembers,
   newMessageTrgger,
   switchAccountTrggr,
   setSwitchAccountTrggr,
   setNewMessageTrgger,
   setOpenConversation,
 }: MessageSideBarProps) {
+
+  const chatMembers = useGetAllChatsQuery({
+    user_id: user.user_id,
+    conversation_id: "",
+  });
+
+  if(chatMembers.isLoading) return null;
   
   return (
     <div className="message__sidebar">
@@ -31,8 +39,7 @@ function MessageSideBar({
         setNewMessageTrgger={setNewMessageTrgger}
       />
       <ChatHistory
-        user={user}
-        chatMembers={chatMembers}
+        chatMembers={chatMembers?.data.data}
         setOpenConversation={setOpenConversation}
       />
     </div>

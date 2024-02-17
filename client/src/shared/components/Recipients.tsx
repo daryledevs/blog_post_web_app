@@ -11,7 +11,8 @@ interface IERecipients {
 interface RecipientsProps {
   recipients: IERecipients[];
   search: string;
-  setSearch: (value:any) => void;
+  setSearch: (value: any) => void;
+  setRecipient: (value: any) => void;
 }
 
 function Recipients(props: RecipientsProps) {
@@ -24,15 +25,42 @@ function Recipients(props: RecipientsProps) {
             key={item.user_id}
           >
             <p>{item.username}</p>
-            <svg 
-              aria-label="Delete Item"  color="rgb(0, 149, 246)" fill="rgb(0, 149, 246)" height="13" width="13" role="img" viewBox="0 0 24 24" >
+            <svg
+              onClick={() =>
+                props.setRecipient((recipients: any) =>
+                  recipients.filter(
+                    (recipient: any) => recipient.user_id !== item.user_id
+                  )
+                )
+              }
+              aria-label="Delete Item"
+              color="rgb(0, 149, 246)"
+              fill="rgb(0, 149, 246)"
+              height="13"
+              width="13"
+              role="img"
+              viewBox="0 0 24 24"
+            >
               <title>Delete Item</title>
-              <polyline 
-                fill="none" points="20.643 3.357 12 12 3.353 20.647" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
-              </polyline>
-              <line 
-                fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" x1="20.649" x2="3.354" y1="20.649" y2="3.354">
-              </line>
+              <polyline
+                fill="none"
+                points="20.643 3.357 12 12 3.353 20.647"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="3"
+              ></polyline>
+              <line
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="3"
+                x1="20.649"
+                x2="3.354"
+                y1="20.649"
+                y2="3.354"
+              ></line>
             </svg>
           </div>
         );

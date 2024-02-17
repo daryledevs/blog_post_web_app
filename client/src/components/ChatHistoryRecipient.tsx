@@ -1,31 +1,27 @@
 import usersPicture from "../assets/icons/avatar.png";
+import { IEOpenConversation } from "../interfaces/interface";
 
 type ChatHistoryRecipientProps = {
-  user: any;
-  chat: any,
-  setOpenConversation: (id: string) => void;
+  chat: any;
+  setOpenConversation: (value: IEOpenConversation| null) => void;
 };
 
-function ChatHistoryRecipient({ user, chat, setOpenConversation }: ChatHistoryRecipientProps) {
+function ChatHistoryRecipient({ chat, setOpenConversation }: ChatHistoryRecipientProps) {
   return (
     <div
       key={chat.conversation_id}
       className="chat-history__recipient"
-      onClick={() => setOpenConversation(chat?.conversation_id)}
+      onClick={() => setOpenConversation(chat)}
     >
       <img
-        src={usersPicture}
+        src={chat.avatar_url ? chat.avatar_url : usersPicture}
         width="10.6%"
         height="29"
         alt=""
       />
       <div className="chat-history__details">
         <p>
-          {chat.name.first_name} {chat.name.last_name}
-        </p>
-        <p>
-          {chat?.[chat.length - 1]?.sender_id === user.user_id && "You: "}{" "}
-          {chat?.[chat.length - 1]?.text_message}
+          {chat.first_name} {chat.last_name}
         </p>
       </div>
     </div>

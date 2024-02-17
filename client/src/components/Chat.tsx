@@ -1,29 +1,15 @@
 import React, { useEffect, useState, useRef } from "react";
 import usersPicture from "../assets/icons/avatar.png";
-import { useAppSelector } from "../redux/hooks/hooks";
-import { addMessage } from "../redux/reducer/chat";
-import { useDispatch } from "react-redux";
-import { io } from "socket.io-client";
-import api from "../config/api";
 import emojiIcon from "../assets/icons/emoji-icon.png";
 import EmojiPicker, { Theme, EmojiClickData } from "emoji-picker-react";
+import { IEOpenConversation } from "../interfaces/interface";
+import { useLazyGetChatMessagesQuery } from "../redux/api/ChatApi";
+import { useGetUserDataQuery } from "../redux/api/UserApi";
 
 interface IEChatProps {
-  openConversation: any;
+  openConversation: IEOpenConversation;
+  socket: any;
 }
-
-function initial(members: any, userData: any, openConversation: any) {
-  return {
-    conversation_id: openConversation,
-    first_name: members?.name.first_name,
-    last_name: members?.name.last_name,
-    sender_id: userData.user_id,
-    text_message: "",
-    user_one: members?.members.user_one,
-    user_two: members?.members.user_two,
-    username: members?.username,
-  };
-};
 
 const eventFilter = (event: any) => {
   return (
@@ -38,19 +24,17 @@ const scrollToDown = (ref:any) => {
   ref.scrollTop = scrollHeight;
 };
 
-function Chat({ openConversation }: IEChatProps) {
-  const dispatch = useDispatch();
-  const socket = useRef(io("ws://localhost:8900"));
+function Chat({ openConversation, socket }: IEChatProps) {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
+  const { onMessageReceived, sendMessage } = socket;
+
+  // consume api
+  const [getChatMessages, allChatMessages] = useLazyGetChatMessagesQuery();
+  const [comingMessage, setComingMessage] = useState<any>([]);
 
   // data
-  const chats = useAppSelector((state) => state.chat);
-  const userData = useAppSelector((state) => state.user);
-  const chatMember = useAppSelector((state) => state.chatMember);
-  
-  const [chatData, setChatData] = useState<any>();
-  const [members, setMembers] = useState<any>();
+  const userDataApi = useGetUserDataQuery();
   const [newMessage, setNewMessage] = useState<any>();
 
   // trigger
@@ -58,80 +42,38 @@ function Chat({ openConversation }: IEChatProps) {
   const [emojiModalTrigger, setEmojiModalTrigger] = useState<boolean>(false);
 
   // functions
-  const classNameChecker = (user_id: any) => user_id === userData.user_id ? "own" : "other";
-  const getReceiverId = () => {
-    return members?.members.user_one === userData.user_id
-      ? members?.members.user_two
-      : members?.members.user_one;
-  };
-  
-  useEffect(() => {
-    const stateInitial = initial(members, userData, openConversation);
-    setNewMessage(stateInitial);
-  }, [openConversation, clearMessage, members, userData]);
-
-  useEffect(() => {
-    if (messageRef.current) {
-      scrollToDown(messageRef.current);
-    }
-  }, [openConversation]);
-
-  useEffect(() => {
-    if(openConversation.isConversation){
-      const getData = chats.find((chat: any) => chat[0]?.conversation_id === openConversation.id);
-      const members = chatMember.find((member) => member.conversation_id === openConversation.id);
-      setChatData(getData);
-      setMembers(members);
-    } else {
-      // api request for chat data and members
-    }
-  }, [chatMember, chats, openConversation]);
-  
-  const submitHandler = async () => {
-    let sendTo;
-    if (openConversation.isConversation) {
-      sendTo = openConversation.id;
-    } else {
-      try {
-        const response = await api.post("/chats", {
-          sender_id: userData.user_id,
-          receiver_id: openConversation.id,
-        });
-        sendTo = response.data.data.insertid;
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    dispatch(addMessage(newMessage));
-    
-    socket.current.emit("sendMessage", {
-      conversation_id: sendTo,
-      senderId: newMessage.sender_id,
-      receiverId: getReceiverId(),
-      text: newMessage?.text_message,
-    });
-
-    try {
-      await api.post("/chats/message", {
-        conversation_id: sendTo,
-        sender_id: newMessage.sender_id,
-        text_message: newMessage?.text_message,
-      });
-    } catch (error) {
-      console.log(error.message);
-    }
-
-    setClearMessage(!clearMessage);
-    scrollToDown(messageRef.current);
+  const classNameChecker = (user_id: any) => {
+    if(!userDataApi.data) return;
+    return user_id === userDataApi?.data.user.user_id ? "own" : "other";
   };
 
   function chooseEmoji(emojiData: EmojiClickData, event: MouseEvent) {
-    // setSelectedEmoji(emojiData.unified);
     setNewMessage({
       ...newMessage,
       text_message: newMessage?.text_message + emojiData.emoji,
     });
   }
+
+  useEffect(() => {
+    onMessageReceived((message: any) => {
+      setComingMessage((prev: any) => [...prev, { ...message }]);
+    });
+  }, [onMessageReceived]);
+
+  useEffect(() => {
+    if(allChatMessages.data) {
+      setComingMessage(allChatMessages?.data?.chats);
+    }
+  }, [allChatMessages]);
+
+  useEffect(() => {
+    getChatMessages({ conversation_id: openConversation.conversation_id });
+  }, [getChatMessages, openConversation.conversation_id]);
+
+
+  useEffect(() => {
+    if (messageRef.current) scrollToDown(messageRef.current);
+  }, [openConversation]);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -142,10 +84,36 @@ function Chat({ openConversation }: IEChatProps) {
     }
   }, [inputRef, newMessage, clearMessage]);
 
+  function sendMessageHandler(){
+    if (!newMessage?.text_message) return;
+    if (!userDataApi?.data) return;
+    const user = userDataApi.data.user;
+    const { user_two, user_one, conversation_id } = openConversation;
+    const receiver_id = user_one !== user.user_id ? user_one : user_two;
+
+    const data = {
+      sender_id: userDataApi.data.user.user_id,
+      receiver_id: receiver_id,
+      conversation_id: conversation_id,
+      text_message: newMessage.text_message,
+    };
+
+    const { receiver_id: _, ...rest } = data;
+    
+    sendMessage(data);
+    setComingMessage((prev: any) => [...prev, { ...rest }]);
+    setClearMessage(!clearMessage);
+  }
+
+  if (allChatMessages.isLoading || !userDataApi.data) return null;
+
   return (
     <div className="chat__container">
-      <div className="chat__message-list" ref={messageRef}>
-        {chatData?.map((data: any, index: number) => {
+      <div
+        className="chat__message-list"
+        ref={messageRef}
+      >
+        {comingMessage?.map((data: any, index: number) => {
           let value = classNameChecker(data?.sender_id);
           // let time_sent = new Date(data.time_sent).getHours();
           return (
@@ -193,12 +161,12 @@ function Chat({ openConversation }: IEChatProps) {
           }
           onKeyDown={(event) => {
             if (eventFilter(event)) return;
-            submitHandler();
+            sendMessageHandler();
           }}
         ></textarea>
         <button
           className="chat__input-box-btn"
-          onClick={submitHandler}
+          onClick={sendMessageHandler}
         >
           Send
         </button>

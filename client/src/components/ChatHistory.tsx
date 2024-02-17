@@ -1,13 +1,12 @@
 import ChatHistoryRecipient from "./ChatHistoryRecipient";
+import { IEOpenConversation } from "../interfaces/interface";
 
 type ChatHistoryProps = {
-  user: any;
   chatMembers: any[];
-  setOpenConversation: (id: string) => void;
+  setOpenConversation: (value: IEOpenConversation | null) => void;
 };
 
 function ChatHistory({
-  user,
   chatMembers,
   setOpenConversation,
 }: ChatHistoryProps) {
@@ -17,7 +16,6 @@ function ChatHistory({
         return (
           <ChatHistoryRecipient
             key={index}
-            user={user}
             chat={chat}
             setOpenConversation={setOpenConversation}
           />

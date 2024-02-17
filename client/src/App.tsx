@@ -1,74 +1,34 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "./redux/hooks/hooks";
-import { useDispatch } from "react-redux";
-import { Socket } from "socket.io-client";
-import { io } from "socket.io-client";
-import { getMessage } from "./redux/reducer/chat";
-import { getFollowers, getPosts, totalFollow, userDataThunk } from "./redux/action/user";
+import { useAppDispatch } from "./redux/hooks/hooks";
+import { getFollowers, getPosts, totalFollow } from "./redux/action/user";
 import RouteIndex from "./routes/Index";
-import api from "./config/api";
-import { checkAccess } from "./redux/action/auth";
-import { useFetchUserData } from "./redux/hooks/userApiHook";
-import { getChatMembers } from "./redux/action/chatMember";
 import { IEUserState } from "./redux/reduxIntface";
-import { getChatThunk } from "./redux/action/chat";
-import { getUserData, isRejected } from "./redux/reducer/user";
+import { getUserData } from "./redux/reducer/user";
 import { useGetUserDataQuery } from "./redux/api/UserApi";
-
 
 function App() {
   const appDispatch = useAppDispatch();
-  const dispatch = useDispatch();
-  const socket = useRef<Socket | null>(null);
-  const userData = useAppSelector((state) => state.user);
-  const [comingMessage, setComingMessage] = useState<any>();
   const routes = RouteIndex();
-  const appTest = useGetUserDataQuery();
+
+  const {
+    data: userApiData,
+    isLoading: userApiLoading,
+    isError: isUserApiError,
+    error: userApiError,
+  } = useGetUserDataQuery();
 
   useEffect(() => {
-    if (!appTest.data) return;
-    if (appTest.isLoading) return;
-    if (appTest.error && "status" in appTest.error) {
-      const error = appTest.error.data;
-      console.log("TEST: ", error);
-      appDispatch(isRejected(error));
-      return
-    }
-    const users: IEUserState = appTest?.data.user;
-    appDispatch(getChatMembers(users.user_id as any));
-    appDispatch(getChatThunk({ user_id: users.user_id as any, length: 0 }));
+    if (!userApiData || userApiLoading) return;
+    const users: IEUserState = userApiData?.user;
     totalFollow(appDispatch, users.user_id);
     getFollowers(appDispatch, users.user_id, [], []);
     getPosts(appDispatch, users.user_id);
     appDispatch(getUserData({ ...users }));
-  }, [appDispatch, appTest.data, appTest.error, appTest.isLoading])
- 
-  // socket handler
-  useEffect(() => {
-    try {
-      if (userData.user_id && socket) {
-        socket.current = io("ws://localhost:8900");
-        socket.current.emit("addUser", userData.user_id);
-        socket.current.on("getMessage", (data: any) => {
-          setComingMessage({
-            conversation_id: data.conversation_id,
-            sender_id: data.senderId,
-            text_message: data.text,
-          });
-        });
-      }
-    } catch (error) {
-      
-    }
-  }, [socket, userData]);
+  }, [appDispatch, userApiData, userApiLoading])
 
-  useEffect(() => {
-    if(comingMessage) dispatch(getMessage(comingMessage));
-  }, [comingMessage, dispatch]);  
-
-  if(!routes) return <></>;
-
+  if (!routes || userApiLoading) return <></>;
+  
   return (
     <Routes>
       {routes}
