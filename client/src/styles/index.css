@@ -723,6 +723,10 @@
   font-weight: bold;
   cursor: pointer;
 }
+.new-message__container .new-message__parent button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
 
 .recipients__container {
   padding: 0 1%;

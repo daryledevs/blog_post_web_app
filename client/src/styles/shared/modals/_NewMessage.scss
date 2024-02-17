@@ -96,5 +96,10 @@
       font-weight: bold;
       cursor: pointer;
     }
+
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
   };
 };

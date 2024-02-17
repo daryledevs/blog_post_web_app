@@ -5,17 +5,19 @@ import closeModal from "../../assets/icons/close.png";
 import Recipients from "../components/Recipients";
 import { useAppDispatch } from "../../redux/hooks/hooks";
 import { checkAccess } from "../../redux/action/auth";
+import { IEOpenConversation } from "../../interfaces/interface";
 
 interface IENewMessage {
   newMessageTrgger: boolean;
   setNewMessageTrgger: (value: any) => void;
+  setOpenConversation: (value: IEOpenConversation) => void;
 };
 
-function NewMessage({ newMessageTrgger, setNewMessageTrgger }: IENewMessage) {
+function NewMessage({ newMessageTrgger, setNewMessageTrgger, setOpenConversation }: IENewMessage) {
   const dispatch = useAppDispatch();
+  const [recipient, setRecipient] = useState<any>([]);
   const [search, setSearch] = useState<string>("");
   const [list, setList] = useState<any>({ people: [] });
-  const [recipient, setRecipient] = useState<any>([]);
 
   useEffect(() => {
     async function searchApi() {
@@ -50,6 +52,11 @@ function NewMessage({ newMessageTrgger, setNewMessageTrgger }: IENewMessage) {
     setSearch("");
   };
 
+  function newChatHandler() {
+    setOpenConversation(recipient);
+    setNewMessageTrgger(!newMessageTrgger);
+  }
+
   if(!newMessageTrgger) return <></>;
 
   return (
@@ -70,6 +77,7 @@ function NewMessage({ newMessageTrgger, setNewMessageTrgger }: IENewMessage) {
               search={search}
               setSearch={setSearch}
               recipients={recipient}
+              setRecipient={setRecipient}
             />
           </label>
         </div>
@@ -103,7 +111,12 @@ function NewMessage({ newMessageTrgger, setNewMessageTrgger }: IENewMessage) {
             <p>No account found.</p>
           )}
         </div>
-        <button>Chat</button>
+        <button
+          disabled={!recipient.length}
+          onClick={newChatHandler}
+        >
+          Chat
+        </button>
       </div>
     </div>
   );
