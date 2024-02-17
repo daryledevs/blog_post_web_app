@@ -15,21 +15,22 @@ const removeUser = (socketId) => {
     users = users.filter((user) => user.socketId !== socketId);
 };
 const getUser = (userId) => {
+    console.log("getUser: ", userId);
     return users.find((user) => user.userId === userId);
 };
 function socketController() {
-    socketIO.on("connection", (socket) => {
-        socket.on("addUser", (userId) => {
+    socketIO.on("connect", (socket) => {
+        socket.on("add-user", (userId) => {
             addUser(userId, socket.id);
-            socket.emit("getUsers", users);
+            socket.emit("get-users", users);
         });
-        socket.on("sendMessage", ({ conversation_id, senderId, receiverId, text }) => {
-            const user = getUser(receiverId);
+        socket.on("send-message", ({ conversation_id, sender_id, receiver_id, text_message }) => {
+            const user = getUser(receiver_id);
             if (user === null || user === void 0 ? void 0 : user.socketId) {
-                socket.to(user.socketId).emit("getMessage", {
+                socket.to(user.socketId).emit("get-message", {
                     conversation_id,
-                    senderId,
-                    text,
+                    sender_id,
+                    text_message,
                 });
             }
             ;

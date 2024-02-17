@@ -19,25 +19,24 @@ const removeUser = (socketId: any) => {
 };
 
 const getUser = (userId: any) => {
+  console.log("getUser: ", userId);
   return users.find((user) => user.userId === userId);
 };
 
 function socketController() {
-  socketIO.on("connection", (socket: Socket) => {
-
-    socket.on("addUser", (userId:string) => {
+  socketIO.on("connect", (socket: Socket) => {
+    socket.on("add-user", (userId:string) => {
       addUser(userId, socket.id);
-      socket.emit("getUsers", users);
+      socket.emit("get-users", users);
     });
 
-    socket.on("sendMessage", ({ conversation_id, senderId, receiverId, text }) => {
-      const user = getUser(receiverId);
-     
+    socket.on("send-message", ({ conversation_id, sender_id, receiver_id, text_message }) => {
+      const user = getUser(receiver_id);
       if(user?.socketId){
-         socket.to(user.socketId).emit("getMessage", {
+         socket.to(user.socketId).emit("get-message", {
            conversation_id,
-           senderId,
-           text,
+           sender_id,
+           text_message,
          });
       };
     });
