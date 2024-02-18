@@ -1,15 +1,9 @@
-type Person = {
-  user_id: string;
-  username: string;
-  first_name: string;
-  last_name: string;
-  avatar_url: string;
-};
+import { PersonType } from "./types";
 
-interface IEOpenConversation extends Person {
+interface IEOpenConversation extends PersonType {
   conversation_id: number;
   user_one: number;
   user_two: number;
 }
 
-export type { Person, IEOpenConversation };
+export type { IEOpenConversation };

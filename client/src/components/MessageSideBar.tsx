@@ -1,6 +1,5 @@
 import ChatHeader from './ChatHeader';
 import ChatHistory from './ChatHistory';
-import { Person } from '../interfaces/interface';
 import { useGetAllChatsQuery } from "../redux/api/ChatApi";
 import { IEOpenConversation } from "../interfaces/interface";
 
