@@ -1,67 +1,89 @@
-
-
-import { useEffect, useState } from 'react'
-import { useLoginMutation } from '../redux/api/AuthApi';
+import { useEffect, useState, useRef } from "react";
 import PublicRoute from "./PublicRoute";
 import PrivateRoute from "./PrivateRoute";
-import { useAppSelector } from '../redux/hooks/hooks';
+
 import useSocket from '../hooks/useSocketIO';
+import useFetchFeed from '../hooks/useFetchFeed';
+import useFetchFeedOnScroll from '../hooks/useFetchFeedOnScroll';
+
+import { useLoginMutation } from '../redux/api/AuthApi';
+import { useGetUserDataQuery } from "../redux/api/UserApi";
+import { useGetTotalFeedQuery, useGetUserFeedMutation } from '../redux/api/FeedApi';
 
 function RouteIndex() {
   const [route, setRoute] = useState<any>(null);
-  const authToken = useAppSelector((state) => state.auth.authToken);
-   const socket = useSocket("ws://localhost:8900");
+  const socket = useSocket("ws://localhost:8900");
   const { onConnection, onDisconnect } = socket;
+  
+  const feedRef = useRef<HTMLDivElement | null>(null);
+  const [feeds, setFeeds] = useState<any>({ feed: [] });
+
+  // SERVICES
+  const userApiData = useGetUserDataQuery();
+  const userTotalFeedApi = useGetTotalFeedQuery({});
+  const [getUserFeed, getUserFeedApi] = useGetUserFeedMutation();
+  const [, loginApiData] = useLoginMutation({ fixedCacheKey: "shared-update-post" });
+
+  const { addFeedTrigger } = useFetchFeedOnScroll({
+    feedRef,
+    feeds,
+    getUserFeed,
+    getTotalFeed: userTotalFeedApi.refetch,
+    totalFeedApiData: userTotalFeedApi.data,
+  });
+  
+  useFetchFeed({
+    addFeedTrigger,
+    getUserFeedApi,
+    getUserFeed,
+    setFeeds,
+  });
 
   useEffect(() => {
     onConnection();
     return () => {
       onDisconnect();
-    }
-  }, [])
-
-  const [
-    login,
-    {
-      data: loginApiData,
-      isLoading: isLoginLoading,
-      isError: isLoginError,
-      error: loginError,
-    },
-  ] = useLoginMutation({ fixedCacheKey: "shared-update-post" }); 
+    };
+  }, []);
 
   useEffect(() => {
+    if(
+        userApiData.isLoading || 
+        loginApiData.isLoading || 
+        getUserFeedApi.isLoading
+      ) return;
+      
     const LOGIN_STATUS = "Login successfully";
     const sessionToken = sessionStorage.getItem("token");
 
-    if (isLoginLoading) return;
-
-    if (isLoginError) {
-      console.log("LOGIN ERROR: ", loginError);
+    if (loginApiData.isError || userApiData.isError) {
+      console.log("LOGIN ERROR: ", loginApiData.error);
+      console.log("USER API ERROR: ", userApiData.error);
       setRoute(PublicRoute());
       return;
     }
 
-    if (loginApiData?.message === LOGIN_STATUS) {
-      sessionStorage.setItem("token", loginApiData.token);
-      setRoute(PrivateRoute({ socket }));
-      return;
-    }
-
-    // Check for existing tokens
-    const result = [authToken, sessionToken].some(
-      (item) => item !== null && item !== undefined && item !== ""
-    );
-
-    if (result) {
-      setRoute(PrivateRoute({ socket }));
-    } else {
-      setRoute(PublicRoute());
+    const ARGUMENT = {
+      socket,
+      feedRef,
+      feeds,
+      isFeedApiLoading: getUserFeedApi.isLoading,
+      isFeedTotalApiLoading: userTotalFeedApi.isLoading,
     };
 
-  }, [loginApiData, authToken, isLoginLoading, isLoginError, loginError]);
-  
-  return route;
+    if (loginApiData.data?.message === LOGIN_STATUS) {
+      sessionStorage.setItem("token", loginApiData.data.token);
+      setRoute(PrivateRoute(ARGUMENT));
+      return;
+    }
+
+    if (sessionToken) setRoute(PrivateRoute(ARGUMENT));
+    else setRoute(PublicRoute());
+
+    // added feeds.feed as an dependency to update its value for the PrivateRoute
+  }, [loginApiData, userApiData, getUserFeedApi, feeds.feed]);
+
+  return { route };
 };
 
 export default RouteIndex;
