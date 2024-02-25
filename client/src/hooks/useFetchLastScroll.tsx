@@ -6,7 +6,13 @@ type useFetchLastScrollProps = {
 };
 
 function useFetchLastScroll({ feedRef, feeds }: useFetchLastScrollProps) {
+
   useEffect(() => {
+    requestAnimationFrame(() => {
+      const scrollPosition = sessionStorage.getItem("scrollPosition");
+      feedRef.current?.scrollTo(0, parseInt(scrollPosition ?? "0"));
+    });
+    
     const onScroll: EventListener = (event: Event) => {
       sessionStorage.setItem(
         "scrollPosition",
@@ -14,16 +20,10 @@ function useFetchLastScroll({ feedRef, feeds }: useFetchLastScrollProps) {
       );
     };
 
-    requestAnimationFrame(() => {
-      const scrollPosition = sessionStorage.getItem("scrollPosition");
-      feedRef.current?.scrollTo(0, parseInt(scrollPosition ?? "0"));
-      setTimeout(() => sessionStorage.removeItem("scrollPosition"), 100);
-    });
-
     const currentFeedRef = feedRef.current;
     currentFeedRef?.addEventListener("scroll", onScroll);
     return () => currentFeedRef?.removeEventListener("scroll", onScroll);
-  }, [feedRef, feeds.feed]);
+  }, [feedRef.current, feeds.feed]);
 }
 
 export default useFetchLastScroll

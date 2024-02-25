@@ -9,16 +9,20 @@ type PrivateRouteProps = {
   socket: any;
   feedRef: React.MutableRefObject<HTMLDivElement | null>;
   feeds: { feed: any[] };
-  isFeedApiLoading: boolean;
-  isFeedTotalApiLoading: boolean;
+  userTotalFeedApi: any;
+  userFeedApi:any;
+  fetchUserFeed: any;
+  setAddFeedTrigger: any;
 };
 
 function PrivateRoute({
   socket,
   feedRef,
   feeds,
-  isFeedApiLoading,
-  isFeedTotalApiLoading,
+  userFeedApi,
+  fetchUserFeed,
+  userTotalFeedApi,
+  setAddFeedTrigger
 }: PrivateRouteProps) {
   const Redirect = () => <Navigate to="/" replace />;
   const PUBLIC_PATH: any[] = ["/login", "/register", "/reset"];
@@ -30,9 +34,11 @@ function PrivateRoute({
         element={
           <Feed
             feeds={feeds}
-            feedRef={feedRef}
-            isFeedApiLoading={isFeedApiLoading}
-            isFeedTotalApiLoading={isFeedTotalApiLoading}
+            ref={feedRef}
+            userFeedApi={userFeedApi}
+            userTotalFeedApi={userTotalFeedApi}
+            fetchUserFeed={fetchUserFeed}
+            setAddFeedTrigger={setAddFeedTrigger}
           />
         }
       />

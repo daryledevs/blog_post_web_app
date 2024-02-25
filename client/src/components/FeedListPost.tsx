@@ -3,9 +3,10 @@ import PostCard from './PostCard';
 
 type FeedListPostProps = {
   feeds: { feed: any[] };
+  userFeedStatus: string;
 };
 
-function FeedListPost({ feeds }: FeedListPostProps) {
+function FeedListPost({ feeds, userFeedStatus }: FeedListPostProps) {
   return (
     <React.Fragment>
       {feeds.feed.length ? (
@@ -16,7 +17,7 @@ function FeedListPost({ feeds }: FeedListPostProps) {
           />
         ))
       ) : (
-        <>No Post To Show</>
+        userFeedStatus === "uninitialized" ? null : <>No Post To Show</> 
       )}
     </React.Fragment>
   );

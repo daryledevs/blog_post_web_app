@@ -3,50 +3,33 @@ import { IEPost } from '../interfaces/interface';
 
 type useFetchFeedProps = {
   addFeedTrigger: string;
-  getUserFeedApi: any;
+  userFeedApi: any;
   setFeeds: React.Dispatch<React.SetStateAction<{ feed: IEPost[] }>>;
-  getUserFeed: ({ post_ids }: { post_ids: number[] }) => void;
+  fetchUserFeed: ({ post_ids }: { post_ids: number[] }) => void;
 };
 
 function useFetchFeed({
-  getUserFeedApi,
+  userFeedApi,
   addFeedTrigger,
   setFeeds, 
-  getUserFeed,
+  fetchUserFeed,
 }: useFetchFeedProps) {
   const [isPageRefresh, setIsPageRefresh] = useState<boolean>(true);
 
   useEffect(() => {
-    const currentTime = new Date();
-    const lastTime = sessionStorage.getItem("lastTime") || 0;
-    const timeDifference = Math.abs(currentTime.getTime() - new Date(lastTime).getTime());
-    const minutesDifference = Math.floor(timeDifference / 1000 / 60);
-    const isGreaterThanThreeMinutes = minutesDifference >= 3;
-
-    if (!lastTime) {
-      getUserFeed({ post_ids: [] });
-      sessionStorage.setItem("lastTime", new Date().toString());
-      return;
-    }
-
-    if (isGreaterThanThreeMinutes) {
-      getUserFeed({ post_ids: [] });
-      sessionStorage.setItem("lastTime", new Date().toString());
-      return;
-    }
-
+    if(userFeedApi.isLoading) return;
+    
     if(isPageRefresh) {
-      getUserFeed({ post_ids: [] });
+      fetchUserFeed({ post_ids: [] });
       sessionStorage.setItem("lastTime", new Date().toString());
       setIsPageRefresh(false);
       return;
     }
-    
-    if (!getUserFeedApi.data) return;
+  
     setFeeds((prev: any) => {
-      return { feed: [...prev.feed, ...getUserFeedApi.data?.feed] };
+      return { feed: [...prev.feed, ...userFeedApi.data?.feed] };
     });
-  }, [addFeedTrigger, getUserFeedApi.data]);
+  }, [addFeedTrigger, userFeedApi]);
 }
 
 export default useFetchFeed
