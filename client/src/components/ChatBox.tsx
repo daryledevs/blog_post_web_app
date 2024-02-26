@@ -6,13 +6,14 @@ import useFetchMessage from "../hooks/useFetchMessage";
 import ChatBoxSubmission from "./ChatBoxSubmission";
 import ChatBoxMessageList from "./ChatBoxMessageList";
 import useSendMessageHandler from "../hooks/useSendMessage";
+import SocketService from "../services/SocketServices";
 
 interface IEChatProps {
   openConversation: IEOpenConversation;
-  socket: any;
+  socketService: SocketService;
 }
 
-function ChatBox({ openConversation, socket }: IEChatProps) {
+function ChatBox({ openConversation, socketService }: IEChatProps) {
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const messageRef = useRef<HTMLDivElement>(null);
 
@@ -23,20 +24,18 @@ function ChatBox({ openConversation, socket }: IEChatProps) {
   // trigger
   const [clearMessage, setClearMessage] = useState<boolean>(false);
 
-  // custom hooks=
-  const { sendMessage } = socket;
+  // custom hooks
   useAdjustInputHeight({ inputRef, newMessage, clearMessage })
-  const { comingMessage, setComingMessage, isLoading } = useFetchMessage({ socket, openConversation });
+  const { comingMessage, setComingMessage, isLoading } = useFetchMessage({ socketService, openConversation });
 
   const sendMessageHandler = useSendMessageHandler({
     userDataApi: userDataApi.data?.user,
     openConversation,
     clearMessage,
+    newMessage,
+    socketService,
     setClearMessage,
     setComingMessage,
-    newMessage,
-    setNewMessage,
-    sendMessage,
   });
 
   useEffect(() => {

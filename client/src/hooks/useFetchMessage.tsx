@@ -1,21 +1,27 @@
 import { useState, useEffect } from 'react'
 import { MessageType } from '../interfaces/types'
 import { useLazyGetChatMessagesQuery } from '../redux/api/ChatApi';
+import { IEOpenConversation } from '../interfaces/interface';
+import SocketService from '../services/SocketServices';
 
-function useFetchMessage({ socket, openConversation }:any) {
+type useFetchMessageProps = {
+  socketService: SocketService;
+  openConversation: IEOpenConversation;
+}
+
+function useFetchMessage({ socketService, openConversation }: useFetchMessageProps) {
   const [comingMessage, setComingMessage] = useState<MessageType[] | null[]>([]);
   const [getChatMessages, allChatMessages] = useLazyGetChatMessagesQuery();
-  const { onMessageReceived } = socket;
 
   useEffect(() => {
     getChatMessages({ conversation_id: openConversation.conversation_id });
   }, [getChatMessages, openConversation.conversation_id]);
 
   useEffect(() => {
-    onMessageReceived((message: any) => {
+    socketService.onMessageReceived((message: any) => {
       setComingMessage((prev: any) => [...prev, { ...message }]);
     });
-  }, [onMessageReceived]);
+  }, [socketService]);
 
   useEffect(() => {
     if (allChatMessages.data) {

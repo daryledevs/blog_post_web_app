@@ -5,20 +5,19 @@ import MessageSideBar from "../components/MessageSideBar";
 import MessageChatBox from "../components/MessageChatBox";
 import { IEOpenConversation } from "../interfaces/interface";
 import { useGetUserDataQuery } from "../redux/api/UserApi";
+import SocketService from "../services/SocketServices";
 
-function Message({ socket }: any) {
+function Message({ socketService }: { socketService: SocketService }) {
   const [openConversation, setOpenConversation] = useState<IEOpenConversation | null>(null);
   const [switchAccountTrggr, setSwitchAccountTrggr] = useState<boolean>(false);
   const [newMessageTrgger, setNewMessageTrgger] = useState<boolean>(false);
   const userApiData = useGetUserDataQuery();
-
-  const { addUserId } = socket;
   const useDataApi = useGetUserDataQuery();
 
   useEffect(() => {
     if (!useDataApi.data) return;
-    addUserId(useDataApi.data.user.user_id);
-  }, [addUserId, useDataApi.data])
+    socketService.addUserId(useDataApi.data.user.user_id);
+  }, [socketService, useDataApi.data]);
 
   if (userApiData.isLoading || !userApiData.data) return null;
 
@@ -45,7 +44,7 @@ function Message({ socket }: any) {
           />
           <MessageChatBox
             openConversation={openConversation}
-            socket={socket}
+            socketService={socketService}
           />
         </div>
       </div>

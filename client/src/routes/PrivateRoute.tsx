@@ -4,9 +4,10 @@ import Feed from '../pages/Feed';
 import Index from '../pages/Index';
 import Message from '../pages/Message';
 import Explore from '../pages/Explore';
+import SocketService from '../services/SocketServices';
 
 type PrivateRouteProps = {
-  socket: any;
+  socketService: SocketService;
   feedRef: React.MutableRefObject<HTMLDivElement | null>;
   feeds: { feed: any[] };
   userTotalFeedApi: any;
@@ -16,7 +17,7 @@ type PrivateRouteProps = {
 };
 
 function PrivateRoute({
-  socket,
+  socketService,
   feedRef,
   feeds,
   userFeedApi,
@@ -43,7 +44,7 @@ function PrivateRoute({
         }
       />
       <Route path="/:username" element={<Profile />} />
-      <Route path="/message" element={<Message socket={socket} />} />
+      <Route path="/message" element={<Message socketService={socketService} />} />
       <Route path="/explore" element={<Explore />} />
       {PUBLIC_PATH.map((path: any, index:number) => (
         <Route

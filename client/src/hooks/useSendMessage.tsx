@@ -1,14 +1,25 @@
 import { useCallback } from 'react';
+import { MessageType } from '../interfaces/types';
+
+type useSendMessageHandlerProps = {
+  userDataApi: any;
+  openConversation: any;
+  clearMessage: boolean;
+  socketService: any;
+  newMessage: any;
+  setComingMessage: React.Dispatch<React.SetStateAction<Array<any>>>;
+  setClearMessage: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
 function useSendMessageHandler({
   userDataApi,
   openConversation,
   clearMessage,
-  sendMessage,
+  socketService,
   setComingMessage,
   setClearMessage,
   newMessage,
-}: any) {
+}: useSendMessageHandlerProps) {
   // returning it, to make an instance of this function
   return useCallback(() => {
     if (!newMessage?.text_message) return;
@@ -25,8 +36,8 @@ function useSendMessageHandler({
 
     const { receiver_id: _, ...rest } = data;
 
-    sendMessage(data);
-    setComingMessage((prev: any) => [...prev, { ...rest }]);
+    socketService.sendMessage(data);
+    setComingMessage((prev: MessageType[]) => [...prev, { ...rest }]);
     setClearMessage(!clearMessage);
   }, [newMessage, userDataApi, openConversation, clearMessage]);
 }

@@ -5,14 +5,15 @@ import { useGetUserDataQuery } from '../redux/api/UserApi';
 import { useGetTotalFeedQuery, useGetUserFeedMutation } from '../redux/api/FeedApi';
 import { useLoginMutation } from '../redux/api/AuthApi';
 import useFetchFeed from './useFetchFeed';
+import SocketService from '../services/SocketServices';
 
-type useFetchRouterProps = { 
-  socket: any; 
-  setRoute: any; 
-}
+type useFetchRouterProps = {
+  socketService: SocketService;
+  setRoute: any;
+};
 
 function useFetchRouter({
-  socket,
+  socketService,
   setRoute,
 }: useFetchRouterProps) {
   const [feeds, setFeeds] = useState<any>({ feed: [] });
@@ -44,7 +45,7 @@ function useFetchRouter({
     }
 
     const ARGUMENT = {
-      socket,
+      socketService,
       feedRef,
       feeds,
       userFeedApi,

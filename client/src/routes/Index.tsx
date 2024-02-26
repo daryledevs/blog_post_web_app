@@ -1,23 +1,22 @@
 import { useEffect, useState } from "react";
-import useSocket from '../hooks/useSocketIO';
+import SocketService from "../services/SocketServices";
 import useFetchRouter from "../hooks/useFetchRouter";
 
 function RouteIndex() {
   const [route, setRoute] = useState<any>(null);
-  const socket = useSocket("ws://localhost:8900");
-  const { onConnection, onDisconnect } = socket;
+  const socketService = new SocketService("ws://localhost:8900");
   
   useEffect(() => {
-    onConnection();
+    socketService.onConnection();
     return () => {
-      onDisconnect();
+     socketService.onDisconnect();
     };
   }, []);
 
   useFetchRouter({
-    socket,
+    socketService,
     setRoute,
-  })
+  });
 
   return { route };
 };

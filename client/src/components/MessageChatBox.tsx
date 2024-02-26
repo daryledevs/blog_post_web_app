@@ -1,19 +1,19 @@
-import React from 'react'
 import ChatBox from "./ChatBox";
 import { IEOpenConversation } from "../interfaces/interface";
+import SocketService from '../services/SocketServices';
 
 type MessageChatBoxProps = {
   openConversation: IEOpenConversation | null;
-  socket: any;
+  socketService: SocketService;
 };
 
-function MessageChatBox({ openConversation, socket }: MessageChatBoxProps) {
+function MessageChatBox({ openConversation, socketService }: MessageChatBoxProps) {
   return (
     <div className="message__conversation-container">
       {openConversation ? (
         <ChatBox
           openConversation={openConversation}
-          socket={socket}
+          socketService={socketService}
         />
       ) : (
         <p className="message__not-viewed">
