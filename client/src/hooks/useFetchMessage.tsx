@@ -15,25 +15,22 @@ function useFetchMessage({ socketService, openConversation }: useFetchMessagePro
 
   useEffect(() => {
     getChatMessages({ conversation_id: openConversation.conversation_id });
-  }, [getChatMessages, openConversation.conversation_id]);
 
-  useEffect(() => {
     socketService.onMessageReceived((message: any) => {
       setComingMessage((prev: any) => [...prev, { ...message }]);
     });
-  }, [socketService]);
-
-  useEffect(() => {
-    if (allChatMessages.data) {
-      setComingMessage(allChatMessages?.data?.chats);
-    }
-  }, [allChatMessages]);
+  }, [getChatMessages, openConversation.conversation_id, socketService]);
 
   useEffect(() => {
     if (allChatMessages.error) {
-      console.log(allChatMessages.error);
+      console.error(allChatMessages.error);
+      return;
     }
-  }, [allChatMessages.error]);
+
+    if (allChatMessages.data) {
+      setComingMessage(allChatMessages?.data?.chats);
+    }
+  }, [allChatMessages, allChatMessages.error]);
 
   return { comingMessage, setComingMessage, isLoading: allChatMessages.isLoading, };
 }

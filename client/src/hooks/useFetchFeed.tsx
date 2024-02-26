@@ -17,7 +17,7 @@ function useFetchFeed({
   const [isPageRefresh, setIsPageRefresh] = useState<boolean>(true);
 
   useEffect(() => {
-    if(userFeedApi.isLoading) return;
+    if(userFeedApi.isLoading || !userFeedApi.data) return;
     
     if(isPageRefresh) {
       fetchUserFeed({ post_ids: [] });
@@ -27,7 +27,7 @@ function useFetchFeed({
     }
   
     setFeeds((prev: any) => {
-      return { feed: [...prev.feed, ...userFeedApi.data?.feed] };
+      return { feed: [...prev?.feed, ...userFeedApi.data?.feed] };
     });
   }, [addFeedTrigger, userFeedApi]);
 }
