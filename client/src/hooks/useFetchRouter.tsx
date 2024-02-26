@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import PublicRoute from "../routes/PublicRoute";
 import PrivateRoute from "../routes/PrivateRoute";
-import { useGetUserDataQuery } from '../redux/api/UserApi';
 import { useGetTotalFeedQuery, useGetUserFeedMutation } from '../redux/api/FeedApi';
 import { useLoginMutation } from '../redux/api/AuthApi';
 import useFetchFeed from './useFetchFeed';
@@ -21,7 +20,6 @@ function useFetchRouter({
   const [addFeedTrigger, setAddFeedTrigger] = useState<string>("not triggered yet");
 
   // SERVICES
-  const userApiData = useGetUserDataQuery();
   const userTotalFeedApi = useGetTotalFeedQuery({});
   const [fetchUserFeed, userFeedApi] = useGetUserFeedMutation();
   const [, loginApiData] = useLoginMutation({ fixedCacheKey: "shared-update-post" });
@@ -37,9 +35,8 @@ function useFetchRouter({
     const LOGIN_STATUS = "Login successfully";
     const sessionToken = sessionStorage.getItem("token");
 
-    if (loginApiData.isError || userApiData.isError) {
+    if (loginApiData.isError) {
       console.log("LOGIN ERROR: ", loginApiData.error);
-      console.log("USER API ERROR: ", userApiData.error);
       setRoute(PublicRoute());
       return;
     }
