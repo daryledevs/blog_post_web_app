@@ -10,7 +10,6 @@ import cookieParser from 'cookie-parser';
 import socketController from "./socket";
 import chatRoutes from "./router/chat";
 import postRouter from "./router/post";
-import likeRouter from "./router/like";
 import feedRouter from "./router/feed";
 import corsOptions from "./config/corsOption";
 import tokenHandler from "./middleware/tokenHandler";
@@ -36,7 +35,6 @@ app.use(`${API}/`, authRoutes);
 app.use(`${API}/chats`, chatRoutes);
 app.use(`${API}/users`, userRoutes);
 app.use(`${API}/posts`, postRouter);
-app.use(`${API}/likes`, likeRouter);
 app.use(`${API}/feeds`, feedRouter);
 
 database.connect((error) => {
