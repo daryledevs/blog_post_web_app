@@ -8,6 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev src/index.ts",
     "build": "tsc",
+    "clean": "rimraf dist",
     "start:dev": "SET NODE_ENV=development && nodemon dist",
     "start:prod": "SET NODE_ENV=production && nodemon dist"
   },
