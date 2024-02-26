@@ -1,9 +1,15 @@
 import express from "express";
-import { findUser, findUsername, userData } from "../controller/user";
+import {
+  toggleFollow,
+  getFollowLists,
+  getUserData,
+  getFollowStats,
+} from "../controller/user";
 const router = express.Router();
 
-router.get("/", userData);
-router.get("/search/:person", findUser);
-router.get("/:username", findUsername);
+router.get("/", getUserData);
+router.get("/:user_id/follows/stats", getFollowStats);
+router.get("/:user_id/follows/:followed_id", toggleFollow);
+router.post("/:user_id/follows/lists", getFollowLists);
 
 export default router;

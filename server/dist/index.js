@@ -39,7 +39,6 @@ const socket_1 = __importDefault(require("./socket"));
 const chat_1 = __importDefault(require("./router/chat"));
 const post_1 = __importDefault(require("./router/post"));
 const like_1 = __importDefault(require("./router/like"));
-const follow_1 = __importDefault(require("./router/follow"));
 const feed_1 = __importDefault(require("./router/feed"));
 const corsOption_1 = __importDefault(require("./config/corsOption"));
 const tokenHandler_1 = __importDefault(require("./middleware/tokenHandler"));
@@ -63,7 +62,6 @@ app.use(`${API}/chats`, chat_1.default);
 app.use(`${API}/users`, user_1.default);
 app.use(`${API}/posts`, post_1.default);
 app.use(`${API}/likes`, like_1.default);
-app.use(`${API}/follow`, follow_1.default);
 app.use(`${API}/feeds`, feed_1.default);
 database_1.default.connect((error) => {
     if (error)
