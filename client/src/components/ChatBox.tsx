@@ -18,7 +18,7 @@ function ChatBox({ openConversation, socketService }: IEChatProps) {
   const messageRef = useRef<HTMLDivElement>(null);
 
   // data
-  const userDataApi = useGetUserDataQuery();
+  const userDataApi = useGetUserDataQuery({ person: ""});
   const [newMessage, setNewMessage] = useState<any>();
 
   // trigger

@@ -11,13 +11,12 @@ function Message({ socketService }: { socketService: SocketService }) {
   const [openConversation, setOpenConversation] = useState<IEOpenConversation | null>(null);
   const [switchAccountTrggr, setSwitchAccountTrggr] = useState<boolean>(false);
   const [newMessageTrgger, setNewMessageTrgger] = useState<boolean>(false);
-  const userApiData = useGetUserDataQuery();
-  const useDataApi = useGetUserDataQuery();
+  const userApiData = useGetUserDataQuery({ person: ""});
 
   useEffect(() => {
-    if (!useDataApi.data) return;
-    socketService.addUserId(useDataApi.data.user.user_id);
-  }, [socketService, useDataApi.data]);
+    if (!userApiData.data) return;
+    socketService.addUserId(userApiData.data.user.user_id);
+  }, [socketService, userApiData.data]);
 
   if (userApiData.isLoading || !userApiData.data) return null;
 

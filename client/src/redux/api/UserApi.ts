@@ -3,25 +3,33 @@ import { IEUserState } from "../reduxIntface";
 
 const userApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
-    getUserData: build.query<IEUserState, void>({
-      query: () => ({
-        url: "/users",
+    getUserData: build.query<IEUserState, { person?: string }>({
+      query: ({ person }) => ({
+        url: `/users?person=${person}`,
         method: "GET",
       }),
     }),
-    getFollowers: build.query<any, void>({
-      query: (user_id) => ({
-        url: `/follow/${user_id}`,
+    getFollowStats: build.query<any, { user_id: number }>({
+      query: ({ user_id }) => ({
+        url: `/users/${user_id}/follows/stats`,
         method: "GET",
       }),
     }),
-    getFollowCount: build.query<any, void>({
-      query: (user_id) => ({
-        url: `/follow/count/${user_id}`,
-        method: "GET",
+    getFollowLists: build.mutation<
+      {
+        user_id: number;
+        follower_ids: Array<number>;
+        following_ids: Array<number>;
+      },
+      any
+    >({
+      query: ({ user_id, follower_ids, following_ids }) => ({
+        url: `/users/${user_id}/follows/lists`,
+        method: "POST",
+        body: { follower_ids, following_ids },
       }),
     }),
   }),
 });
 
-export const { useGetUserDataQuery, useGetFollowersQuery, useGetFollowCountQuery } = userApi;
+export const { useGetUserDataQuery, useGetFollowListsMutation, useGetFollowStatsQuery } = userApi;

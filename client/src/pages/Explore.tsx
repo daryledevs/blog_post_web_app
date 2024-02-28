@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import GridPost from "../components/GridPost";
+import GridPost from "../components/ProfileGallery";
 import { useGetExploreFeedQuery } from "../redux/api/FeedApi";
 import { useGetUserDataQuery } from "../redux/api/UserApi";
 
@@ -21,7 +21,7 @@ function Explore() {
     isError: isUserApiError,
     error: userApiError,
     isSuccess: isUserApiSuccess,
-  } = useGetUserDataQuery();
+  } = useGetUserDataQuery({ person: ""});
 
   const {
     data: exploreApiData,

@@ -29,20 +29,10 @@ const feedApi = baseApi.injectEndpoints({
         method: "GET",
       }),
     }),
-    getUserPost: build.query<any, void>({
-      query: (user_id: any) => ({
-        url: `/posts/${user_id}`,
-        method: "GET",
-      }),
-    }),
+    
   }),
 });
 
-export const {
-  useGetUserFeedMutation,
-  useGetTotalFeedQuery,
-  useGetExploreFeedQuery,
-  useGetUserPostQuery,
-} = feedApi;
+export const { useGetUserFeedMutation, useGetTotalFeedQuery, useGetExploreFeedQuery } = feedApi;
 
 export { feedApi };
