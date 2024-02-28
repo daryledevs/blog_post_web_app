@@ -19,8 +19,8 @@ router.patch("/:post_id", editPost);
 router.delete("/:post_id", deletePost);
 
 router.get("/:post_id/likes", getLikesCountForPost);
-router.get("/:post_id/likes/:user_id/likes", checkUserLikeStatusForPost);
-router.put("/:post_id/likes/:user_id/likes", toggleUserLikeForPost);
+router.get("/:post_id/users/:user_id/likes", checkUserLikeStatusForPost);
+router.put("/:post_id/users/:user_id/likes", toggleUserLikeForPost);
 router.post("/", uploadOption.fields(option_field), newPost);
 
 export default router;
