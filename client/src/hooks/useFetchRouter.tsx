@@ -5,6 +5,7 @@ import { useGetTotalFeedQuery, useGetUserFeedMutation } from '../redux/api/FeedA
 import { useLoginMutation } from '../redux/api/AuthApi';
 import useFetchFeed from './useFetchFeed';
 import SocketService from '../services/SocketServices';
+import { useGetUserDataQuery } from '../redux/api/UserApi';
 
 type useFetchRouterProps = {
   socketService: SocketService;
@@ -23,6 +24,8 @@ function useFetchRouter({
   const userTotalFeedApi = useGetTotalFeedQuery({});
   const [fetchUserFeed, userFeedApi] = useGetUserFeedMutation();
   const [, loginApiData] = useLoginMutation({ fixedCacheKey: "shared-update-post" });
+
+  const userDataApi = useGetUserDataQuery({ person: "" });
 
   useFetchFeed({
     addFeedTrigger,
@@ -57,11 +60,17 @@ function useFetchRouter({
       return;
     }
 
-    if (sessionToken) setRoute(PrivateRoute(ARGUMENT));
-    else setRoute(PublicRoute());
+    if (sessionToken || userDataApi.data) {
+      setRoute(PrivateRoute(ARGUMENT));
+      return
+    }
+    
+    if (!userDataApi.isLoading) {
+      setRoute(PublicRoute());
+    }
 
     // added feeds.feed as an dependency to update its value for the PrivateRoute
-  }, [feeds.feed, loginApiData]);
+  }, [feeds.feed, loginApiData, userDataApi]);
 }
 
 export default useFetchRouter
