@@ -214,55 +214,59 @@
   left: 20px;
 }
 
-.grid-post__container {
+.profile-gallery__container {
   display: grid;
-  height: max-content;
-  grid-template-columns: 32% 32% 32%;
-  grid-template-rows: 300px;
-  grid-gap: 15px;
+  grid-template-columns: 33% 33% 33%;
+  grid-auto-rows: 20vw;
+  grid-gap: 1vw;
   width: 80%;
   margin: 10px auto;
   justify-content: center;
+  height: min-content;
 }
-.grid-post__container .grid-post__card {
+.profile-gallery__container .profile-gallery__card {
   position: relative;
   cursor: pointer;
 }
-.grid-post__container .grid-post__card .grid-post__image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.grid-post__container .grid-post__card .grid-post__image-hover {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: opacity 0.3s ease;
-  position: absolute;
-  top: 0;
-  left: 0;
-  background: rgb(0, 0, 0);
-}
-.grid-post__container .grid-post__card .grid-post__image-hover-details {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  inset: 0;
-  color: 0;
+.profile-gallery__container .profile-gallery__card .profile-gallery__post-container {
   display: flex;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: center center;
   justify-content: center;
   align-items: center;
-  gap: 2%;
+  gap: 1.2vw;
 }
-.grid-post__container .grid-post__card .grid-post__image-hover-details img {
-  width: 5%;
-}
-.grid-post__container .grid-post__card .grid-post__image-hover-details p {
-  font-size: 3vh;
+.profile-gallery__container .profile-gallery__card .profile-gallery__post-container .profile-gallery__hover {
+  display: none;
   color: white;
+  font-weight: bold;
 }
-.grid-post__container .grid-post__card:hover .grid-post__image {
-  opacity: 0.4;
+.profile-gallery__container .profile-gallery__card .profile-gallery__post-container .profile-gallery__hover .profile-gallery__icon-heart {
+  width: 20px;
+  margin-right: 1vw;
+}
+.profile-gallery__container .profile-gallery__card .profile-gallery__post-container .profile-gallery__hover .profile-gallery__icon-comment {
+  width: 30px;
+  height: 20px;
+  margin-right: 0.5vw;
+}
+.profile-gallery__container .profile-gallery__card .profile-gallery__post-container:hover .profile-gallery__hover {
+  display: flex;
+  position: relative;
+  z-index: 2;
+}
+.profile-gallery__container .profile-gallery__card .profile-gallery__post-container:hover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1;
 }
 
 .profile__container, .explore__container {
@@ -277,14 +281,14 @@
   justify-content: flex-start;
   padding: 1% 1% 1% 10.5%;
   width: 100%;
-  height: 250px;
+  height: min-content;
   border-bottom: 1px solid #ccc;
 }
 .profile__container .profile__header .profile__avatar-container, .explore__container .profile__header .profile__avatar-container {
   position: relative;
   border-radius: 50%;
   width: 19%;
-  height: 100%;
+  height: 30vh;
   margin-right: 1%;
   border: 1px solid black;
 }
@@ -825,4 +829,6 @@
   list-style: none;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   font-size: 16px;
-}/*# sourceMappingURL=index.css.map */
+}
+
+/*# sourceMappingURL=index.css.map */
