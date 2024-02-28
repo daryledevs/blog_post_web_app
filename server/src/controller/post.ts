@@ -6,7 +6,7 @@ dotenv.config();
 
 const getUserPost = async (req: Request, res: Response) => {
   try {
-    const { user_id } = req.params;
+    const { user_id } = req.query;
     const sql = 
     `
       SELECT 
@@ -18,7 +18,7 @@ const getUserPost = async (req: Request, res: Response) => {
             LIKES L
           WHERE
             P.POST_ID = L.POST_ID
-        ) AS "COUNT"
+        ) AS "LIKES"
       FROM
           POSTS P
       WHERE
@@ -28,6 +28,26 @@ const getUserPost = async (req: Request, res: Response) => {
     res.status(200).send({ post: data });
   } catch (error:any) {
     res.status(500).send({ message: "An error occurred", error: error.message });
+  }
+};
+
+const getUserTotalPosts = async (req: Request, res: Response) => {
+  try {
+    const { user_id } = req.query;
+    const sql = `
+      SELECT 
+        COUNT(*)
+      FROM
+          POSTS P
+      WHERE
+          P.USER_ID = (?);
+    `;
+    const [data] = await db(sql, [user_id]);
+    res.status(200).send({ totalPost: data["COUNT(*)"] });
+  } catch (error: any) {
+    res
+      .status(500)
+      .send({ message: "An error occurred", error: error.message });
   }
 };
 
@@ -154,6 +174,7 @@ const toggleUserLikeForPost = async (req: Request, res: Response) => {
 export {
   newPost,
   getUserPost,
+  getUserTotalPosts,
   editPost,
   deletePost,
   getLikesCountForPost,

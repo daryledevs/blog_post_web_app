@@ -35,14 +35,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.toggleUserLikeForPost = exports.checkUserLikeStatusForPost = exports.getLikesCountForPost = exports.deletePost = exports.editPost = exports.getUserPost = exports.newPost = void 0;
+exports.toggleUserLikeForPost = exports.checkUserLikeStatusForPost = exports.getLikesCountForPost = exports.deletePost = exports.editPost = exports.getUserTotalPosts = exports.getUserPost = exports.newPost = void 0;
 const dotenv = __importStar(require("dotenv"));
 const query_1 = __importDefault(require("../database/query"));
 const cloudinary_1 = __importDefault(require("../config/cloudinary"));
 dotenv.config();
 const getUserPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { user_id } = req.params;
+        const { user_id } = req.query;
         const sql = `
       SELECT 
         P.*,
@@ -53,7 +53,7 @@ const getUserPost = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             LIKES L
           WHERE
             P.POST_ID = L.POST_ID
-        ) AS "COUNT"
+        ) AS "LIKES"
       FROM
           POSTS P
       WHERE
@@ -67,6 +67,27 @@ const getUserPost = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.getUserPost = getUserPost;
+const getUserTotalPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { user_id } = req.query;
+        const sql = `
+      SELECT 
+        COUNT(*)
+      FROM
+          POSTS P
+      WHERE
+          P.USER_ID = (?);
+    `;
+        const [data] = yield (0, query_1.default)(sql, [user_id]);
+        res.status(200).send({ totalPost: data["COUNT(*)"] });
+    }
+    catch (error) {
+        res
+            .status(500)
+            .send({ message: "An error occurred", error: error.message });
+    }
+});
+exports.getUserTotalPosts = getUserTotalPosts;
 const newPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { user_id, caption } = req.body;

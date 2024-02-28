@@ -3,18 +3,21 @@ import uploadImage from "../middleware/multer";
 import {
   newPost,
   getUserPost,
+  getUserTotalPosts,
   editPost,
   deletePost,
   getLikesCountForPost,
   checkUserLikeStatusForPost,
   toggleUserLikeForPost,
 } from "../controller/post";
+
 const router = express.Router();
 
 const uploadOption = uploadImage("./uploads/post");
 const option_field = [ { name: "img", maxCount: 1 }, { name: "imgs", maxCount: 7 } ];
 
-router.get("/users/:user_id", getUserPost);
+router.get("/", getUserPost);
+router.get("/stats", getUserTotalPosts);
 router.patch("/:post_id", editPost);
 router.delete("/:post_id", deletePost);
 
