@@ -2,7 +2,7 @@ import burger from "../../assets/icons/hamburger.png";
 import Links from "../../assets/data/nav_links";
 import logo from "../../assets/images/dee-logo.png";
 
-import { useLocation, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import { useGetUserDataQuery } from '../../redux/api/UserApi';
 
 interface IProps {
@@ -12,21 +12,18 @@ interface IProps {
 
 function Sidebar({ clickedLink, setClickedLink }: IProps) {
   const navigate = useNavigate();
-  const { state } = useLocation();
   const userDataApi = useGetUserDataQuery({ person: "" });
 
   if (userDataApi.isLoading || !userDataApi.data) return null;
   
   const isProfile = (item:any) => {
     if (item.link === "/profile"){
-      const username = state?.username
-        ? state.username
-        : userDataApi.data?.user.username;
-        
+      const user = userDataApi.data?.user
+      const username = user.username;
       return `/${username}`;
-    } else {
-      return item.link;
-    }
+    } 
+
+    return item.link;
   }
   
   const nav_links = Links.map((item: any, index: any) => {
