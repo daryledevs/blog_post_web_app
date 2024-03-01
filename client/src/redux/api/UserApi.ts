@@ -1,4 +1,4 @@
-import baseApi from "./BaseApi";
+import baseApi from "./baseApi";
 import { IEUserState } from "../../interfaces/interface";
 
 const userApi = baseApi.injectEndpoints({

@@ -1,7 +1,7 @@
 import {  useEffect } from 'react'
 import closeModal from "../../assets/icons/close.png";
 import avatar from "../../assets/icons/avatar.png";
-import { useGetUserDataQuery } from '../../redux/api/UserApi';
+import { useGetUserDataQuery } from '../../redux/api/userApi';
 import { useAppDispatch, useAppSelector } from '../../hooks/reduxHooks';
 import { selectMessage, setSwitchAccountTrigger } from '../../redux/slices/messageSlice';
 

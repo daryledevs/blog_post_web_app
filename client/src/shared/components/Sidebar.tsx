@@ -3,7 +3,7 @@ import Links from "../../assets/data/nav_links";
 import logo from "../../assets/images/dee-logo.png";
 
 import {  useNavigate } from "react-router-dom";
-import { useGetUserDataQuery } from '../../redux/api/UserApi';
+import { useGetUserDataQuery } from '../../redux/api/userApi';
 
 interface IProps {
   clickedLink: string;

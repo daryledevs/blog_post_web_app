@@ -1,5 +1,5 @@
 import { IEPost } from "../../interfaces/interface";
-import baseApi from "./BaseApi";
+import baseApi from "./baseApi";
 
 interface IEUserFeed {
   post_ids: number[];

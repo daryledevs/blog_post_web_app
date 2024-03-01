@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import SocketService from "../services/SocketServices";
 import useFetchRouter from "../hooks/useFetchRouter";
-import { useGetUserDataQuery } from "../redux/api/UserApi";
+import { useGetUserDataQuery } from "../redux/api/userApi";
 
 function RouteIndex() {
   const [route, setRoute] = useState<any>(null);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import GridPost from "../components/ProfileGallery";
-import { useGetExploreFeedQuery } from "../redux/api/FeedApi";
-import { useGetUserDataQuery } from "../redux/api/UserApi";
+import { useGetExploreFeedQuery } from "../redux/api/feedApi";
+import { useGetUserDataQuery } from "../redux/api/userApi";
 
 type FeedApiData = {
   feed: any[]; 

@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { IEUserState } from "../interfaces/interface";
 import ProfileHeaderDetailsStats from "./ProfileHeaderDetailsStats";
-import { useGetUserTotalPostsQuery } from "../redux/api/PostApi";
-import { useGetFollowStatsQuery } from "../redux/api/UserApi";
+import { useGetUserTotalPostsQuery } from "../redux/api/postApi";
+import { useGetFollowStatsQuery } from "../redux/api/userApi";
 
 type ProfileHeaderDetailsProps = {
   user: IEUserState;

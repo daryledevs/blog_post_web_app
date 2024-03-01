@@ -1,11 +1,11 @@
 import { useEffect, useState, useRef } from 'react'
 import PublicRoute from "../routes/PublicRoute";
 import PrivateRoute from "../routes/PrivateRoute";
-import { useGetTotalFeedQuery, useGetUserFeedMutation } from '../redux/api/FeedApi';
-import { useLoginMutation } from '../redux/api/AuthApi';
+import { useGetTotalFeedQuery, useGetUserFeedMutation } from '../redux/api/feedApi';
+import { useLoginMutation } from '../redux/api/authApi';
 import useFetchFeed from './useFetchFeed';
 import SocketService from '../services/SocketServices';
-import { useGetUserDataQuery } from '../redux/api/UserApi';
+import { useGetUserDataQuery } from '../redux/api/userApi';
 
 type useFetchRouterProps = {
   socketService: SocketService;

@@ -1,8 +1,8 @@
 import ProfileGallery from "../components/ProfileGallery";
 import ProfileHeader from "../components/ProfileHeader";
 import { useLocation } from "react-router-dom";
-import { useGetUserDataQuery, } from "../redux/api/UserApi";
-import { useGetUserPostQuery, useGetUserTotalPostsQuery, } from "../redux/api/PostApi";
+import { useGetUserDataQuery, } from "../redux/api/userApi";
+import { useGetUserPostQuery, useGetUserTotalPostsQuery, } from "../redux/api/postApi";
 
 function Profile() {
   const { state } = useLocation();

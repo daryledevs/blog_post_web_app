@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useGetUserDataQuery } from "../redux/api/UserApi";
+import { useGetUserDataQuery } from "../redux/api/userApi";
 import useAdjustInputHeight from "../hooks/useAdjustInputHeight";
 import useFetchMessage from "../hooks/useFetchMessage";
 import ChatBoxSubmission from "./ChatBoxSubmission";

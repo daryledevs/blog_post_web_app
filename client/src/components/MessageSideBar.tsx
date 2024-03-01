@@ -1,6 +1,6 @@
 import ChatHeader from "./ChatHeader";
 import ChatHistory from "./ChatHistory";
-import { useGetAllChatsQuery } from "../redux/api/ChatApi";
+import { useGetAllChatsQuery } from "../redux/api/chatApi";
 
 type MessageSideBarProps = {
   user: any;

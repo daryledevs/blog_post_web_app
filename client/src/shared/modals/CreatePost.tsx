@@ -8,7 +8,7 @@ import arrow_left from "../../assets/icons/left-arrow.png";
 import { Area } from "react-easy-crop/types";
 import api from "../../config/api";
 import avatar from "../../assets/icons/avatar.png";
-import { useGetUserDataQuery } from "../../redux/api/UserApi";
+import { useGetUserDataQuery } from "../../redux/api/userApi";
 
 interface Modal {
   setClickedLink: (message: string) => void;
