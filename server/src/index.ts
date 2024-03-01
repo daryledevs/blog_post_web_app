@@ -21,6 +21,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const API = process.env.API;
 
+app.disable("x-powered-by");
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
