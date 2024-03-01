@@ -1,6 +1,6 @@
 import ProfileHeaderAvatar from "./ProfileHeaderAvatar";
 import ProfileHeaderDetails from "./ProfileHeaderDetails";
-import { IEUserState } from "../redux/reduxIntface";
+import { IEUserState } from "../interfaces/interface";
 
 type ProfileHeaderProps = {
   user: IEUserState;

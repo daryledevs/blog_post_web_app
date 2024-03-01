@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { IEUserState } from "../redux/reduxIntface";
+import { IEUserState } from "../interfaces/interface";
 import ProfileHeaderDetailsStats from "./ProfileHeaderDetailsStats";
 import { useGetUserTotalPostsQuery } from "../redux/api/PostApi";
 import { useGetFollowStatsQuery } from "../redux/api/UserApi";

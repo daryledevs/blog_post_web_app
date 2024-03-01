@@ -1,5 +1,5 @@
 import baseApi from "./BaseApi";
-import { IEUserState } from "../reduxIntface";
+import { IEUserState } from "../../interfaces/interface";
 
 const userApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
