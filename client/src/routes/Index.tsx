@@ -1,17 +1,22 @@
 import { useEffect, useState } from "react";
 import SocketService from "../services/SocketServices";
 import useFetchRouter from "../hooks/useFetchRouter";
+import { useGetUserDataQuery } from "../redux/api/UserApi";
 
 function RouteIndex() {
   const [route, setRoute] = useState<any>(null);
   const socketService = new SocketService("ws://localhost:8900");
-  
+  const userDataApi = useGetUserDataQuery({ person: "" });
+
   useEffect(() => {
-    socketService.onConnection();
+    if (userDataApi.data) {
+      socketService.addUserId(userDataApi.data.user.user_id);
+      socketService.onConnection();
+    }
     return () => {
-     socketService.onDisconnect();
+      socketService.onDisconnect();
     };
-  }, []);
+  }, [userDataApi.data]);
 
   useFetchRouter({
     socketService,
@@ -19,6 +24,6 @@ function RouteIndex() {
   });
 
   return { route };
-};
+}
 
 export default RouteIndex;
