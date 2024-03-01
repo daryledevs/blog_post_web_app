@@ -1,48 +1,30 @@
-import React, { useState, useEffect } from "react";
-import api from "../../config/api";
+import { useState, useEffect } from "react";
 import avatar from "../../assets/icons/avatar.png";
 import closeModal from "../../assets/icons/close.png";
 import Recipients from "../components/Recipients";
-import { useAppDispatch } from "../../redux/hooks/hooks";
-import { checkAccess } from "../../redux/action/auth";
-import { IEOpenConversation } from "../../interfaces/interface";
+import { selectMessage, setNewMessageTrigger, setOpenConversation } from "../../redux/slices/messageSlice";
+import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 
-interface IENewMessage {
-  newMessageTrgger: boolean;
-  setNewMessageTrgger: (value: any) => void;
-  setOpenConversation: (value: IEOpenConversation) => void;
-};
 
-function NewMessage({ newMessageTrgger, setNewMessageTrgger, setOpenConversation }: IENewMessage) {
+function NewMessage() {
+  const messages = useAppSelector(selectMessage);
   const dispatch = useAppDispatch();
+
   const [recipient, setRecipient] = useState<any>([]);
   const [search, setSearch] = useState<string>("");
   const [list, setList] = useState<any>({ people: [] });
 
-  useEffect(() => {
-    async function searchApi() {
-      try {
-        const response = await api.get(`/users/search/${search}`);
-        if(response.data.accessToken) return response;
-        setList({ people: response.data.people });
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    dispatch(checkAccess({ apiRequest: searchApi }));
-  }, [dispatch, search]);
 
   useEffect(() => {
     function handleEscapeKey(event: KeyboardEvent) {
-      if (newMessageTrgger && event.code === "Escape") {
-        setNewMessageTrgger(!newMessageTrgger);
+      if (messages.newMessageTrigger && event.code === "Escape") {
+        dispatch(setNewMessageTrigger());
       }  
     };
 
     document.addEventListener("keydown", handleEscapeKey);
     return () => document.removeEventListener("keydown", handleEscapeKey);
-  }, [newMessageTrgger, setNewMessageTrgger]);
+  }, [messages.newMessageTrigger]);
 
   function newMessageHandler(person: any) {
     if (recipient.some((item: any) => item.user_id === person.user_id)) return;
@@ -53,11 +35,11 @@ function NewMessage({ newMessageTrgger, setNewMessageTrgger, setOpenConversation
   };
 
   function newChatHandler() {
-    setOpenConversation(recipient);
-    setNewMessageTrgger(!newMessageTrgger);
+    dispatch(setOpenConversation(recipient));
+    dispatch(setNewMessageTrigger());
   }
 
-  if(!newMessageTrgger) return <></>;
+  if (!messages.newMessageTrigger) return <></>;
 
   return (
     <div className="new-message__container">
@@ -66,7 +48,7 @@ function NewMessage({ newMessageTrgger, setNewMessageTrgger, setOpenConversation
           <p>New message</p>
           <img
             src={closeModal}
-            onClick={() => setNewMessageTrgger(!newMessageTrgger)}
+            onClick={() => dispatch(setNewMessageTrigger())}
             alt=""
           />
         </div>

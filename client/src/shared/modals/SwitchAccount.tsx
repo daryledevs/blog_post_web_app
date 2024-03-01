@@ -1,28 +1,28 @@
-import React, { useState, useEffect } from 'react'
+import {  useEffect } from 'react'
 import closeModal from "../../assets/icons/close.png";
-import { useAppSelector } from '../../redux/hooks/hooks';
 import avatar from "../../assets/icons/avatar.png";
+import { useGetUserDataQuery } from '../../redux/api/UserApi';
+import { useAppDispatch, useAppSelector } from '../../hooks/reduxHooks';
+import { selectMessage, setSwitchAccountTrigger } from '../../redux/slices/messageSlice';
 
-interface IESwitchAccount {
-  switchAccountTrggr: boolean;
-  setSwitchAccountTrggr: (value: boolean) => void;
-}
-
-function SwitchAccount({ switchAccountTrggr, setSwitchAccountTrggr }: IESwitchAccount) {
-  const user = useAppSelector((state) => state.user);
+function SwitchAccount() {
+  const userDataApi = useGetUserDataQuery({ person: "" });
+  const user = userDataApi.data?.user;
+  const dispatch = useAppDispatch();
+  const messages = useAppSelector(selectMessage);
 
   useEffect(() => {
     function handleEscapeKey(event: KeyboardEvent) {
-      if (switchAccountTrggr && event.code === "Escape") {
-        setSwitchAccountTrggr(!switchAccountTrggr);
+      if (messages.switchAccountTrigger && event.code === "Escape") {
+        dispatch(setSwitchAccountTrigger());
       }
     }
 
     document.addEventListener("keydown", handleEscapeKey);
     return () => document.removeEventListener("keydown", handleEscapeKey);
-  }, [switchAccountTrggr, setSwitchAccountTrggr]);
+  }, [messages.switchAccountTrigger]);
 
-  if(!switchAccountTrggr) return null;
+  if (!messages.switchAccountTrigger || userDataApi.isLoading) return null;
 
   return (
     <div className="switch-account__container">
@@ -31,7 +31,7 @@ function SwitchAccount({ switchAccountTrggr, setSwitchAccountTrggr }: IESwitchAc
           <p>Switch Account</p>
           <img
             src={closeModal}
-            onClick={() => setSwitchAccountTrggr(!switchAccountTrggr)}
+            onClick={() => dispatch(setSwitchAccountTrigger())}
             alt=""
           />
         </div>

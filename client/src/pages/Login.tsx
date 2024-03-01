@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useLoginMutation } from '../redux/api/AuthApi';
-import { setAuthToken } from '../redux/reducer/auth';
 
 function Login() {
   const [username, setUsername] = useState("daryledevs");

@@ -1,14 +1,14 @@
-import React, { useState, useCallback, useRef, useEffect } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import close from "../../assets/icons/close-modal.png";
 import image_gallery from "../../assets/icons/image-gallery.png";
 import ImageUploading, { ImageListType } from "react-images-uploading";
 import Cropper from "react-easy-crop";
 import arrow_left from "../../assets/icons/left-arrow.png";
-import { Point, Area } from "react-easy-crop/types";
+import { Area } from "react-easy-crop/types";
 import api from "../../config/api";
-import { useAppSelector } from "../../redux/hooks/hooks";
 import avatar from "../../assets/icons/avatar.png";
+import { useGetUserDataQuery } from "../../redux/api/UserApi";
 
 interface Modal {
   setClickedLink: (message: string) => void;
@@ -25,7 +25,8 @@ function CreatePost({ setClickedLink }: Modal) {
   const win: Window = window;
 
   const { pathname } = useLocation();
-  const user = useAppSelector((state) => state.user);
+  const userDataApi = useGetUserDataQuery({ person: "" });
+  const user = userDataApi?.data?.user;
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const [next, setNext] = useState("Crop");
@@ -141,6 +142,8 @@ function CreatePost({ setClickedLink }: Modal) {
   //   document.body.classList.remove("scrollView");
   // };
   // }, []);
+
+  if(userDataApi.isLoading) return null;
 
   return (
     <div className="create-post__parent">

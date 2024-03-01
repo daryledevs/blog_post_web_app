@@ -1,27 +1,23 @@
-import React from 'react'
 import avatar from "../assets/icons/avatar.png";
 import settingIcon from "../assets/icons/setting-icon.png";
 import heartIcon_uncheck from "../assets/icons/heart_uncheck.png";
-import heartIcon_check from "../assets/icons/heart_check.png";
 import commentIcon from "../assets/icons/comment.png";
 import bookmark from "../assets/icons/bookmark.png";
 import emojiIcon from "../assets/icons/emoji-icon.png";
 import shareIcon from "../assets/icons/share.png";
-// mock post
-import user_post from "../assets/images/mock_post.jpg";
-import { useAppSelector } from '../redux/hooks/hooks';
+import { useAppSelector } from '../hooks/reduxHooks';
 
 interface IEPostCard{
   postData:any;
 }
 
 function PostCard({ postData }: IEPostCard) {
-  const follow = useAppSelector(state => state.follow);
-  const user = follow.following.find(item => item.user_id === postData.followed_id);
+  // const follow = useAppSelector(state => state.follow);
+  // const user = follow.following.find(item => item.user_id === postData.followed_id);
 
   return (
     <div className="post-card-container">
-      <div className='post-card__header'>
+      {/* <div className='post-card__header'>
         <img src={avatar} className="post-card__header-avatar" alt='user-profile-picture'/>
         <p>{user?.username}</p>
         <img src={settingIcon} className='post-card__header-settings'/>
@@ -51,7 +47,7 @@ function PostCard({ postData }: IEPostCard) {
           placeholder='Add a comment...'
         />
         <p>Post</p>
-      </div>
+      </div> */}
     </div>
   );
 }
