@@ -1,18 +1,19 @@
 import ChatBox from "./ChatBox";
-import { IEOpenConversation } from "../interfaces/interface";
 import SocketService from '../services/SocketServices';
+import { useAppSelector } from "../hooks/reduxHooks";
+import { selectMessage } from "../redux/slices/messageSlice";
 
 type MessageChatBoxProps = {
-  openConversation: IEOpenConversation | null;
   socketService: SocketService;
 };
 
-function MessageChatBox({ openConversation, socketService }: MessageChatBoxProps) {
+function MessageChatBox({ socketService }: MessageChatBoxProps) {
+  const messages = useAppSelector(selectMessage);
+
   return (
     <div className="message__conversation-container">
-      {openConversation ? (
+      {messages.openConversation ? (
         <ChatBox
-          openConversation={openConversation}
           socketService={socketService}
         />
       ) : (

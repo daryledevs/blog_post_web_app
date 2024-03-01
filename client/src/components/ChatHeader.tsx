@@ -1,27 +1,23 @@
 import downArrow from "../assets/icons/down-arrow.png";
 import newMessage from "../assets/icons/editing.png";
+import { useAppDispatch } from "../hooks/reduxHooks";
+import {
+  setNewMessageTrigger,
+  setSwitchAccountTrigger,
+} from "../redux/slices/messageSlice";
 
 type ChatHeaderProps = {
   user: any;
-  newMessageTrgger: boolean;
-  switchAccountTrggr: boolean;
-  setSwitchAccountTrggr: (value: boolean) => void;
-  setNewMessageTrgger: (value: boolean) => void;
 };
 
-function ChatHeader({
-  user,
-  switchAccountTrggr,
-  newMessageTrgger,
-  setSwitchAccountTrggr,
-  setNewMessageTrgger,
-}: ChatHeaderProps) {
-  
+function ChatHeader({ user }: ChatHeaderProps) {
+  const dispatch = useAppDispatch();
+
   return (
     <div className="chat-header__container">
       <div />
       <div
-        onClick={() => setSwitchAccountTrggr(!switchAccountTrggr)}
+        onClick={() => dispatch(setSwitchAccountTrigger())}
         className="chat-header__username"
       >
         <p>{user.username}</p>
@@ -34,11 +30,11 @@ function ChatHeader({
       <img
         alt=""
         src={newMessage}
-        onClick={() => setNewMessageTrgger(!newMessageTrgger)}
+        onClick={() => dispatch(setNewMessageTrigger())}
         className="chat-header__new-message-icon"
       />
     </div>
   );
 }
 
-export default ChatHeader
+export default ChatHeader;

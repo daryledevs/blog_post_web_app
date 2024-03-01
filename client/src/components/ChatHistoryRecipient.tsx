@@ -1,17 +1,19 @@
 import usersPicture from "../assets/icons/avatar.png";
-import { IEOpenConversation } from "../interfaces/interface";
+import { useAppDispatch } from "../hooks/reduxHooks";
+import { setOpenConversation } from "../redux/slices/messageSlice";
 
 type ChatHistoryRecipientProps = {
   chat: any;
-  setOpenConversation: (value: IEOpenConversation| null) => void;
 };
 
-function ChatHistoryRecipient({ chat, setOpenConversation }: ChatHistoryRecipientProps) {
+function ChatHistoryRecipient({ chat }: ChatHistoryRecipientProps) {
+  const dispatch = useAppDispatch();
+
   return (
     <div
       key={chat.conversation_id}
       className="chat-history__recipient"
-      onClick={() => setOpenConversation(chat)}
+      onClick={() => dispatch(setOpenConversation(chat))}
     >
       <img
         src={chat.avatar_url ? chat.avatar_url : usersPicture}
@@ -28,4 +30,4 @@ function ChatHistoryRecipient({ chat, setOpenConversation }: ChatHistoryRecipien
   );
 }
 
-export default ChatHistoryRecipient
+export default ChatHistoryRecipient;

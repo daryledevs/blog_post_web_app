@@ -1,5 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
-import { IEOpenConversation } from "../interfaces/interface";
+import { useEffect, useState, useRef } from "react";
 import { useGetUserDataQuery } from "../redux/api/UserApi";
 import useAdjustInputHeight from "../hooks/useAdjustInputHeight";
 import useFetchMessage from "../hooks/useFetchMessage";
@@ -7,15 +6,17 @@ import ChatBoxSubmission from "./ChatBoxSubmission";
 import ChatBoxMessageList from "./ChatBoxMessageList";
 import useSendMessageHandler from "../hooks/useSendMessage";
 import SocketService from "../services/SocketServices";
+import { useAppSelector } from "../hooks/reduxHooks";
+import { selectMessage } from "../redux/slices/messageSlice";
 
 interface IEChatProps {
-  openConversation: IEOpenConversation;
   socketService: SocketService;
 }
 
-function ChatBox({ openConversation, socketService }: IEChatProps) {
+function ChatBox({ socketService }: IEChatProps) {
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const messageRef = useRef<HTMLDivElement>(null);
+  const { openConversation } = useAppSelector(selectMessage);
 
   // data
   const userDataApi = useGetUserDataQuery({ person: ""});
