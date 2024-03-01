@@ -1,13 +1,10 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "target": "ESNext",
+    "isolatedModules": true,
     "useUnknownInCatchVariables": false,
-    "typeRoots" : ["node_modules/@types"],
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "typeRoots": ["node_modules/@types"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -17,13 +14,12 @@
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",
     "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "baseUrl": "./",
+    "paths": {
+      "*": ["src/*"]
+    }
   },
-  "include": [
-    "src",
-    "src/client-app-env.d.ts", 
-  ]
+  "include": ["src", "src/client-app-env.d.ts"]
 }
