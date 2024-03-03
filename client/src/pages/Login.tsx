@@ -1,32 +1,39 @@
-import React, { useState } from 'react';
-import { useLoginMutation } from '../redux/api/authApi';
+import { useLoginMutation } from "../redux/api/authApi";
+import { SubmitHandler } from "react-hook-form";
+import LoginForm from "components/LoginForm";
+import LoginErrorMessage from "components/LoginErrorMessage";
+import Instagram from "../assets/images/instagram-logo.svg?react";
+import LoginSignUpPrompt from "components/LoginSignUpPrompt";
+
+type Inputs = {
+  userCredential: string;
+  password: string;
+};
 
 function Login() {
-  const [username, setUsername] = useState("daryledevs");
-  const [password, setPassword] = useState("password123");
-  const [login] = useLoginMutation({ fixedCacheKey: "shared-update-post" }); 
+  const [login, { isError, error }] = useLoginMutation({
+    fixedCacheKey: "shared-update-post",
+  });
 
-  async function handleSubmit(event: React.FormEvent) {
-    event.preventDefault();
+  const onSubmit: SubmitHandler<Inputs> = (data) => {
+    const username = data.userCredential;
+    const password = data.password;
     login({ username, password });
-  }
+  };
 
   return (
-    <div className="login-container">
-      <form onSubmit={handleSubmit}>
-        <input
-          placeholder="Username or Email"
-          value={username}
-          onChange={(event) => setUsername(event.target.value)}
-        />
-        <input
-          placeholder="Password"
-          type="password"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-        />
-        <button type="submit">Login</button>
-      </form>
+    <div className="login__container">
+      <div className="login__wrapper">
+        <div className="login__parent">
+          <Instagram style={{ margin: "1vh 0 4vh 0" }} />
+          <LoginForm onSubmit={onSubmit} />
+          <LoginErrorMessage
+            isError={isError}
+            error={error}
+          />
+        </div>
+        <LoginSignUpPrompt />
+      </div>
     </div>
   );
 }
