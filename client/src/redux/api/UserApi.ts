@@ -15,21 +15,21 @@ const userApi = baseApi.injectEndpoints({
         method: "GET",
       }),
     }),
-    getFollowLists: build.mutation<
+    getFollowersAndFollowingLists: build.mutation<
+      any,
       {
         user_id: number;
-        follower_ids: Array<number>;
-        following_ids: Array<number>;
-      },
-      any
+        fetch: string;
+        listsId: Array<number> | number;
+      }
     >({
-      query: ({ user_id, follower_ids, following_ids }) => ({
-        url: `/users/${user_id}/follows/lists`,
+      query: ({ user_id, fetch, listsId }) => ({
+        url: `/users/${user_id}/lists?fetch=${fetch}`,
         method: "POST",
-        body: { follower_ids, following_ids },
+        body: { listsId },
       }),
     }),
   }),
 });
 
-export const { useGetUserDataQuery, useGetFollowListsMutation, useGetFollowStatsQuery } = userApi;
+export const { useGetUserDataQuery, useGetFollowersAndFollowingListsMutation,useGetFollowStatsQuery } = userApi;
