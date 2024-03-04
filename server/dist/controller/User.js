@@ -23,7 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.toggleFollow = exports.getFollowLists = exports.getFollowStats = exports.getUserData = void 0;
+exports.toggleFollow = exports.getFollowerFollowingLists = exports.getFollowStats = exports.getUserData = void 0;
 const query_1 = __importDefault(require("../database/query"));
 const getUserData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -82,13 +82,10 @@ const getFollowStats = (req, res) => __awaiter(void 0, void 0, void 0, function*
         F.FOLLOWER_ID = (?)
       GROUP BY F.FOLLOWER_ID;
     `;
-        const [data] = yield (0, query_1.default)(sql, [user_id, user_id]);
-        const followers = data[0];
-        const following = data[1];
-        res.status(200).send({
-            followers: (followers === null || followers === void 0 ? void 0 : followers.COUNT) ? followers.COUNT : 0,
-            following: (following === null || following === void 0 ? void 0 : following.COUNT) ? following.COUNT : 0,
-        });
+        const data = yield (0, query_1.default)(sql, [user_id, user_id]);
+        const { COUNT: followers } = data[0][0];
+        const { COUNT: following } = data[1][0];
+        res.status(200).send({ followers, following });
     }
     catch (error) {
         res
@@ -97,29 +94,13 @@ const getFollowStats = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.getFollowStats = getFollowStats;
-const getFollowLists = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getFollowerFollowingLists = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { user_id } = req.params;
-        const { follower_ids, following_ids } = req.body;
-        const isItEmpty = (arr) => (arr.length ? arr : 0);
-        const followers = isItEmpty(follower_ids);
-        const following = isItEmpty(following_ids);
-        const sql = `
-      SELECT 
-        F.*, 
-        U.USER_ID, 
-        U.USERNAME, 
-        U.FIRST_NAME, 
-        U.LAST_NAME, 
-        U.AVATAR_URL
-      FROM
-        FOLLOWERS F
-      INNER JOIN
-        USERS U ON F.FOLLOWER_ID = U.USER_ID
-      WHERE
-        F.FOLLOWED_ID = (?) AND F.FOLLOWER_ID NOT IN (?)
-      LIMIT 3;
-
+        const { listsId } = req.body;
+        const { fetch } = req.query;
+        const lists = listsId.length ? listsId : 0;
+        const sqlSelectFollowedId = `
       SELECT 
         F.*, 
         U.USER_ID, 
@@ -135,13 +116,25 @@ const getFollowLists = (req, res) => __awaiter(void 0, void 0, void 0, function*
         F.FOLLOWER_ID = (?) AND F.FOLLOWED_ID NOT IN (?)
       LIMIT 3;
     `;
-        const [followersData, followingData] = yield (0, query_1.default)(sql, [
-            user_id,
-            followers,
-            user_id,
-            following,
-        ]);
-        res.status(200).send({ followers: followersData, following: followingData });
+        const sqlSelectFollowerId = `
+      SELECT 
+        F.*, 
+        U.USER_ID, 
+        U.USERNAME, 
+        U.FIRST_NAME, 
+        U.LAST_NAME, 
+        U.AVATAR_URL
+      FROM
+        FOLLOWERS F
+      INNER JOIN
+        USERS U ON F.FOLLOWER_ID = U.USER_ID
+      WHERE
+        F.FOLLOWED_ID = (?) AND F.FOLLOWER_ID NOT IN (?)
+      LIMIT 3;
+    `;
+        const sql = fetch === "followers" ? sqlSelectFollowerId : sqlSelectFollowedId;
+        const data = yield (0, query_1.default)(sql, [user_id, lists]);
+        res.status(200).send({ lists: data });
     }
     catch (error) {
         res
@@ -149,7 +142,7 @@ const getFollowLists = (req, res) => __awaiter(void 0, void 0, void 0, function*
             .send({ message: "An error occurred", error: error.message });
     }
 });
-exports.getFollowLists = getFollowLists;
+exports.getFollowerFollowingLists = getFollowerFollowingLists;
 const toggleFollow = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let { user_id, followed_id } = req.params;

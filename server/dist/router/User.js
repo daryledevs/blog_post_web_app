@@ -9,5 +9,5 @@ const router = express_1.default.Router();
 router.get("/", user_1.getUserData);
 router.get("/:user_id/follows/stats", user_1.getFollowStats);
 router.get("/:user_id/follows/:followed_id", user_1.toggleFollow);
-router.post("/:user_id/follows/lists", user_1.getFollowLists);
+router.post("/:user_id/lists", user_1.getFollowerFollowingLists);
 exports.default = router;

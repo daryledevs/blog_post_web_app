@@ -60,14 +60,11 @@ const getFollowStats = async (req: Request, res: Response) => {
       GROUP BY F.FOLLOWER_ID;
     `;
 
-    const [data] = await db(sql, [user_id, user_id]);
-    const followers = data[0];
-    const following = data[1];
+    const data = await db(sql, [user_id, user_id]);
+    const { COUNT: followers } = data[0][0];
+    const { COUNT: following } = data[1][0];
 
-    res.status(200).send({
-      followers: followers?.COUNT ? followers.COUNT : 0,
-      following: following?.COUNT ? following.COUNT : 0,
-    });
+    res.status(200).send({ followers, following});
   } catch (error: any) {
     res
       .status(500)
@@ -75,31 +72,14 @@ const getFollowStats = async (req: Request, res: Response) => {
   }
 };
 
-const getFollowLists = async (req: Request, res: Response) => {
+const getFollowerFollowingLists = async (req: Request, res: Response) => {
   try {
     const { user_id } = req.params;
-    const { follower_ids, following_ids } = req.body;
-    
-    const isItEmpty = (arr: any) => (arr.length ? arr : 0);
-    const followers = isItEmpty(follower_ids);
-    const following = isItEmpty(following_ids);
+    const { listsId } = req.body;
+    const { fetch } = req.query;
+    const lists = listsId.length ? listsId : 0;
 
-    const sql = `
-      SELECT 
-        F.*, 
-        U.USER_ID, 
-        U.USERNAME, 
-        U.FIRST_NAME, 
-        U.LAST_NAME, 
-        U.AVATAR_URL
-      FROM
-        FOLLOWERS F
-      INNER JOIN
-        USERS U ON F.FOLLOWER_ID = U.USER_ID
-      WHERE
-        F.FOLLOWED_ID = (?) AND F.FOLLOWER_ID NOT IN (?)
-      LIMIT 3;
-
+    const sqlSelectFollowedId = `
       SELECT 
         F.*, 
         U.USER_ID, 
@@ -116,20 +96,32 @@ const getFollowLists = async (req: Request, res: Response) => {
       LIMIT 3;
     `;
 
-    const [followersData, followingData] = await db(sql, [
-      user_id,
-      followers,
-      user_id,
-      following,
-    ]);
-
-    res.status(200).send({ followers: followersData, following: followingData });
-  } catch (error: any) {
+    const sqlSelectFollowerId = `
+      SELECT 
+        F.*, 
+        U.USER_ID, 
+        U.USERNAME, 
+        U.FIRST_NAME, 
+        U.LAST_NAME, 
+        U.AVATAR_URL
+      FROM
+        FOLLOWERS F
+      INNER JOIN
+        USERS U ON F.FOLLOWER_ID = U.USER_ID
+      WHERE
+        F.FOLLOWED_ID = (?) AND F.FOLLOWER_ID NOT IN (?)
+      LIMIT 3;
+    `;
+    
+    const sql = fetch === "followers" ? sqlSelectFollowerId : sqlSelectFollowedId;
+    const data = await db(sql, [user_id, lists]);
+    res.status(200).send({ lists: data });
+  } catch (error:any) {
     res
       .status(500)
       .send({ message: "An error occurred", error: error.message });
   }
-};
+}
 
 const toggleFollow = async (req: Request, res: Response) => {
   try {
@@ -168,4 +160,4 @@ const toggleFollow = async (req: Request, res: Response) => {
   }
 };
 
-export { getUserData, getFollowStats, getFollowLists, toggleFollow };
+export { getUserData, getFollowStats, getFollowerFollowingLists, toggleFollow };
