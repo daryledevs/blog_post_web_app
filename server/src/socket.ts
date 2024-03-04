@@ -3,7 +3,11 @@ import { Socket } from "socket.io";
 
 const socketIO = new Server(8900, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: [
+      `${process.env.SERVER_URL_ONE}`,
+      `${process.env.SERVER_URL_TWO}`,
+      `${process.env.SERVER_URL_THREE}`,
+    ],
   },
 });
 

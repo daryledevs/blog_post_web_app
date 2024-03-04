@@ -3,7 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const socket_io_1 = require("socket.io");
 const socketIO = new socket_io_1.Server(8900, {
     cors: {
-        origin: "http://localhost:3000",
+        origin: [
+            `${process.env.SERVER_URL_ONE}`,
+            `${process.env.SERVER_URL_TWO}`,
+            `${process.env.SERVER_URL_THREE}`,
+        ],
     },
 });
 let users = [];
