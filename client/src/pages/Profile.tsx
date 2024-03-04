@@ -1,6 +1,7 @@
+import React from "react";
 import ProfileGallery from "../components/ProfileGallery";
 import ProfileHeader from "../components/ProfileHeader";
-import { useLocation } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { useGetUserDataQuery, } from "../redux/api/userApi";
 import { useGetUserPostQuery, useGetUserTotalPostsQuery, } from "../redux/api/postApi";
 
@@ -28,10 +29,13 @@ function Profile() {
     return null;
 
   return (
-    <div className="profile__container">
-      <ProfileHeader user={userDataApi.data.user} />
-      <ProfileGallery posts={postDataApi.data} />
-    </div>
+    <React.Fragment>
+      <Outlet />
+      <div className="profile__container">
+        <ProfileHeader user={userDataApi.data.user} />
+        <ProfileGallery posts={postDataApi.data} />
+      </div>
+    </React.Fragment>
   );
 }
 

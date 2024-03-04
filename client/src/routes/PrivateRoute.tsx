@@ -5,6 +5,7 @@ import Index from '../pages/Index';
 import Message from '../pages/Message';
 import Explore from '../pages/Explore';
 import SocketService from '../services/SocketServices';
+import FollowModal from 'shared/modals/FollowModal';
 
 type PrivateRouteProps = {
   socketService: SocketService;
@@ -43,9 +44,12 @@ function PrivateRoute({
           />
         }
       />
-      <Route path="/:username" element={<Profile />} />
+      <Route path="/:username/" element={<Profile />}>
+        <Route path="followers" element={<FollowModal />} />
+        <Route path="following" element={<FollowModal />} />
+      </Route>
       <Route path="/message" element={<Message socketService={socketService} />} />
-      <Route path="/explore" element={<Explore />} />
+      <Route path="/explore" element={<Explore />} /> 
       {PUBLIC_PATH.map((path: any, index:number) => (
         <Route
           key={index}

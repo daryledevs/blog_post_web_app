@@ -12,7 +12,7 @@ function ProfileHeaderDetails({ user }: ProfileHeaderDetailsProps) {
   const navigate = useNavigate();
   const totalPostsApi = useGetUserTotalPostsQuery({ user_id: user.user_id });
   const followStatsDataApi = useGetFollowStatsQuery({ user_id: user.user_id });
-  
+  const navigateHandler = (path: string, fetch: string, username:string) => navigate(path, { state: { fetch, username } })
   if(totalPostsApi.isLoading || totalPostsApi.isLoading) return null;
   
   return (
@@ -27,13 +27,19 @@ function ProfileHeaderDetails({ user }: ProfileHeaderDetailsProps) {
         <ProfileHeaderDetailsStats
           count={followStatsDataApi.data?.followers}
           label="Followers"
-          onClick={() => null}
+          onClick={() => {
+            const path = `/${user.username}/followers`;
+            navigateHandler(path, "followers", user.username);
+          }}
           styles={{ cursor: "pointer" }}
         />
         <ProfileHeaderDetailsStats
           count={followStatsDataApi.data?.following}
           label="Following"
-          onClick={() => navigate("/admin", { state: { username: "admin" } })}
+          onClick={() => {
+            const path = `/${user.username}/following`;
+            navigateHandler(path, "following", user.username);
+          }}
           styles={{ cursor: "pointer" }}
         />
       </div>
