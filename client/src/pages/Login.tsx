@@ -16,9 +16,9 @@ function Login() {
   });
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    const username = data.userCredential;
+    const userCredential = data.userCredential;
     const password = data.password;
-    login({ username, password });
+    login({ userCredential, password });
   };
 
   return (

@@ -36,13 +36,14 @@ const register = async (req: Request, res: Response) => {
 
 const login = async (req: Request, res: Response) => {
   try {
-    const { username, email, password } = req.body;
-    const isMissing = (!req.body || (!username && !email) || !password);
+    const { userCredential, password } = req.body;
+    const isMissing = !req.body || !userCredential || !password;
+    
     const sql = "SELECT * FROM USERS WHERE (USERNAME = ? OR EMAIL = ?)";
     if(isMissing) return res.status(400).send({ message: "Missing required fields" });
     
     // Check if the user is exists.
-    const [user] = await db(sql, [username || "", email || ""]);
+    const [user] = await db(sql, [userCredential || "", userCredential || ""]);
     if(!user) return res.status(404).send({ message: "User not found" });
 
     // Compare the password from database and from request body.

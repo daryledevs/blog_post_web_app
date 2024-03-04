@@ -68,13 +68,13 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.register = register;
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { username, email, password } = req.body;
-        const isMissing = (!req.body || (!username && !email) || !password);
+        const { userCredential, password } = req.body;
+        const isMissing = !req.body || !userCredential || !password;
         const sql = "SELECT * FROM USERS WHERE (USERNAME = ? OR EMAIL = ?)";
         if (isMissing)
             return res.status(400).send({ message: "Missing required fields" });
         // Check if the user is exists.
-        const [user] = yield (0, query_1.default)(sql, [username || "", email || ""]);
+        const [user] = yield (0, query_1.default)(sql, [userCredential || "", userCredential || ""]);
         if (!user)
             return res.status(404).send({ message: "User not found" });
         // Compare the password from database and from request body.
