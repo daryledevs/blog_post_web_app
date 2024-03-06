@@ -64,18 +64,21 @@
 
           .item-card__flw-btn {
             @include btnSettings;
+          }
+
+          .item-card__rmv-flw-btn {
+            @include btnSettings;
             background-color: rgb(0,149,246);
-            color: white;
+            color: white
           }
 
           .item-card__rmv-btn{
+            &:disabled{
+              @include btnSettings;
+              cursor: default;
+              opacity: 0.6;
+            }
             @include btnSettings;
-          }
-
-          .item-card__rmved-btn{
-            @include btnSettings;
-            cursor: default;
-            opacity: 0.6;
           }
         }
       }

@@ -745,6 +745,16 @@
   height: 80%;
   font-size: 0.9em;
   border-radius: 8px;
+}
+.follow-modal__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmv-flw-btn, .switch-account__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmv-flw-btn, .switch-account__container .switch-account__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmv-flw-btn, .new-message__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmv-flw-btn, .new-message__container .new-message__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmv-flw-btn {
+  height: 100%;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  width: 25%;
+  height: 80%;
+  font-size: 0.9em;
+  border-radius: 8px;
   background-color: rgb(0, 149, 246);
   color: white;
 }
@@ -758,7 +768,7 @@
   font-size: 0.9em;
   border-radius: 8px;
 }
-.follow-modal__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmved-btn, .switch-account__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmved-btn, .switch-account__container .switch-account__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmved-btn, .new-message__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmved-btn, .new-message__container .new-message__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmved-btn {
+.follow-modal__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmv-btn:disabled, .switch-account__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmv-btn:disabled, .switch-account__container .switch-account__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmv-btn:disabled, .new-message__container .follow-modal__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmv-btn:disabled, .new-message__container .new-message__parent .follow-modal__list-container .item-card .item-card__item .item-card__rmv-btn:disabled {
   height: 100%;
   font-weight: 600;
   cursor: pointer;
