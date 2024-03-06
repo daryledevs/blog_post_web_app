@@ -10,7 +10,6 @@ type ProfileHeaderDetailsProps = {
 function ProfileHeaderDetails({ user }: ProfileHeaderDetailsProps) {
   const navigate = useNavigate();
   const { totalPosts, followers, following, isLoading, isFetching } = useUserDetailsStats({ user_id: user.user_id });
-  const navigateHandler = (path: string, fetch: string, username:string) => navigate(path, { state: { fetch, username } })
   if (isLoading || isFetching) return null;
 
   return (
@@ -25,19 +24,13 @@ function ProfileHeaderDetails({ user }: ProfileHeaderDetailsProps) {
         <ProfileHeaderDetailsStats
           count={followers}
           label="Followers"
-          onClick={() => {
-            const path = `/${user.username}/followers`;
-            navigateHandler(path, "followers", user.username);
-          }}
+          onClick={() => navigate(`/${user.username}/followers`)}
           styles={{ cursor: "pointer" }}
         />
         <ProfileHeaderDetailsStats
           count={following}
           label="Following"
-          onClick={() => {
-            const path = `/${user.username}/following`;
-            navigateHandler(path, "following", user.username);
-          }}
+          onClick={() => navigate(`/${user.username}/following`)}
           styles={{ cursor: "pointer" }}
         />
       </div>
