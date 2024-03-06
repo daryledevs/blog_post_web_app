@@ -6,6 +6,7 @@ type useFetchFeedProps = {
   userFeedApi: any;
   setFeeds: React.Dispatch<React.SetStateAction<{ feed: IEPost[] }>>;
   fetchUserFeed: ({ post_ids }: { post_ids: number[] }) => void;
+  setAddFeedTrigger: React.Dispatch<React.SetStateAction<string>>;
 };
 
 function useFetchFeed({
@@ -13,22 +14,21 @@ function useFetchFeed({
   addFeedTrigger,
   setFeeds, 
   fetchUserFeed,
+  setAddFeedTrigger
 }: useFetchFeedProps) {
   const [isPageRefresh, setIsPageRefresh] = useState<boolean>(true);
 
   useEffect(() => {
-    if(userFeedApi.isLoading || !userFeedApi.data) return;
-    
-    if(isPageRefresh) {
+    if (isPageRefresh && userFeedApi.status === "uninitialized") {
       fetchUserFeed({ post_ids: [] });
       sessionStorage.setItem("lastTime", new Date().toString());
       setIsPageRefresh(false);
       return;
     }
-  
-    setFeeds((prev: any) => {
-      return { feed: [...prev?.feed, ...userFeedApi.data?.feed] };
-    });
+    
+    if(!userFeedApi.data) return;
+    setFeeds((prev: any) => ({ feed: [...prev?.feed, ...userFeedApi?.data?.feed] }));
+    setAddFeedTrigger("not triggered yet");
   }, [addFeedTrigger, userFeedApi]);
 }
 

@@ -4,12 +4,11 @@ import useFetchFeedOnScroll from "../hooks/useFetchFeedOnScroll";
 import FeedLoading from "../shared/components/FeedLoading";
 import FeedListPost from "../components/FeedListPost";
 import { IEPost } from "../interfaces/interface";
+import { useGetUserFeedMutation } from "redux/api/feedApi";
 
 type FeedProps = {
   feeds: { feed: IEPost[] };
-  userFeedApi: any;
   userTotalFeedApi: any;
-  fetchUserFeed: any;
   setAddFeedTrigger: any;
 };
 
@@ -17,14 +16,13 @@ const Feed = forwardRef(
   (
     {
       feeds,
-      userFeedApi,
       userTotalFeedApi,
-      fetchUserFeed,
       setAddFeedTrigger,
     }: FeedProps,
-    ref
+    ref 
   ) => {
     const [hasShownLoading, setHasShownLoading] = useState<boolean>(false);
+    const [fetchUserFeed, userFeedApi] = useGetUserFeedMutation({ fixedCacheKey: "shared-update-post" });
 
     useFetchLastScroll({
       feedRef: ref as React.RefObject<HTMLDivElement>,
@@ -32,8 +30,8 @@ const Feed = forwardRef(
     });
 
     useFetchFeedOnScroll({
-      feedRef: ref as React.RefObject<HTMLDivElement>,
       feeds,
+      feedRef: ref as React.RefObject<HTMLDivElement>,
       userTotalFeedApi,
       fetchUserFeed,
       setAddFeedTrigger,

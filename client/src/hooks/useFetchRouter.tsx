@@ -22,7 +22,7 @@ function useFetchRouter({
 
   // SERVICES
   const userTotalFeedApi = useGetTotalFeedQuery({});
-  const [fetchUserFeed, userFeedApi] = useGetUserFeedMutation();
+  const [fetchUserFeed, userFeedApi] = useGetUserFeedMutation({ fixedCacheKey: "shared-update-post" });
   const [, loginApiData] = useLoginMutation({ fixedCacheKey: "shared-update-post" });
 
   const userDataApi = useGetUserDataQuery({ person: "" });
@@ -32,6 +32,7 @@ function useFetchRouter({
     userFeedApi,
     fetchUserFeed,
     setFeeds,
+    setAddFeedTrigger,
   });
 
   useEffect(() => {
@@ -48,9 +49,7 @@ function useFetchRouter({
       socketService,
       feedRef,
       feeds,
-      userFeedApi,
       userTotalFeedApi,
-      fetchUserFeed,
       setAddFeedTrigger,
     };
 
@@ -70,7 +69,7 @@ function useFetchRouter({
     }
 
     // added feeds.feed as an dependency to update its value for the PrivateRoute
-  }, [feeds.feed, loginApiData, userDataApi]);
+  }, [feeds.feed, loginApiData]);
 }
 
 export default useFetchRouter
