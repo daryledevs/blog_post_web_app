@@ -12,17 +12,10 @@ type FeedProps = {
   setAddFeedTrigger: any;
 };
 
-const Feed = forwardRef(
-  (
-    {
-      feeds,
-      userTotalFeedApi,
-      setAddFeedTrigger,
-    }: FeedProps,
-    ref 
-  ) => {
+const Feed = forwardRef((props: FeedProps, ref ) => {
+    const { feeds, userTotalFeedApi, setAddFeedTrigger } = props;
     const [hasShownLoading, setHasShownLoading] = useState<boolean>(false);
-    const [fetchUserFeed, userFeedApi] = useGetUserFeedMutation({ fixedCacheKey: "shared-update-post" });
+    const [fetchUserFeed, userFeedApi] = useGetUserFeedMutation({ fixedCacheKey: "feed-api" });
 
     useFetchLastScroll({
       feedRef: ref as React.RefObject<HTMLDivElement>,

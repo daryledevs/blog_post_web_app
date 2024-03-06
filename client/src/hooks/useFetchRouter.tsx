@@ -1,39 +1,16 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect } from 'react'
 import PublicRoute from "../routes/PublicRoute";
 import PrivateRoute from "../routes/PrivateRoute";
-import { useGetTotalFeedQuery, useGetUserFeedMutation } from '../redux/api/feedApi';
 import { useLoginMutation } from '../redux/api/authApi';
-import useFetchFeed from './useFetchFeed';
-import SocketService from '../services/SocketServices';
 import { useGetUserDataQuery } from '../redux/api/userApi';
 
 type useFetchRouterProps = {
-  socketService: SocketService;
   setRoute: any;
 };
 
-function useFetchRouter({
-  socketService,
-  setRoute,
-}: useFetchRouterProps) {
-  const [feeds, setFeeds] = useState<any>({ feed: [] });
-  const feedRef = useRef<HTMLDivElement | null>(null);
-  const [addFeedTrigger, setAddFeedTrigger] = useState<string>("not triggered yet");
-
-  // SERVICES
-  const userTotalFeedApi = useGetTotalFeedQuery({});
-  const [fetchUserFeed, userFeedApi] = useGetUserFeedMutation({ fixedCacheKey: "shared-update-post" });
-  const [, loginApiData] = useLoginMutation({ fixedCacheKey: "shared-update-post" });
-
+function useFetchRouter({ setRoute }: useFetchRouterProps) {
+  const [, loginApiData] = useLoginMutation({ fixedCacheKey: "login-api" });
   const userDataApi = useGetUserDataQuery({ person: "" });
-
-  useFetchFeed({
-    addFeedTrigger,
-    userFeedApi,
-    fetchUserFeed,
-    setFeeds,
-    setAddFeedTrigger,
-  });
 
   useEffect(() => {
     const LOGIN_STATUS = "Login successfully";
@@ -41,35 +18,25 @@ function useFetchRouter({
 
     if (loginApiData.isError) {
       console.log("LOGIN ERROR: ", loginApiData.error);
-      setRoute(PublicRoute());
+      setRoute(() => <PublicRoute />);
       return;
     }
 
-    const ARGUMENT = {
-      socketService,
-      feedRef,
-      feeds,
-      userTotalFeedApi,
-      setAddFeedTrigger,
-    };
-
     if (loginApiData.data?.message === LOGIN_STATUS) {
       sessionStorage.setItem("token", loginApiData.data.token);
-      setRoute(PrivateRoute(ARGUMENT));
+      setRoute(() => <PrivateRoute />);
       return;
     }
 
     if (sessionToken || userDataApi.data) {
-      setRoute(PrivateRoute(ARGUMENT));
-      return
-    }
-    
-    if (!userDataApi.isLoading) {
-      setRoute(PublicRoute());
+      setRoute(() => <PrivateRoute />);
+      return;
     }
 
-    // added feeds.feed as an dependency to update its value for the PrivateRoute
-  }, [feeds.feed, loginApiData]);
+    if (!userDataApi.isLoading) {
+      setRoute(() => <PublicRoute />);
+    }
+  }, [loginApiData, userDataApi]);
 }
 
 export default useFetchRouter

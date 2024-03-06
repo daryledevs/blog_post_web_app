@@ -11,9 +11,7 @@ type Inputs = {
 };
 
 function Login() {
-  const [login, { isError, error }] = useLoginMutation({
-    fixedCacheKey: "shared-update-post",
-  });
+  const [login, { isError, error }] = useLoginMutation({ fixedCacheKey: "login-api" });
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     const userCredential = data.userCredential;
