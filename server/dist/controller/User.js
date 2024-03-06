@@ -23,7 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.toggleFollow = exports.getFollowerFollowingLists = exports.getFollowStats = exports.getUserData = void 0;
+exports.toggleFollow = exports.getFollowerFollowingLists = exports.getFollowStats = exports.searchUsersByQuery = exports.getUserData = void 0;
 const query_1 = __importDefault(require("../database/query"));
 const getUserData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -31,6 +31,34 @@ const getUserData = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const { person } = req.query;
         const sqlSelectWithId = "SELECT * FROM USERS WHERE USER_ID = (?);";
         const sqlSelectPerson = `
+      SELECT 
+          *
+      FROM
+          USERS
+      WHERE
+          USERNAME LIKE (?) OR 
+          FIRST_NAME LIKE (?) OR 
+          CONCAT(FIRST_NAME, ' ', LAST_NAME) LIKE (?);
+    `;
+        const sql = person ? sqlSelectPerson : sqlSelectWithId;
+        const personArray = Array.from({ length: 3 }, () => person);
+        const params = person ? personArray : [user_id];
+        const [data] = yield (0, query_1.default)(sql, params);
+        if (!data)
+            return res.status(404).send({ message: "User not found" });
+        const { PASSWORD } = data, rest = __rest(data, ["PASSWORD"]);
+        res.status(200).send({ user: rest });
+    }
+    catch (error) {
+        res.status(500).send({ message: "An error occurred", error: error.message });
+    }
+    ;
+});
+exports.getUserData = getUserData;
+const searchUsersByQuery = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { search } = req.query;
+        const sql = `
       SELECT 
           USER_ID,
           USERNAME,
@@ -43,21 +71,19 @@ const getUserData = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
           FIRST_NAME LIKE (?) OR 
           CONCAT(FIRST_NAME, ' ', LAST_NAME) LIKE (?);
     `;
-        const sql = person ? sqlSelectPerson : sqlSelectWithId;
-        const personArray = Array.from({ length: 3 }, () => person + "%");
-        const params = person ? personArray : [user_id];
-        const [data] = yield (0, query_1.default)(sql, params);
-        if (!data)
+        const params = Array.from({ length: 3 }, () => search + "%");
+        const data = yield (0, query_1.default)(sql, params);
+        if (!data.length)
             return res.status(404).send({ message: "User not found" });
-        const { password } = data, rest = __rest(data, ["password"]);
-        res.status(200).send({ user: rest });
+        res.status(200).send({ users: data });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
+        res
+            .status(500)
+            .send({ message: "An error occurred", error: error.message });
     }
-    ;
 });
-exports.getUserData = getUserData;
+exports.searchUsersByQuery = searchUsersByQuery;
 const getFollowStats = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { user_id } = req.params;

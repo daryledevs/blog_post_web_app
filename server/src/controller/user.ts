@@ -10,6 +10,34 @@ const getUserData = async (req: Request, res: Response) => {
     const sqlSelectPerson = 
     `
       SELECT 
+          *
+      FROM
+          USERS
+      WHERE
+          USERNAME LIKE (?) OR 
+          FIRST_NAME LIKE (?) OR 
+          CONCAT(FIRST_NAME, ' ', LAST_NAME) LIKE (?);
+    `;
+
+    const sql = person ? sqlSelectPerson : sqlSelectWithId;
+    const personArray = Array.from({ length: 3 }, () => person)
+    const params = person ? personArray : [user_id];
+    
+    const [data] = await db(sql, params);
+    if(!data) return res.status(404).send({ message: "User not found" });
+    const { PASSWORD, ...rest } = data;
+    res.status(200).send({ user: rest });
+  } catch (error:any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
+  };
+};
+
+const searchUsersByQuery = async (req: Request, res: Response) => {
+  try {
+    const { search } = req.query;
+
+    const sql = `
+      SELECT 
           USER_ID,
           USERNAME,
           FIRST_NAME,
@@ -22,17 +50,16 @@ const getUserData = async (req: Request, res: Response) => {
           CONCAT(FIRST_NAME, ' ', LAST_NAME) LIKE (?);
     `;
 
-    const sql = person ? sqlSelectPerson : sqlSelectWithId;
-    const personArray = Array.from({ length: 3 }, () => person + "%")
-    const params = person ? personArray : [user_id];
-    
-    const [data] = await db(sql, params);
-    if(!data) return res.status(404).send({ message: "User not found" });
-    const { password, ...rest } = data;
-    res.status(200).send({ user: rest });
-  } catch (error:any) {
-    res.status(500).send({ message: "An error occurred", error: error.message });
-  };
+    const params = Array.from({ length: 3 }, () => search + "%");
+    const data = await db(sql, params);
+    if (!data.length)
+      return res.status(404).send({ message: "User not found" });
+    res.status(200).send({ users: data });
+  } catch (error: any) {
+    res
+      .status(500)
+      .send({ message: "An error occurred", error: error.message });
+  }
 };
 
 const getFollowStats = async (req: Request, res: Response) => {
@@ -160,4 +187,4 @@ const toggleFollow = async (req: Request, res: Response) => {
   }
 };
 
-export { getUserData, getFollowStats, getFollowerFollowingLists, toggleFollow };
+export { getUserData, searchUsersByQuery, getFollowStats, getFollowerFollowingLists, toggleFollow };

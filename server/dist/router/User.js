@@ -7,6 +7,7 @@ const express_1 = __importDefault(require("express"));
 const user_1 = require("../controller/user");
 const router = express_1.default.Router();
 router.get("/", user_1.getUserData);
+router.get("/lists", user_1.searchUsersByQuery);
 router.get("/:user_id/follows/stats", user_1.getFollowStats);
 router.get("/:user_id/follows/:followed_id", user_1.toggleFollow);
 router.post("/:user_id/lists", user_1.getFollowerFollowingLists);
