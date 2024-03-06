@@ -4,7 +4,7 @@ import FollowToggleButton from "./FollowToggleButton";
 
 type FollowUserCardProps = {
   item: any;
-  state: any;
+  path: any;
   removedUsers: any;
   removeUserHandler: (userFollowId: number) => void;
   addUserHandler: (userFollowId: number) => void;
@@ -12,7 +12,7 @@ type FollowUserCardProps = {
 
 function FollowUserCard({
   item,
-  state,
+  path,
   removedUsers,
   removeUserHandler,
   addUserHandler,
@@ -28,7 +28,7 @@ function FollowUserCard({
         />
         <FollowToggleButton
           followId={item.user_id}
-          fetchType={state.fetch}
+          fetchType={path}
           removedUsers={removedUsers}
           onClickRemove={() => removeUserHandler(item.user_id)}
           onClickAdd={() => addUserHandler(item.user_id)}

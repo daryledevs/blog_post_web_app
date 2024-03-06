@@ -1,16 +1,15 @@
 import React from "react";
 import ProfileGallery from "../components/ProfileGallery";
 import ProfileHeader from "../components/ProfileHeader";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useParams } from "react-router-dom";
 import { useGetUserDataQuery, } from "../redux/api/userApi";
 import { useGetUserPostQuery, } from "../redux/api/postApi";
 
 function Profile() {
-  const { state } = useLocation();
-  const person = state?.username ? state.username : "";
+  const { username } = useParams();
 
   // services
-  const { data, isLoading } = useGetUserDataQuery({ person });
+  const { data, isLoading } = useGetUserDataQuery({ person: username || "" });
   const postDataApi = useGetUserPostQuery({ user_id: data?.user.user_id }, { skip: !data?.user });
 
   if (isLoading || postDataApi.isLoading || !data || !postDataApi.data) return null;

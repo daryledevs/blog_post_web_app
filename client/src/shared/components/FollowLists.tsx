@@ -4,7 +4,7 @@ import FollowUserCard from "./FollowUserCard";
 type FollowListsProps = {
   isLoading: boolean;
   lists: any;
-  state: any;
+  path: string;
   removedUsers: any;
   setRemovedUsers: React.Dispatch<React.SetStateAction<any>>;
 };
@@ -12,7 +12,7 @@ type FollowListsProps = {
 function FollowLists({
   isLoading,
   lists,
-  state,
+  path,
   removedUsers,
   setRemovedUsers,
 }: FollowListsProps) {
@@ -34,7 +34,7 @@ function FollowLists({
         <FollowUserCard
           key={index}
           item={item}
-          state={state}
+          path={path}
           removedUsers={removedUsers}
           removeUserHandler={removeUserHandler}
           addUserHandler={addUserHandler}
