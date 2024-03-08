@@ -8,7 +8,6 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import * as dotenv from "dotenv";
-import cookieOptions from "../config/cookieOptions";
 import sendEmail from "../config/nodemailer";
 import encryptData from "../util/encrypt";
 import decryptData from "../util/decrypt";
@@ -51,7 +50,7 @@ const login = async (req: Request, res: Response) => {
       const ACCESS_TOKEN = generateAccessToken(user);
       const REFRESH_TOKEN = generateRefreshToken(user);
       res
-        .cookie("REFRESH_TOKEN", REFRESH_TOKEN, cookieOptions)
+        .cookie("REFRESH_TOKEN", REFRESH_TOKEN, req.body.cookieOptions)
         .status(200)
         .send({ message: "Login successfully", token: ACCESS_TOKEN });
       return;
@@ -141,7 +140,7 @@ const logout = async (req: Request, res: Response) => {
   res
     .clearCookie("REFRESH_TOKEN", {
       sameSite: "none",
-      secure: cookieOptions.secure,
+      secure: req.body.cookieOptions.secure,
       httpOnly: true,
     })
     .status(200)

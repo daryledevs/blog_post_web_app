@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
-const cookieOptions_1 = __importDefault(require("../config/cookieOptions"));
 const routeException_1 = __importDefault(require("../helper/routeException"));
 const query_1 = __importDefault(require("../database/query"));
 const authTokens_1 = require("../util/authTokens");
@@ -41,7 +40,7 @@ const tokenHandler = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
                 const REFRESH_OPTION = { USER_ID: refreshDecode.user_id, USERNAME: refreshDecode.username };
                 const REFRESH_TKN = (0, authTokens_1.generateRefreshToken)(REFRESH_OPTION);
                 const ACCESS_TOKEN = (0, authTokens_1.generateAccessToken)(ACCESS_OPTION);
-                res.cookie("REFRESH_TOKEN", REFRESH_TKN, cookieOptions_1.default);
+                res.cookie("REFRESH_TOKEN", REFRESH_TKN, req.body.cookieOptions);
                 return res.status(200).send({ accessToken: ACCESS_TOKEN });
             }
             req.body.user_id = refreshDecode.user_id;

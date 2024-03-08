@@ -25,6 +25,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
@@ -43,13 +44,16 @@ const corsOption_1 = __importDefault(require("./config/corsOption"));
 const tokenHandler_1 = __importDefault(require("./middleware/tokenHandler"));
 const path_1 = __importDefault(require("./config/path"));
 const responseHandler_1 = __importDefault(require("./middleware/responseHandler"));
+const cookieOptions_1 = __importDefault(require("./config/cookieOptions"));
 dotenv.config();
 const app = (0, express_1.default)();
-const PORT = process.env.PORT || 5000;
+const PORT = parseInt((_a = process.env.SERVER_PORT) !== null && _a !== void 0 ? _a : "5000");
+const HOST = process.env.SERVER_HOST || "localhost";
 const API = process.env.API;
 app.disable("x-powered-by");
 app.use(body_parser_1.default.json());
 app.use((0, cookie_parser_1.default)());
+app.use(cookieOptions_1.default);
 app.use((0, cors_1.default)(corsOption_1.default));
 app.use(tokenHandler_1.default);
 app.use(responseHandler_1.default);
@@ -67,7 +71,7 @@ database_1.default.connect((error) => {
         throw error;
     console.log("Connected to MySQL Server!");
 });
-app.listen(PORT, () => {
+app.listen(PORT, HOST, () => {
     (0, socket_1.default)();
-    console.log("Connected to", PORT, "in: ", app.settings.env);
+    console.log("Connected to", PORT, HOST, "in: ", app.settings.env);
 });

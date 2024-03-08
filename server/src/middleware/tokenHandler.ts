@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
-import cookieOptions from "../config/cookieOptions";
 import routeException from "../helper/routeException";
 import db from "../database/query";
 import { generateAccessToken, generateRefreshToken, verifyToken } from "../util/authTokens";
@@ -30,7 +29,7 @@ const tokenHandler = async (req: Request, res: Response, next: NextFunction) => 
         const REFRESH_OPTION = { USER_ID: refreshDecode.user_id, USERNAME: refreshDecode.username };
         const REFRESH_TKN = generateRefreshToken(REFRESH_OPTION);
         const ACCESS_TOKEN = generateAccessToken(ACCESS_OPTION);
-        res.cookie("REFRESH_TOKEN", REFRESH_TKN, cookieOptions)
+        res.cookie("REFRESH_TOKEN", REFRESH_TKN, req.body.cookieOptions);
         return res.status(200).send({ accessToken: ACCESS_TOKEN });
       }
       

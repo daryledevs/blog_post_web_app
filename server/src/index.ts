@@ -15,15 +15,18 @@ import corsOptions from "./config/corsOption";
 import tokenHandler from "./middleware/tokenHandler";
 import rootPath from "./config/path";
 import responseHandler from "./middleware/responseHandler";
+import cookieOptions from "./config/cookieOptions";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = parseInt(process.env.SERVER_PORT ?? "5000");
+const HOST = process.env.SERVER_HOST || "localhost";
 const API = process.env.API;
 
 app.disable("x-powered-by");
 app.use(bodyParser.json());
 app.use(cookieParser());
+app.use(cookieOptions);
 app.use(cors(corsOptions));
 app.use(tokenHandler);
 app.use(responseHandler);
@@ -43,7 +46,7 @@ database.connect((error) => {
   console.log("Connected to MySQL Server!");
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, HOST, () => {
   socketController();
-  console.log("Connected to", PORT, "in: ", app.settings.env);
+  console.log("Connected to", PORT, HOST, "in: ", app.settings.env);
 });

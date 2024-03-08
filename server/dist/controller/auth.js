@@ -40,7 +40,6 @@ const authTokens_1 = require("../util/authTokens");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv = __importStar(require("dotenv"));
-const cookieOptions_1 = __importDefault(require("../config/cookieOptions"));
 const nodemailer_1 = __importDefault(require("../config/nodemailer"));
 const encrypt_1 = __importDefault(require("../util/encrypt"));
 const decrypt_1 = __importDefault(require("../util/decrypt"));
@@ -82,7 +81,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             const ACCESS_TOKEN = (0, authTokens_1.generateAccessToken)(user);
             const REFRESH_TOKEN = (0, authTokens_1.generateRefreshToken)(user);
             res
-                .cookie("REFRESH_TOKEN", REFRESH_TOKEN, cookieOptions_1.default)
+                .cookie("REFRESH_TOKEN", REFRESH_TOKEN, req.body.cookieOptions)
                 .status(200)
                 .send({ message: "Login successfully", token: ACCESS_TOKEN });
             return;
@@ -177,7 +176,7 @@ const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res
         .clearCookie("REFRESH_TOKEN", {
         sameSite: "none",
-        secure: cookieOptions_1.default.secure,
+        secure: req.body.cookieOptions.secure,
         httpOnly: true,
     })
         .status(200)
