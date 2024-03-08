@@ -31,7 +31,7 @@ const dotenv = __importStar(require("dotenv"));
 dotenv.config();
 const db_port = process.env.DATABASE_PORT ? parseInt(process.env.DATABASE_PORT) : 3306;
 const database = mysql_1.default.createConnection({
-    host: `${process.env.HOST}`,
+    host: `${process.env.DATABASE_HOST}`,
     port: db_port,
     user: `${process.env.USER}`,
     password: process.env.PASSWORD,
