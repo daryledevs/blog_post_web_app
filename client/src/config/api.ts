@@ -11,8 +11,12 @@ class ErrorHandler {
   };
 }
 
+const apiUrlOne = import.meta.env.VITE_REACT_APP_API_URL1;
+const apiUrlTwo = import.meta.env.VITE_REACT_APP_API_URL2;
+const domain = window.location.hostname === "localhost" ? apiUrlOne : apiUrlTwo;
+
 const api = axios.create({
-  baseURL: "http://localhost:5000/api/v1",
+  baseURL: domain,
   headers: {
     Accept: "application/json",
     "Content-Type": "application/json",
@@ -29,6 +33,7 @@ api.interceptors.request.use(
         Authorization: `Bearer ${token}`,
       };
     }
+
     return config;
   },
   (error) => {
