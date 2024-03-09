@@ -44,7 +44,7 @@ const corsOption_1 = __importDefault(require("./config/corsOption"));
 const tokenHandler_1 = __importDefault(require("./middleware/tokenHandler"));
 const path_1 = __importDefault(require("./config/path"));
 const responseHandler_1 = __importDefault(require("./middleware/responseHandler"));
-const cookieOptions_1 = __importDefault(require("./config/cookieOptions"));
+const cookieOptions_1 = __importDefault(require("./middleware/cookieOptions"));
 dotenv.config();
 const app = (0, express_1.default)();
 const PORT = parseInt((_a = process.env.SERVER_PORT) !== null && _a !== void 0 ? _a : "5000");

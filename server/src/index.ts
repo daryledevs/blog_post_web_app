@@ -15,7 +15,7 @@ import corsOptions from "./config/corsOption";
 import tokenHandler from "./middleware/tokenHandler";
 import rootPath from "./config/path";
 import responseHandler from "./middleware/responseHandler";
-import cookieOptions from "./config/cookieOptions";
+import cookieOptions from "./middleware/cookieOptions";
 dotenv.config();
 
 const app = express();
