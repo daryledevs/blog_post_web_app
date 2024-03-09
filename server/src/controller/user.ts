@@ -88,10 +88,10 @@ const getFollowStats = async (req: Request, res: Response) => {
     `;
 
     const data = await db(sql, [user_id, user_id]);
-    const { COUNT: followers } = data[0][0];
-    const { COUNT: following } = data[1][0];
+    const { COUNT: followers } = data[0][0] || { COUNT: 0 };
+    const { COUNT: following } = data[1][0] || { COUNT: 0 };
 
-    res.status(200).send({ followers, following});
+    res.status(200).send({ followers, following });
   } catch (error: any) {
     res
       .status(500)

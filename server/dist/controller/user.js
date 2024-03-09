@@ -109,8 +109,8 @@ const getFollowStats = (req, res) => __awaiter(void 0, void 0, void 0, function*
       GROUP BY F.FOLLOWER_ID;
     `;
         const data = yield (0, query_1.default)(sql, [user_id, user_id]);
-        const { COUNT: followers } = data[0][0];
-        const { COUNT: following } = data[1][0];
+        const { COUNT: followers } = data[0][0] || { COUNT: 0 };
+        const { COUNT: following } = data[1][0] || { COUNT: 0 };
         res.status(200).send({ followers, following });
     }
     catch (error) {
