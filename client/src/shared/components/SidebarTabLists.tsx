@@ -1,5 +1,5 @@
 
-import Links from "../../assets/data/nav_links";
+import Links from "../constants/nav_links";
 import SidebarTabCard from "./SidebarTabCard";
 
 type SidebarTabListsProps = {
