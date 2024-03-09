@@ -14,7 +14,8 @@ function useFetchMessage({ socketService, openConversation }: useFetchMessagePro
   const [getChatMessages, allChatMessages] = useLazyGetChatMessagesQuery();
 
   useEffect(() => {
-    getChatMessages({ conversation_id: openConversation.conversation_id });
+    if(!openConversation.conversation_id) return;
+    getChatMessages({ conversation_id: openConversation.conversation_id, messages: [] });
 
     socketService.onMessageReceived((message: any) => {
       setComingMessage((prev: any) => [...prev, { ...message }]);
