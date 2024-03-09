@@ -1,104 +1,50 @@
-import { useState, useEffect } from "react";
-import avatar from "../../assets/icons/avatar.png";
-import closeModal from "../../assets/icons/close.png";
-import Recipients from "../components/Recipients";
-import { selectMessage, setNewMessageTrigger, setOpenConversation } from "../../redux/slices/messageSlice";
+import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
+import { selectMessage, setNewMessageTrigger, setOpenConversation } from "../../redux/slices/messageSlice";
 
+import Button from "shared/components/Elements/Button";
+import Recipients from "../components/Recipients";
+import NewMessageLists from "shared/components/NewMessageLists";
+import NewMessageHeader from "shared/components/NewMessageHeader";
 
 function NewMessage() {
   const messages = useAppSelector(selectMessage);
   const dispatch = useAppDispatch();
 
-  const [recipient, setRecipient] = useState<any>([]);
+  const [recipients, setRecipients] = useState<any>([]);
   const [search, setSearch] = useState<string>("");
-  const [list, setList] = useState<any>({ people: [] });
-
-
-  useEffect(() => {
-    function handleEscapeKey(event: KeyboardEvent) {
-      if (messages.newMessageTrigger && event.code === "Escape") {
-        dispatch(setNewMessageTrigger());
-      }  
-    };
-
-    document.addEventListener("keydown", handleEscapeKey);
-    return () => document.removeEventListener("keydown", handleEscapeKey);
-  }, [messages.newMessageTrigger]);
-
-  function newMessageHandler(person: any) {
-    if (recipient.some((item: any) => item.user_id === person.user_id)) return;
-    let newArr = [...recipient];
-    newArr.push(person);
-    setRecipient([...newArr]);
-    setSearch("");
-  };
 
   function newChatHandler() {
-    dispatch(setOpenConversation(recipient));
+    dispatch(setOpenConversation(recipients));
     dispatch(setNewMessageTrigger());
   }
 
-  if (!messages.newMessageTrigger) return <></>;
+  if (!messages.newMessageTrigger) return null;
 
   return (
     <div className="new-message__container">
       <div className="new-message__parent">
-        <div className="new-message__header">
-          <p>New message</p>
-          <img
-            src={closeModal}
-            onClick={() => dispatch(setNewMessageTrigger())}
-            alt=""
+        <NewMessageHeader />
+        <div className="new-message__search-bar">
+          <Recipients
+            search={search}
+            setSearch={setSearch}
+            recipients={recipients}
+            setRecipients={setRecipients}
           />
         </div>
-        <div className="new-message__search-bar">
-          <label htmlFor="search">
-            To:
-            <Recipients
-              search={search}
-              setSearch={setSearch}
-              recipients={recipient}
-              setRecipient={setRecipient}
-            />
-          </label>
-        </div>
-        <div className="new-message__search-list">
-          {list.people && list.people.length ? (
-            <>
-              {list.people.map((person: any, index: any) => {
-                return (
-                  <div
-                    key={index}
-                    className="new-message__person"
-                    onClick={() => newMessageHandler(person)}
-                  >
-                    <div className="new-message__avatar">
-                      <img
-                        src={person.avatar_url ? person.avatar_url : avatar}
-                        alt=""
-                      />
-                    </div>
-                    <div className="new-message__person-details">
-                      <p>{person.username}</p>
-                      <p>
-                        {person?.first_name} {person?.last_name}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </>
-          ) : (
-            <p>No account found.</p>
-          )}
-        </div>
-        <button
-          disabled={!recipient.length}
+        <NewMessageLists
+          search={search}
+          setSearch={setSearch}
+          recipients={recipients}
+          setRecipients={setRecipients}
+        />
+        <Button
           onClick={newChatHandler}
+          disabled={!recipients.length}
         >
           Chat
-        </button>
+        </Button>
       </div>
     </div>
   );
