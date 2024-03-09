@@ -10,7 +10,7 @@ type NewMessageListsProps = {
 };
 
 function NewMessageLists({ search, recipients, setRecipients, setSearch  }: NewMessageListsProps) {
-  const listsUsersApi = useSearchUsersQuery({ search });
+  const listsUsersApi = useSearchUsersQuery({ search },  { skip: !search });
   if(listsUsersApi.isLoading) return null;
   return (
     <div className="new-message__search-list">
