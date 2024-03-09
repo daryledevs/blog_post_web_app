@@ -9,6 +9,12 @@ const userApi = baseApi.injectEndpoints({
         method: "GET",
       }),
     }),
+    searchUsers: build.query<any, { search: string }>({
+      query: ({ search}) => ({
+        url: `/users/lists?search=${search}`,
+        method: "GET",
+      })
+    }),
     getFollowStats: build.query<any, { user_id: number }>({
       query: ({ user_id }) => ({
         url: `/users/${user_id}/follows/stats`,
@@ -32,4 +38,9 @@ const userApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetUserDataQuery, useGetFollowersAndFollowingListsMutation,useGetFollowStatsQuery } = userApi;
+export const {
+  useGetUserDataQuery,
+  useSearchUsersQuery,
+  useGetFollowersAndFollowingListsMutation,
+  useGetFollowStatsQuery,
+} = userApi;
