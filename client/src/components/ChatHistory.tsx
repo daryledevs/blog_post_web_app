@@ -1,30 +1,22 @@
-import { useEffect } from "react";
 import ChatHistoryRecipient from "./ChatHistoryRecipient";
-import { useGetUserConversationsMutation } from "../redux/api/chatApi";
 
 type ChatHistoryProps = {
-  user: any;
+  list: any;
+  isLoading: boolean;
 };
 
-function ChatHistory({ user }: ChatHistoryProps) {
-  const [getUsersConversations, chatHistory] = useGetUserConversationsMutation();
-
-  useEffect(() => {
-    getUsersConversations({ user_id: user.user_id, conversations: [] });
-  }, []);
-  
-  if (chatHistory.isLoading || !chatHistory.data) return null;
-
+function ChatHistory({ list, isLoading }: ChatHistoryProps) {
   return (
     <div className="chat-history__container">
-      {chatHistory?.data?.list?.map((chat: any, index: number) => {
-        return (
-          <ChatHistoryRecipient
-            key={index}
-            chat={chat}
-          />
-        );
-      })}
+      {!isLoading &&
+        list?.map((chat: any, index: number) => {
+          return (
+            <ChatHistoryRecipient
+              key={index}
+              chat={chat}
+            />
+          );
+        })}
     </div>
   );
 }

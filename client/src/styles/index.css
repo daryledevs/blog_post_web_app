@@ -438,12 +438,12 @@
   align-items: center;
 }
 .message__container .message__parent {
-  border: 1px solid #ccc;
   border-left: none;
   width: 75%;
   height: 94%;
   border-radius: 5px;
   display: flex;
+  border: 1px solid #ccc;
 }
 .message__container .message__parent .message__sidebar {
   flex: 1;
@@ -451,9 +451,8 @@
   flex-direction: column;
 }
 .message__container .message__parent .message__sidebar .chat-header__container {
-  border: 1px solid #ccc;
-  border-bottom: none;
-  border-top: none;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
   flex: 1;
   display: inherit;
   flex-direction: row;
@@ -481,7 +480,7 @@
 }
 .message__container .message__parent .message__sidebar .chat-history__container {
   position: relative;
-  border: 1px solid #ccc;
+  border-right: 1px solid #ccc;
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -1,7 +1,7 @@
 import React from "react";
 import NewMessage from "../shared/modals/NewMessage";
 import SwitchAccount from "../shared/modals/SwitchAccount";
-import MessageSideBar from "../components/MessageSideBar";
+import MessageSidebar from "../components/MessageSidebar";
 import MessageChatBox from "../components/MessageChatBox";
 import { useGetUserDataQuery } from "../redux/api/userApi";
 import SocketService from "../services/SocketServices";
@@ -16,12 +16,8 @@ function Message({ socketService }: { socketService: SocketService }) {
       <SwitchAccount />
       <div className="message__container">
         <div className="message__parent">
-          <MessageSideBar
-            user={userApiData.data.user}
-          />
-          <MessageChatBox 
-            socketService={socketService}
-          />
+          <MessageSidebar user={userApiData.data.user} />
+          <MessageChatBox socketService={socketService} />
         </div>
       </div>
     </React.Fragment>
