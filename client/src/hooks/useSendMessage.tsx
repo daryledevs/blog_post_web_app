@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { MessageType } from '../interfaces/types';
+import { useSendNewMessagesMutation } from "../redux/api/chatApi";
 
 type useSendMessageHandlerProps = {
   userDataApi: any;
@@ -20,6 +21,8 @@ function useSendMessageHandler({
   setClearMessage,
   newMessage,
 }: useSendMessageHandlerProps) {
+  const [sendMessage, ] = useSendNewMessagesMutation();
+
   // returning it, to make an instance of this function
   return useCallback(() => {
     if (!newMessage?.text_message) return;
@@ -36,6 +39,7 @@ function useSendMessageHandler({
 
     const { receiver_id: _, ...rest } = data;
 
+    sendMessage(data);
     socketService.sendMessage(data);
     setComingMessage((prev: MessageType[]) => [...prev, { ...rest }]);
     setClearMessage(!clearMessage);

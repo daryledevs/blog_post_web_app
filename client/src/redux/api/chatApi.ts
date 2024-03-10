@@ -2,11 +2,14 @@ import baseApi from "./baseApi";
 
 const chatApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
-    getChatMessages: build.query<any, { conversation_id: number, messages: any[] }>({
+    getChatMessages: build.query<
+      any,
+      { conversation_id: number; messages: any[] }
+    >({
       query: ({ conversation_id, messages }) => ({
         url: `/chats/${conversation_id}/messages`,
         method: "POST",
-        body: { messages }
+        body: { messages },
       }),
     }),
     getUserConversations: build.mutation<
@@ -19,18 +22,23 @@ const chatApi = baseApi.injectEndpoints({
         body: { conversations },
       }),
     }),
-    sendNewMessages: build.query<
+    sendNewMessages: build.mutation<
       any,
-      { sender_id: any; text_message: string; conversation_id: any }
+      {
+        sender_id: any;
+        receiver_id: number;
+        text_message: string;
+        conversation_id: any;
+      }
     >({
-      query: ({ sender_id, text_message, conversation_id }) => ({
+      query: ({ sender_id, receiver_id, text_message, conversation_id }) => ({
         url: `/chats`,
         method: "POST",
-        body: { sender_id, text_message, conversation_id },
+        body: { sender_id, receiver_id, text_message, conversation_id },
       }),
     }),
   }),
 });
 
-export const { useLazyGetChatMessagesQuery, useGetUserConversationsMutation, useSendNewMessagesQuery } =
+export const { useLazyGetChatMessagesQuery, useGetUserConversationsMutation, useSendNewMessagesMutation } =
   chatApi;
