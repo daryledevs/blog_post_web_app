@@ -6,16 +6,14 @@ type FollowUserCardProps = {
   item: any;
   path: any;
   removedUsers: any;
-  removeUserHandler: (userFollowId: number) => void;
-  addUserHandler: (userFollowId: number) => void;
+  onClick: (userFollowId: number) => void;
 };
 
 function FollowUserCard({
   item,
   path,
   removedUsers,
-  removeUserHandler,
-  addUserHandler,
+  onClick,
 }: FollowUserCardProps) {
   return (
     <div className="item-card">
@@ -30,8 +28,7 @@ function FollowUserCard({
           followId={item.user_id}
           fetchType={path}
           removedUsers={removedUsers}
-          onClickRemove={() => removeUserHandler(item.user_id)}
-          onClickAdd={() => addUserHandler(item.user_id)}
+          onClick={() => onClick(item.user_id)}
         />
       </div>
     </div>

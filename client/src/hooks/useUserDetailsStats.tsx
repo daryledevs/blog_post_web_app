@@ -1,9 +1,15 @@
+import { useEffect } from 'react';
 import { useGetUserTotalPostsQuery } from 'redux/api/postApi';
-import { useGetFollowStatsQuery } from 'redux/api/userApi';
+import { useFollowUserMutation, useGetFollowStatsQuery } from 'redux/api/userApi';
 
 function useUserDetailsStats({ user_id }:any) {
-  const totalPostsApi = useGetUserTotalPostsQuery({ user_id }, { skip: !user_id, });
+  const [, followsListsApi] = useFollowUserMutation({ fixedCacheKey: "follows-api" });
+  const totalPostsApi = useGetUserTotalPostsQuery({ user_id }, { skip: !user_id });
   const followStatsDataApi = useGetFollowStatsQuery({ user_id }, { skip: !user_id });
+
+  useEffect(() => {
+    followStatsDataApi.refetch();
+  }, [followsListsApi.data]); 
 
   return {
     totalPosts: totalPostsApi.data?.totalPost,

@@ -24,9 +24,10 @@ function FollowModal() {
         <FollowModalTitle path={pathType} />
         <div className="follow-modal__list-container">
           <FollowLists
+            path={pathType}
+            follower_id={userApiData?.data?.user?.user_id}
             isLoading={isLoading}
             lists={follows?.lists}
-            path={pathType}
             removedUsers={removedUsers}
             setRemovedUsers={setRemovedUsers}
           />

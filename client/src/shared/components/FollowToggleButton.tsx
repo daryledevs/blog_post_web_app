@@ -1,4 +1,4 @@
-function FollowToggleButton({ followId, fetchType, removedUsers, onClickRemove, onClickAdd }: any) {
+function FollowToggleButton({ followId, fetchType, removedUsers, onClick }: any) {
   const isRemove = removedUsers?.includes(followId);
   const removedText = fetchType === "followers" ? "Removed" : "Follow";
   const notRemovedText = fetchType === "followers" ? "Remove" : "Following";
@@ -7,7 +7,7 @@ function FollowToggleButton({ followId, fetchType, removedUsers, onClickRemove, 
   return (
     <button
       disabled={fetchType === "followers" && isRemove}
-      onClick={isRemove ? onClickAdd : onClickRemove}
+      onClick={onClick}
       className={className}
     >
       {isRemove ? removedText : notRemovedText}
