@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import FollowUserCard from "./FollowUserCard";
 import { useFollowUserMutation } from "redux/api/userApi";
 
@@ -19,32 +19,25 @@ function FollowLists({
   removedUsers,
   setRemovedUsers,
 }: FollowListsProps) {
-  const [followUser, followUserApi] = useFollowUserMutation({ fixedCacheKey: "follows-api" });
+  const [followUser] = useFollowUserMutation({ fixedCacheKey: "follows-api" });
 
-  function followUserHandler(userFollowId: number) {
-    if(!follower_id) return null;
-    const listsCopy = [...lists];
-    
-    // if the user is in the list of removed users
-    if (removedUsers.includes(userFollowId)) {
-      // we remove from the list of removed users
-      followUser({ follower_id, followed_id: userFollowId });
-      setRemovedUsers((prev: any) => prev.filter((id: number) => id !== userFollowId));
-      return;
-    } 
+  const followUserHandler = useCallback((userFollowId: number) => {
+    const userInRemoved = removedUsers.includes(userFollowId);
+    const isUserInList = (user_id:number) => user_id === userFollowId;
+    const userInList = lists?.some(
+      (item: any) => isUserInList(item.follower_id) || isUserInList(item.followed_id)
+    );
 
-    // if the user is not in the list of removed users
-    if (!removedUsers.includes(userFollowId)) {
-      // we add to the list of removed users
-      setRemovedUsers((prev: any) => [...prev, userFollowId]);
-      followUser({ follower_id: userFollowId, followed_id: follower_id });
-      return;
+    if (!userInRemoved && userInList) {
+      setRemovedUsers((prev: number[]) => [...prev, userFollowId]);
+    } else {
+      setRemovedUsers((prev: number[]) => prev.filter(id => id !== userFollowId));
     }
-  }
 
-  useEffect(() => {
-    console.log(followUserApi?.data?.message)
-  }, [followUserApi.data]);
+    const argOne = path === "following" ? follower_id : userFollowId;
+    const argTwo = path === "following" ? userFollowId : follower_id;
+    followUser({ follower_id: argOne, followed_id: argTwo });
+  }, [lists, removedUsers, setRemovedUsers]);
 
   if (isLoading) return null;
 
