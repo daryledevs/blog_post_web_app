@@ -1,5 +1,5 @@
 type PersonType = {
-  user_id: string;
+  user_id: number;
   username: string;
   first_name: string;
   last_name: string;
