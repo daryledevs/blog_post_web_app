@@ -3,11 +3,39 @@ import db from "../database/query";
 
 const getMessage = async (req: Request, res: Response) => {
   try {
-    const { conversation_id } = req.params;
-    const { messages } = req.body;
-    const ids = messages.length ? messages : 0;
-    const sql = "SELECT * FROM MESSAGES WHERE CONVERSATION_ID = (?) AND CONVERSATION_ID NOT IN (?) LIMIT 3;";
-    const data = await db(sql, [conversation_id, ids]);
+    const user_id: any | any[] = req.query.user_id || [];
+    let conversation_id = req.params.conversation_id;
+    const { messages } = req.body || [];
+    const ids = messages?.length ? messages : 0;
+
+    if(user_id.length){
+      const reverse = user_id.slice().reverse();
+      const args = [...user_id, ...reverse];
+
+      const sqlFindConversationId = `
+        SELECT *
+        FROM CONVERSATIONS
+        WHERE 
+          (USER_ONE = (?) AND USER_TWO = (?))
+          OR 
+          (USER_ONE = (?) AND USER_TWO = (?));
+      `;
+
+      const [getConversationIdData] = await db(sqlFindConversationId, args);
+      if(!getConversationIdData) return res.status(200).send({ message: "No conversation found" });
+      conversation_id = getConversationIdData.CONVERSATION_ID;
+    }
+
+    const sqlGetConversation = `
+      SELECT *
+      FROM MESSAGES
+      WHERE 
+          CONVERSATION_ID = (?)
+          AND CONVERSATION_ID NOT IN (?)
+      LIMIT 3;
+    `;
+    
+    const data = await db(sqlGetConversation, [conversation_id, ids]);
     res.status(200).send({ chats: data });
   } catch (error:any) {
     res.status(500).send({ message: "An error occurred", error: error.message });

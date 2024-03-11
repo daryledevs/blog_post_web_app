@@ -16,11 +16,35 @@ exports.getUserConversations = exports.newMessageAndConversation = exports.getMe
 const query_1 = __importDefault(require("../database/query"));
 const getMessage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { conversation_id } = req.params;
-        const { messages } = req.body;
-        const ids = messages.length ? messages : 0;
-        const sql = "SELECT * FROM MESSAGES WHERE CONVERSATION_ID = (?) AND CONVERSATION_ID NOT IN (?) LIMIT 3;";
-        const data = yield (0, query_1.default)(sql, [conversation_id, ids]);
+        const user_id = req.query.user_id || [];
+        let conversation_id = req.params.conversation_id;
+        const { messages } = req.body || [];
+        const ids = (messages === null || messages === void 0 ? void 0 : messages.length) ? messages : 0;
+        if (user_id.length) {
+            const reverse = user_id.slice().reverse();
+            const args = [...user_id, ...reverse];
+            const sqlFindConversationId = `
+        SELECT *
+        FROM CONVERSATIONS
+        WHERE 
+          (USER_ONE = (?) AND USER_TWO = (?))
+          OR 
+          (USER_ONE = (?) AND USER_TWO = (?));
+      `;
+            const [getConversationIdData] = yield (0, query_1.default)(sqlFindConversationId, args);
+            if (!getConversationIdData)
+                return res.status(200).send({ message: "No conversation found" });
+            conversation_id = getConversationIdData.CONVERSATION_ID;
+        }
+        const sqlGetConversation = `
+      SELECT *
+      FROM MESSAGES
+      WHERE 
+          CONVERSATION_ID = (?)
+          AND CONVERSATION_ID NOT IN (?)
+      LIMIT 3;
+    `;
+        const data = yield (0, query_1.default)(sqlGetConversation, [conversation_id, ids]);
         res.status(200).send({ chats: data });
     }
     catch (error) {
