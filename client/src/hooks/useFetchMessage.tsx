@@ -5,22 +5,27 @@ import { IEOpenConversation } from '../interfaces/interface';
 import SocketService from '../services/SocketServices';
 
 type useFetchMessageProps = {
+  userDataApi: any;
   socketService: SocketService;
-  openConversation: IEOpenConversation;
-}
+  openConversation: IEOpenConversation[];
+};
 
-function useFetchMessage({ socketService, openConversation }: useFetchMessageProps) {
+function useFetchMessage({ userDataApi, socketService, openConversation }: useFetchMessageProps) {
   const [comingMessage, setComingMessage] = useState<MessageType[] | null[]>([]);
   const [getChatMessages, allChatMessages] = useLazyGetChatMessagesQuery();
 
   useEffect(() => {
-    if(!openConversation.conversation_id) return;
-    getChatMessages({ conversation_id: openConversation.conversation_id, messages: [] });
+    getChatMessages({
+      userId: userDataApi?.user_id,
+      personId: openConversation?.[0]?.user_id,
+      conversation_id: openConversation?.[0]?.conversation_id,
+      messages: [],
+    });
 
     socketService.onMessageReceived((message: any) => {
       setComingMessage((prev: any) => [...prev, { ...message }]);
     });
-  }, [getChatMessages, openConversation.conversation_id, socketService]);
+  }, [getChatMessages, openConversation, socketService]);
 
   useEffect(() => {
     if (allChatMessages.error) {
@@ -29,7 +34,9 @@ function useFetchMessage({ socketService, openConversation }: useFetchMessagePro
     }
 
     if (allChatMessages.data) {
-      setComingMessage(allChatMessages?.data?.chats);
+      const data = allChatMessages?.data
+      const chatData = data?.message ? data?.message : data?.chats;
+      setComingMessage(chatData);
     }
   }, [allChatMessages, allChatMessages.error]);
 

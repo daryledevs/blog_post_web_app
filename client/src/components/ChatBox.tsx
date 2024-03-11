@@ -26,8 +26,13 @@ function ChatBox({ socketService }: IEChatProps) {
   const [clearMessage, setClearMessage] = useState<boolean>(false);
 
   // custom hooks
-  useAdjustInputHeight({ inputRef, newMessage, clearMessage })
-  const { comingMessage, setComingMessage, isLoading } = useFetchMessage({ socketService, openConversation });
+  useAdjustInputHeight({ inputRef, newMessage, clearMessage });
+  
+  const { comingMessage, setComingMessage, isLoading } = useFetchMessage({
+    userDataApi: userDataApi.data?.user,
+    socketService,
+    openConversation,
+  });
 
   const sendMessageHandler = useSendMessageHandler({
     userDataApi: userDataApi.data?.user,
@@ -44,8 +49,8 @@ function ChatBox({ socketService }: IEChatProps) {
   }, [openConversation]);
 
   function scrollToDown(ref:any){
-     const scrollHeight = ref.scrollHeight;
-     ref.scrollTop = scrollHeight;
+    const scrollHeight = ref.scrollHeight;
+    ref.scrollTop = scrollHeight;
   }
 
   if (isLoading || !userDataApi.data) return null;

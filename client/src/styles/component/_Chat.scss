@@ -6,6 +6,10 @@
   .chat__message-list{
     flex: 1;
     overflow-y: auto;
+    
+    & > p {
+      @extend .message__not-viewed;
+    }
 
     .chat__other-container{
       padding: 0.3%;
