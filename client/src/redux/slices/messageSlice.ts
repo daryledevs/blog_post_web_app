@@ -2,22 +2,13 @@ import { createSlice } from "@reduxjs/toolkit";
 import { IEOpenConversation } from "../../interfaces/interface";
 
 type MessageStateType = {
-  openConversation: IEOpenConversation;
+  openConversation: IEOpenConversation[];
   newMessageTrigger: boolean;
   switchAccountTrigger: boolean;
 };
 
 const initialState: MessageStateType | null = {
-  openConversation: {
-    conversation_id: null as any,
-    user_one: null as any,
-    user_two: null as any,
-    user_id: "",
-    username: "",
-    avatar_url: "",
-    first_name: "",
-    last_name: "",
-  },
+  openConversation: [],
   newMessageTrigger: false,
   switchAccountTrigger: false,
 };
@@ -27,7 +18,12 @@ const messageSlice = createSlice({
   initialState,
   reducers: {
     setOpenConversation: (state, action) => {
-      state.openConversation = action.payload;
+      const { payload } = action;
+      const isArray = Array.isArray(payload);
+      return {
+        ...state,
+        openConversation: [...(isArray ? payload : [payload])],
+      };
     },
     setNewMessageTrigger: (state) => {
       state.newMessageTrigger = !state.newMessageTrigger;
@@ -38,7 +34,8 @@ const messageSlice = createSlice({
   },
 });
 
-export const selectMessage = (state: { messages: MessageStateType }) => state.messages;
+export const selectMessage = (state: { messages: MessageStateType }) =>
+  state.messages;
 
 export const {
   setOpenConversation,

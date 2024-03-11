@@ -17,6 +17,7 @@ function NewMessage() {
   function newChatHandler() {
     dispatch(setOpenConversation(recipients));
     dispatch(setNewMessageTrigger());
+    setRecipients([]);
   }
 
   if (!messages.newMessageTrigger) return null;
@@ -41,7 +42,10 @@ function NewMessage() {
         />
         <Button
           onClick={newChatHandler}
-          disabled={!recipients.length}
+          disabled={
+            !recipients.length || 
+            recipients.length >= 2 ? true : false
+          }
         >
           Chat
         </Button>

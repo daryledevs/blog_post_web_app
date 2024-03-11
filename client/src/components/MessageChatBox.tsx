@@ -12,7 +12,7 @@ function MessageChatBox({ socketService }: MessageChatBoxProps) {
 
   return (
     <div className="message__conversation-container">
-      {messages.openConversation ? (
+      {messages.openConversation.length ? (
         <ChatBox
           socketService={socketService}
         />
