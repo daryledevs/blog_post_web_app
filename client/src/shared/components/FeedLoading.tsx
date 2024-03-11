@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import svg_loading from "../../assets/icons/loading.svg";
+import svg_loading from "../../assets/icons/svg/loading.svg";
 
 type FeedLoadingProps = {
   isLoading: boolean;
