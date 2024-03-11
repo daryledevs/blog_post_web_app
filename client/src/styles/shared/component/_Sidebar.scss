@@ -12,7 +12,7 @@
   
   .sidebar__logo{
     display: block;
-    margin: 0 auto;
+    margin: 2vh auto 5vh auto;
     width: 10vw;
   }
 
@@ -26,10 +26,6 @@
       justify-content: center;
       align-items: center;
       padding: 2vh 1vw;
-
-      img{
-        max-width: 12%;
-      }
       
       div{
         cursor: pointer;
@@ -50,7 +46,6 @@
   }
 
   .sidebar__burger{
-    width: 13%;
     margin: auto auto 15% auto; // centered at the bottom of the page with a margin of 1vh bottom
     cursor: pointer;
   }

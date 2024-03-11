@@ -10,54 +10,71 @@ import create_check from "../../assets/icons/create_post_check.png";
 import create_uncheck from "../../assets/icons/create_post_uncheck.png";
 import avatar from "../../assets/icons/avatar.png";
 
-let nav_links: any = [
+import Home from "../../assets/icons/svg/home.svg?react";
+import Search from "../../assets/icons/svg/search.svg?react";
+import Explore from "../../assets/icons/svg/explore.svg?react";
+import Messenger from "../../assets/icons/svg/messenger.svg?react";
+import Profile from "../../assets/icons/svg/profile.svg?react";
+import Create from "../../assets/icons/svg/create.svg?react";
+
+import HomeFilled from "../../assets/icons/svg/home-filled.svg?react";
+import SearchFilled from "../../assets/icons/svg/search-filled.svg?react";
+import ExploreFilled from "../../assets/icons/svg/explore-filled.svg?react";
+import MessengerFilled from "../../assets/icons/svg/messenger-filled.svg?react";
+import ProfileFilled from "../../assets/icons/svg/profile-filled.svg?react";
+import CreateFilled from "../../assets/icons/svg/create-filled.svg?react";
+
+
+
+let NAVIGATION_LINKS: any = [
   {
     name: "Home",
-    link: '/',
+    link: "/",
     icon: {
-      check: home_check,
-      uncheck: home_uncheck,
+      check: HomeFilled,
+      uncheck: Home,
     },
   },
   {
     name: "Search",
-    link: '/search',
+    link: "none",
     icon: {
-      check: search_check,
-      uncheck: search_uncheck,
+      check: SearchFilled,
+      uncheck: Search,
     },
   },
   {
     name: "Explore",
-    link: '/explore',
+    link: "/explore",
     icon: {
-      check: explore_check,
-      uncheck: explore_uncheck,
+      check: ExploreFilled,
+      uncheck: Explore,
     },
   },
   {
     name: "Message",
-    link: '/message',
+    link: "/message",
     icon: {
-      check: message_check,
-      uncheck: message_uncheck,
+      check: MessengerFilled,
+      uncheck: Messenger,
     },
   },
   {
     name: "Create",
-    link: 'none',
+    link: "none",
     icon: {
-      check: create_check,
-      uncheck: create_uncheck,
+      check: CreateFilled,
+      uncheck: Create,
     },
   },
   {
     name: "Profile",
-    link: '/profile',
+    link: "/profile",
     icon: {
-      check: avatar,
+      check: ProfileFilled,
+      uncheck: Profile,
     },
   },
 ];
 
-export default nav_links;
+export default NAVIGATION_LINKS;

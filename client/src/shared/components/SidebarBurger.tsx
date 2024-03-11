@@ -1,13 +1,7 @@
-import burger from "../../assets/icons/hamburger.png";
+import Menu from "../../assets/icons/svg/menu.svg?react";
 
 function SidebarBurger() {
-  return (
-    <img
-      src={burger}
-      className="sidebar__burger"
-      alt=""
-    />
-  );
+  return <Menu className="sidebar__burger"/>;
 }
 
 export default SidebarBurger;

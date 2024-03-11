@@ -11,7 +11,6 @@ interface IProps {
 
 function Sidebar({ clickedLink, setClickedLink }: IProps) {
   const userDataApi = useGetUserDataQuery({ person: "" });
-
   if (userDataApi.isLoading || !userDataApi.data) return null;
   
   return (
@@ -20,6 +19,7 @@ function Sidebar({ clickedLink, setClickedLink }: IProps) {
       <ul className="sidebar__links">
         <SidebarTabLists
           clickedLink={clickedLink}
+          avatar={userDataApi?.data?.user.avatar_url}
           username={userDataApi?.data?.user.username}
           setClickedLink={setClickedLink}
         />
