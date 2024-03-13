@@ -4,7 +4,8 @@ dotenv.config();
 
 const db_port = process.env.DATABASE_PORT ? parseInt(process.env.DATABASE_PORT) : 3306;
 
-const database = mysql.createConnection({
+
+const database = mysql.createPool({
   host: `${process.env.DATABASE_HOST}`,
   port: db_port,
   user: `${process.env.USER}`,
@@ -12,6 +13,9 @@ const database = mysql.createConnection({
   database: `${process.env.DATABASE}`,
   multipleStatements: true,
   charset: "utf8mb4",
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
 });
 
 export default database;

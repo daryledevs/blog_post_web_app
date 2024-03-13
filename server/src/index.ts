@@ -16,6 +16,7 @@ import tokenHandler from "./middleware/tokenHandler";
 import rootPath from "./config/path";
 import responseHandler from "./middleware/responseHandler";
 import cookieOptions from "./middleware/cookieOptions";
+import db from "./database/query";
 dotenv.config();
 
 const app = express();
@@ -41,9 +42,14 @@ app.use(`${API}/users`, userRoutes);
 app.use(`${API}/posts`, postRouter);
 app.use(`${API}/feeds`, feedRouter);
 
-database.connect((error) => {
-  if(error) throw error;
+database.getConnection(async (error) => {
+  if (error) throw error;
   console.log("Connected to MySQL Server!");
+
+  // force mysql not to lose connection
+  // https://github.com/sidorares/node-mysql2/issues/836
+  const [data] = await db("SELECT 1 + 1 AS solution", []);
+  console.log("The solution is: ", data.solution);
 });
 
 app.listen(PORT, HOST, () => {

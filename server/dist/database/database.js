@@ -30,7 +30,7 @@ const mysql_1 = __importDefault(require("mysql"));
 const dotenv = __importStar(require("dotenv"));
 dotenv.config();
 const db_port = process.env.DATABASE_PORT ? parseInt(process.env.DATABASE_PORT) : 3306;
-const database = mysql_1.default.createConnection({
+const database = mysql_1.default.createPool({
     host: `${process.env.DATABASE_HOST}`,
     port: db_port,
     user: `${process.env.USER}`,
@@ -38,5 +38,8 @@ const database = mysql_1.default.createConnection({
     database: `${process.env.DATABASE}`,
     multipleStatements: true,
     charset: "utf8mb4",
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
 });
 exports.default = database;

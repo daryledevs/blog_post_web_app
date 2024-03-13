@@ -22,6 +22,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -45,6 +54,7 @@ const tokenHandler_1 = __importDefault(require("./middleware/tokenHandler"));
 const path_1 = __importDefault(require("./config/path"));
 const responseHandler_1 = __importDefault(require("./middleware/responseHandler"));
 const cookieOptions_1 = __importDefault(require("./middleware/cookieOptions"));
+const query_1 = __importDefault(require("./database/query"));
 dotenv.config();
 const app = (0, express_1.default)();
 const PORT = parseInt((_a = process.env.SERVER_PORT) !== null && _a !== void 0 ? _a : "5000");
@@ -66,11 +76,15 @@ app.use(`${API}/chats`, chat_1.default);
 app.use(`${API}/users`, user_1.default);
 app.use(`${API}/posts`, post_1.default);
 app.use(`${API}/feeds`, feed_1.default);
-database_1.default.connect((error) => {
+database_1.default.getConnection((error) => __awaiter(void 0, void 0, void 0, function* () {
     if (error)
         throw error;
     console.log("Connected to MySQL Server!");
-});
+    // force mysql not to lose connection
+    // https://github.com/sidorares/node-mysql2/issues/836
+    const [data] = yield (0, query_1.default)("SELECT 1 + 1 AS solution", []);
+    console.log("The solution is: ", data.solution);
+}));
 app.listen(PORT, HOST, () => {
     (0, socket_1.default)();
     console.log("Connected to", PORT, HOST, "in: ", app.settings.env);
