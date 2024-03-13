@@ -52,13 +52,34 @@ const searchUsersByQuery = async (req: Request, res: Response) => {
 
     const params = Array.from({ length: 3 }, () => search + "%");
     const data = await db(sql, params);
-    if (!data.length)
-      return res.status(404).send({ message: "User not found" });
+    if (!data.length) return res.status(404).send({ message: "User not found" });
     res.status(200).send({ users: data });
   } catch (error: any) {
-    res
-      .status(500)
-      .send({ message: "An error occurred", error: error.message });
+    res.status(500).send({ message: "An error occurred", error: error.message });
+  }
+};
+
+const getRecentSearchUser = async (req: Request, res: Response) => {
+  try {
+    const { method } = req.query;
+    const { user_id } = req.params;
+
+    const sqlInsert = "INSERT INTO RECENT_SEARCHES (USER_ID) VALUES (?);";
+    const sqlSelect = "SELECT * FROM RECENT_SEARCHES WHERE USER_ID = (?) LIMIT 5;";
+
+    if(method === "POST") {
+      await db(sqlInsert, [user_id]);
+      return res.status(200).send({ message: "User saved" });
+    }
+
+    if(method === "GET") {
+      const data = await db(sqlSelect, [user_id]);
+      return res.status(200).send({ users: data });
+    }
+
+    res.status(404).send({ message: "Method not found" });
+  } catch (error: any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
   }
 };
 
@@ -93,9 +114,7 @@ const getFollowStats = async (req: Request, res: Response) => {
 
     res.status(200).send({ followers, following });
   } catch (error: any) {
-    res
-      .status(500)
-      .send({ message: "An error occurred", error: error.message });
+    res.status(500).send({ message: "An error occurred", error: error.message });
   }
 };
 
@@ -144,9 +163,7 @@ const getFollowerFollowingLists = async (req: Request, res: Response) => {
     const data = await db(sql, [user_id, lists]);
     res.status(200).send({ lists: data });
   } catch (error:any) {
-    res
-      .status(500)
-      .send({ message: "An error occurred", error: error.message });
+    res.status(500).send({ message: "An error occurred", error: error.message });
   }
 }
 
@@ -187,4 +204,11 @@ const toggleFollow = async (req: Request, res: Response) => {
   }
 };
 
-export { getUserData, searchUsersByQuery, getFollowStats, getFollowerFollowingLists, toggleFollow };
+export {
+  getUserData,
+  searchUsersByQuery,
+  getFollowStats,
+  getFollowerFollowingLists,
+  toggleFollow,
+  getRecentSearchUser
+};

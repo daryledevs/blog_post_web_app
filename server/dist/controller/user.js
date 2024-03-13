@@ -23,7 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.toggleFollow = exports.getFollowerFollowingLists = exports.getFollowStats = exports.searchUsersByQuery = exports.getUserData = void 0;
+exports.getRecentSearchUser = exports.toggleFollow = exports.getFollowerFollowingLists = exports.getFollowStats = exports.searchUsersByQuery = exports.getUserData = void 0;
 const query_1 = __importDefault(require("../database/query"));
 const getUserData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -78,12 +78,31 @@ const searchUsersByQuery = (req, res) => __awaiter(void 0, void 0, void 0, funct
         res.status(200).send({ users: data });
     }
     catch (error) {
-        res
-            .status(500)
-            .send({ message: "An error occurred", error: error.message });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
 });
 exports.searchUsersByQuery = searchUsersByQuery;
+const getRecentSearchUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { method } = req.query;
+        const { user_id } = req.params;
+        const sqlInsert = "INSERT INTO RECENT_SEARCHES (USER_ID) VALUES (?);";
+        const sqlSelect = "SELECT * FROM RECENT_SEARCHES WHERE USER_ID = (?) LIMIT 5;";
+        if (method === "POST") {
+            yield (0, query_1.default)(sqlInsert, [user_id]);
+            return res.status(200).send({ message: "User saved" });
+        }
+        if (method === "GET") {
+            const data = yield (0, query_1.default)(sqlSelect, [user_id]);
+            return res.status(200).send({ users: data });
+        }
+        res.status(404).send({ message: "Method not found" });
+    }
+    catch (error) {
+        res.status(500).send({ message: "An error occurred", error: error.message });
+    }
+});
+exports.getRecentSearchUser = getRecentSearchUser;
 const getFollowStats = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { user_id } = req.params;
@@ -114,9 +133,7 @@ const getFollowStats = (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.status(200).send({ followers, following });
     }
     catch (error) {
-        res
-            .status(500)
-            .send({ message: "An error occurred", error: error.message });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
 });
 exports.getFollowStats = getFollowStats;
@@ -163,9 +180,7 @@ const getFollowerFollowingLists = (req, res) => __awaiter(void 0, void 0, void 0
         res.status(200).send({ lists: data });
     }
     catch (error) {
-        res
-            .status(500)
-            .send({ message: "An error occurred", error: error.message });
+        res.status(500).send({ message: "An error occurred", error: error.message });
     }
 });
 exports.getFollowerFollowingLists = getFollowerFollowingLists;
