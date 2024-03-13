@@ -65,7 +65,20 @@ const getRecentSearchUser = async (req: Request, res: Response) => {
     const { user_id } = req.params;
 
     const sqlInsert = "INSERT INTO RECENT_SEARCHES (USER_ID) VALUES (?);";
-    const sqlSelect = "SELECT * FROM RECENT_SEARCHES WHERE USER_ID = (?) LIMIT 5;";
+    const sqlSelect = `
+      SELECT 
+            RS.RECENT_ID,
+            U.USER_ID,
+            U.USERNAME,
+            U.FIRST_NAME,
+            U.LAST_NAME,
+            U.AVATAR_URL
+      FROM   RECENT_SEARCHES RS
+            INNER JOIN USERS U
+                    ON U.USER_ID = RS.USER_ID
+      WHERE  U.USER_ID = 1
+      LIMIT  5;
+    `;
 
     if(method === "POST") {
       await db(sqlInsert, [user_id]);
@@ -206,7 +219,7 @@ const toggleFollow = async (req: Request, res: Response) => {
 
 export {
   getUserData,
-  searchUsersByQuery,
+searchUsersByQuery,
   getFollowStats,
   getFollowerFollowingLists,
   toggleFollow,

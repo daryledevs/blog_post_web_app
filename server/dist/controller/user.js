@@ -87,7 +87,20 @@ const getRecentSearchUser = (req, res) => __awaiter(void 0, void 0, void 0, func
         const { method } = req.query;
         const { user_id } = req.params;
         const sqlInsert = "INSERT INTO RECENT_SEARCHES (USER_ID) VALUES (?);";
-        const sqlSelect = "SELECT * FROM RECENT_SEARCHES WHERE USER_ID = (?) LIMIT 5;";
+        const sqlSelect = `
+      SELECT 
+            RS.RECENT_ID,
+            U.USER_ID,
+            U.USERNAME,
+            U.FIRST_NAME,
+            U.LAST_NAME,
+            U.AVATAR_URL
+      FROM   RECENT_SEARCHES RS
+            INNER JOIN USERS U
+                    ON U.USER_ID = RS.USER_ID
+      WHERE  U.USER_ID = 1
+      LIMIT  5;
+    `;
         if (method === "POST") {
             yield (0, query_1.default)(sqlInsert, [user_id]);
             return res.status(200).send({ message: "User saved" });
