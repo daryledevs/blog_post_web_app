@@ -1,0 +1,59 @@
+// Define the font sizes for each breakpoint
+// properties are called "keys" (breakpoints) in maps
+// values are called "values" (sizes) in maps
+$font-sizes: (
+  'small': 0.75rem, // 12px
+  'medium': 0.875rem, // 14px
+  'large': 1rem, // 16px
+  'xlarge': 1.125rem, // 18px
+  'default': 1rem // 16px
+);
+
+// Define the pixel values for each breakpoint
+$breakpoints: (
+  'small': 576px,
+  'medium': 768px,
+  'large': 992px,
+  'xlarge': 1200px
+);
+
+// Mixin to generate media queries
+@mixin respond($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    @media (min-width: map-get($breakpoints, $breakpoint)) {
+      @content;
+    }
+  } @else {
+    @warn "Unknown breakpoint: #{$breakpoint}.";
+  }
+}
+
+// Set the root font size for each breakpoint
+html {
+  font-size: map-get($font-sizes, 'default');
+  
+  @each $breakpoint, $size in $font-sizes {
+    @if $breakpoint != 'default' {
+      @include respond($breakpoint) {
+        font-size: $size;
+      }
+    }
+  }
+}
+
+// Set the font size for each element
+body {
+  font-size: 1rem;
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+h2 {
+  font-size: 1.75rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+}

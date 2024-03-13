@@ -18,8 +18,10 @@ function Profile() {
     <React.Fragment>
       <Outlet />
       <div className="profile__container">
-        <ProfileHeader user={data.user} />
-        <ProfileGallery posts={postDataApi.data} />
+        <div className="profile__parent">
+          <ProfileHeader user={data.user} />
+          <ProfileGallery posts={postDataApi.data} />
+        </div>
       </div>
     </React.Fragment>
   );

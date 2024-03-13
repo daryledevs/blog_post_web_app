@@ -1,4 +1,4 @@
-import CloseIcon from "../../assets/icons/svg/close-icon.svg?react";
+import CloseIcon from "../../assets/icons/svg/close-icon-blue.svg?react";
 
 function RecipientPersonCard({ item, setRecipients }: any) {
   return (
