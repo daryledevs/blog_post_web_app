@@ -15,6 +15,30 @@ const userApi = baseApi.injectEndpoints({
         method: "GET",
       }),
     }),
+    getRecentSearchUser: build.query<any, { user_id: number }>({
+      query: ({ user_id }) => ({
+        url: `/users/${user_id}/recent-searches`,
+        method: "GET",
+      }),
+    }),
+    saveRecentSearchUser: build.mutation<
+      any,
+      { user_id: number; searched_id: number }
+    >({
+      query: ({ user_id, searched_id }) => ({
+        url: `/users/${user_id}/recent-searches/${searched_id}`,
+        method: "POST",
+      }),
+    }),
+    deleteRecentSearchUser: build.mutation<
+      any,
+      { recent_id: number }
+    >({
+      query: ({ recent_id }) => ({
+        url: `/users/recent-searches/${recent_id}`,
+        method: "DELETE",
+      }),
+    }),
     getFollowStats: build.query<any, { user_id: number }>({
       query: ({ user_id }) => ({
         url: `/users/${user_id}/follows/stats`,
@@ -35,10 +59,13 @@ const userApi = baseApi.injectEndpoints({
         body: { listsId },
       }),
     }),
-    followUser: build.mutation<any, { follower_id: number; followed_id: number }>({
+    followUser: build.mutation<
+      any,
+      { follower_id: number; followed_id: number }
+    >({
       query: ({ follower_id, followed_id }) => ({
         url: `/users/${follower_id}/follows/${followed_id}`,
-        method: "GET",
+        method: "POST",
       }),
     }),
   }),
@@ -50,4 +77,7 @@ export const {
   useGetFollowersAndFollowingListsMutation,
   useGetFollowStatsQuery,
   useFollowUserMutation,
+  useGetRecentSearchUserQuery,
+  useSaveRecentSearchUserMutation,
+  useDeleteRecentSearchUserMutation,
 } = userApi;
