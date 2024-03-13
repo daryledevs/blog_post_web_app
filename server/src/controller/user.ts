@@ -59,38 +59,56 @@ const searchUsersByQuery = async (req: Request, res: Response) => {
   }
 };
 
-const getRecentSearchUser = async (req: Request, res: Response) => {
+const getRecentSearches = async (req: Request, res: Response) => {
   try {
-    const { method } = req.query;
     const { user_id } = req.params;
 
-    const sqlInsert = "INSERT INTO RECENT_SEARCHES (USER_ID) VALUES (?);";
-    const sqlSelect = `
+    const sql = `
       SELECT 
-            RS.RECENT_ID,
-            U.USER_ID,
-            U.USERNAME,
-            U.FIRST_NAME,
-            U.LAST_NAME,
-            U.AVATAR_URL
+        RS.RECENT_ID,
+        U.USER_ID,
+        U.USERNAME,
+        U.FIRST_NAME,
+        U.LAST_NAME,
+        U.AVATAR_URL
       FROM   RECENT_SEARCHES RS
-            INNER JOIN USERS U
-                    ON U.USER_ID = RS.USER_ID
-      WHERE  U.USER_ID = 1
-      LIMIT  5;
+        INNER JOIN USERS U
+            ON U.USER_ID = RS.SEARCH_USER_ID
+      WHERE  RS.USER_ID = (?) LIMIT 10;
     `;
 
-    if(method === "POST") {
-      await db(sqlInsert, [user_id]);
-      return res.status(200).send({ message: "User saved" });
-    }
+    const data = await db(sql, [user_id]);
+    return res.status(200).send({ users: data });
+  } catch (error: any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
+  }
+};
 
-    if(method === "GET") {
-      const data = await db(sqlSelect, [user_id]);
-      return res.status(200).send({ users: data });
-    }
+const saveRecentSearches = async (req: Request, res: Response) => {
+  try {
+    const { user_id, searched_id } = req.params;
 
-    res.status(404).send({ message: "Method not found" });
+    // Check if the user is already saved
+    const sqlSelect = "SELECT * FROM RECENT_SEARCHES WHERE SEARCH_USER_ID = (?) AND USER_ID = (?);";
+    const [data] = await db(sqlSelect, [searched_id, user_id]);
+    if (data) return res.status(200).send({ message: "User already saved" });
+    
+    // If the user is not saved, save the user
+    const sql = "INSERT INTO RECENT_SEARCHES (SEARCH_USER_ID, USER_ID) VALUES (?, ?);";
+    await db(sql, [searched_id, user_id]);
+    return res.status(200).send({ message: "User saved" });
+  } catch (error: any) {
+    res.status(500).send({ message: "An error occurred", error: error.message });
+  }
+};
+
+const removeRecentSearches = async (req: Request, res: Response) => {
+  try {
+    const { recent_id } = req.params;
+    const sql = "DELETE FROM RECENT_SEARCHES WHERE RECENT_ID = (?);";
+
+    const data = await db(sql, [recent_id]);
+    return res.status(200).send({ users: data });
   } catch (error: any) {
     res.status(500).send({ message: "An error occurred", error: error.message });
   }
@@ -219,9 +237,11 @@ const toggleFollow = async (req: Request, res: Response) => {
 
 export {
   getUserData,
-searchUsersByQuery,
+  searchUsersByQuery,
+  saveRecentSearches,
+  getRecentSearches,
+  removeRecentSearches,
   getFollowStats,
   getFollowerFollowingLists,
   toggleFollow,
-  getRecentSearchUser
 };

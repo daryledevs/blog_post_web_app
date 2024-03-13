@@ -5,15 +5,21 @@ import {
   toggleFollow,
   getFollowStats,
   getFollowerFollowingLists,
-  getRecentSearchUser,
+  getRecentSearches,
+  saveRecentSearches,
+  removeRecentSearches,
 } from "../controller/user";
 const router = express.Router();
 
 router.get("/", getUserData);
 router.get("/lists", searchUsersByQuery);
 router.get("/:user_id/follows/stats", getFollowStats);
-router.get("/:user_id/recent-searches", getRecentSearchUser);
-router.get("/:user_id/follows/:followed_id", toggleFollow);
+router.get("/:user_id/recent-searches", getRecentSearches);
 router.post("/:user_id/lists", getFollowerFollowingLists);
+
+router.post("/:user_id/follows/:followed_id", toggleFollow);
+router.post("/:user_id/recent-searches/:searched_id", saveRecentSearches);
+
+router.delete("/recent-searches/:recent_id", removeRecentSearches);
 
 export default router;
