@@ -669,6 +669,94 @@ h3 {
   display: none;
 }
 
+.search-bar__container {
+  flex: 1;
+  height: 100vh;
+  border-right: 1px solid #ccc;
+}
+
+.search-header__container {
+  height: 20%;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid #ccc;
+}
+.search-header__container h3 {
+  margin: auto;
+  font-weight: 400;
+  width: 90%;
+}
+.search-header__container input {
+  display: block;
+  outline: none;
+  border: none;
+  width: 90%;
+  margin: auto;
+  padding: 0.6rem;
+  background-color: rgb(239, 239, 239);
+  border-radius: 5px;
+}
+
+.search-body__container {
+  display: flex;
+  flex-direction: column;
+  height: 80%;
+}
+.search-body__container .search-body__list {
+  display: flex;
+  height: 100%;
+  overflow: auto;
+  flex-direction: column;
+}
+.search-body__container .search-body__list .search-body__header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 1.2rem;
+}
+.search-body__container .search-body__list .search-body__header h6 {
+  font-weight: 600;
+}
+.search-body__container .search-body__list .search-body__header h6:last-child {
+  cursor: pointer;
+  color: #0095f6;
+}
+.search-body__container .search-body__list .search-card__container {
+  display: flex;
+  flex-direction: row;
+  align-self: center;
+  align-items: center;
+  gap: 0.2rem;
+  width: 100%;
+  padding: 0.5rem 1rem 0.5rem 0.5rem;
+  cursor: pointer;
+}
+.search-body__container .search-body__list .search-card__container img {
+  width: 55px;
+}
+.search-body__container .search-body__list .search-card__container p:first-child {
+  color: black;
+  font-weight: 600;
+}
+.search-body__container .search-body__list .search-card__container p {
+  color: rgb(177, 177, 177);
+}
+.search-body__container .search-body__list .search-card__container svg {
+  cursor: pointer;
+  margin-left: auto;
+}
+.search-body__container .search-body__list .search-card__container:hover {
+  background-color: rgb(242, 242, 242);
+}
+.search-body__container .search-body__list .search-body__no-search {
+  height: 100%;
+  display: inherit;
+  align-items: center;
+  justify-content: center;
+  color: rgba(53, 50, 50, 0.507);
+  font-weight: 500;
+}
+
 .create-post__parent {
   background: rgba(0, 0, 0, 0.5);
   width: 100%;

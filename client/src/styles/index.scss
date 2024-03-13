@@ -17,7 +17,8 @@
   font-size: 16px; 
 }
 
-@import "./_colors";
+@import "./_Colors";
+@import "./_FontSize";
 @import "../styles/pages/_Feed";
 
 @import "./component/_Chat";
@@ -32,6 +33,10 @@
 @import './pages/_Index';
 
 @import "../styles/shared/component/_Sidebar";
+@import "../styles/shared/component/_SearchBar";
+@import "../styles/shared/component/_SearchBarHeader";
+@import "../styles/shared/component/_SearchBarBody";
+
 @import "./shared/modals/_CreatePost";
 @import "./shared/modals/_FollowModal";
 @import "./shared/modals/_NewMessage";

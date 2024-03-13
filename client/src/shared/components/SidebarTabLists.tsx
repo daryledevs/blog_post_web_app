@@ -1,19 +1,20 @@
 
+import { ClickedLink } from "pages/Index";
 import Links from "../constants/nav_links";
 import SidebarTabCard from "./SidebarTabCard";
 
 type SidebarTabListsProps = {
   avatar: string;
-  clickedLink: string;
   username: string;
-  setClickedLink: React.Dispatch<React.SetStateAction<any>>;
+  clickedLink: ClickedLink;
+  setClickedLink: React.Dispatch<React.SetStateAction<ClickedLink>>;
 };
 
 function SidebarTabLists({ avatar, clickedLink, username, setClickedLink } : SidebarTabListsProps) {
   
   return Links.map((item: any, index: any) => {
     const { name, link } = item;
-    const isClicked = link === clickedLink || name === clickedLink;
+    const isClicked = [link, name].includes(clickedLink.current);
     
     return (
       <SidebarTabCard
@@ -22,6 +23,7 @@ function SidebarTabLists({ avatar, clickedLink, username, setClickedLink } : Sid
         avatar={avatar}
         username={username}
         isClicked={isClicked}
+        clickedLink={clickedLink}
         setClickedLink={setClickedLink}
       />
     );

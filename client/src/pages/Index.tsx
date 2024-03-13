@@ -2,20 +2,33 @@ import React, { useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import CreatePost from "../shared/modals/CreatePost";
 import Sidebar from "../shared/components/Sidebar";
+import SearchBar from "shared/components/SearchBar";
+
+export type ClickedLink = {
+  previous: string;
+  current: string;
+};
 
 function Index() {
   const { hash, pathname, search } = useLocation();
-  const [clickedLink, setClickedLink] = useState(pathname);
+  const [clickedLink, setClickedLink] = useState<ClickedLink>({ previous: "", current: pathname });
 
   return (
     <div className="index__container">
-      {clickedLink === "Create" && (
-        <CreatePost setClickedLink={setClickedLink} />
-      )}
-      <Sidebar
+      <CreatePost
         clickedLink={clickedLink}
         setClickedLink={setClickedLink}
       />
+      <div className="index__sidebar">
+        <Sidebar
+          clickedLink={clickedLink}
+          setClickedLink={setClickedLink}
+        />
+        <SearchBar
+          clickedLink={clickedLink}
+          setClickedLink={setClickedLink}
+        />
+      </div>
       <Outlet />
     </div>
   );

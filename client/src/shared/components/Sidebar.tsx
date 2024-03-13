@@ -1,26 +1,32 @@
-
-import { useGetUserDataQuery } from '../../redux/api/userApi';
-import SidebarBurger from './SidebarBurger';
+import React, { useState } from "react";
+import { useGetUserDataQuery } from "../../redux/api/userApi";
+import SidebarBurger from "./SidebarBurger";
 import SidebarLogo from "./SidebarLogo";
 import SidebarTabLists from "./SidebarTabLists";
+import { ClickedLink } from "pages/Index";
 
 interface IProps {
-  clickedLink: string;
-  setClickedLink: (message: string) => void;
+  clickedLink: ClickedLink;
+  setClickedLink: React.Dispatch<React.SetStateAction<ClickedLink>>;
 }
 
 function Sidebar({ clickedLink, setClickedLink }: IProps) {
   const userDataApi = useGetUserDataQuery({ person: "" });
+  const user = userDataApi?.data?.user;
   if (userDataApi.isLoading || !userDataApi.data) return null;
-  
+
   return (
-    <div className="sidebar__container">
+    <div
+      className={`sidebar__container ${
+        clickedLink.current === "Search" && "sidebar__show-search-tab"
+      }`}
+    >
       <SidebarLogo />
       <ul className="sidebar__links">
         <SidebarTabLists
+          avatar={user.avatar_url}
+          username={user.username}
           clickedLink={clickedLink}
-          avatar={userDataApi?.data?.user.avatar_url}
-          username={userDataApi?.data?.user.username}
           setClickedLink={setClickedLink}
         />
       </ul>
@@ -29,4 +35,4 @@ function Sidebar({ clickedLink, setClickedLink }: IProps) {
   );
 }
 
-export default Sidebar
+export default Sidebar;

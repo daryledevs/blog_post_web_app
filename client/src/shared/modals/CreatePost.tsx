@@ -9,9 +9,11 @@ import { Area } from "react-easy-crop/types";
 import api from "../../config/api";
 import avatar from "../../assets/icons/avatar.png";
 import { useGetUserDataQuery } from "../../redux/api/userApi";
+import { ClickedLink } from "pages/Index";
 
 interface Modal {
-  setClickedLink: (message: string) => void;
+  clickedLink: ClickedLink;
+  setClickedLink: React.Dispatch<React.SetStateAction<ClickedLink>>;
 }
 
 interface IEGetCroppedImg {
@@ -20,7 +22,7 @@ interface IEGetCroppedImg {
   fileName: string;
 }
 
-function CreatePost({ setClickedLink }: Modal) {
+function CreatePost({ clickedLink, setClickedLink }: Modal) {
   let rootElement: HTMLElement = document.querySelector<HTMLElement>("div")!;
   const win: Window = window;
 
@@ -124,7 +126,7 @@ function CreatePost({ setClickedLink }: Modal) {
           "Content-Type": "multipart/form-data",
         },
       });
-      setClickedLink(pathname);
+      setClickedLink({ previous: clickedLink.current, current: "Create" });
     } catch (error) {
       console.log(error);
     }
@@ -143,7 +145,7 @@ function CreatePost({ setClickedLink }: Modal) {
   // };
   // }, []);
 
-  if(userDataApi.isLoading) return null;
+  if (userDataApi.isLoading || clickedLink.current !== "Create") return null;
 
   return (
     <div className="create-post__parent">
@@ -151,7 +153,12 @@ function CreatePost({ setClickedLink }: Modal) {
         src={close}
         alt=""
         className="create-post__close-modal"
-        onClick={() => setClickedLink(pathname)}
+        onClick={() =>
+          setClickedLink({
+            previous: "",
+            current: clickedLink.previous
+          })
+        }
       />
 
       <div
