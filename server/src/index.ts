@@ -17,7 +17,7 @@ import tokenHandler from "./middleware/token-handler";
 import rootPath from "./config/path";
 import responseHandler from "./middleware/response-handler";
 import cookieOptions from "./middleware/cookie-options";
-import { errorHandler } from "./helper/error-handler";
+import errorHandler from "./helper/error-handler";
 dotenv.config();
 
 const app = express();

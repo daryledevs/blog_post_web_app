@@ -55,7 +55,7 @@ const token_handler_1 = __importDefault(require("./middleware/token-handler"));
 const path_1 = __importDefault(require("./config/path"));
 const response_handler_1 = __importDefault(require("./middleware/response-handler"));
 const cookie_options_1 = __importDefault(require("./middleware/cookie-options"));
-const error_handler_1 = require("./helper/error-handler");
+const error_handler_1 = __importDefault(require("./helper/error-handler"));
 dotenv.config();
 const app = (0, express_1.default)();
 const PORT = parseInt((_a = process.env.SERVER_PORT) !== null && _a !== void 0 ? _a : "5000");
@@ -77,7 +77,7 @@ app.use(`${API}/chats`, chat_1.default);
 app.use(`${API}/users`, user_1.default);
 app.use(`${API}/posts`, post_1.default);
 app.use(`${API}/feeds`, feed_1.default);
-app.use(error_handler_1.errorHandler);
+app.use(error_handler_1.default);
 database_1.default.getConnection((error) => __awaiter(void 0, void 0, void 0, function* () {
     if (error)
         throw error;

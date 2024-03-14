@@ -8,9 +8,7 @@ const errorHandler : ErrorRequestHandler = (err, req, res, next) => {
     return res.status(status).send({ message });
   }
 
-  res.status(500).send({ message: "Something went wrong" });
+  res.status(500).send({ message: "Something went wrong", error: err.message });
 };
 
-export {
-  errorHandler,
-};
+export default errorHandler;
