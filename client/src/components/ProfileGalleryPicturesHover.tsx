@@ -1,6 +1,7 @@
 import React from "react";
 import heart from "../assets/icons/heart-filled-white.png";
 import comment from "../assets/icons/comment-filled.png";
+import ProfileGalleryPicturesCard from "./ProfileGalleryPicturesHoverCard";
 
 const images = [
   {
@@ -21,17 +22,13 @@ function ProfileGalleryPicturesHover() {
   return (
     <React.Fragment>
       {images.map((icon, index) => (
-        <div
+        <ProfileGalleryPicturesCard
           key={index}
-          className="profile-gallery__hover"
-        >
-          <img
-            src={icon.picture}
-            alt={icon.alt}
-            className={icon.className}
-          />
-          <p>{icon.count}</p>
-        </div>
+          picture={icon.picture}
+          alt={icon.alt}
+          className={icon.className}
+          count={icon.count}
+        />
       ))}
     </React.Fragment>
   );
