@@ -1,7 +1,7 @@
 import db from "../database/query";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 
-const getTotalFeed = async (req: Request, res: Response) => {
+const getTotalFeed = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { user_id } = req.body;
     const sql = `
@@ -15,12 +15,12 @@ const getTotalFeed = async (req: Request, res: Response) => {
     `;
     const [data] = await db(sql, [user_id]);
     res.status(200).send({ count: data["COUNT(*)"] });
-  } catch (error: any) {
-    res.status(500).send({ message: "An error occurred", error: error.message });
+  } catch (error) {
+    next(error)
   };
 };
 
-const getUserFeed = async (req: Request, res: Response) => {
+const getUserFeed = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { post_ids, user_id } = req.body;
     const values = post_ids.length ? post_ids : 0;
@@ -45,15 +45,15 @@ const getUserFeed = async (req: Request, res: Response) => {
         P.POST_DATE > DATE_SUB(CURDATE(), INTERVAL 3 DAY) AND
         POST_ID NOT IN (?) 
       ORDER BY RAND() LIMIT 3;
-   `;
+    `;
     const data = await db(sql, [user_id, values]);
     res.status(200).send({ feed: data });
-  } catch (error: any) {
-    res.status(500).send({ message: "An error occurred", error: error.message });
+  } catch (error) {
+    next(error)
   };
 };
 
-const getExploreFeed = async (req: Request, res: Response) => {
+const getExploreFeed = async (req: Request, res: Response, next: NextFunction) => {
   const { user_id } = req.params;
 
   try {
@@ -81,8 +81,8 @@ const getExploreFeed = async (req: Request, res: Response) => {
 
     const data = await db(sqlSelect, [user_id]);
     res.status(200).send({ feed: data });
-  } catch (error: any) {
-    res.status(500).send({ message: "An error occurred", error: error.message });
+  } catch (error) {
+    next(error)
   };
 };
 

@@ -3,6 +3,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import morgan from "morgan";
 import * as dotenv from "dotenv";
+import db from "./database/query";
 import database from "./database/database";
 import authRoutes from "./router/auth";
 import userRoutes from './router/user';
@@ -12,11 +13,11 @@ import chatRoutes from "./router/chat";
 import postRouter from "./router/post";
 import feedRouter from "./router/feed";
 import corsOptions from "./config/corsOption";
-import tokenHandler from "./middleware/tokenHandler";
+import tokenHandler from "./middleware/token-handler";
 import rootPath from "./config/path";
-import responseHandler from "./middleware/responseHandler";
-import cookieOptions from "./middleware/cookieOptions";
-import db from "./database/query";
+import responseHandler from "./middleware/response-handler";
+import cookieOptions from "./middleware/cookie-options";
+import { errorHandler } from "./helper/error-handler";
 dotenv.config();
 
 const app = express();
@@ -41,15 +42,14 @@ app.use(`${API}/chats`, chatRoutes);
 app.use(`${API}/users`, userRoutes);
 app.use(`${API}/posts`, postRouter);
 app.use(`${API}/feeds`, feedRouter);
+app.use(errorHandler);
 
 database.getConnection(async (error) => {
   if (error) throw error;
   console.log("Connected to MySQL Server!");
-
   // force mysql not to lose connection
   // https://github.com/sidorares/node-mysql2/issues/836
-  const [data] = await db("SELECT 1 + 1 AS solution", []);
-  console.log("The solution is: ", data.solution);
+  await db("SELECT 1 + 1 AS solution", []);
 });
 
 app.listen(PORT, HOST, () => {

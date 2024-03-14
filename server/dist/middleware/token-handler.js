@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
-const routeException_1 = __importDefault(require("../helper/routeException"));
+const routeException_1 = __importDefault(require("../util/routeException"));
 const query_1 = __importDefault(require("../database/query"));
 const authTokens_1 = require("../util/authTokens");
 dotenv_1.default.config();

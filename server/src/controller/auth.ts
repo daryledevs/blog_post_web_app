@@ -4,7 +4,7 @@ import {
   generateResetToken,
   referenceToken,
 } from "../util/authTokens";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import * as dotenv from "dotenv";
@@ -12,9 +12,10 @@ import sendEmail from "../config/nodemailer";
 import encryptData from "../util/encrypt";
 import decryptData from "../util/decrypt";
 import db from "../database/query";
+import Exception from "../exception/exception";
 dotenv.config();
 
-const register = async (req: Request, res: Response) => {
+const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, username, password, first_name, last_name } = req.body;
     const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
@@ -28,12 +29,12 @@ const register = async (req: Request, res: Response) => {
     // Save the user to the database
     await db(sqlInsert, [username, email, hashPassword, first_name, last_name]);
     return res.status(200).send({ message: "Registration is successful" });
-  } catch (error:any) {
-    res.status(500).send({ message: "An error occurred", error: error.message });
+  } catch (error) {
+    next(error);
   };
 };
 
-const login = async (req: Request, res: Response) => {
+const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { userCredential, password } = req.body;
     const isMissing = !req.body || !userCredential || !password;
@@ -43,7 +44,7 @@ const login = async (req: Request, res: Response) => {
     
     // Check if the user is exists.
     const [user] = await db(sql, [userCredential || "", userCredential || ""]);
-    if(!user) return res.status(404).send({ message: "User not found" });
+    if(!user) return next(Exception.notFound("User not found"));
 
     // Compare the password from database and from request body.
     if(bcrypt.compareSync(password, user.PASSWORD)) {
@@ -57,12 +58,12 @@ const login = async (req: Request, res: Response) => {
     } else {
       return res.status(404).send({ message: "Password is incorrect" });
     }
-  } catch (error:any) {
-    return res.status(500).send({ message: "An error occurred", error: error.message });
+  } catch (error) {
+    next(error)
   };
 };
 
-const forgotPassword = async (req: Request, res: Response) => {
+const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email } = req.body;
     const sqlSelect = "SELECT * FROM USERS WHERE EMAIL = ?;";
@@ -70,7 +71,7 @@ const forgotPassword = async (req: Request, res: Response) => {
     
     // Check if user exists
     const [user] = await db(sqlSelect, [email]);
-    if(!user) return res.status(404).send({ message: "User doesn't exist" });
+    if(!user) next(Exception.notFound("User doesn't exists"));
     
     // Generate tokens
     const token = generateResetToken(user);
@@ -84,12 +85,12 @@ const forgotPassword = async (req: Request, res: Response) => {
     // Send reset password email
     sendEmail(email, "Reset Password", encodedToken);
     res.json({ message: "Password reset email sent" });
-  } catch (error:any) {
-    res.status(500).send({ message: "An error occurred", error: error.message });
+  } catch (error) {
+    next(error);
   };
 };
 
-const resetPasswordForm =  async (req: Request, res: Response) => {
+const resetPasswordForm =  async (req: Request, res: Response, next: NextFunction) => {
   try {  
     const token = req.query.token as string;
     const decodedToken = decodeURIComponent(token);
@@ -105,15 +106,15 @@ const resetPasswordForm =  async (req: Request, res: Response) => {
       const { email, user_id } = decode as { email: any, user_id:any };
       res.status(200).render("resetPassword", { email, user_id });
     });
-  } catch (error:any) {
-    res.status(500).send({ message: "An error occurred", error: error.message });
+  } catch (error) {
+    next(error);
   };
 };
 
-const resetPassword = async (req: Request, res: Response) => {
+const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { tokenId, user_id, email, password, confirmPassword } = req.body;
-    if(password !== confirmPassword) return res.status(422).send({ message: "Password does not match confirm password" });
+    if(password !== confirmPassword) return next(Exception.badRequest("Password does not match"));
     if(password.length <= 5) return res.status(400).json({ error: "Password should be at least 5 characters long." });
     
     // Used limit here due to "safe update mode" error.
@@ -131,12 +132,12 @@ const resetPassword = async (req: Request, res: Response) => {
     await db(sqlUpdate, [hashPassword, email, user_id]);
     await db(sqlDelete, [decodedTokenId]);
     res.status(200).send({ message: "Reset password successfully" });
-  } catch (error:any) {
-    res.status(500).send({ message: "An error occurred", error: error.message });
+  } catch (error) {
+    next(error);
   };
 };
 
-const logout = async (req: Request, res: Response) => {
+const logout = async (req: Request, res: Response, next: NextFunction) => {
   res
     .clearCookie("REFRESH_TOKEN", {
       sameSite: "none",

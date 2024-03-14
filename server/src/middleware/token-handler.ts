@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
-import routeException from "../helper/routeException";
+import routeException from "../util/routeException";
 import db from "../database/query";
 import { generateAccessToken, generateRefreshToken, verifyToken } from "../util/authTokens";
 

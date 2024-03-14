@@ -1,10 +1,10 @@
-import { Response, Request } from "express";
+import { Response, Request, NextFunction } from "express";
 import * as dotenv from "dotenv";
 import db from "../database/query";
 import uploadAndDeleteLocal from "../config/cloudinary";
 dotenv.config();
 
-const getUserPost = async (req: Request, res: Response) => {
+const getUserPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { user_id } = req.query;
     const sql = 
@@ -26,12 +26,12 @@ const getUserPost = async (req: Request, res: Response) => {
     `;
     const data = await db(sql, [user_id]);
     res.status(200).send({ post: data });
-  } catch (error:any) {
-    res.status(500).send({ message: "An error occurred", error: error.message });
+  } catch (error) {
+    next(error)
   }
 };
 
-const getUserTotalPosts = async (req: Request, res: Response) => {
+const getUserTotalPosts = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { user_id } = req.query;
     const sql = `
@@ -45,13 +45,11 @@ const getUserTotalPosts = async (req: Request, res: Response) => {
     const [data] = await db(sql, [user_id]);
     res.status(200).send({ totalPost: data["COUNT(*)"] });
   } catch (error: any) {
-    res
-      .status(500)
-      .send({ message: "An error occurred", error: error.message });
+    next(error)
   }
 };
 
-const newPost = async (req: Request, res: Response) => {
+const newPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { user_id, caption } = req.body;
     const { img } = req.files as { [fieldname: string]: Express.Multer.File[] };
@@ -65,12 +63,12 @@ const newPost = async (req: Request, res: Response) => {
     `;
     await db(sql, [values]);
     res.status(200).send({ message: "Post has been posted" });
-  } catch (error:any) {
-    res.status(500).send({ message: "An error occurred", error: error.message });
+  } catch (error) {
+    next(error)
   }
 };
 
-const editPost = async (req: Request, res: Response) => {
+const editPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { post_id } = req.params;
     const body = req.body;
@@ -84,24 +82,24 @@ const editPost = async (req: Request, res: Response) => {
     const sql = `UPDATE POSTS SET ${query} WHERE POST_ID = (?);`;
     await db(sql, [parseInt(post_id)]);
     res.status(200).send({ message: "Edit post successfully" });
-  } catch (error:any) {
-    res.status(500).send({ message: "An error occurred", error: error.message });
+  } catch (error) {
+    next(error)
   }
 };
 
-const deletePost = async (req: Request, res: Response) => {
+const deletePost = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { post_id } = req.params;
     const sql = "DELETE FROM POSTS WHERE POST_ID = (?);";
     await db(sql, [parseInt(post_id)]);
     res.status(200).send("Delete post successfully");
-  } catch (error:any) {
-    res.status(500).send({ message: "An error occurred", error: error.message });
+  } catch (error) {
+    next(error)
   }
 };
 
 
-const getLikesCountForPost = async (req: Request, res: Response) => {
+const getLikesCountForPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { post_id } = req.params;
     const sql = 
@@ -116,12 +114,12 @@ const getLikesCountForPost = async (req: Request, res: Response) => {
 
     const [data] = await db(sql, [post_id]);
     res.status(200).send({ count: data.COUNT });
-  } catch (error:any) {
-    res.status(500).send({ message: "An error occurred", error: error.message });
+  } catch (error) {
+    next(error)
   }
 };
 
-const checkUserLikeStatusForPost = async (req: Request, res: Response) => {
+const checkUserLikeStatusForPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { post_id, user_id } = req.params;
     const sql = `
@@ -132,12 +130,12 @@ const checkUserLikeStatusForPost = async (req: Request, res: Response) => {
 
     const [data] = await db(sql, [post_id, user_id]);
     res.status(200).send({ status: data ? true : false });
-  } catch (error:any) {
-    res.status(500).send({ message: "An error occurred", error: error.message });
+  } catch (error) {
+    next(error)
   }
 };
 
-const toggleUserLikeForPost = async (req: Request, res: Response) => {
+const toggleUserLikeForPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { post_id, user_id } = req.params;
     const sql_get = `
@@ -166,8 +164,8 @@ const toggleUserLikeForPost = async (req: Request, res: Response) => {
       await db(sql_create, [post_id, user_id]);
       return res.status(200).send("Liked post");
     }
-  } catch (error:any) {
-    res.status(500).send({ message: "An error occurred", error: error.message });
+  } catch (error) {
+    next(error)
   }
 };
 

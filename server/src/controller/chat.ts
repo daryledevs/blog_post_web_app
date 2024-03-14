@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import db from "../database/query";
 
-const getMessage = async (req: Request, res: Response) => {
+const getMessage = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user_id: any | any[] = req.query.user_id || [];
     let conversation_id = req.params.conversation_id;
@@ -37,12 +37,12 @@ const getMessage = async (req: Request, res: Response) => {
     
     const data = await db(sqlGetConversation, [conversation_id, ids]);
     res.status(200).send({ chats: data });
-  } catch (error:any) {
-    res.status(500).send({ message: "An error occurred", error: error.message });
+  } catch (error) {
+    next(error)
   };
 };
 
-const getUserConversations = async (req: Request, res: Response) => {
+const getUserConversations = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { user_id } = req.query;
     const { conversations } = req.body;
@@ -72,14 +72,12 @@ const getUserConversations = async (req: Request, res: Response) => {
     const data = await db(sql, [user_id, ids]);
     if (!data) return res.status(200).send({ list: data });
     return res.status(200).send({ list: data });
-  } catch (error: any) {
-    res
-      .status(500)
-      .send({ message: "An error occurred", error: error.message });
+  } catch (error) {
+    next(error);
   }
 };
 
-const newMessageAndConversation = async (req: Request, res: Response) => {
+const newMessageAndConversation = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { sender_id, receiver_id, text_message, conversation_id } = req.body;
     const sqlFindConversationId = "SELECT * FROM CONVERSATIONS WHERE CONVERSATION_ID = (?);"
@@ -99,8 +97,8 @@ const newMessageAndConversation = async (req: Request, res: Response) => {
       await db(sqlInsertNewMessage, [sender_id, conversation_id, text_message]);
       return res.status(200).send({ message: "New message created" });
     }
-  } catch (error:any) {
-    res.status(500).send({ message: "An error occurred", error: error.message });
+  } catch (error) {
+    next(error)
   };
 };
 

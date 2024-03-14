@@ -41,6 +41,7 @@ const cors_1 = __importDefault(require("cors"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const morgan_1 = __importDefault(require("morgan"));
 const dotenv = __importStar(require("dotenv"));
+const query_1 = __importDefault(require("./database/query"));
 const database_1 = __importDefault(require("./database/database"));
 const auth_1 = __importDefault(require("./router/auth"));
 const user_1 = __importDefault(require("./router/user"));
@@ -50,11 +51,11 @@ const chat_1 = __importDefault(require("./router/chat"));
 const post_1 = __importDefault(require("./router/post"));
 const feed_1 = __importDefault(require("./router/feed"));
 const corsOption_1 = __importDefault(require("./config/corsOption"));
-const tokenHandler_1 = __importDefault(require("./middleware/tokenHandler"));
+const token_handler_1 = __importDefault(require("./middleware/token-handler"));
 const path_1 = __importDefault(require("./config/path"));
-const responseHandler_1 = __importDefault(require("./middleware/responseHandler"));
-const cookieOptions_1 = __importDefault(require("./middleware/cookieOptions"));
-const query_1 = __importDefault(require("./database/query"));
+const response_handler_1 = __importDefault(require("./middleware/response-handler"));
+const cookie_options_1 = __importDefault(require("./middleware/cookie-options"));
+const error_handler_1 = require("./helper/error-handler");
 dotenv.config();
 const app = (0, express_1.default)();
 const PORT = parseInt((_a = process.env.SERVER_PORT) !== null && _a !== void 0 ? _a : "5000");
@@ -63,10 +64,10 @@ const API = process.env.API;
 app.disable("x-powered-by");
 app.use(body_parser_1.default.json());
 app.use((0, cookie_parser_1.default)());
-app.use(cookieOptions_1.default);
+app.use(cookie_options_1.default);
 app.use((0, cors_1.default)(corsOption_1.default));
-app.use(tokenHandler_1.default);
-app.use(responseHandler_1.default);
+app.use(token_handler_1.default);
+app.use(response_handler_1.default);
 app.set("views", path_1.default); // Set the views directory
 app.set('view engine', 'ejs'); // Set EJS as the template engine
 app.use((0, morgan_1.default)("tiny"));
@@ -76,14 +77,14 @@ app.use(`${API}/chats`, chat_1.default);
 app.use(`${API}/users`, user_1.default);
 app.use(`${API}/posts`, post_1.default);
 app.use(`${API}/feeds`, feed_1.default);
+app.use(error_handler_1.errorHandler);
 database_1.default.getConnection((error) => __awaiter(void 0, void 0, void 0, function* () {
     if (error)
         throw error;
     console.log("Connected to MySQL Server!");
     // force mysql not to lose connection
     // https://github.com/sidorares/node-mysql2/issues/836
-    const [data] = yield (0, query_1.default)("SELECT 1 + 1 AS solution", []);
-    console.log("The solution is: ", data.solution);
+    yield (0, query_1.default)("SELECT 1 + 1 AS solution", []);
 }));
 app.listen(PORT, HOST, () => {
     (0, socket_1.default)();

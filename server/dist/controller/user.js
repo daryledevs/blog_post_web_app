@@ -25,7 +25,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.toggleFollow = exports.getFollowerFollowingLists = exports.getFollowStats = exports.removeRecentSearches = exports.getRecentSearches = exports.saveRecentSearches = exports.searchUsersByQuery = exports.getUserData = void 0;
 const query_1 = __importDefault(require("../database/query"));
-const getUserData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const exception_1 = __importDefault(require("../exception/exception"));
+const getUserData = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { user_id } = req.body;
         const { person } = req.query;
@@ -45,17 +46,17 @@ const getUserData = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const params = person ? personArray : [user_id];
         const [data] = yield (0, query_1.default)(sql, params);
         if (!data)
-            return res.status(404).send({ message: "User not found" });
+            return next(exception_1.default.notFound("User not found"));
         const { PASSWORD } = data, rest = __rest(data, ["PASSWORD"]);
         res.status(200).send({ user: rest });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
+        next(error);
     }
     ;
 });
 exports.getUserData = getUserData;
-const searchUsersByQuery = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const searchUsersByQuery = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { search } = req.query;
         const sql = `
@@ -74,15 +75,15 @@ const searchUsersByQuery = (req, res) => __awaiter(void 0, void 0, void 0, funct
         const params = Array.from({ length: 3 }, () => search + "%");
         const data = yield (0, query_1.default)(sql, params);
         if (!data.length)
-            return res.status(404).send({ message: "User not found" });
+            return next(exception_1.default.notFound("User not found"));
         res.status(200).send({ users: data });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
+        next(error);
     }
 });
 exports.searchUsersByQuery = searchUsersByQuery;
-const getRecentSearches = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getRecentSearches = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { user_id } = req.params;
         const sql = `
@@ -102,11 +103,11 @@ const getRecentSearches = (req, res) => __awaiter(void 0, void 0, void 0, functi
         return res.status(200).send({ users: data });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
+        next(error);
     }
 });
 exports.getRecentSearches = getRecentSearches;
-const saveRecentSearches = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const saveRecentSearches = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { user_id, searched_id } = req.params;
         // Check if the user is already saved
@@ -120,11 +121,11 @@ const saveRecentSearches = (req, res) => __awaiter(void 0, void 0, void 0, funct
         return res.status(200).send({ message: "User saved" });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
+        next(error);
     }
 });
 exports.saveRecentSearches = saveRecentSearches;
-const removeRecentSearches = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const removeRecentSearches = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { recent_id } = req.params;
         const sql = "DELETE FROM RECENT_SEARCHES WHERE RECENT_ID = (?);";
@@ -132,11 +133,11 @@ const removeRecentSearches = (req, res) => __awaiter(void 0, void 0, void 0, fun
         return res.status(200).send({ users: data });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
+        next(error);
     }
 });
 exports.removeRecentSearches = removeRecentSearches;
-const getFollowStats = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getFollowStats = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { user_id } = req.params;
         const sql = `
@@ -166,11 +167,11 @@ const getFollowStats = (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.status(200).send({ followers, following });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
+        next(error);
     }
 });
 exports.getFollowStats = getFollowStats;
-const getFollowerFollowingLists = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getFollowerFollowingLists = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { user_id } = req.params;
         const { listsId } = req.body;
@@ -213,11 +214,11 @@ const getFollowerFollowingLists = (req, res) => __awaiter(void 0, void 0, void 0
         res.status(200).send({ lists: data });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
+        next(error);
     }
 });
 exports.getFollowerFollowingLists = getFollowerFollowingLists;
-const toggleFollow = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const toggleFollow = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let { user_id, followed_id } = req.params;
         const values = [parseInt(user_id), parseInt(followed_id)];
@@ -248,7 +249,7 @@ const toggleFollow = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         }
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
+        next(error);
     }
 });
 exports.toggleFollow = toggleFollow;

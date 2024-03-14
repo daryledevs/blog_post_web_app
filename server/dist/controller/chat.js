@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getUserConversations = exports.newMessageAndConversation = exports.getMessage = void 0;
 const query_1 = __importDefault(require("../database/query"));
-const getMessage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getMessage = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user_id = req.query.user_id || [];
         let conversation_id = req.params.conversation_id;
@@ -48,12 +48,12 @@ const getMessage = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         res.status(200).send({ chats: data });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
+        next(error);
     }
     ;
 });
 exports.getMessage = getMessage;
-const getUserConversations = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getUserConversations = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { user_id } = req.query;
         const { conversations } = req.body;
@@ -84,13 +84,11 @@ const getUserConversations = (req, res) => __awaiter(void 0, void 0, void 0, fun
         return res.status(200).send({ list: data });
     }
     catch (error) {
-        res
-            .status(500)
-            .send({ message: "An error occurred", error: error.message });
+        next(error);
     }
 });
 exports.getUserConversations = getUserConversations;
-const newMessageAndConversation = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const newMessageAndConversation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { sender_id, receiver_id, text_message, conversation_id } = req.body;
         const sqlFindConversationId = "SELECT * FROM CONVERSATIONS WHERE CONVERSATION_ID = (?);";
@@ -111,7 +109,7 @@ const newMessageAndConversation = (req, res) => __awaiter(void 0, void 0, void 0
         }
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
+        next(error);
     }
     ;
 });

@@ -1,7 +1,8 @@
 import db from "../database/query";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
+import Exception from "../exception/exception";
 
-const getUserData = async (req: Request, res: Response) => {
+const getUserData = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { user_id } = req.body;
     const { person } = req.query;
@@ -24,15 +25,15 @@ const getUserData = async (req: Request, res: Response) => {
     const params = person ? personArray : [user_id];
     
     const [data] = await db(sql, params);
-    if(!data) return res.status(404).send({ message: "User not found" });
+    if(!data) return next(Exception.notFound("User not found"));
     const { PASSWORD, ...rest } = data;
     res.status(200).send({ user: rest });
   } catch (error:any) {
-    res.status(500).send({ message: "An error occurred", error: error.message });
+    next(error)
   };
 };
 
-const searchUsersByQuery = async (req: Request, res: Response) => {
+const searchUsersByQuery = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { search } = req.query;
 
@@ -52,14 +53,14 @@ const searchUsersByQuery = async (req: Request, res: Response) => {
 
     const params = Array.from({ length: 3 }, () => search + "%");
     const data = await db(sql, params);
-    if (!data.length) return res.status(404).send({ message: "User not found" });
+    if (!data.length) return next(Exception.notFound("User not found"));
     res.status(200).send({ users: data });
-  } catch (error: any) {
-    res.status(500).send({ message: "An error occurred", error: error.message });
+  } catch (error) {
+    next(error)
   }
 };
 
-const getRecentSearches = async (req: Request, res: Response) => {
+const getRecentSearches = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { user_id } = req.params;
 
@@ -79,12 +80,12 @@ const getRecentSearches = async (req: Request, res: Response) => {
 
     const data = await db(sql, [user_id]);
     return res.status(200).send({ users: data });
-  } catch (error: any) {
-    res.status(500).send({ message: "An error occurred", error: error.message });
+  } catch (error) {
+    next(error)
   }
 };
 
-const saveRecentSearches = async (req: Request, res: Response) => {
+const saveRecentSearches = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { user_id, searched_id } = req.params;
 
@@ -97,24 +98,24 @@ const saveRecentSearches = async (req: Request, res: Response) => {
     const sql = "INSERT INTO RECENT_SEARCHES (SEARCH_USER_ID, USER_ID) VALUES (?, ?);";
     await db(sql, [searched_id, user_id]);
     return res.status(200).send({ message: "User saved" });
-  } catch (error: any) {
-    res.status(500).send({ message: "An error occurred", error: error.message });
+  } catch (error) {
+    next(error)
   }
 };
 
-const removeRecentSearches = async (req: Request, res: Response) => {
+const removeRecentSearches = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { recent_id } = req.params;
     const sql = "DELETE FROM RECENT_SEARCHES WHERE RECENT_ID = (?);";
 
     const data = await db(sql, [recent_id]);
     return res.status(200).send({ users: data });
-  } catch (error: any) {
-    res.status(500).send({ message: "An error occurred", error: error.message });
+  } catch (error) {
+    next(error)
   }
 };
 
-const getFollowStats = async (req: Request, res: Response) => {
+const getFollowStats = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { user_id } = req.params;
     const sql = `
@@ -144,12 +145,12 @@ const getFollowStats = async (req: Request, res: Response) => {
     const { COUNT: following } = data[1][0] || { COUNT: 0 };
 
     res.status(200).send({ followers, following });
-  } catch (error: any) {
-    res.status(500).send({ message: "An error occurred", error: error.message });
+  } catch (error) {
+    next(error)
   }
 };
 
-const getFollowerFollowingLists = async (req: Request, res: Response) => {
+const getFollowerFollowingLists = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { user_id } = req.params;
     const { listsId } = req.body;
@@ -194,11 +195,11 @@ const getFollowerFollowingLists = async (req: Request, res: Response) => {
     const data = await db(sql, [user_id, lists]);
     res.status(200).send({ lists: data });
   } catch (error:any) {
-    res.status(500).send({ message: "An error occurred", error: error.message });
+    next(error)
   }
 }
 
-const toggleFollow = async (req: Request, res: Response) => {
+const toggleFollow = async (req: Request, res: Response, next: NextFunction) => {
   try {
     let { user_id, followed_id } = req.params;
     const values = [parseInt(user_id), parseInt(followed_id)];
@@ -231,7 +232,7 @@ const toggleFollow = async (req: Request, res: Response) => {
       res.status(200).send({ message: "Followed user" });
     }
   } catch (error:any) {
-    res.status(500).send({ message: "An error occurred", error: error.message });
+    next(error)
   }
 };
 

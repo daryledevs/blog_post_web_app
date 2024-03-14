@@ -40,7 +40,7 @@ const dotenv = __importStar(require("dotenv"));
 const query_1 = __importDefault(require("../database/query"));
 const cloudinary_1 = __importDefault(require("../config/cloudinary"));
 dotenv.config();
-const getUserPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getUserPost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { user_id } = req.query;
         const sql = `
@@ -63,11 +63,11 @@ const getUserPost = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         res.status(200).send({ post: data });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
+        next(error);
     }
 });
 exports.getUserPost = getUserPost;
-const getUserTotalPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getUserTotalPosts = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { user_id } = req.query;
         const sql = `
@@ -82,13 +82,11 @@ const getUserTotalPosts = (req, res) => __awaiter(void 0, void 0, void 0, functi
         res.status(200).send({ totalPost: data["COUNT(*)"] });
     }
     catch (error) {
-        res
-            .status(500)
-            .send({ message: "An error occurred", error: error.message });
+        next(error);
     }
 });
 exports.getUserTotalPosts = getUserTotalPosts;
-const newPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const newPost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { user_id, caption } = req.body;
         const { img } = req.files;
@@ -103,11 +101,11 @@ const newPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(200).send({ message: "Post has been posted" });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
+        next(error);
     }
 });
 exports.newPost = newPost;
-const editPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const editPost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { post_id } = req.params;
         const body = req.body;
@@ -123,11 +121,11 @@ const editPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(200).send({ message: "Edit post successfully" });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
+        next(error);
     }
 });
 exports.editPost = editPost;
-const deletePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const deletePost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { post_id } = req.params;
         const sql = "DELETE FROM POSTS WHERE POST_ID = (?);";
@@ -135,11 +133,11 @@ const deletePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         res.status(200).send("Delete post successfully");
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
+        next(error);
     }
 });
 exports.deletePost = deletePost;
-const getLikesCountForPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getLikesCountForPost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { post_id } = req.params;
         const sql = `
@@ -154,11 +152,11 @@ const getLikesCountForPost = (req, res) => __awaiter(void 0, void 0, void 0, fun
         res.status(200).send({ count: data.COUNT });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
+        next(error);
     }
 });
 exports.getLikesCountForPost = getLikesCountForPost;
-const checkUserLikeStatusForPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const checkUserLikeStatusForPost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { post_id, user_id } = req.params;
         const sql = `
@@ -170,11 +168,11 @@ const checkUserLikeStatusForPost = (req, res) => __awaiter(void 0, void 0, void 
         res.status(200).send({ status: data ? true : false });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
+        next(error);
     }
 });
 exports.checkUserLikeStatusForPost = checkUserLikeStatusForPost;
-const toggleUserLikeForPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const toggleUserLikeForPost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { post_id, user_id } = req.params;
         const sql_get = `
@@ -204,7 +202,7 @@ const toggleUserLikeForPost = (req, res) => __awaiter(void 0, void 0, void 0, fu
         }
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
+        next(error);
     }
 });
 exports.toggleUserLikeForPost = toggleUserLikeForPost;

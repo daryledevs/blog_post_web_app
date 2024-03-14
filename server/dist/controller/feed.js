@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getExploreFeed = exports.getUserFeed = exports.getTotalFeed = void 0;
 const query_1 = __importDefault(require("../database/query"));
-const getTotalFeed = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getTotalFeed = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { user_id } = req.body;
         const sql = `
@@ -30,12 +30,12 @@ const getTotalFeed = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         res.status(200).send({ count: data["COUNT(*)"] });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
+        next(error);
     }
     ;
 });
 exports.getTotalFeed = getTotalFeed;
-const getUserFeed = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getUserFeed = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { post_ids, user_id } = req.body;
         const values = post_ids.length ? post_ids : 0;
@@ -60,17 +60,17 @@ const getUserFeed = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         P.POST_DATE > DATE_SUB(CURDATE(), INTERVAL 3 DAY) AND
         POST_ID NOT IN (?) 
       ORDER BY RAND() LIMIT 3;
-   `;
+    `;
         const data = yield (0, query_1.default)(sql, [user_id, values]);
         res.status(200).send({ feed: data });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
+        next(error);
     }
     ;
 });
 exports.getUserFeed = getUserFeed;
-const getExploreFeed = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getExploreFeed = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { user_id } = req.params;
     try {
         const sqlSelect = `
@@ -98,7 +98,7 @@ const getExploreFeed = (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.status(200).send({ feed: data });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
+        next(error);
     }
     ;
 });

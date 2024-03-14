@@ -44,8 +44,9 @@ const nodemailer_1 = __importDefault(require("../config/nodemailer"));
 const encrypt_1 = __importDefault(require("../util/encrypt"));
 const decrypt_1 = __importDefault(require("../util/decrypt"));
 const query_1 = __importDefault(require("../database/query"));
+const exception_1 = __importDefault(require("../exception/exception"));
 dotenv.config();
-const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, username, password, first_name, last_name } = req.body;
         const hashPassword = bcrypt_1.default.hashSync(password, bcrypt_1.default.genSaltSync(10));
@@ -60,12 +61,12 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return res.status(200).send({ message: "Registration is successful" });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
+        next(error);
     }
     ;
 });
 exports.register = register;
-const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { userCredential, password } = req.body;
         const isMissing = !req.body || !userCredential || !password;
@@ -75,7 +76,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         // Check if the user is exists.
         const [user] = yield (0, query_1.default)(sql, [userCredential || "", userCredential || ""]);
         if (!user)
-            return res.status(404).send({ message: "User not found" });
+            return next(exception_1.default.notFound("User not found"));
         // Compare the password from database and from request body.
         if (bcrypt_1.default.compareSync(password, user.PASSWORD)) {
             const ACCESS_TOKEN = (0, authTokens_1.generateAccessToken)(user);
@@ -91,12 +92,12 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
     }
     catch (error) {
-        return res.status(500).send({ message: "An error occurred", error: error.message });
+        next(error);
     }
     ;
 });
 exports.login = login;
-const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const forgotPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email } = req.body;
         const sqlSelect = "SELECT * FROM USERS WHERE EMAIL = ?;";
@@ -104,7 +105,7 @@ const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
         // Check if user exists
         const [user] = yield (0, query_1.default)(sqlSelect, [email]);
         if (!user)
-            return res.status(404).send({ message: "User doesn't exist" });
+            next(exception_1.default.notFound("User doesn't exists"));
         // Generate tokens
         const token = (0, authTokens_1.generateResetToken)(user);
         const shortToken = yield (0, authTokens_1.referenceToken)();
@@ -117,12 +118,12 @@ const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.json({ message: "Password reset email sent" });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
+        next(error);
     }
     ;
 });
 exports.forgotPassword = forgotPassword;
-const resetPasswordForm = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const resetPasswordForm = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const token = req.query.token;
         const decodedToken = decodeURIComponent(token);
@@ -139,16 +140,16 @@ const resetPasswordForm = (req, res) => __awaiter(void 0, void 0, void 0, functi
         });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
+        next(error);
     }
     ;
 });
 exports.resetPasswordForm = resetPasswordForm;
-const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const resetPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { tokenId, user_id, email, password, confirmPassword } = req.body;
         if (password !== confirmPassword)
-            return res.status(422).send({ message: "Password does not match confirm password" });
+            return next(exception_1.default.badRequest("Password does not match"));
         if (password.length <= 5)
             return res.status(400).json({ error: "Password should be at least 5 characters long." });
         // Used limit here due to "safe update mode" error.
@@ -167,12 +168,12 @@ const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         res.status(200).send({ message: "Reset password successfully" });
     }
     catch (error) {
-        res.status(500).send({ message: "An error occurred", error: error.message });
+        next(error);
     }
     ;
 });
 exports.resetPassword = resetPassword;
-const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const logout = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     res
         .clearCookie("REFRESH_TOKEN", {
         sameSite: "none",
