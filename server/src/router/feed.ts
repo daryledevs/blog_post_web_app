@@ -3,8 +3,8 @@ import { getExploreFeed, getTotalFeed, getUserFeed } from "../controller/feed";
 
 const router = express.Router();
 
-router.post("/user", getUserFeed);
 router.get("/count", getTotalFeed);
-router.get("/explore/:user_id", getExploreFeed);
+router.get("/explore", getExploreFeed);
+router.post("/", getUserFeed);
 
 export default router;

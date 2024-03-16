@@ -12,7 +12,7 @@ const feedApi = baseApi.injectEndpoints({
       { post_ids: Array<number> }
     >({
       query: ({ post_ids }: IEUserFeed) => ({
-        url: "/feeds/user/",
+        url: "/feeds/",
         method: "POST",
         body: { post_ids },
       }),
@@ -25,7 +25,7 @@ const feedApi = baseApi.injectEndpoints({
     }),
     getExploreFeed: build.query<any, void>({
       query: (user_id: any) => ({
-        url: `/feeds/explore/${user_id}`,
+        url: `/feeds/explore?user_id=${user_id}`,
         method: "GET",
       }),
     }),
