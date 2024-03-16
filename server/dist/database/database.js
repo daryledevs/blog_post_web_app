@@ -29,17 +29,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mysql_1 = __importDefault(require("mysql"));
 const dotenv = __importStar(require("dotenv"));
 dotenv.config();
-const db_port = process.env.DATABASE_PORT ? parseInt(process.env.DATABASE_PORT) : 3306;
 const database = mysql_1.default.createPool({
     host: `${process.env.DATABASE_HOST}`,
-    port: db_port,
+    port: process.env.DATABASE_PORT,
     user: `${process.env.USER}`,
     password: process.env.PASSWORD,
     database: `${process.env.DATABASE}`,
     multipleStatements: true,
     charset: "utf8mb4",
     waitForConnections: true,
-    connectionLimit: 10,
+    connectionLimit: `${process.env.DATABASE_CONNECTION_LIMIT}`,
     queueLimit: 0,
 });
 exports.default = database;
