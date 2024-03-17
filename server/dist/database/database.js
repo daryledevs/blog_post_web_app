@@ -26,7 +26,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.db = void 0;
 const mysql_1 = __importDefault(require("mysql"));
+const mysql2_1 = require("mysql2");
+const kysely_1 = require("kysely");
 const dotenv = __importStar(require("dotenv"));
 dotenv.config();
 const database = mysql_1.default.createPool({
@@ -41,4 +44,19 @@ const database = mysql_1.default.createPool({
     connectionLimit: `${process.env.DATABASE_CONNECTION_LIMIT}`,
     queueLimit: 0,
 });
+const dialect = new kysely_1.MysqlDialect({
+    pool: (0, mysql2_1.createPool)({
+        database: `${process.env.DATABASE}`,
+        host: `${process.env.DATABASE_HOST}`,
+        port: process.env.DATABASE_PORT,
+        user: `${process.env.USER}`,
+        password: process.env.PASSWORD,
+        waitForConnections: true,
+        multipleStatements: true,
+        charset: "utf8mb4",
+        connectionLimit: `${process.env.DATABASE_CONNECTION_LIMIT}`,
+        queueLimit: 0,
+    }),
+});
+exports.db = new kysely_1.Kysely({ dialect });
 exports.default = database;
