@@ -4,7 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const exception_1 = __importDefault(require("../exception/exception"));
+const database_1 = __importDefault(require("../exception/database"));
 const errorHandler = (err, req, res, next) => {
+    if (err instanceof database_1.default) {
+        const { errorCode, errorType, message, query } = err;
+        return res.status(500).send({ errorCode, errorType, message, query });
+    }
     if (err instanceof exception_1.default) {
         const { status, message } = err;
         return res.status(status).send({ message });
