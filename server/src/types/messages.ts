@@ -1,7 +1,7 @@
-import { Insertable, Selectable, Updateable } from "kysely";
+import { Generated, Insertable, Selectable, Updateable } from "kysely";
 
 interface MessageTable {
-  message_id: number;
+  message_id: Generated<number>;
   conversation_id: number;
   sender_id: number;
   text_message: string | null;

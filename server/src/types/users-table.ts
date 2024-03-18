@@ -1,7 +1,7 @@
-import { Insertable, Selectable, Updateable } from "kysely";
+import { Generated, Insertable, Selectable, Updateable } from "kysely";
 
 interface UsersTable {
-  user_id: number;
+  user_id: Generated<number>;
   username: string;
   email: string;
   password: string;

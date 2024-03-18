@@ -1,7 +1,7 @@
-import { Insertable, Selectable, Updateable } from "kysely";
+import { Generated, Insertable, Selectable, Updateable } from "kysely";
 
 interface ResetPasswordTokenTable {
-  token_id: string;
+  token_id: Generated<number>;
   user_id: number;
   encrypted: string | null;
   create_time: string;

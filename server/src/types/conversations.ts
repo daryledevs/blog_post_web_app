@@ -1,7 +1,7 @@
-import { Insertable, Selectable, Updateable } from "kysely";
+import { Generated, Insertable, Selectable, Updateable } from "kysely";
 
 interface ConversationTable {
-  conversation_id: number;
+  conversation_id: Generated<number>;
   user_one: number;
   user_two: number;
 }

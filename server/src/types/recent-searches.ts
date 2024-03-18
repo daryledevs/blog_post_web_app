@@ -1,10 +1,10 @@
-import { Insertable, Selectable, Updateable } from "kysely";
+import { Generated, Insertable, Selectable, Updateable } from "kysely";
 
 interface RecentSearchTable {
-  recent_id: number;
+  recent_id: Generated<number>;
   search_user_id: number;
   user_id: number;
-  create_time: string;
+  create_time: Generated<Date>;
 }
 
 export type RecentSearch = Selectable<RecentSearchTable>;

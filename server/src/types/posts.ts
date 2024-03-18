@@ -1,7 +1,7 @@
-import { Insertable, Selectable, Updateable } from "kysely";
+import { Generated, Insertable, Selectable, Updateable } from "kysely";
 
 interface PostTable {
-  post_id: number;
+  post_id: Generated<number>;
   user_id: number;
   image_id: number;
   caption: string | null;
