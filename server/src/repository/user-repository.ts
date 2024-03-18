@@ -148,26 +148,27 @@ class UserRepository {
   }
 
   static async getFollowsStats(user_id: number): Promise<{ followers: number, following: number }> {
-    const [followersResult, followingResult] = await Promise.all([
-      db
-        .selectFrom("followers")
-        .innerJoin("users", "followers.followed_id", "users.user_id")
-        .select((eb) => eb.fn.count("followers.followed_id").as("followers"))
-        .where("followers.followed_id", "=", user_id)
-        .groupBy("followers.followed_id")
-        .executeTakeFirst(),
+    const queryFollowers = db
+      .selectFrom("followers")
+      .innerJoin("users", "followers.followed_id", "users.user_id")
+      .select((eb) => [eb.fn.count<number>("followed_id").as("followers")])
+      .where("followers.followed_id", "=", user_id)
+      .groupBy("followers.followed_id");
 
-      db
-        .selectFrom("followers")
-        .innerJoin("users", "followers.follower_id", "users.user_id")
-        .select((eb) => eb.fn.count("followers.follower_id").as("following"))
-        .where("followers.follower_id", "=", user_id)
-        .groupBy("followers.follower_id")
-        .executeTakeFirst(),
-    ]);
+    const queryFollowing = db
+      .selectFrom("followers")
+      .innerJoin("users", "followers.follower_id", "users.user_id")
+      .select((eb) => eb.fn.count<number>("followers.follower_id").as("following"))
+      .where("followers.follower_id", "=", user_id)
+      .groupBy("followers.follower_id");
 
-    const followers = Number(followersResult?.followers) || 0;
-    const following = Number(followingResult?.following) || 0;
+
+    const { followers, following } = await db
+      .selectNoFrom((eb) => [
+        eb.fn.coalesce(queryFollowers, eb.lit(0)).as("followers"),
+        eb.fn.coalesce(queryFollowing, eb.lit(0)).as("following"),
+      ])
+      .executeTakeFirstOrThrow();
 
     return { followers, following };
   };

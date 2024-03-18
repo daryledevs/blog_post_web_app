@@ -149,24 +149,24 @@ class UserRepository {
     }
     static getFollowsStats(user_id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const [followersResult, followingResult] = yield Promise.all([
-                database_1.db
-                    .selectFrom("followers")
-                    .innerJoin("users", "followers.followed_id", "users.user_id")
-                    .select((eb) => eb.fn.count("followers.followed_id").as("followers"))
-                    .where("followers.followed_id", "=", user_id)
-                    .groupBy("followers.followed_id")
-                    .executeTakeFirst(),
-                database_1.db
-                    .selectFrom("followers")
-                    .innerJoin("users", "followers.follower_id", "users.user_id")
-                    .select((eb) => eb.fn.count("followers.follower_id").as("following"))
-                    .where("followers.follower_id", "=", user_id)
-                    .groupBy("followers.follower_id")
-                    .executeTakeFirst(),
-            ]);
-            const followers = Number(followersResult === null || followersResult === void 0 ? void 0 : followersResult.followers) || 0;
-            const following = Number(followingResult === null || followingResult === void 0 ? void 0 : followingResult.following) || 0;
+            const queryFollowers = database_1.db
+                .selectFrom("followers")
+                .innerJoin("users", "followers.followed_id", "users.user_id")
+                .select((eb) => [eb.fn.count("followed_id").as("followers")])
+                .where("followers.followed_id", "=", user_id)
+                .groupBy("followers.followed_id");
+            const queryFollowing = database_1.db
+                .selectFrom("followers")
+                .innerJoin("users", "followers.follower_id", "users.user_id")
+                .select((eb) => eb.fn.count("followers.follower_id").as("following"))
+                .where("followers.follower_id", "=", user_id)
+                .groupBy("followers.follower_id");
+            const { followers, following } = yield database_1.db
+                .selectNoFrom((eb) => [
+                eb.fn.coalesce(queryFollowers, eb.lit(0)).as("followers"),
+                eb.fn.coalesce(queryFollowing, eb.lit(0)).as("following"),
+            ])
+                .executeTakeFirstOrThrow();
             return { followers, following };
         });
     }
