@@ -1,9 +1,9 @@
-import { Insertable, Selectable, Updateable } from "kysely";
+import { Generated, Insertable, Selectable, Updateable } from "kysely";
 
 interface LikeTable {
   post_id: number;
   user_id: number;
-  like_date: string;
+  like_date: Generated<Date>;
 };
 
 export type Like = Selectable<LikeTable>;

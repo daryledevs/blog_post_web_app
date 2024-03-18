@@ -11,7 +11,7 @@ interface UsersTable {
   birthday: string | null;
   avatar_url: string | null;
   roles: string | "users" | "admin";
-  created_at: string;
+  created_at: Generated<Date>;
 };
 
 export type User = Selectable<UsersTable>;
