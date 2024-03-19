@@ -17,11 +17,6 @@
   font-size: 16px; 
 }
 
-
-@import "../styles/Colors.scss";
-@import "../styles/FontSize.scss";
-@import "../styles/pages/Feed.scss";
-
 @import "../styles/component/Chat.scss";
 @import "../styles/component/ProfileGallery.scss";
 @import "../styles/component/LoginForm.scss";
@@ -31,6 +26,7 @@
 @import "../styles/pages/Profile.scss";
 @import "../styles/pages/Message.scss";
 @import "../styles/pages/Login.scss";
+@import "../styles/pages/Feed.scss";
 @import './pages/Index.scss';
 
 @import "../styles/shared/component/Sidebar.scss";
