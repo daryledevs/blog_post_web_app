@@ -18,19 +18,19 @@
 }
 
 
-@import "./Colors.scss";
-@import "./FontSize.scss";
+@import "../styles/Colors.scss";
+@import "../styles/FontSize.scss";
 @import "../styles/pages/Feed.scss";
 
-@import "./component/Chat.scss";
-@import "./component/ProfileGallery.scss";
-@import "./component/LoginForm.scss";
-@import "./component/FormControllers/TextInput.scss";
+@import "../styles/component/Chat.scss";
+@import "../styles/component/ProfileGallery.scss";
+@import "../styles/component/LoginForm.scss";
+@import "../styles/component/FormControllers/TextInput.scss";
 
-@import "./pages/Explore.scss";
-@import "./pages/Profile.scss";
-@import "./pages/Message.scss";
-@import "./pages/Login.scss";
+@import "../styles/pages/Explore.scss";
+@import "../styles/pages/Profile.scss";
+@import "../styles/pages/Message.scss";
+@import "../styles/pages/Login.scss";
 @import './pages/Index.scss';
 
 @import "../styles/shared/component/Sidebar.scss";
@@ -38,10 +38,10 @@
 @import "../styles/shared/component/SearchBarHeader.scss";
 @import "../styles/shared/component/SearchBarBody.scss";
 
-@import "./shared/modals/CreatePost.scss";
-@import "./shared/modals/FollowModal.scss";
-@import "./shared/modals/NewMessage.scss";
-@import "./shared/component/Recipients.scss";
-@import "./shared/modals/SwitchAccount.scss";
+@import "../styles/shared/modals/CreatePost.scss";
+@import "../styles/shared/modals/FollowModal.scss";
+@import "../styles/shared/modals/NewMessage.scss";
+@import "../styles/shared/component/Recipients.scss";
+@import "../styles/shared/modals/SwitchAccount.scss";
 
 
