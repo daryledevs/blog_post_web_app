@@ -17,30 +17,31 @@
   font-size: 16px; 
 }
 
-@import "./_Colors";
-@import "./_FontSize";
-@import "../styles/pages/_Feed";
 
-@import "./component/_Chat";
-@import "./component/_ProfileGallery";
-@import "./component/_LoginForm";
-@import "./component/FormControllers/_TextInput";
+@import "./Colors.scss";
+@import "./FontSize.scss";
+@import "../styles/pages/Feed.scss";
 
-@import "./pages/_Explore";
-@import "./pages/_Profile";
-@import "./pages/_Message";
-@import "./pages/_Login";
-@import './pages/_Index';
+@import "./component/Chat.scss";
+@import "./component/ProfileGallery.scss";
+@import "./component/LoginForm.scss";
+@import "./component/FormControllers/TextInput.scss";
 
-@import "../styles/shared/component/_Sidebar";
-@import "../styles/shared/component/_SearchBar";
-@import "../styles/shared/component/_SearchBarHeader";
-@import "../styles/shared/component/_SearchBarBody";
+@import "./pages/Explore.scss";
+@import "./pages/Profile.scss";
+@import "./pages/Message.scss";
+@import "./pages/Login.scss";
+@import './pages/Index.scss';
 
-@import "./shared/modals/_CreatePost";
-@import "./shared/modals/_FollowModal";
-@import "./shared/modals/_NewMessage";
-@import "./shared/component/_Recipients";
-@import "./shared/modals/_SwitchAccount";
+@import "../styles/shared/component/Sidebar.scss";
+@import "../styles/shared/component/SearchBar.scss";
+@import "../styles/shared/component/SearchBarHeader.scss";
+@import "../styles/shared/component/SearchBarBody.scss";
+
+@import "./shared/modals/CreatePost.scss";
+@import "./shared/modals/FollowModal.scss";
+@import "./shared/modals/NewMessage.scss";
+@import "./shared/component/Recipients.scss";
+@import "./shared/modals/SwitchAccount.scss";
 
 
