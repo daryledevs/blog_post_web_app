@@ -13,21 +13,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getExploreFeed = exports.getUserFeed = exports.getTotalFeed = void 0;
-const query_1 = __importDefault(require("../database/query"));
+const feed_repository_1 = __importDefault(require("../repository/feed-repository"));
 const getTotalFeed = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { user_id } = req.body;
-        const sql = `
-      SELECT 
-        COUNT(*)
-      FROM
-        POSTS
-      WHERE
-        POST_DATE > DATE_SUB(CURDATE(), INTERVAL 3 DAY)
-      ORDER BY RAND() LIMIT 3;
-    `;
-        const [data] = yield (0, query_1.default)(sql, [user_id]);
-        res.status(200).send({ count: data["COUNT(*)"] });
+        const data = yield feed_repository_1.default.getTotalFeed();
+        res.status(200).send({ count: data });
     }
     catch (error) {
         next(error);
@@ -38,30 +28,8 @@ exports.getTotalFeed = getTotalFeed;
 const getUserFeed = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { post_ids, user_id } = req.body;
-        const values = post_ids.length ? post_ids : 0;
-        const sql = `
-      SELECT 
-        F.FOLLOWED_ID, 
-        F.FOLLOWER_ID, 
-        P.*, 
-        (SELECT 
-          COUNT(*)
-        FROM
-          LIKES L
-        WHERE
-          P.POST_ID = L.POST_ID
-        ) AS "COUNT"
-      FROM
-        FOLLOWERS F
-      INNER JOIN
-        POSTS P ON P.USER_ID = F.FOLLOWED_ID
-      WHERE
-        F.FOLLOWER_ID = (?) AND 
-        P.POST_DATE > DATE_SUB(CURDATE(), INTERVAL 3 DAY) AND
-        POST_ID NOT IN (?) 
-      ORDER BY RAND() LIMIT 3;
-    `;
-        const data = yield (0, query_1.default)(sql, [user_id, values]);
+        const values = post_ids.length ? post_ids : [0];
+        const data = yield feed_repository_1.default.getUserFeed(values, user_id);
         res.status(200).send({ feed: data });
     }
     catch (error) {
@@ -71,35 +39,13 @@ const getUserFeed = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
 });
 exports.getUserFeed = getUserFeed;
 const getExploreFeed = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { user_id } = req.params;
     try {
-        const sqlSelect = `
-      SELECT 
-        P.*,
-        U.USERNAME,
-        U.FIRST_NAME,
-        U.LAST_NAME,
-        (SELECT 
-            COUNT(*)
-          FROM
-            LIKES L
-          WHERE
-            P.POST_ID = L.POST_ID AND 
-            P.USER_ID = L.USER_ID
-        ) AS COUNT
-      FROM
-        POSTS P
-      INNER JOIN USERS U 
-        ON P.USER_ID = U.USER_ID
-      WHERE
-        P.POST_DATE >= DATE_SUB(CURDATE(), INTERVAL 3 DAY) AND P.USER_ID != (?);
-    `;
-        const data = yield (0, query_1.default)(sqlSelect, [user_id]);
-        res.status(200).send({ feed: data });
+        const { user_id } = req.body;
+        const data = yield feed_repository_1.default.getExploreFeed(user_id);
+        res.status(200).send({ explore: data });
     }
     catch (error) {
         next(error);
     }
-    ;
 });
 exports.getExploreFeed = getExploreFeed;

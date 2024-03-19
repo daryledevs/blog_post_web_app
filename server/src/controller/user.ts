@@ -1,59 +1,45 @@
-import db from "../database/query";
 import { NextFunction, Request, Response } from "express";
 import Exception from "../exception/exception";
+import UserRepository from "../repository/user-repository";
+
+interface User {
+  password: string;
+  [key: string]: any;
+}
 
 const getUserData = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { user_id } = req.body;
     const { person } = req.query;
 
-    const sqlSelectWithId = "SELECT * FROM USERS WHERE USER_ID = (?);";
-    const sqlSelectPerson = 
-    `
-      SELECT 
-          *
-      FROM
-          USERS
-      WHERE
-          USERNAME LIKE (?) OR 
-          FIRST_NAME LIKE (?) OR 
-          CONCAT(FIRST_NAME, ' ', LAST_NAME) LIKE (?);
-    `;
+    let data: User | undefined = undefined;
 
-    const sql = person ? sqlSelectPerson : sqlSelectWithId;
-    const personArray = Array.from({ length: 3 }, () => person)
-    const params = person ? personArray : [user_id];
+    // If no parameters are provided, return an error
+    if(!user_id && !person) return next(Exception.badRequest("No parameters provided"));
+
+    // If the person is provided, search the user by username
+    if (person) data = await UserRepository.findUserByUsername(person as string);
+
+    // If the user_id is provided, search the user by user_id
+    if (!person && user_id) data = await UserRepository.findUserById(user_id);
+
+    // If the user is not found, return an error
+    if (!data) return next(Exception.notFound("User not found"));
+
     
-    const [data] = await db(sql, params);
-    if(!data) return next(Exception.notFound("User not found"));
     const { PASSWORD, ...rest } = data;
     res.status(200).send({ user: rest });
-  } catch (error:any) {
-    next(error)
-  };
+  } catch (error: any) {  
+    next(error);
+  }
 };
 
 const searchUsersByQuery = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { search } = req.query;
-
-    const sql = `
-      SELECT 
-          USER_ID,
-          USERNAME,
-          FIRST_NAME,
-          LAST_NAME
-      FROM
-          USERS
-      WHERE
-          USERNAME LIKE (?) OR 
-          FIRST_NAME LIKE (?) OR 
-          CONCAT(FIRST_NAME, ' ', LAST_NAME) LIKE (?);
-    `;
-
-    const params = Array.from({ length: 3 }, () => search + "%");
-    const data = await db(sql, params);
-    if (!data.length) return next(Exception.notFound("User not found"));
+    const data = await UserRepository.searchUsersByQuery(search as string);
+    // If the user is not found, return an error
+    if (!data?.length) return next(Exception.notFound("User not found"));
     res.status(200).send({ users: data });
   } catch (error) {
     next(error)
@@ -63,22 +49,7 @@ const searchUsersByQuery = async (req: Request, res: Response, next: NextFunctio
 const getRecentSearches = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { user_id } = req.params;
-
-    const sql = `
-      SELECT 
-        RS.RECENT_ID,
-        U.USER_ID,
-        U.USERNAME,
-        U.FIRST_NAME,
-        U.LAST_NAME,
-        U.AVATAR_URL
-      FROM   RECENT_SEARCHES RS
-        INNER JOIN USERS U
-            ON U.USER_ID = RS.SEARCH_USER_ID
-      WHERE  RS.USER_ID = (?) LIMIT 10;
-    `;
-
-    const data = await db(sql, [user_id]);
+    const data = await UserRepository.getRecentSearches(user_id as unknown as number);
     return res.status(200).send({ users: data });
   } catch (error) {
     next(error)
@@ -89,15 +60,12 @@ const saveRecentSearches = async (req: Request, res: Response, next: NextFunctio
   try {
     const { user_id, searched_id } = req.params;
 
-    // Check if the user is already saved
-    const sqlSelect = "SELECT * FROM RECENT_SEARCHES WHERE SEARCH_USER_ID = (?) AND USER_ID = (?);";
-    const [data] = await db(sqlSelect, [searched_id, user_id]);
-    if (data) return res.status(200).send({ message: "User already saved" });
-    
-    // If the user is not saved, save the user
-    const sql = "INSERT INTO RECENT_SEARCHES (SEARCH_USER_ID, USER_ID) VALUES (?, ?);";
-    await db(sql, [searched_id, user_id]);
-    return res.status(200).send({ message: "User saved" });
+    const data = await UserRepository.saveRecentSearches(
+      user_id as unknown as number,
+      searched_id as unknown as number
+    );
+
+    return res.status(200).send({ message: data });
   } catch (error) {
     next(error)
   }
@@ -106,9 +74,7 @@ const saveRecentSearches = async (req: Request, res: Response, next: NextFunctio
 const removeRecentSearches = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { recent_id } = req.params;
-    const sql = "DELETE FROM RECENT_SEARCHES WHERE RECENT_ID = (?);";
-
-    const data = await db(sql, [recent_id]);
+    const data = await UserRepository.deleteRecentSearches(recent_id as unknown as number);
     return res.status(200).send({ users: data });
   } catch (error) {
     next(error)
@@ -118,32 +84,7 @@ const removeRecentSearches = async (req: Request, res: Response, next: NextFunct
 const getFollowStats = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { user_id } = req.params;
-    const sql = `
-      SELECT 
-        COUNT(F.FOLLOWED_ID) AS \`COUNT\`
-      FROM
-        FOLLOWERS F
-      INNER JOIN
-        USERS U ON F.FOLLOWER_ID = U.USER_ID
-      WHERE
-        F.FOLLOWED_ID = (?)
-      GROUP BY F.FOLLOWED_ID;
-
-      SELECT 
-        COUNT(F.FOLLOWED_ID) AS \`COUNT\`
-      FROM
-        FOLLOWERS F
-      INNER JOIN
-        USERS U ON F.FOLLOWED_ID = U.USER_ID
-      WHERE
-        F.FOLLOWER_ID = (?)
-      GROUP BY F.FOLLOWER_ID;
-    `;
-
-    const data = await db(sql, [user_id, user_id]);
-    const { COUNT: followers } = data[0][0] || { COUNT: 0 };
-    const { COUNT: following } = data[1][0] || { COUNT: 0 };
-
+    const { followers, following } = await UserRepository.getFollowsStats(user_id as unknown as number);
     res.status(200).send({ followers, following });
   } catch (error) {
     next(error)
@@ -155,44 +96,13 @@ const getFollowerFollowingLists = async (req: Request, res: Response, next: Next
     const { user_id } = req.params;
     const { listsId } = req.body;
     const { fetch } = req.query;
-    const lists = listsId.length ? listsId : 0;
 
-    const sqlSelectFollowedId = `
-      SELECT 
-        F.*, 
-        U.USER_ID, 
-        U.USERNAME, 
-        U.FIRST_NAME, 
-        U.LAST_NAME,  
-        U.AVATAR_URL
-      FROM
-        FOLLOWERS F
-      INNER JOIN
-        USERS U ON F.FOLLOWED_ID = U.USER_ID
-      WHERE
-        F.FOLLOWER_ID = (?) AND F.FOLLOWED_ID NOT IN (?)
-      LIMIT 3;
-    `;
-
-    const sqlSelectFollowerId = `
-      SELECT 
-        F.*, 
-        U.USER_ID, 
-        U.USERNAME, 
-        U.FIRST_NAME, 
-        U.LAST_NAME, 
-        U.AVATAR_URL
-      FROM
-        FOLLOWERS F
-      INNER JOIN
-        USERS U ON F.FOLLOWER_ID = U.USER_ID
-      WHERE
-        F.FOLLOWED_ID = (?) AND F.FOLLOWER_ID NOT IN (?)
-      LIMIT 3;
-    `;
+    const data = await UserRepository.getFollowerFollowingLists(
+      user_id as unknown as number,
+      fetch as string,
+      listsId as number[]
+    );
     
-    const sql = fetch === "followers" ? sqlSelectFollowerId : sqlSelectFollowedId;
-    const data = await db(sql, [user_id, lists]);
     res.status(200).send({ lists: data });
   } catch (error:any) {
     next(error)
@@ -202,35 +112,23 @@ const getFollowerFollowingLists = async (req: Request, res: Response, next: Next
 const toggleFollow = async (req: Request, res: Response, next: NextFunction) => {
   try {
     let { user_id, followed_id } = req.params;
-    const values = [parseInt(user_id), parseInt(followed_id)];
+    let result: string | undefined = undefined;
 
-    const sqlCreate = `
-      INSERT INTO FOLLOWERS 
-      (FOLLOWER_ID, FOLLOWED_ID) VALUES (?, ?);
-    `;
-
-      const sqlGet = `
-      SELECT * 
-      FROM FOLLOWERS 
-      WHERE FOLLOWER_ID = (?) AND FOLLOWED_ID = (?);
-    `;
-      const sqlDelete = `
-      DELETE FROM FOLLOWERS 
-      WHERE FOLLOWER_ID = (?) AND FOLLOWED_ID = (?);
-    `;
-
-    // Get all the data from the database to see if it is already there
-    const [data] = await db(sqlGet, [...values]);
+    const args = {
+      follower_id: user_id as unknown as number,
+      followed_id: followed_id as unknown as number,
+    };
+    
+    // Check if the user is already following the other user
+    const isExist = await UserRepository.isFollowUser(args);
 
     // If it already exists, delete the data from the database
-    if (data) {
-      await db(sqlDelete, [...values]);
-      res.status(200).send({ message: "Unfollowed user" });
-    } else {
-      // if there is no data in the database, create one
-      await db(sqlCreate, [...values]);
-      res.status(200).send({ message: "Followed user" });
-    }
+    if (isExist) result = await UserRepository.unfollowUser(args);
+
+    // if there is no data in the database, create one
+    if (!isExist) result = await UserRepository.followUser(args);
+
+    res.status(200).send({ message: result });
   } catch (error:any) {
     next(error)
   }

@@ -1,5 +1,5 @@
-import cloudinary from "cloudinary";
-import * as fs from "fs";
+import cloudinary  from "cloudinary";
+import * as fs     from "fs";
 import * as dotenv from "dotenv";
 dotenv.config();
 
@@ -13,6 +13,7 @@ cloudinary.v2.config({
 async function uploadAndDeleteLocal(path: any) {
   const result = await cloudinary.v2.uploader.upload(path, {
     UNIQUE_FILENAME: true,
+    folder: process.env.STORAGE_FOLDER,
   });
   fs.unlink(path, (err) => {
     if (err) throw err;
