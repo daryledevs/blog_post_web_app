@@ -49,6 +49,7 @@ function uploadAndDeleteLocal(path) {
     return __awaiter(this, void 0, void 0, function* () {
         const result = yield cloudinary_1.default.v2.uploader.upload(path, {
             UNIQUE_FILENAME: true,
+            folder: process.env.STORAGE_FOLDER,
         });
         fs.unlink(path, (err) => {
             if (err)
