@@ -14,8 +14,8 @@ interface Database {
   messages: MessageTable;
   posts: PostTable;
   likes: LikeTable;
-  recentSearches: RecentSearchTable;
-  resetPasswordToken: ResetPasswordTable;
+  recent_searches: RecentSearchTable;
+  reset_password_token: ResetPasswordTable;
 };
 
 export default Database;
