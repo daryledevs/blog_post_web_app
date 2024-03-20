@@ -31,33 +31,44 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.logout = exports.resetPassword = exports.resetPasswordForm = exports.forgotPassword = exports.login = exports.register = void 0;
 const authTokens_1 = require("../util/authTokens");
-const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const dotenv = __importStar(require("dotenv"));
+const bcrypt_1 = __importDefault(require("bcrypt"));
+const exception_1 = __importDefault(require("../exception/exception"));
 const nodemailer_1 = __importDefault(require("../config/nodemailer"));
+const dotenv = __importStar(require("dotenv"));
 const encrypt_1 = __importDefault(require("../util/encrypt"));
 const decrypt_1 = __importDefault(require("../util/decrypt"));
-const query_1 = __importDefault(require("../database/query"));
-const exception_1 = __importDefault(require("../exception/exception"));
+const user_repository_1 = __importDefault(require("../repository/user-repository"));
+const auth_repository_1 = __importDefault(require("../repository/auth-repository"));
 dotenv.config();
 const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { email, username, password, first_name, last_name } = req.body;
+        const { email, username, password } = req.body;
         const hashPassword = bcrypt_1.default.hashSync(password, bcrypt_1.default.genSaltSync(10));
-        const sqlSelect = "SELECT * FROM USERS WHERE EMAIL = ? OR USERNAME = ?";
-        const sqlInsert = "INSERT INTO USERS (USERNAME, EMAIL, PASSWORD, FIRST_NAME, LAST_NAME) VALUES (?, ?, ?, ?, ?)";
         // Check to see if the user is already in the database.
-        const [user] = yield (0, query_1.default)(sqlSelect, [email, username]);
+        const user = yield user_repository_1.default.findUserByCredentials(username, email);
         if (user)
             return res.status(409).send({ message: "User is already exists" });
+        const _a = req.body, { cookieOptions } = _a, rest = __rest(_a, ["cookieOptions"]);
         // Save the user to the database
-        yield (0, query_1.default)(sqlInsert, [username, email, hashPassword, first_name, last_name]);
+        yield auth_repository_1.default.createUser(Object.assign(Object.assign({}, rest), { password: hashPassword }));
         return res.status(200).send({ message: "Registration is successful" });
     }
     catch (error) {
@@ -70,11 +81,10 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
     try {
         const { userCredential, password } = req.body;
         const isMissing = !req.body || !userCredential || !password;
-        const sql = "SELECT * FROM USERS WHERE (USERNAME = ? OR EMAIL = ?)";
         if (isMissing)
             return res.status(400).send({ message: "Missing required fields" });
         // Check if the user is exists.
-        const [user] = yield (0, query_1.default)(sql, [userCredential || "", userCredential || ""]);
+        const user = yield user_repository_1.default.findUserByCredentials(userCredential, userCredential);
         if (!user)
             return next(exception_1.default.notFound("User not found"));
         // Compare the password from database and from request body.
@@ -90,6 +100,7 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
         else {
             return res.status(404).send({ message: "Password is incorrect" });
         }
+        ;
     }
     catch (error) {
         next(error);
@@ -100,19 +111,20 @@ exports.login = login;
 const forgotPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email } = req.body;
-        const sqlSelect = "SELECT * FROM USERS WHERE EMAIL = ?;";
-        const sqlInsert = "INSERT INTO RESET_PASSWORD_TOKEN (TOKEN_ID, ENCRYPTED) VALUES (?, ?);";
         // Check if user exists
-        const [user] = yield (0, query_1.default)(sqlSelect, [email]);
+        const user = yield user_repository_1.default.findUserByEmail(email);
         if (!user)
             next(exception_1.default.notFound("User doesn't exists"));
         // Generate tokens
-        const token = (0, authTokens_1.generateResetToken)(user);
+        const token = (0, authTokens_1.generateResetToken)({ EMAIL: email, USER_ID: user.USER_ID });
         const shortToken = yield (0, authTokens_1.referenceToken)();
         const encryptedToken = (0, encrypt_1.default)(token);
         const encodedToken = encodeURIComponent(shortToken);
         // Save token to the database
-        yield (0, query_1.default)(sqlInsert, [shortToken, encryptedToken]);
+        yield auth_repository_1.default.saveResetToken({
+            user_id: user.USER_ID,
+            encrypted: encryptedToken
+        });
         // Send reset password email
         (0, nodemailer_1.default)(email, "Reset Password", encodedToken);
         res.json({ message: "Password reset email sent" });
@@ -127,14 +139,13 @@ const resetPasswordForm = (req, res, next) => __awaiter(void 0, void 0, void 0, 
     try {
         const token = req.query.token;
         const decodedToken = decodeURIComponent(token);
-        const sqlSelect = "SELECT * FROM RESET_PASSWORD_TOKEN WHERE TOKEN_ID = (?);";
         // Check if the token (id) exists in the database.
-        const [data] = yield (0, query_1.default)(sqlSelect, [decodedToken]);
-        const decryptedToken = (0, decrypt_1.default)(data.ENCRYPTED);
+        const data = yield auth_repository_1.default.findResetTokenById(decodedToken);
+        const decryptedToken = (0, decrypt_1.default)(data === null || data === void 0 ? void 0 : data.ENCRYPTED);
         // then decrypt the code to check if it is still valid.
         jsonwebtoken_1.default.verify(decryptedToken, process.env.RESET_PWD_TKN_SECRET, (error, decode) => {
             if (error)
-                return res.status(500).send({ message: "Cannot access the reset password form", error });
+                return next(exception_1.default.badRequest("Invalid or expired token"));
             const { email, user_id } = decode;
             res.status(200).render("resetPassword", { email, user_id });
         });
@@ -148,23 +159,22 @@ exports.resetPasswordForm = resetPasswordForm;
 const resetPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { tokenId, user_id, email, password, confirmPassword } = req.body;
-        if (password !== confirmPassword)
+        const isPasswordMismatch = password !== confirmPassword;
+        const passwordLength = password.length <= 5;
+        if (isPasswordMismatch)
             return next(exception_1.default.badRequest("Password does not match"));
-        if (password.length <= 5)
-            return res.status(400).json({ error: "Password should be at least 5 characters long." });
-        // Used limit here due to "safe update mode" error.
-        const sqlDelete = "DELETE FROM RESET_PASSWORD_TOKEN WHERE id = (?) LIMIT 1;";
-        const sqlUpdate = "UPDATE USERS SET PASSWORD = (?) WHERE EMAIL = (?) AND USER_ID = (?);";
-        const sqlSelect = "SELECT * FROM USERS WHERE EMAIL = (?) AND USER_ID = (?);";
+        if (passwordLength)
+            return next(exception_1.default.badRequest("Password must be at least 6 characters"));
         const decodedTokenId = decodeURIComponent(tokenId);
         const hashPassword = bcrypt_1.default.hashSync(password, bcrypt_1.default.genSaltSync(10));
         // Check if the user exists.
-        const [user] = yield (0, query_1.default)(sqlSelect, [email, user_id]);
+        const user = yield user_repository_1.default.findUserById(user_id);
         if (!user)
-            return res.status(404).send({ message: "User not found" });
+            return next(exception_1.default.notFound("User not found"));
         // Update the user's password and delete the reset password token from the database.
-        yield (0, query_1.default)(sqlUpdate, [hashPassword, email, user_id]);
-        yield (0, query_1.default)(sqlDelete, [decodedTokenId]);
+        yield user_repository_1.default.updateUser(user_id, { PASSWORD: hashPassword });
+        yield auth_repository_1.default.deleteResetToken(decodedTokenId);
+        // add here confirmation email to the user that the password has been reset.
         res.status(200).send({ message: "Reset password successfully" });
     }
     catch (error) {
