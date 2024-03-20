@@ -1,23 +1,21 @@
-import express from "express";
-import cors from "cors";
-import bodyParser from "body-parser";
-import morgan from "morgan";
-import * as dotenv from "dotenv";
-import db from "./database/query";
-import database from "./database/database";
-import authRoutes from "./router/auth";
-import userRoutes from './router/user';
-import cookieParser from 'cookie-parser';
+import cors             from "cors";
+import morgan           from "morgan";
+import express          from "express";
+import rootPath         from "./config/path";
+import bodyParser       from "body-parser";
+import authRoutes       from "./router/auth";
+import userRoutes       from './router/user';
+import chatRoutes       from "./router/chat";
+import postRouter       from "./router/post";
+import feedRouter       from "./router/feed";
+import * as dotenv      from "dotenv";
+import corsOptions      from "./config/corsOption";
+import cookieParser     from 'cookie-parser';
+import errorHandler     from "./helper/error-handler";
+import tokenHandler     from "./middleware/token-handler";
+import cookieOptions    from "./middleware/cookie-options";
+import responseHandler  from "./middleware/response-handler";
 import socketController from "./socket";
-import chatRoutes from "./router/chat";
-import postRouter from "./router/post";
-import feedRouter from "./router/feed";
-import corsOptions from "./config/corsOption";
-import tokenHandler from "./middleware/token-handler";
-import rootPath from "./config/path";
-import responseHandler from "./middleware/response-handler";
-import cookieOptions from "./middleware/cookie-options";
-import errorHandler from "./helper/error-handler";
 dotenv.config();
 
 const app = express();
@@ -43,14 +41,6 @@ app.use(`${API}/users`, userRoutes);
 app.use(`${API}/posts`, postRouter);
 app.use(`${API}/feeds`, feedRouter);
 app.use(errorHandler);
-
-database.getConnection(async (error) => {
-  if (error) throw error;
-  console.log("Connected to MySQL Server!");
-  // force mysql not to lose connection
-  // https://github.com/sidorares/node-mysql2/issues/836
-  await db("SELECT 1 + 1 AS solution", []);
-});
 
 app.listen(PORT, HOST, () => {
   socketController();
