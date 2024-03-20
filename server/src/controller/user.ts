@@ -1,18 +1,16 @@
+import { User }                            from "../types/users-table";
+import Exception                           from "../exception/exception";
+import UserRepository                      from "../repository/user-repository";
+import FollowRepository                    from "../repository/follow-repository";
+import RecentSearchesRepository            from "../repository/recent-searches-repository";
 import { NextFunction, Request, Response } from "express";
-import Exception from "../exception/exception";
-import UserRepository from "../repository/user-repository";
-
-interface User {
-  password: string;
-  [key: string]: any;
-}
 
 const getUserData = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { user_id } = req.body;
     const { person } = req.query;
 
-    let data: User | undefined = undefined;
+    let data: User | undefined;
 
     // If no parameters are provided, return an error
     if(!user_id && !person) return next(Exception.badRequest("No parameters provided"));
@@ -25,13 +23,12 @@ const getUserData = async (req: Request, res: Response, next: NextFunction) => {
 
     // If the user is not found, return an error
     if (!data) return next(Exception.notFound("User not found"));
-
     
     const { PASSWORD, ...rest } = data;
     res.status(200).send({ user: rest });
   } catch (error: any) {  
     next(error);
-  }
+  };
 };
 
 const searchUsersByQuery = async (req: Request, res: Response, next: NextFunction) => {
@@ -43,24 +40,33 @@ const searchUsersByQuery = async (req: Request, res: Response, next: NextFunctio
     res.status(200).send({ users: data });
   } catch (error) {
     next(error)
-  }
+  };
 };
 
 const getRecentSearches = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { user_id } = req.params;
-    const data = await UserRepository.getRecentSearches(user_id as unknown as number);
+    const user_id: any = req.params.user_id;
+    const data = await RecentSearchesRepository.getRecentSearches(user_id);
     return res.status(200).send({ users: data });
   } catch (error) {
     next(error)
-  }
+  };
 };
 
 const saveRecentSearches = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { user_id, searched_id } = req.params;
 
-    const data = await UserRepository.saveRecentSearches(
+    // Check if the user is already saved
+    const isRecentExists = await RecentSearchesRepository.findUsersSearchByUserId(
+      user_id as unknown as number,
+      searched_id as unknown as number
+    );
+
+    // If the user is already saved, return an error
+    if (isRecentExists) return next(Exception.badRequest("User already saved"));
+    
+    const data = await RecentSearchesRepository.saveRecentSearches(
       user_id as unknown as number,
       searched_id as unknown as number
     );
@@ -68,23 +74,30 @@ const saveRecentSearches = async (req: Request, res: Response, next: NextFunctio
     return res.status(200).send({ message: data });
   } catch (error) {
     next(error)
-  }
+  };
 };
 
 const removeRecentSearches = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { recent_id } = req.params;
-    const data = await UserRepository.deleteRecentSearches(recent_id as unknown as number);
+    const recent_id: any = req.params.recent_id;
+
+    // Check if the user exists
+    const recent = await RecentSearchesRepository.findUsersSearchByRecentId(recent_id);
+
+    // If the user does not exist, return an error
+    if (recent) return next(Exception.notFound("User not found"));
+
+    const data = await RecentSearchesRepository.deleteRecentSearches(recent_id);
     return res.status(200).send({ users: data });
   } catch (error) {
     next(error)
-  }
+  };
 };
 
 const getFollowStats = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { user_id } = req.params;
-    const { followers, following } = await UserRepository.getFollowsStats(user_id as unknown as number);
+    const user_id: any = req.params.user_id;
+    const { followers, following } = await FollowRepository.getFollowsStats(user_id);
     res.status(200).send({ followers, following });
   } catch (error) {
     next(error)
@@ -93,21 +106,21 @@ const getFollowStats = async (req: Request, res: Response, next: NextFunction) =
 
 const getFollowerFollowingLists = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { user_id } = req.params;
-    const { listsId } = req.body;
-    const { fetch } = req.query;
+    const user_id: any = req.params.user_id;
+    const listsId: number[] = req.body.listsId;
+    const fetch: any = req.query.fetch;
 
-    const data = await UserRepository.getFollowerFollowingLists(
-      user_id as unknown as number,
-      fetch as string,
-      listsId as number[]
+    const data = await FollowRepository.getFollowerFollowingLists(
+      user_id,
+      fetch,
+      listsId
     );
     
     res.status(200).send({ lists: data });
   } catch (error:any) {
     next(error)
-  }
-}
+  };
+};
 
 const toggleFollow = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -120,18 +133,18 @@ const toggleFollow = async (req: Request, res: Response, next: NextFunction) => 
     };
     
     // Check if the user is already following the other user
-    const isExist = await UserRepository.isFollowUser(args);
+    const isExist = await FollowRepository.isFollowUser(args);
 
     // If it already exists, delete the data from the database
-    if (isExist) result = await UserRepository.unfollowUser(args);
+    if (isExist) result = await FollowRepository.unfollowUser(args);
 
     // if there is no data in the database, create one
-    if (!isExist) result = await UserRepository.followUser(args);
+    if (!isExist) result = await FollowRepository.followUser(args);
 
     res.status(200).send({ message: result });
   } catch (error:any) {
     next(error)
-  }
+  };
 };
 
 export {

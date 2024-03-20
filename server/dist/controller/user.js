@@ -26,11 +26,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.toggleFollow = exports.getFollowerFollowingLists = exports.getFollowStats = exports.removeRecentSearches = exports.getRecentSearches = exports.saveRecentSearches = exports.searchUsersByQuery = exports.getUserData = void 0;
 const exception_1 = __importDefault(require("../exception/exception"));
 const user_repository_1 = __importDefault(require("../repository/user-repository"));
+const follow_repository_1 = __importDefault(require("../repository/follow-repository"));
+const recent_searches_repository_1 = __importDefault(require("../repository/recent-searches-repository"));
 const getUserData = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { user_id } = req.body;
         const { person } = req.query;
-        let data = undefined;
+        let data;
         // If no parameters are provided, return an error
         if (!user_id && !person)
             return next(exception_1.default.badRequest("No parameters provided"));
@@ -49,6 +51,7 @@ const getUserData = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
     catch (error) {
         next(error);
     }
+    ;
 });
 exports.getUserData = getUserData;
 const searchUsersByQuery = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -63,45 +66,59 @@ const searchUsersByQuery = (req, res, next) => __awaiter(void 0, void 0, void 0,
     catch (error) {
         next(error);
     }
+    ;
 });
 exports.searchUsersByQuery = searchUsersByQuery;
 const getRecentSearches = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { user_id } = req.params;
-        const data = yield user_repository_1.default.getRecentSearches(user_id);
+        const user_id = req.params.user_id;
+        const data = yield recent_searches_repository_1.default.getRecentSearches(user_id);
         return res.status(200).send({ users: data });
     }
     catch (error) {
         next(error);
     }
+    ;
 });
 exports.getRecentSearches = getRecentSearches;
 const saveRecentSearches = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { user_id, searched_id } = req.params;
-        const data = yield user_repository_1.default.saveRecentSearches(user_id, searched_id);
+        // Check if the user is already saved
+        const isRecentExists = yield recent_searches_repository_1.default.findUsersSearchByUserId(user_id, searched_id);
+        // If the user is already saved, return an error
+        if (isRecentExists)
+            return next(exception_1.default.badRequest("User already saved"));
+        const data = yield recent_searches_repository_1.default.saveRecentSearches(user_id, searched_id);
         return res.status(200).send({ message: data });
     }
     catch (error) {
         next(error);
     }
+    ;
 });
 exports.saveRecentSearches = saveRecentSearches;
 const removeRecentSearches = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { recent_id } = req.params;
-        const data = yield user_repository_1.default.deleteRecentSearches(recent_id);
+        const recent_id = req.params.recent_id;
+        // Check if the user exists
+        const recent = yield recent_searches_repository_1.default.findUsersSearchByRecentId(recent_id);
+        // If the user does not exist, return an error
+        if (recent)
+            return next(exception_1.default.notFound("User not found"));
+        const data = yield recent_searches_repository_1.default.deleteRecentSearches(recent_id);
         return res.status(200).send({ users: data });
     }
     catch (error) {
         next(error);
     }
+    ;
 });
 exports.removeRecentSearches = removeRecentSearches;
 const getFollowStats = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { user_id } = req.params;
-        const { followers, following } = yield user_repository_1.default.getFollowsStats(user_id);
+        const user_id = req.params.user_id;
+        const { followers, following } = yield follow_repository_1.default.getFollowsStats(user_id);
         res.status(200).send({ followers, following });
     }
     catch (error) {
@@ -111,15 +128,16 @@ const getFollowStats = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
 exports.getFollowStats = getFollowStats;
 const getFollowerFollowingLists = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { user_id } = req.params;
-        const { listsId } = req.body;
-        const { fetch } = req.query;
-        const data = yield user_repository_1.default.getFollowerFollowingLists(user_id, fetch, listsId);
+        const user_id = req.params.user_id;
+        const listsId = req.body.listsId;
+        const fetch = req.query.fetch;
+        const data = yield follow_repository_1.default.getFollowerFollowingLists(user_id, fetch, listsId);
         res.status(200).send({ lists: data });
     }
     catch (error) {
         next(error);
     }
+    ;
 });
 exports.getFollowerFollowingLists = getFollowerFollowingLists;
 const toggleFollow = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -131,17 +149,18 @@ const toggleFollow = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
             followed_id: followed_id,
         };
         // Check if the user is already following the other user
-        const isExist = yield user_repository_1.default.isFollowUser(args);
+        const isExist = yield follow_repository_1.default.isFollowUser(args);
         // If it already exists, delete the data from the database
         if (isExist)
-            result = yield user_repository_1.default.unfollowUser(args);
+            result = yield follow_repository_1.default.unfollowUser(args);
         // if there is no data in the database, create one
         if (!isExist)
-            result = yield user_repository_1.default.followUser(args);
+            result = yield follow_repository_1.default.followUser(args);
         res.status(200).send({ message: result });
     }
     catch (error) {
         next(error);
     }
+    ;
 });
 exports.toggleFollow = toggleFollow;
