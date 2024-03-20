@@ -12,6 +12,7 @@ interface UsersTable {
   avatar_url: string | null;
   roles: string | "users" | "admin";
   created_at: Generated<Date>;
+  [key: string]: any;
 };
 
 export type User = Selectable<UsersTable>;

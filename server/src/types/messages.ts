@@ -6,6 +6,7 @@ interface MessageTable {
   sender_id: number;
   text_message: string | null;
   time_sent: Generated<Date>;
+  [key: string]: any;
 };
 
 export type Message = Selectable<MessageTable>;

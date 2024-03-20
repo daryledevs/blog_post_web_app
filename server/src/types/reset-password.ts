@@ -5,6 +5,7 @@ interface ResetPasswordTokenTable {
   user_id: number;
   encrypted: string | null;
   create_time: Generated<Date>;
+  [key: string]: any;
 };
 
 export type ResetPasswordToken = Selectable<ResetPasswordTokenTable>;

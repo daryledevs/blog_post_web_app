@@ -5,6 +5,7 @@ interface RecentSearchTable {
   search_user_id: number;
   user_id: number;
   create_time: Generated<Date>;
+  [key: string]: any;
 }
 
 export type RecentSearch = Selectable<RecentSearchTable>;

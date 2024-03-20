@@ -4,6 +4,7 @@ interface LikeTable {
   post_id: number;
   user_id: number;
   like_date: Generated<Date>;
+  [key: string]: any;
 };
 
 export type Like = Selectable<LikeTable>;

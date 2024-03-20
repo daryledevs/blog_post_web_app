@@ -8,6 +8,7 @@ interface PostTable {
   image_url: string | null;
   privacy_level?: string | "public" | "private";
   post_date: Generated<Date>;
+  [key: string]: any;
 };
 
 export type Post = Selectable<PostTable>;
