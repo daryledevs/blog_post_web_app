@@ -4,15 +4,10 @@ const chatApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     getChatMessages: build.query<
       any,
-      {
-        userId?: number;
-        personId?: number;
-        conversation_id?: number;
-        messages?: any[];
-      }
+      { conversation_id?: number; messages?: any[] }
     >({
-      query: ({ userId, personId, conversation_id, messages }) => ({
-        url: `/chats/${conversation_id}/messages?user_id=${userId}&user_id=${personId}`,
+      query: ({ conversation_id, messages }) => ({
+        url: `/chats/${conversation_id}/messages`,
         method: "POST",
         body: { messages },
       }),
@@ -45,5 +40,8 @@ const chatApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useLazyGetChatMessagesQuery, useGetUserConversationsMutation, useSendNewMessagesMutation } =
-  chatApi;
+export const {
+  useLazyGetChatMessagesQuery,
+  useGetUserConversationsMutation,
+  useSendNewMessagesMutation,
+} = chatApi;

@@ -16,8 +16,6 @@ function useFetchMessage({ userDataApi, socketService, openConversation }: useFe
 
   useEffect(() => {
     getChatMessages({
-      userId: userDataApi?.user_id,
-      personId: openConversation?.[0]?.user_id,
       conversation_id: openConversation?.[0]?.conversation_id,
       messages: [],
     });
