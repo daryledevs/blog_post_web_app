@@ -2,8 +2,8 @@ import { Generated, Insertable, Selectable, Updateable } from "kysely";
 
 interface ConversationTable {
   conversation_id: Generated<number>;
-  user_one: number;
-  user_two: number;
+  user_one_id: number;
+  user_two_id: number;
 }
 
 export type Conversation = Selectable<ConversationTable>;
