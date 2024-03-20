@@ -226,7 +226,7 @@ class UserRepository {
       
       const result = await db
         .selectFrom("followers")
-        .innerJoin("users", `followers.${myId}`, "users.user_id")
+        .innerJoin("users", `followers.${otherId}`, "users.user_id")
         .where((eb) =>
           eb.and([
             eb(`followers.${myId}`, "=", user_id),

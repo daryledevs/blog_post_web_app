@@ -257,7 +257,7 @@ class UserRepository {
                 const otherId = fetch !== "followers" ? "followed_id" : "follower_id";
                 const result = yield database_1.db
                     .selectFrom("followers")
-                    .innerJoin("users", `followers.${myId}`, "users.user_id")
+                    .innerJoin("users", `followers.${otherId}`, "users.user_id")
                     .where((eb) => eb.and([
                     eb(`followers.${myId}`, "=", user_id),
                     eb(`followers.${otherId}`, "not in", listIdsToExclude),

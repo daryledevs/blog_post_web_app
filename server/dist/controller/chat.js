@@ -21,8 +21,7 @@ const getMessage = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         const messages = req.body.messages || [0];
         const ids = messages.length ? messages : [0];
         const data = yield chat_repository_1.default.getMessagesByConversationId(conversation_id, ids);
-        if (!data)
-            return next(exception_1.default.notFound("Messages not found"));
+        if (!data.length) return next(exception_1.default.notFound("Messages not found"));
         res.status(200).send({ chats: data });
     }
     catch (error) {
