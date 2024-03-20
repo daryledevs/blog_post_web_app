@@ -7,15 +7,23 @@ class Exception {
         this.status = status;
         this.message = message;
     }
+    ;
     static badRequest(message) {
         return new Exception(message, 400);
     }
+    ;
+    static unauthorized(message) {
+        return new Exception(message, 401);
+    }
+    ;
     static notFound(message) {
         return new Exception(message, 404);
     }
+    ;
     static internal(message) {
         return new Exception(message, 500);
     }
+    ;
 }
 ;
 exports.default = Exception;
