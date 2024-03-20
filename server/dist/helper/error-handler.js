@@ -7,8 +7,7 @@ const exception_1 = __importDefault(require("../exception/exception"));
 const database_1 = __importDefault(require("../exception/database"));
 const errorHandler = (err, req, res, next) => {
     if (err instanceof database_1.default) {
-        const { errorCode, errorType, message, query } = err;
-        return res.status(500).send({ errorCode, errorType, message, query });
+        return res.status(500).send(err);
     }
     if (err instanceof exception_1.default) {
         const { status, message } = err;

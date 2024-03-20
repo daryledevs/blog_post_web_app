@@ -5,8 +5,7 @@ import DatabaseException from "../exception/database";
 const errorHandler : ErrorRequestHandler = (err, req, res, next) => {
 
   if(err instanceof DatabaseException) {
-    const { errorCode, errorType, message, query } = err;
-    return res.status(500).send({ errorCode, errorType, message, query });
+    return res.status(500).send(err);
   }
 
   if(err instanceof Exception) {
