@@ -13,16 +13,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../database/database"));
-const kysely_1 = require("kysely");
 const database_2 = __importDefault(require("../exception/database"));
-class UserRepository {
-    static findUserById(user_id) {
+class RecentSearchesRepository {
+    static findUsersSearchByRecentId(recent_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 return yield database_1.default
-                    .selectFrom("users")
-                    .where("user_id", "=", user_id)
+                    .selectFrom("recent_searches")
                     .selectAll()
+                    .where("recent_id", "=", recent_id)
                     .executeTakeFirst();
             }
             catch (error) {
@@ -32,38 +31,33 @@ class UserRepository {
         });
     }
     ;
-    static findUserByUsername(username) {
+    static findUsersSearchByUserId(user_id, search_user_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 return yield database_1.default
-                    .selectFrom("users")
-                    .where("username", "like", username + "%")
+                    .selectFrom("recent_searches")
                     .selectAll()
-                    .executeTakeFirst();
-            }
-            catch (error) {
-                throw database_2.default.fromError(error);
-            }
-            ;
-        });
-    }
-    ;
-    static searchUsersByQuery(search) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                return yield database_1.default
-                    .selectFrom("users")
-                    .where((eb) => eb.or([
-                    eb("username", "=", search + "%"),
-                    eb("first_name", "=", search + "%"),
-                    eb("last_name", "=", search + "%"),
-                    eb((0, kysely_1.sql) `
-                concat(
-                  ${eb.ref("first_name")}, "", 
-                  ${eb.ref("last_name")}
-                )
-              `, "=", search + "%"),
+                    .where((eb) => eb.and([
+                    eb("user_id", "=", user_id),
+                    eb("search_user_id", "=", search_user_id),
                 ]))
+                    .executeTakeFirst();
+            }
+            catch (error) {
+                throw database_2.default.fromError(error);
+            }
+            ;
+        });
+    }
+    ;
+    static getRecentSearches(user_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                return yield database_1.default
+                    .selectFrom("recent_searches")
+                    .innerJoin("users", "users.user_id", "recent_searches.search_user_id")
+                    .where("recent_searches.user_id", "=", user_id)
+                    .limit(10)
                     .selectAll()
                     .execute();
             }
@@ -74,50 +68,14 @@ class UserRepository {
         });
     }
     ;
-    static findUserByEmail(email) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                return yield database_1.default
-                    .selectFrom("users")
-                    .where("email", "=", email)
-                    .selectAll()
-                    .executeTakeFirst();
-            }
-            catch (error) {
-                throw database_2.default.fromError(error);
-            }
-            ;
-        });
-    }
-    ;
-    static findUserByCredentials(username, email) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                return yield database_1.default
-                    .selectFrom("users")
-                    .selectAll()
-                    .where((eb) => eb.or([
-                    eb("email", "=", email),
-                    eb("username", "=", username)
-                ]))
-                    .executeTakeFirst();
-            }
-            catch (error) {
-                throw database_2.default.fromError(error);
-            }
-            ;
-        });
-    }
-    ;
-    static updateUser(user_id, user) {
+    static saveRecentSearches(user_id, search_user_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 yield database_1.default
-                    .updateTable("users")
-                    .set(user)
-                    .where("user_id", "=", user_id)
-                    .executeTakeFirstOrThrow();
-                return yield UserRepository.findUserById(user_id);
+                    .insertInto("recent_searches")
+                    .values({ user_id, search_user_id })
+                    .execute();
+                return "User saved successfully";
             }
             catch (error) {
                 throw database_2.default.fromError(error);
@@ -126,12 +84,12 @@ class UserRepository {
         });
     }
     ;
-    static deleteUser(user_id) {
+    static deleteRecentSearches(recent_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 yield database_1.default
-                    .deleteFrom("users")
-                    .where("user_id", "=", user_id)
+                    .deleteFrom("recent_searches")
+                    .where("recent_id", "=", recent_id)
                     .execute();
                 return "User deleted successfully";
             }
@@ -143,5 +101,4 @@ class UserRepository {
     }
     ;
 }
-;
-exports.default = UserRepository;
+exports.default = RecentSearchesRepository;
