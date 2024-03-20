@@ -13,17 +13,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const kysely_1 = require("kysely");
-const database_1 = require("../database/database");
+const database_1 = __importDefault(require("../database/database"));
 const database_2 = __importDefault(require("../exception/database"));
 class FeedRepository {
     static getTotalFeed() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const query = database_1.db
+                const query = database_1.default
                     .selectFrom("posts")
                     .select((eb) => eb.fn.countAll().as("count"))
                     .where((eb) => eb("post_date", ">", (0, kysely_1.sql) `DATE_SUB(CURDATE(), INTERVAL 3 DAY)`));
-                const { count } = yield database_1.db
+                const { count } = yield database_1.default
                     .selectNoFrom((eb) => [eb.fn.coalesce(query, eb.lit(0)).as("count")])
                     .executeTakeFirstOrThrow();
                 return count;
@@ -37,7 +37,7 @@ class FeedRepository {
     static getUserFeed(post_ids, user_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield database_1.db
+                return yield database_1.default
                     .selectFrom("followers")
                     .innerJoin("posts", "followers.followed_id", "posts.user_id")
                     .innerJoin("users", "users.user_id", "posts.user_id")
@@ -76,7 +76,7 @@ class FeedRepository {
     ;
     static getExploreFeed(user_id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield database_1.db
+            return yield database_1.default
                 .selectFrom("posts")
                 .innerJoin("users", "users.user_id", "posts.user_id")
                 .leftJoin("followers", (join) => join.on((eb) => eb.and([

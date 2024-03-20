@@ -1,4 +1,4 @@
-import { db }                            from "../database/database";
+import db                            from "../database/database";
 import DatabaseException                 from "../exception/database";
 import { Message, NewMessage }           from "../types/messages";
 import { Conversation, NewConversation } from "../types/conversations";

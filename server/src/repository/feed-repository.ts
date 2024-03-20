@@ -1,5 +1,5 @@
 import { sql }           from "kysely";
-import { db }            from "../database/database";
+import db            from "../database/database";
 import { Post }          from "../types/posts";
 import DatabaseException from "../exception/database";
 

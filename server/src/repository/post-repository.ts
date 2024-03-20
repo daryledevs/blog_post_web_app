@@ -1,4 +1,4 @@
-import { db }                        from "../database/database";
+import db                        from "../database/database";
 import { Like }                      from "../types/likes";
 import Exception                     from "../exception/exception";
 import cloudinary                    from "cloudinary";

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const database_1 = require("../database/database");
+const database_1 = __importDefault(require("../database/database"));
 const exception_1 = __importDefault(require("../exception/exception"));
 const cloudinary_1 = __importDefault(require("cloudinary"));
 const database_2 = __importDefault(require("../exception/database"));
@@ -20,7 +20,7 @@ class PostRepository {
     static getUserPosts(user_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield database_1.db
+                return yield database_1.default
                     .selectFrom("posts")
                     .innerJoin("users", "posts.user_id", "users.user_id")
                     .leftJoin("likes", "posts.post_id", "likes.post_id")
@@ -52,11 +52,11 @@ class PostRepository {
     static getUserTotalPosts(user_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const query = database_1.db
+                const query = database_1.default
                     .selectFrom("posts")
                     .select((eb) => eb.fn.count("posts.post_id").as("count"))
                     .where("user_id", "=", user_id);
-                const { count } = yield database_1.db
+                const { count } = yield database_1.default
                     .selectNoFrom((eb) => eb.fn.coalesce(query, eb.lit(0)).as("count"))
                     .executeTakeFirstOrThrow();
                 return count;
@@ -71,7 +71,7 @@ class PostRepository {
     static newPost(post) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                yield database_1.db
+                yield database_1.default
                     .insertInto("posts")
                     .values(post)
                     .execute();
@@ -87,7 +87,7 @@ class PostRepository {
     static editPost(post_id, post) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                yield database_1.db
+                yield database_1.default
                     .updateTable("posts")
                     .set(post)
                     .where("post_id", "=", post_id)
@@ -104,7 +104,7 @@ class PostRepository {
     static deletePost(post_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { image_id } = yield database_1.db
+                const { image_id } = yield database_1.default
                     .selectFrom("posts")
                     .select(["image_id"])
                     .where("post_id", "=", post_id)
@@ -112,7 +112,7 @@ class PostRepository {
                 const status = yield cloudinary_1.default.v2.uploader.destroy(image_id);
                 if (status.result !== "ok")
                     throw exception_1.default.badRequest("Delete image failed");
-                yield database_1.db
+                yield database_1.default
                     .deleteFrom("posts")
                     .where("post_id", "=", post_id)
                     .executeTakeFirst();
@@ -128,11 +128,11 @@ class PostRepository {
     static getLikesCountForPost(post_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const query = database_1.db
+                const query = database_1.default
                     .selectFrom("likes")
                     .select((eb) => eb.fn.count("likes.post_id").as("count"))
                     .where("likes.post_id", "=", post_id);
-                const { count } = yield database_1.db
+                const { count } = yield database_1.default
                     .selectNoFrom((eb) => eb.fn.coalesce(query, eb.lit(0)).as("count"))
                     .executeTakeFirstOrThrow();
                 return count;
@@ -147,7 +147,7 @@ class PostRepository {
     static isUserLikePost(like) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield database_1.db
+                return yield database_1.default
                     .selectFrom("likes")
                     .selectAll()
                     .where((eb) => eb.and([
@@ -166,7 +166,7 @@ class PostRepository {
     static toggleUserLikeForPost(like) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                yield database_1.db
+                yield database_1.default
                     .insertInto("likes")
                     .values(like)
                     .execute();
@@ -181,7 +181,7 @@ class PostRepository {
     static removeUserLikeForPost(like) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                yield database_1.db
+                yield database_1.default
                     .deleteFrom("likes")
                     .where((eb) => eb.and([
                     eb("likes.post_id", "=", like.post_id),

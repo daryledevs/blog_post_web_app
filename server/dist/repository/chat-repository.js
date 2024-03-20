@@ -12,13 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const database_1 = require("../database/database");
+const database_1 = __importDefault(require("../database/database"));
 const database_2 = __importDefault(require("../exception/database"));
 class ChatRepository {
     static getUserConversationHistoryByUserId(user_id, conversations) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield database_1.db
+                return yield database_1.default
                     .selectFrom("conversations")
                     .select([
                     "conversations.conversation_id",
@@ -53,7 +53,7 @@ class ChatRepository {
     static getHistoryByConversationId(conversation_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield database_1.db
+                return yield database_1.default
                     .selectFrom("conversations")
                     .selectAll()
                     .where("conversation_id", "=", conversation_id)
@@ -68,7 +68,7 @@ class ChatRepository {
     static findConversationByUserId(user_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield database_1.db
+                return yield database_1.default
                     .selectFrom("conversations")
                     .select([
                     "conversations.conversation_id",
@@ -93,7 +93,7 @@ class ChatRepository {
     static getMessagesByConversationId(conversation_id, ids) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield database_1.db
+                return yield database_1.default
                     .selectFrom("messages")
                     .selectAll()
                     .where((eb) => eb.and([
@@ -113,7 +113,7 @@ class ChatRepository {
     static saveNewConversation(conversation) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { insertId } = yield database_1.db
+                const { insertId } = yield database_1.default
                     .insertInto("conversations")
                     .values(conversation)
                     .executeTakeFirst();
@@ -129,7 +129,7 @@ class ChatRepository {
     static saveNewMessage(message) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                yield database_1.db
+                yield database_1.default
                     .insertInto("messages")
                     .values(message)
                     .executeTakeFirst();
