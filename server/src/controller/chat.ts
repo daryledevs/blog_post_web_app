@@ -1,41 +1,16 @@
+import Exception                           from "../exception/exception";
+import ChatRepository                      from "../repository/chat-repository";
 import { NextFunction, Request, Response } from "express";
-import db from "../database/query";
 
 const getMessage = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const user_id: any | any[] = req.query.user_id || [];
-    let conversation_id = req.params.conversation_id;
-    const { messages } = req.body || [];
-    const ids = messages?.length ? messages : 0;
+    let conversation_id: any = req.params.conversation_id;
+    const messages = req.body.messages || [0];
+    const ids = messages.length ? messages : [0];
 
-    if(user_id.length){
-      const reverse = user_id.slice().reverse();
-      const args = [...user_id, ...reverse];
+    const data = await ChatRepository.getMessagesByConversationId(conversation_id, ids);
+    if (!data.length) return next(Exception.notFound("Messages not found"));
 
-      const sqlFindConversationId = `
-        SELECT *
-        FROM CONVERSATIONS
-        WHERE 
-          (USER_ONE = (?) AND USER_TWO = (?))
-          OR 
-          (USER_ONE = (?) AND USER_TWO = (?));
-      `;
-
-      const [getConversationIdData] = await db(sqlFindConversationId, args);
-      if(!getConversationIdData) return res.status(200).send({ message: "No conversation found" });
-      conversation_id = getConversationIdData.CONVERSATION_ID;
-    }
-
-    const sqlGetConversation = `
-      SELECT *
-      FROM MESSAGES
-      WHERE 
-          CONVERSATION_ID = (?)
-          AND CONVERSATION_ID NOT IN (?)
-      LIMIT 3;
-    `;
-    
-    const data = await db(sqlGetConversation, [conversation_id, ids]);
     res.status(200).send({ chats: data });
   } catch (error) {
     next(error)
@@ -44,32 +19,11 @@ const getMessage = async (req: Request, res: Response, next: NextFunction) => {
 
 const getUserConversations = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { user_id } = req.query;
-    const { conversations } = req.body;
-    const ids = conversations.length ? conversations : 0;
+    const user_id: any = req.query.user_id;
+    const conversations = req.body || [];
+    const ids = conversations.length ? conversations : [0];
 
-    const sql = `
-      SELECT 
-        C.*, 
-        U.USER_ID, 
-        U.USERNAME, 
-        U.FIRST_NAME, 
-        U.LAST_NAME, 
-        U.AVATAR_URL 
-      FROM 
-        CONVERSATIONS C 
-        LEFT JOIN USERS U ON U.USER_ID = 
-        CASE 
-          WHEN C.USER_ONE = (?) THEN C.USER_TWO 
-          ELSE C.USER_ONE 
-        END 
-      WHERE 
-        CONVERSATION_ID NOT IN (?) 
-      LIMIT 
-        10;
-    `;
-
-    const data = await db(sql, [user_id, ids]);
+    const data = await ChatRepository.getUserConversationHistoryByUserId(user_id, ids);
     if (!data) return res.status(200).send({ list: data });
     return res.status(200).send({ list: data });
   } catch (error) {
@@ -79,24 +33,24 @@ const getUserConversations = async (req: Request, res: Response, next: NextFunct
 
 const newMessageAndConversation = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { sender_id, receiver_id, text_message, conversation_id } = req.body;
-    const sqlFindConversationId = "SELECT * FROM CONVERSATIONS WHERE CONVERSATION_ID = (?);"
-    const [getConversationIdData] = await db(sqlFindConversationId, [conversation_id]);
+    const { sender_id, receiver_id, text_message } = req.body;
+    let conversation_id: any = req.params.conversation_id;
+    const data = await ChatRepository.getHistoryByConversationId(conversation_id);
 
-    if(!getConversationIdData) {
-      const sqlInsertNewConversation = `
-        INSERT INTO CONVERSATIONS (USER_ONE, USER_TWO) VALUES (?, ?);
-        SET @LAST_ID_IN_CONVERSATION = LAST_INSERT_ID();
-        INSERT INTO MESSAGES (SENDER_ID, CONVERSATION_ID, TEXT_MESSAGE) VALUES (?, @LAST_ID_IN_CONVERSATION, ?);
-      `;
-      
-      await db(sqlInsertNewConversation, [sender_id, receiver_id, sender_id, text_message]);
-      return res.status(200).send({ message: "New conversation and message created" });
-    } else {
-      const sqlInsertNewMessage = "INSERT INTO MESSAGES  (SENDER_ID, CONVERSATION_ID, TEXT_MESSAGE) VALUES (?, ?, ?);";
-      await db(sqlInsertNewMessage, [sender_id, conversation_id, text_message]);
-      return res.status(200).send({ message: "New message created" });
-    }
+    if(!data) {
+      conversation_id = await ChatRepository.saveNewConversation({
+        user_one_id: sender_id,
+        user_two_id: receiver_id,
+      });
+    } 
+    
+    const message = await ChatRepository.saveNewMessage({
+      conversation_id: conversation_id,
+      sender_id,
+      text_message,
+    });
+
+    return res.status(200).send({ message });
   } catch (error) {
     next(error)
   };
