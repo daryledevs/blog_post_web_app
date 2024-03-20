@@ -1,9 +1,11 @@
-import { Request, Response, NextFunction } from "express";
-import dotenv from "dotenv";
-import routeException from "../util/routeException";
-import db from "../database/query";
+import dotenv                                                     from "dotenv";
+import { User }                                                   from "../types/users-table";
+import Exception                                                  from "../exception/exception";
+import isTokenValid                                               from "../util/is-token-invalid";
+import routeException                                             from "../util/routeException";
+import UserRepository                                             from "../repository/user-repository";
+import { Request, Response, NextFunction }                        from "express";
 import { generateAccessToken, generateRefreshToken, verifyToken } from "../util/authTokens";
-
 dotenv.config();
 
 const tokenHandler = async (req: Request, res: Response, next: NextFunction) => {
@@ -13,51 +15,49 @@ const tokenHandler = async (req: Request, res: Response, next: NextFunction) => 
     const accessToken = req.headers.authorization?.split(" ")[1];
     const refreshSecret = process.env.REFRESH_TKN_SECRET!;
     const accessSecret = process.env.ACCESS_TKN_SECRET!;
-    const sqlSelect = "SELECT USER_ID, ROLES FROM USERS WHERE USER_ID = (?);";
-    if (!refreshToken) return res.status(401).send({ message: "Unauthorized" });
+    const isTokenInvalid = isTokenValid(accessToken, refreshToken);
+
+    // if the token is not provided, return an error
+    if (isTokenInvalid) return next(Exception.unauthorized("Token is not provided"));
     
-    if (accessToken && refreshToken && !isInvalidToken(accessToken, refreshToken)) {
-  
-      const { refreshError, refreshDecode } = await verifyToken(refreshToken, refreshSecret, "refresh");
-      const { accessError, accessDecode } = await verifyToken(accessToken, accessSecret, "access");
+    // verify the refresh token and access token
+    const { refreshError, refreshDecode } = await verifyToken(refreshToken, refreshSecret, "refresh");
+    const { accessError, accessDecode } = await verifyToken(accessToken, accessSecret, "access");
+    const isTokenError = [refreshError, accessError].some((status) => status === "JsonWebTokenError");
+    
+    // if the refresh token is not provided, return an error
+    if (isTokenError) return next(Exception.unauthorized("Token is not valid"));
 
-      const isTokenError = [refreshError, accessError].some((status) => status === "JsonWebTokenError");
-      if (isTokenError) return res.status(401).send({ message: "Token is not valid" });
+    // if user is not found, return an error
+    const result: User | undefined = await UserRepository.findUserById(refreshDecode.user_id);
+    if (!result) return next(Exception.notFound("User not found"));
 
-      if (refreshError === "TokenExpiredError" || accessError === "TokenExpiredError") {
-        const ACCESS_OPTION = { USER_ID: accessDecode.user_id, ROLES: accessDecode.roles };
-        const REFRESH_OPTION = { USER_ID: refreshDecode.user_id, USERNAME: refreshDecode.username };
-        const REFRESH_TKN = generateRefreshToken(REFRESH_OPTION);
-        const ACCESS_TOKEN = generateAccessToken(ACCESS_OPTION);
-        res.cookie("REFRESH_TOKEN", REFRESH_TKN, req.body.cookieOptions);
-        return res.status(200).send({ accessToken: ACCESS_TOKEN });
-      }
-      
-      req.body.user_id = refreshDecode.user_id;
-      req.body.roles = accessDecode.roles;
-      next();
-    } else if (refreshToken) {
-      const { refreshError, refreshDecode } = await verifyToken(refreshToken, refreshSecret, "refresh");
-      if (refreshError === "JsonWebTokenError") return res.status(401).send({ message: "Token is not valid" });
-      const [result] = await db(sqlSelect, [refreshDecode.user_id]);
-      const ACCESS_TOKEN = generateAccessToken(result);
+    // if the refresh token is expired, generate a new refresh token and access token
+    if (refreshError === "TokenExpiredError" || accessError === "TokenExpiredError") {
+      // token options
+      const ACCESS_OPTION = { USER_ID: accessDecode.user_id, ROLES: accessDecode.roles };
+      const REFRESH_OPTION = { USER_ID: refreshDecode.user_id, USERNAME: refreshDecode.username };
+
+      // generate new tokens
+      const REFRESH_TKN = generateRefreshToken(REFRESH_OPTION);
+      const ACCESS_TOKEN = generateAccessToken(ACCESS_OPTION);
+      res.cookie("REFRESH_TOKEN", REFRESH_TKN, req.body.cookieOptions);
       return res.status(200).send({ accessToken: ACCESS_TOKEN });
-    } else {
-      throw new Error("Token: Unknown Error");
-    }
-
-  } catch (error:any) {
-    res.status(500).send({ message: "Something went wrong", error: error?.message });
-  }
-};
-
-// an empty token returns null as a string when used sessionStorage.getItem(...) function
-function isInvalidToken(accessToken:any, refreshToken:any){
-  if(accessToken === "null" || accessToken === null) return true;
-  if(accessToken === "undefined" || accessToken === undefined) return true;
-  if(refreshToken === "null" || refreshToken === null) return true;
-  if(refreshToken === "undefined" || refreshToken === undefined) return true;
-  return false;
+    };
+    
+    // if the access token is not provided, generate a new access token
+    if (!accessToken) {
+      const ACCESS_TOKEN = generateAccessToken({ USER_ID: result?.USER_ID, ROLES: result?.ROLES });
+      return res.status(200).send({ accessToken: ACCESS_TOKEN });
+    };
+  
+    // if the access token is provided, decode the token and pass the user_id and roles to the next middleware
+    req.body.user_id = refreshDecode.user_id;
+    req.body.roles = accessDecode.roles;
+    next();
+  } catch (error) {
+    next(error);
+  };
 };
 
 export default tokenHandler;
