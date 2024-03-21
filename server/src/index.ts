@@ -29,7 +29,6 @@ app.use(cookieParser());
 app.use(cookieOptions);
 app.use(cors(corsOptions));
 app.use(tokenHandler);
-app.use(responseHandler);
 app.set("views", rootPath); // Set the views directory
 app.set('view engine', 'ejs'); // Set EJS as the template engine
 app.use(morgan("tiny"));

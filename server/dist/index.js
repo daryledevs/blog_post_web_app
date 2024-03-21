@@ -43,7 +43,6 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const error_handler_1 = __importDefault(require("./helper/error-handler"));
 const token_handler_1 = __importDefault(require("./middleware/token-handler"));
 const cookie_options_1 = __importDefault(require("./middleware/cookie-options"));
-const response_handler_1 = __importDefault(require("./middleware/response-handler"));
 const socket_1 = __importDefault(require("./socket"));
 dotenv.config();
 const app = (0, express_1.default)();
@@ -56,7 +55,6 @@ app.use((0, cookie_parser_1.default)());
 app.use(cookie_options_1.default);
 app.use((0, cors_1.default)(corsOption_1.default));
 app.use(token_handler_1.default);
-app.use(response_handler_1.default);
 app.set("views", path_1.default); // Set the views directory
 app.set('view engine', 'ejs'); // Set EJS as the template engine
 app.use((0, morgan_1.default)("tiny"));
