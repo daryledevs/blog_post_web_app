@@ -1,7 +1,7 @@
-import * as dotenv                               from "dotenv";
-import { type DB }                               from "../types/schema.types";
-import { createPool }                            from "mysql2";
-import { CamelCasePlugin, Kysely, MysqlDialect } from "kysely";
+import * as dotenv              from "dotenv";
+import { type DB }              from "../types/schema.types";
+import { createPool, }          from "mysql2";
+import { Kysely, MysqlDialect } from "kysely";
 dotenv.config();
 
 const dialect = new MysqlDialect({
@@ -17,11 +17,7 @@ const dialect = new MysqlDialect({
     connectionLimit: `${process.env.DATABASE_CONNECTION_LIMIT}` as unknown as number,
     queueLimit: 0,
   }),
-});
+})
 
-const db = new Kysely<DB>({ 
-  dialect, 
-  // plugins: [new CamelCasePlugin] 
-});
-
+const db = new Kysely<DB>({ dialect });
 export default db;

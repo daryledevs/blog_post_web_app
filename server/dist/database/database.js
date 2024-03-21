@@ -41,8 +41,5 @@ const dialect = new kysely_1.MysqlDialect({
         queueLimit: 0,
     }),
 });
-const db = new kysely_1.Kysely({
-    dialect,
-    // plugins: [new CamelCasePlugin] 
-});
+const db = new kysely_1.Kysely({ dialect });
 exports.default = db;
