@@ -46,8 +46,8 @@ const tokenHandler = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         // if the refresh token is expired, generate a new refresh token and access token
         if (refreshError === "TokenExpiredError" || accessError === "TokenExpiredError") {
             // token options
-            const ACCESS_OPTION = { USER_ID: accessDecode.user_id, ROLES: accessDecode.roles };
-            const REFRESH_OPTION = { USER_ID: refreshDecode.user_id, USERNAME: refreshDecode.username };
+            const ACCESS_OPTION = { user_id: accessDecode.user_id, roles: accessDecode.roles };
+            const REFRESH_OPTION = { user_id: refreshDecode.user_id, username: refreshDecode.username };
             // generate new tokens
             const REFRESH_TKN = (0, authTokens_1.generateRefreshToken)(REFRESH_OPTION);
             const ACCESS_TOKEN = (0, authTokens_1.generateAccessToken)(ACCESS_OPTION);
@@ -57,7 +57,10 @@ const tokenHandler = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         ;
         // if the access token is not provided, generate a new access token
         if (!accessToken) {
-            const ACCESS_TOKEN = (0, authTokens_1.generateAccessToken)({ USER_ID: result === null || result === void 0 ? void 0 : result.USER_ID, ROLES: result === null || result === void 0 ? void 0 : result.ROLES });
+            const ACCESS_TOKEN = (0, authTokens_1.generateAccessToken)({
+                user_id: result === null || result === void 0 ? void 0 : result.user_id,
+                roles: result === null || result === void 0 ? void 0 : result.roles,
+            });
             return res.status(200).send({ accessToken: ACCESS_TOKEN });
         }
         ;

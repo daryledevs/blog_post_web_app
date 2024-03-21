@@ -27,10 +27,8 @@ class RecentSearchesRepository {
             catch (error) {
                 throw database_2.default.fromError(error);
             }
-            ;
         });
     }
-    ;
     static findUsersSearchByUserId(user_id, search_user_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -46,10 +44,8 @@ class RecentSearchesRepository {
             catch (error) {
                 throw database_2.default.fromError(error);
             }
-            ;
         });
     }
-    ;
     static getRecentSearches(user_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -64,10 +60,8 @@ class RecentSearchesRepository {
             catch (error) {
                 throw database_2.default.fromError(error);
             }
-            ;
         });
     }
-    ;
     static saveRecentSearches(user_id, search_user_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -80,10 +74,8 @@ class RecentSearchesRepository {
             catch (error) {
                 throw database_2.default.fromError(error);
             }
-            ;
         });
     }
-    ;
     static deleteRecentSearches(recent_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -96,9 +88,7 @@ class RecentSearchesRepository {
             catch (error) {
                 throw database_2.default.fromError(error);
             }
-            ;
         });
     }
-    ;
 }
 exports.default = RecentSearchesRepository;

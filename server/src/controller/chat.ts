@@ -9,7 +9,7 @@ const getMessage = async (req: Request, res: Response, next: NextFunction) => {
     const ids = messages.length ? messages : [0];
 
     const data = await ChatRepository.getMessagesByConversationId(conversation_id, ids);
-    if (!data.length) return next(Exception.notFound("Messages not found"));
+    if(!data.length) return next(Exception.notFound("Messages not found"));
 
     res.status(200).send({ chats: data });
   } catch (error) {

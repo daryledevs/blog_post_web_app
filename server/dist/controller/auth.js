@@ -116,13 +116,13 @@ const forgotPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         if (!user)
             next(exception_1.default.notFound("User doesn't exists"));
         // Generate tokens
-        const token = (0, authTokens_1.generateResetToken)({ EMAIL: email, USER_ID: user.USER_ID });
+        const token = (0, authTokens_1.generateResetToken)({ EMAIL: email, user_id: user.user_id });
         const shortToken = yield (0, authTokens_1.referenceToken)();
         const encryptedToken = (0, encrypt_1.default)(token);
         const encodedToken = encodeURIComponent(shortToken);
         // Save token to the database
         yield auth_repository_1.default.saveResetToken({
-            user_id: user.USER_ID,
+            user_id: user.user_id,
             encrypted: encryptedToken
         });
         // Send reset password email
@@ -141,7 +141,9 @@ const resetPasswordForm = (req, res, next) => __awaiter(void 0, void 0, void 0, 
         const decodedToken = decodeURIComponent(token);
         // Check if the token (id) exists in the database.
         const data = yield auth_repository_1.default.findResetTokenById(decodedToken);
-        const decryptedToken = (0, decrypt_1.default)(data === null || data === void 0 ? void 0 : data.ENCRYPTED);
+        if (!data)
+            return next(exception_1.default.badRequest("Invalid or expired token"));
+        const decryptedToken = (0, decrypt_1.default)(data.encrypted);
         // then decrypt the code to check if it is still valid.
         jsonwebtoken_1.default.verify(decryptedToken, process.env.RESET_PWD_TKN_SECRET, (error, decode) => {
             if (error)
@@ -172,7 +174,7 @@ const resetPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         if (!user)
             return next(exception_1.default.notFound("User not found"));
         // Update the user's password and delete the reset password token from the database.
-        yield user_repository_1.default.updateUser(user_id, { PASSWORD: hashPassword });
+        yield user_repository_1.default.updateUser(user_id, { password: hashPassword });
         yield auth_repository_1.default.deleteResetToken(decodedTokenId);
         // add here confirmation email to the user that the password has been reset.
         res.status(200).send({ message: "Reset password successfully" });

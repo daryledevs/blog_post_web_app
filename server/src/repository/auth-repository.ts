@@ -1,12 +1,16 @@
-import db                                        from "../database/database";
+import {
+  NewResetPasswordToken,
+  NewUsers,
+  SelectResetPasswordToken,
+  SelectUsers,
+}                                                    from "../types/table.types";
+import db                                            from "../database/database";
 import UserRepository                                from "./user-repository";
-import { NewUser, User }                             from "../types/users-table";
 import DatabaseException                             from "../exception/database";
-import { NewResetPasswordToken, ResetPasswordToken } from "../types/reset-password";
 
 class AuthRepository {
 
-  static async createUser(user: NewUser): Promise<User | undefined> {
+  static async createUser(user: NewUsers): Promise<SelectUsers | undefined> {
     try {
       const { insertId } = await db
         .insertInto("users")
@@ -19,7 +23,7 @@ class AuthRepository {
     };
   };
 
-  static async findResetTokenById(token_id:number): Promise<ResetPasswordToken | undefined> {
+  static async findResetTokenById(token_id:number): Promise<SelectResetPasswordToken | undefined> {
     try {
       return await db
         .selectFrom("reset_password_token")

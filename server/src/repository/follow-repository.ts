@@ -1,6 +1,6 @@
-import db                    from "../database/database";
-import DatabaseException         from "../exception/database";
-import { Follower, NewFollower } from "../types/followers";
+import db                                from "../database/database";
+import DatabaseException                 from "../exception/database";
+import { NewFollowers, SelectFollowers } from "../types/table.types";
 
 class FollowRepository {
   
@@ -59,7 +59,7 @@ class FollowRepository {
     };
   };
 
-  static async isFollowUser (identifier: Follower): Promise<boolean> {
+  static async isFollowUser (identifier: SelectFollowers): Promise<boolean> {
     try {
       const result = await db
         .selectFrom("followers")
@@ -78,7 +78,7 @@ class FollowRepository {
     };
   };
 
-  static async followUser(identifier: NewFollower): Promise<string | undefined> {
+  static async followUser(identifier: NewFollowers): Promise<string | undefined> {
     await db
       .insertInto("followers")
       .values(identifier)
@@ -87,7 +87,7 @@ class FollowRepository {
     return "User followed successfully";
   };
 
-  static async unfollowUser(identifier: Follower): Promise<string | undefined> {
+  static async unfollowUser(identifier: SelectFollowers): Promise<string | undefined> {
     try {
       await db
         .deleteFrom("followers")

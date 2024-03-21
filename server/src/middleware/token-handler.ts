@@ -1,7 +1,7 @@
 import dotenv                                                     from "dotenv";
-import { User }                                                   from "../types/users-table";
 import Exception                                                  from "../exception/exception";
 import isTokenValid                                               from "../util/is-token-invalid";
+import { SelectUsers }                                            from "../types/table.types";
 import routeException                                             from "../util/routeException";
 import UserRepository                                             from "../repository/user-repository";
 import { Request, Response, NextFunction }                        from "express";
@@ -29,14 +29,14 @@ const tokenHandler = async (req: Request, res: Response, next: NextFunction) => 
     if (isTokenError) return next(Exception.unauthorized("Token is not valid"));
 
     // if user is not found, return an error
-    const result: User | undefined = await UserRepository.findUserById(refreshDecode.user_id);
+    const result: SelectUsers | undefined = await UserRepository.findUserById(refreshDecode.user_id);
     if (!result) return next(Exception.notFound("User not found"));
 
     // if the refresh token is expired, generate a new refresh token and access token
     if (refreshError === "TokenExpiredError" || accessError === "TokenExpiredError") {
       // token options
-      const ACCESS_OPTION = { USER_ID: accessDecode.user_id, ROLES: accessDecode.roles };
-      const REFRESH_OPTION = { USER_ID: refreshDecode.user_id, USERNAME: refreshDecode.username };
+      const ACCESS_OPTION = { user_id: accessDecode.user_id, roles: accessDecode.roles };
+      const REFRESH_OPTION = { user_id: refreshDecode.user_id, username: refreshDecode.username };
 
       // generate new tokens
       const REFRESH_TKN = generateRefreshToken(REFRESH_OPTION);
@@ -47,7 +47,10 @@ const tokenHandler = async (req: Request, res: Response, next: NextFunction) => 
     
     // if the access token is not provided, generate a new access token
     if (!accessToken) {
-      const ACCESS_TOKEN = generateAccessToken({ USER_ID: result?.USER_ID, ROLES: result?.ROLES });
+      const ACCESS_TOKEN = generateAccessToken({
+        user_id: result?.user_id as any,
+        roles: result?.roles as any,
+      });
       return res.status(200).send({ accessToken: ACCESS_TOKEN });
     };
   

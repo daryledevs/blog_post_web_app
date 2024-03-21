@@ -58,27 +58,27 @@ function verifyToken(token, secret, tokenName) {
     });
 }
 exports.verifyToken = verifyToken;
-function generateRefreshToken({ USER_ID, USERNAME }) {
+function generateRefreshToken({ user_id, username }) {
     const REFRESH_SECRET = process.env.REFRESH_TKN_SECRET;
-    const details = { user_id: USER_ID, username: USERNAME };
+    const details = { user_id: user_id, username: username };
     const expiration = { expiresIn: REFRESH_TOKEN_EXPIRATION };
     const token = jsonwebtoken_1.default.sign(details, REFRESH_SECRET, expiration);
     return token;
 }
 exports.generateRefreshToken = generateRefreshToken;
 ;
-function generateAccessToken({ USER_ID, ROLES }) {
+function generateAccessToken({ user_id, roles }) {
     const ACCESS_SECRET = process.env.ACCESS_TKN_SECRET;
-    const details = { user_id: USER_ID, roles: ROLES };
+    const details = { user_id: user_id, roles: roles };
     const expiration = { expiresIn: ACCESS_TOKEN_EXPIRATION };
     const token = jsonwebtoken_1.default.sign(details, ACCESS_SECRET, expiration);
     return token;
 }
 exports.generateAccessToken = generateAccessToken;
 ;
-function generateResetToken({ EMAIL, USER_ID }) {
+function generateResetToken({ EMAIL, user_id }) {
     const RESET_SECRET = process.env.RESET_PWD_TKN_SECRET;
-    const details = { email: EMAIL, user_id: USER_ID };
+    const details = { email: EMAIL, user_id: user_id };
     const expiration = { expiresIn: RESET_TOKEN_EXPIRATION };
     const token = jsonwebtoken_1.default.sign(details, RESET_SECRET, expiration);
     return token;

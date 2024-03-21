@@ -1,11 +1,11 @@
-import db               from "../database/database";
-import { sql }              from "kysely";
-import DatabaseException    from "../exception/database";
-import { User, UpdateUser } from "../types/users-table";
+import db                           from "../database/database";
+import { sql }                      from "kysely";
+import DatabaseException            from "../exception/database";
+import { SelectUsers, UpdateUsers } from "../types/table.types";
 
 class UserRepository {
   
-  static async findUserById(user_id: number): Promise<User | undefined> {
+  static async findUserById(user_id: number): Promise<SelectUsers | undefined> {
     try {
       return await db
         .selectFrom("users")
@@ -17,7 +17,7 @@ class UserRepository {
     };
   };
 
-  static async findUserByUsername(username: string): Promise<User | undefined> {
+  static async findUserByUsername(username: string): Promise<SelectUsers | undefined> {
     try {
       return await db
         .selectFrom("users")
@@ -29,7 +29,7 @@ class UserRepository {
     };
   };
 
-  static async searchUsersByQuery(search: string): Promise<User[] | undefined> {
+  static async searchUsersByQuery(search: string): Promise<SelectUsers[] | undefined> {
     try {
       return await db
         .selectFrom("users")
@@ -57,7 +57,7 @@ class UserRepository {
     };
   };
 
-  static async findUserByEmail(email: string): Promise<User | undefined> {
+  static async findUserByEmail(email: string): Promise<SelectUsers | undefined> {
     try {
       return await db
         .selectFrom("users")
@@ -69,7 +69,7 @@ class UserRepository {
     };
   };
 
-  static async findUserByCredentials(username: string, email: string): Promise<User | undefined> {
+  static async findUserByCredentials(username: string, email: string): Promise<SelectUsers | undefined> {
     try {
       return await db
         .selectFrom("users")
@@ -87,7 +87,7 @@ class UserRepository {
   };
 
 
-  static async updateUser( user_id: number, user: UpdateUser): Promise<User | undefined> {
+  static async updateUser( user_id: number, user: UpdateUsers): Promise<SelectUsers | undefined> {
     try {
       await db
         .updateTable("users")

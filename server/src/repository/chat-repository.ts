@@ -1,7 +1,11 @@
-import db                            from "../database/database";
+import {
+  NewConversations,
+  NewMessages,
+  SelectConversations,
+  SelectMessages,
+}                                        from "../types/table.types";
+import db                                from "../database/database";
 import DatabaseException                 from "../exception/database";
-import { Message, NewMessage }           from "../types/messages";
-import { Conversation, NewConversation } from "../types/conversations";
 
 class ChatRepository {
   static async getUserConversationHistoryByUserId(user_id: number, conversations: number[]): Promise<any> {
@@ -43,7 +47,7 @@ class ChatRepository {
     }
   };
 
-  static async getHistoryByConversationId(conversation_id: number): Promise<Conversation | undefined> {
+  static async getHistoryByConversationId(conversation_id: number): Promise<SelectConversations | undefined> {
     try {
       return await db
         .selectFrom("conversations")
@@ -55,7 +59,7 @@ class ChatRepository {
     }
   };
 
-  static async findConversationByUserId(user_id: number[]): Promise<Conversation | undefined> {
+  static async findConversationByUserId(user_id: number[]): Promise<SelectConversations | undefined> {
     try {
       return await db
         .selectFrom("conversations")
@@ -78,7 +82,7 @@ class ChatRepository {
     };
   };
 
-  static async getMessagesByConversationId(conversation_id: number, ids: number[] | number): Promise<Message[]> {
+  static async getMessagesByConversationId(conversation_id: number, ids: number[] | number): Promise<SelectMessages[]> {
     try {
       return await db
         .selectFrom("messages")
@@ -94,7 +98,7 @@ class ChatRepository {
     };
   };
 
-  static async saveNewConversation(conversation: NewConversation): Promise<bigint | undefined> {
+  static async saveNewConversation(conversation: NewConversations): Promise<bigint | undefined> {
     try {
       const { insertId } = await db
         .insertInto("conversations")
@@ -107,7 +111,7 @@ class ChatRepository {
     };
   };
 
-  static async saveNewMessage(message: NewMessage): Promise<string> {
+  static async saveNewMessage(message: NewMessages): Promise<string> {
     try {
       await db
         .insertInto("messages")

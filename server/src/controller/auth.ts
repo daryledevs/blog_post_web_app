@@ -70,14 +70,14 @@ const forgotPassword = async (req: Request, res: Response, next: NextFunction) =
     if(!user) next(Exception.notFound("User doesn't exists"));
     
     // Generate tokens
-    const token = generateResetToken({ EMAIL: email, USER_ID: user.USER_ID });
+    const token = generateResetToken({ EMAIL: email, user_id: user.user_id });
     const shortToken: any = await referenceToken();
     const encryptedToken = encryptData(token);
     const encodedToken = encodeURIComponent(shortToken);
 
     // Save token to the database
     await AuthRepository.saveResetToken({ 
-      user_id: user.USER_ID, 
+      user_id: user.user_id, 
       encrypted: encryptedToken 
     });
 
@@ -96,7 +96,8 @@ const resetPasswordForm =  async (req: Request, res: Response, next: NextFunctio
 
     // Check if the token (id) exists in the database.
     const data = await AuthRepository.findResetTokenById(decodedToken)
-    const decryptedToken = decryptData(data?.ENCRYPTED);
+    if(!data) return next(Exception.badRequest("Invalid or expired token"));
+    const decryptedToken = decryptData(data.encrypted as any);
 
     // then decrypt the code to check if it is still valid.
     jwt.verify(decryptedToken, process.env.RESET_PWD_TKN_SECRET!, (error, decode) => {
@@ -126,7 +127,7 @@ const resetPassword = async (req: Request, res: Response, next: NextFunction) =>
     if(!user) return next(Exception.notFound("User not found"));
 
     // Update the user's password and delete the reset password token from the database.
-    await UserRepository.updateUser(user_id, { PASSWORD: hashPassword })
+    await UserRepository.updateUser(user_id, { password: hashPassword })
     await AuthRepository.deleteResetToken(decodedTokenId);
     // add here confirmation email to the user that the password has been reset.
     res.status(200).send({ message: "Reset password successfully" });

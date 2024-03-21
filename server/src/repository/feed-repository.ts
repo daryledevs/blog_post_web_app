@@ -1,6 +1,6 @@
+import db                from "../database/database";
 import { sql }           from "kysely";
-import db            from "../database/database";
-import { Post }          from "../types/posts";
+import { SelectPosts }   from "../types/table.types";
 import DatabaseException from "../exception/database";
 
 class FeedRepository {
@@ -21,7 +21,7 @@ class FeedRepository {
     }
   };
 
-  static async getUserFeed(post_ids: number[], user_id: number): Promise<Post[]> {
+  static async getUserFeed(post_ids: number[], user_id: number): Promise<SelectPosts[]> {
     try {
       return await db
         .selectFrom("followers")
@@ -60,7 +60,7 @@ class FeedRepository {
     }
   };
 
-  static async getExploreFeed(user_id: number): Promise<Post[]> {
+  static async getExploreFeed(user_id: number): Promise<SelectPosts[]> {
     return await db
       .selectFrom("posts")
       .innerJoin("users", "users.user_id", "posts.user_id")

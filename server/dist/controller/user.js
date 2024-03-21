@@ -45,7 +45,7 @@ const getUserData = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         // If the user is not found, return an error
         if (!data)
             return next(exception_1.default.notFound("User not found"));
-        const { PASSWORD } = data, rest = __rest(data, ["PASSWORD"]);
+        const { password } = data, rest = __rest(data, ["password"]);
         res.status(200).send({ user: rest });
     }
     catch (error) {

@@ -12,8 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const kysely_1 = require("kysely");
 const database_1 = __importDefault(require("../database/database"));
+const kysely_1 = require("kysely");
 const database_2 = __importDefault(require("../exception/database"));
 class FeedRepository {
     static getTotalFeed() {

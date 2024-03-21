@@ -1,6 +1,6 @@
-import { User }                            from "../types/users-table";
 import Exception                           from "../exception/exception";
 import UserRepository                      from "../repository/user-repository";
+import { SelectUsers }                     from "../types/table.types";
 import FollowRepository                    from "../repository/follow-repository";
 import RecentSearchesRepository            from "../repository/recent-searches-repository";
 import { NextFunction, Request, Response } from "express";
@@ -10,7 +10,7 @@ const getUserData = async (req: Request, res: Response, next: NextFunction) => {
     const { user_id } = req.body;
     const { person } = req.query;
 
-    let data: User | undefined;
+    let data: SelectUsers | undefined;
 
     // If no parameters are provided, return an error
     if(!user_id && !person) return next(Exception.badRequest("No parameters provided"));
@@ -24,7 +24,7 @@ const getUserData = async (req: Request, res: Response, next: NextFunction) => {
     // If the user is not found, return an error
     if (!data) return next(Exception.notFound("User not found"));
     
-    const { PASSWORD, ...rest } = data;
+    const { password, ...rest } = data;
     res.status(200).send({ user: rest });
   } catch (error: any) {  
     next(error);

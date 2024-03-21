@@ -1,10 +1,11 @@
-import db            from "../database/database";
-import { User }          from "../types/users-table";
-import DatabaseException from "../exception/database";
+import db                       from "../database/database";
+import DatabaseException        from "../exception/database";
+import { SelectRecentSearches } from "../types/table.types";
 
 class RecentSearchesRepository {
-
-  static async findUsersSearchByRecentId(recent_id: number): Promise<User | undefined> {
+  static async findUsersSearchByRecentId(
+    recent_id: number
+  ): Promise<SelectRecentSearches | undefined> {
     try {
       return await db
         .selectFrom("recent_searches")
@@ -13,10 +14,13 @@ class RecentSearchesRepository {
         .executeTakeFirst();
     } catch (error) {
       throw DatabaseException.fromError(error);
-    };
-  };
+    }
+  }
 
-  static async findUsersSearchByUserId(user_id: number, search_user_id: number): Promise<User | undefined> {
+  static async findUsersSearchByUserId(
+    user_id: number,
+    search_user_id: number
+  ): Promise<SelectRecentSearches | undefined> {
     try {
       return await db
         .selectFrom("recent_searches")
@@ -30,10 +34,12 @@ class RecentSearchesRepository {
         .executeTakeFirst();
     } catch (error) {
       throw DatabaseException.fromError(error);
-    };
-  };
+    }
+  }
 
-  static async getRecentSearches(user_id: number): Promise<User[] | undefined> {
+  static async getRecentSearches(
+    user_id: number
+  ): Promise<SelectRecentSearches[] | undefined> {
     try {
       return await db
         .selectFrom("recent_searches")
@@ -44,10 +50,13 @@ class RecentSearchesRepository {
         .execute();
     } catch (error) {
       throw DatabaseException.fromError(error);
-    };
-  };
+    }
+  }
 
-  static async saveRecentSearches(user_id: number, search_user_id: number): Promise<string | undefined> {
+  static async saveRecentSearches(
+    user_id: number,
+    search_user_id: number
+  ): Promise<string | undefined> {
     try {
       await db
         .insertInto("recent_searches")
@@ -57,10 +66,12 @@ class RecentSearchesRepository {
       return "User saved successfully";
     } catch (error) {
       throw DatabaseException.fromError(error);
-    };
-  };
+    }
+  }
 
-  static async deleteRecentSearches(recent_id: number): Promise<string | undefined> {
+  static async deleteRecentSearches(
+    recent_id: number
+  ): Promise<string | undefined> {
     try {
       await db
         .deleteFrom("recent_searches")
@@ -70,8 +81,8 @@ class RecentSearchesRepository {
       return "User deleted successfully";
     } catch (error) {
       throw DatabaseException.fromError(error);
-    };
-  };
+    }
+  }
 }
 
-export default RecentSearchesRepository;  
+export default RecentSearchesRepository;

@@ -1,12 +1,16 @@
-import db                        from "../database/database";
-import { Like }                      from "../types/likes";
+import {
+  NewPosts,
+  SelectLikes,
+  SelectPosts,
+  UpdatePosts,
+} from "../types/table.types";
+import db                            from "../database/database";
 import Exception                     from "../exception/exception";
 import cloudinary                    from "cloudinary";
 import DatabaseException             from "../exception/database";
-import { NewPost, Post, UpdatePost } from "../types/posts";
 
 class PostRepository {
-  static async getUserPosts(user_id: number): Promise<Post[]> {
+  static async getUserPosts(user_id: number): Promise<SelectPosts[]> {
     try {
       return await db
         .selectFrom("posts")
@@ -51,7 +55,7 @@ class PostRepository {
     };
   };
 
-  static async newPost(post: NewPost): Promise<string> {
+  static async newPost(post: NewPosts): Promise<string> {
     try {
       await db
         .insertInto("posts")
@@ -63,7 +67,7 @@ class PostRepository {
     };
   };
 
-  static async editPost(post_id: number, post: UpdatePost): Promise<string> {
+  static async editPost(post_id: number, post: UpdatePosts): Promise<string> {
     try {
       await db
         .updateTable("posts")
@@ -116,7 +120,7 @@ class PostRepository {
     };
   };
 
-  static async isUserLikePost(like: Like): Promise<Like | undefined> {
+  static async isUserLikePost(like: SelectLikes): Promise<SelectLikes | undefined> {
     try {
       return await db
         .selectFrom("likes")
@@ -131,7 +135,7 @@ class PostRepository {
     };
   };
 
-  static async toggleUserLikeForPost(like: Like): Promise<string> {
+  static async toggleUserLikeForPost(like: SelectLikes): Promise<string> {
     try {
       await db
       .insertInto("likes")
@@ -144,7 +148,7 @@ class PostRepository {
     }
   };
 
-  static async removeUserLikeForPost(like: Like): Promise<string> {
+  static async removeUserLikeForPost(like: SelectLikes): Promise<string> {
     try {
       await db
       .deleteFrom("likes")

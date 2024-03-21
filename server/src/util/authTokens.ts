@@ -8,18 +8,18 @@ const ACCESS_TOKEN_EXPIRATION = "15m";
 const RESET_TOKEN_EXPIRATION = "1hr";
 
 interface IERefreshToken {
-  USER_ID: string;
-  USERNAME: string;
+  user_id: string;
+  username: string;
 }
 
 interface IEAccessToken {
-  USER_ID: string;
-  ROLES: string;
+  user_id: string;
+  roles: string;
 }
 
 interface IEResetToken {
   EMAIL: string;
-  USER_ID: string;
+  user_id: string;
 }
 
 function verifyToken(token: any, secret: any, tokenName: string): Promise<any> {
@@ -36,25 +36,25 @@ function verifyToken(token: any, secret: any, tokenName: string): Promise<any> {
   });
 }
 
-function generateRefreshToken({ USER_ID, USERNAME }: IERefreshToken): string {
+function generateRefreshToken({ user_id, username }: IERefreshToken): string {
   const REFRESH_SECRET = process.env.REFRESH_TKN_SECRET!;
-  const details = { user_id: USER_ID, username: USERNAME };
+  const details = { user_id: user_id, username: username };
   const expiration = { expiresIn: REFRESH_TOKEN_EXPIRATION };
   const token = jwt.sign(details, REFRESH_SECRET, expiration);
   return token;
 };
 
-function generateAccessToken({ USER_ID, ROLES }: IEAccessToken): string {
+function generateAccessToken({ user_id, roles }: IEAccessToken): string {
   const ACCESS_SECRET = process.env.ACCESS_TKN_SECRET!;
-  const details = { user_id: USER_ID, roles: ROLES };
+  const details = { user_id: user_id, roles: roles };
   const expiration = { expiresIn: ACCESS_TOKEN_EXPIRATION };
   const token = jwt.sign(details, ACCESS_SECRET, expiration);
   return token;
 };
 
-function generateResetToken({ EMAIL, USER_ID }: IEResetToken): string {
+function generateResetToken({ EMAIL, user_id }: IEResetToken): string {
   const RESET_SECRET = process.env.RESET_PWD_TKN_SECRET!;
-  const details = { email: EMAIL, user_id: USER_ID };
+  const details = { email: EMAIL, user_id: user_id };
   const expiration = { expiresIn: RESET_TOKEN_EXPIRATION };
   const token = jwt.sign(details, RESET_SECRET, expiration);
   return token;
