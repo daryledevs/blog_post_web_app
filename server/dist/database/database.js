@@ -43,6 +43,6 @@ const dialect = new kysely_1.MysqlDialect({
 });
 const db = new kysely_1.Kysely({
     dialect,
-    plugins: [new kysely_1.CamelCasePlugin]
+    // plugins: [new CamelCasePlugin] 
 });
 exports.default = db;

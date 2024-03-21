@@ -21,7 +21,7 @@ const dialect = new MysqlDialect({
 
 const db = new Kysely<DB>({ 
   dialect, 
-  plugins: [new CamelCasePlugin] 
+  // plugins: [new CamelCasePlugin] 
 });
 
 export default db;
