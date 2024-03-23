@@ -30,7 +30,7 @@ function socketController() {
         });
         socket.on("send-message", ({ conversation_id, sender_id, receiver_id, text_message }) => {
             const user = getUser(receiver_id);
-            if (user === null || user === void 0 ? void 0 : user.socketId) {
+            if (user?.socketId) {
                 socket.to(user.socketId).emit("get-message", {
                     conversation_id,
                     sender_id,

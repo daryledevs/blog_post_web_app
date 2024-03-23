@@ -1,33 +1,22 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-function responseHandler(req, res, next) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const originalSend = res.send;
-        let isConverted = false;
-        res.send = function (body) {
-            const noAccessToken = typeof body === "object" && !(body === null || body === void 0 ? void 0 : body.accessToken);
-            const isSuccessStatus = res.statusCode >= 200 && res.statusCode <= 299;
-            if (!isConverted && noAccessToken && isSuccessStatus) {
-                isConverted = true;
-                const dataKeys = Object.keys(body);
-                const converted = destructureObject(body, dataKeys);
-                return originalSend.call(res, converted);
-            }
-            else {
-                return originalSend.call(res, body);
-            }
-        };
-        next();
-    });
+async function responseHandler(req, res, next) {
+    const originalSend = res.send;
+    let isConverted = false;
+    res.send = function (body) {
+        const noAccessToken = typeof body === "object" && !body?.accessToken;
+        const isSuccessStatus = res.statusCode >= 200 && res.statusCode <= 299;
+        if (!isConverted && noAccessToken && isSuccessStatus) {
+            isConverted = true;
+            const dataKeys = Object.keys(body);
+            const converted = destructureObject(body, dataKeys);
+            return originalSend.call(res, converted);
+        }
+        else {
+            return originalSend.call(res, body);
+        }
+    };
+    next();
 }
 function destructureObject(data, dataKeys) {
     let instance = {};
@@ -38,17 +27,17 @@ function destructureObject(data, dataKeys) {
             // way to get the RowDataPacket's values
             const parsedArr = value.map((item) => JSON.parse(JSON.stringify(item)));
             const result = parsedArr.map((item) => convert(item));
-            instance = Object.assign(Object.assign({}, instance), { [key]: result });
+            instance = { ...instance, [key]: result };
         }
         else if (data.hasOwnProperty(key) && typeof value === "object" && value) {
             const result = destructureObject(value, dataKeys);
             const converted = convert(result);
             const length = Object.keys(converted).length;
             const newValue = Array.isArray(value) ? length ? [converted] : [] : converted;
-            instance = Object.assign(Object.assign({}, instance), { [key]: newValue });
+            instance = { ...instance, [key]: newValue };
         }
         else {
-            instance = Object.assign(Object.assign({}, instance), data);
+            instance = { ...instance, ...data };
         }
         ;
     }
@@ -60,7 +49,10 @@ function convert(data) {
     let modified = {};
     Object.keys(data).forEach((key, index) => {
         const lowerCaseKey = key.toLowerCase();
-        modified = Object.assign(Object.assign({}, modified), { [lowerCaseKey]: data[`${key}`] });
+        modified = {
+            ...modified,
+            [lowerCaseKey]: data[`${key}`],
+        };
     });
     return modified;
 }
