@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.toggleFollow = exports.getFollowerFollowingLists = exports.getFollowStats = exports.removeRecentSearches = exports.getRecentSearches = exports.saveRecentSearches = exports.searchUsersByQuery = exports.getUserData = void 0;
+exports.deleteUser = exports.toggleFollow = exports.getFollowerFollowingLists = exports.getFollowStats = exports.removeRecentSearches = exports.getRecentSearches = exports.saveRecentSearches = exports.searchUsersByQuery = exports.getUserData = void 0;
 const exception_1 = __importDefault(require("../exception/exception"));
 const user_repository_1 = __importDefault(require("../repository/user-repository"));
 const follow_repository_1 = __importDefault(require("../repository/follow-repository"));
@@ -34,6 +34,18 @@ const getUserData = async (req, res, next) => {
     ;
 };
 exports.getUserData = getUserData;
+const deleteUser = async (req, res, next) => {
+    try {
+        const { user_id } = req.body;
+        const data = await user_repository_1.default.deleteUser(user_id);
+        res.status(200).send({ message: data });
+    }
+    catch (error) {
+        next(error);
+    }
+    ;
+};
+exports.deleteUser = deleteUser;
 const searchUsersByQuery = async (req, res, next) => {
     try {
         const { search } = req.query;

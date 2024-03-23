@@ -14,4 +14,5 @@ router.post("/:user_id/lists", user_1.getFollowerFollowingLists);
 router.post("/:user_id/follows/:followed_id", user_1.toggleFollow);
 router.post("/:user_id/recent-searches/:searched_id", user_1.saveRecentSearches);
 router.delete("/recent-searches/:recent_id", user_1.removeRecentSearches);
+router.delete("/:user_id/", user_1.deleteUser);
 exports.default = router;

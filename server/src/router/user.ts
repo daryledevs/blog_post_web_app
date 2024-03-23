@@ -8,6 +8,7 @@ import {
   getRecentSearches,
   saveRecentSearches,
   removeRecentSearches,
+  deleteUser,
 } from "../controller/user";
 const router = express.Router();
 
@@ -21,5 +22,6 @@ router.post("/:user_id/follows/:followed_id", toggleFollow);
 router.post("/:user_id/recent-searches/:searched_id", saveRecentSearches);
 
 router.delete("/recent-searches/:recent_id", removeRecentSearches);
+router.delete("/:user_id/", deleteUser);
 
 export default router;

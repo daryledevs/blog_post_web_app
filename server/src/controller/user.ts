@@ -31,6 +31,16 @@ const getUserData = async (req: Request, res: Response, next: NextFunction) => {
   };
 };
 
+const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { user_id } = req.body;
+    const data = await UserRepository.deleteUser(user_id);
+    res.status(200).send({ message: data });
+  } catch (error: any) {
+    next(error)
+  };
+};
+
 const searchUsersByQuery = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { search } = req.query;
@@ -156,4 +166,5 @@ export {
   getFollowStats,
   getFollowerFollowingLists,
   toggleFollow,
+  deleteUser,
 };
