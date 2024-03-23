@@ -1,12 +1,18 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "es2020",
+    "baseUrl": "./",
     "module": "commonjs",
     "outDir": "dist",
     "rootDir": "src",
     "strict": true,
     "moduleResolution": "node",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "types": ["vitest/globals"],
+    "skipLibCheck": true
   },
   "exclude": ["node_modules"]
 }
