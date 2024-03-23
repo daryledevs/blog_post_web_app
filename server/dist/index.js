@@ -25,7 +25,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 const cors_1 = __importDefault(require("cors"));
 const morgan_1 = __importDefault(require("morgan"));
@@ -46,7 +45,7 @@ const cookie_options_1 = __importDefault(require("./middleware/cookie-options"))
 const socket_1 = __importDefault(require("./socket"));
 dotenv.config();
 const app = (0, express_1.default)();
-const PORT = parseInt((_a = process.env.SERVER_PORT) !== null && _a !== void 0 ? _a : "5000");
+const PORT = parseInt(process.env.SERVER_PORT ?? "5000");
 const HOST = process.env.SERVER_HOST || "localhost";
 const API = process.env.API;
 app.disable("x-powered-by");
@@ -69,3 +68,4 @@ app.listen(PORT, HOST, () => {
     (0, socket_1.default)();
     console.log("Connected to", PORT, HOST, "in: ", app.settings.env);
 });
+exports.default = app;

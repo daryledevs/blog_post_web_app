@@ -45,3 +45,5 @@ app.listen(PORT, HOST, () => {
   socketController();
   console.log("Connected to", PORT, HOST, "in: ", app.settings.env);
 });
+
+export default app;

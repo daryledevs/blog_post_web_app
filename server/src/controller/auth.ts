@@ -39,13 +39,13 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     const { userCredential, password } = req.body;
     const isMissing = !req.body || !userCredential || !password;
     if(isMissing) return res.status(400).send({ message: "Missing required fields" });
-    
+
     // Check if the user is exists.
     const user: any = await UserRepository.findUserByCredentials(userCredential, userCredential);
     if(!user) return next(Exception.notFound("User not found"));
 
     // Compare the password from database and from request body.
-    if(bcrypt.compareSync(password, user.PASSWORD)) {
+    if(bcrypt.compareSync(password, user.password)) {
       const ACCESS_TOKEN = generateAccessToken(user);
       const REFRESH_TOKEN = generateRefreshToken(user);
       res
