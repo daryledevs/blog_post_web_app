@@ -16,6 +16,10 @@ class Exception {
     return new Exception(message, 404);
   };
 
+  static conflict(message: string) {
+    return new Exception(message, 409);
+  };
+
   static internal(message: string) {
     return new Exception(message, 500);
   };

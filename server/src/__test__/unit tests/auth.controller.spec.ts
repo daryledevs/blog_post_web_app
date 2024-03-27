@@ -1,8 +1,8 @@
 import db                                            from "../../database/database";
 import { sql }                                       from "kysely";
 import { faker }                                     from "@faker-js/faker";
-import AuthRepository                                from "../../repository/auth-repository";
 import { describe, it, expect, vi, Mock, afterEach } from "vitest";
+import AuthService from "@/service/auth/auth.service.impl";
 
 let user = {
   username: faker.internet.userName(),
@@ -17,6 +17,8 @@ let user = {
 };
 
 describe("AuthRepository", () => {
+  const auth: AuthService = new AuthService();
+
   afterEach(async () => {
     await sql`SET FOREIGN_KEY_CHECKS = 0`.execute(db);
     await sql`TRUNCATE USERS`.execute(db);
@@ -24,7 +26,7 @@ describe("AuthRepository", () => {
   });
 
   it("should create a user and return the user data", async () => {
-    const result = await AuthRepository.createUser(user);
+    const result = await auth.register(user);
     expect(result).toEqual(expect.objectContaining(user));
   });
 });

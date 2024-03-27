@@ -31,8 +31,8 @@ const morgan_1 = __importDefault(require("morgan"));
 const express_1 = __importDefault(require("express"));
 const path_1 = __importDefault(require("./config/path"));
 const body_parser_1 = __importDefault(require("body-parser"));
-const auth_1 = __importDefault(require("./router/auth"));
-const user_1 = __importDefault(require("./router/user"));
+const auth_route_1 = __importDefault(require("./router/auth.route"));
+const user_router_1 = __importDefault(require("./router/user.router"));
 const chat_1 = __importDefault(require("./router/chat"));
 const post_1 = __importDefault(require("./router/post"));
 const feed_1 = __importDefault(require("./router/feed"));
@@ -58,9 +58,9 @@ app.set("views", path_1.default); // Set the views directory
 app.set('view engine', 'ejs'); // Set EJS as the template engine
 app.use((0, morgan_1.default)("tiny"));
 // Routes
-app.use(`${API}/`, auth_1.default);
+app.use(`${API}/`, auth_route_1.default);
 app.use(`${API}/chats`, chat_1.default);
-app.use(`${API}/users`, user_1.default);
+app.use(`${API}/users`, user_router_1.default);
 app.use(`${API}/posts`, post_1.default);
 app.use(`${API}/feeds`, feed_1.default);
 app.use(error_handler_1.default);

@@ -7,13 +7,14 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const exception_1 = __importDefault(require("../exception/exception"));
 const is_token_invalid_1 = __importDefault(require("../util/is-token-invalid"));
 const routeException_1 = __importDefault(require("../util/routeException"));
-const user_repository_1 = __importDefault(require("../repository/user-repository"));
+const user_repository_1 = __importDefault(require("../repository/user.repository"));
 const authTokens_1 = require("../util/authTokens");
 dotenv_1.default.config();
 const tokenHandler = async (req, res, next) => {
     try {
         if ((0, routeException_1.default)(req.path))
             return next();
+        const userRepository = new user_repository_1.default();
         const refreshToken = req.cookies.REFRESH_TOKEN;
         const accessToken = req.headers.authorization?.split(" ")[1];
         const refreshSecret = process.env.REFRESH_TKN_SECRET;
@@ -30,7 +31,7 @@ const tokenHandler = async (req, res, next) => {
         if (isTokenError)
             return next(exception_1.default.unauthorized("Token is not valid"));
         // if user is not found, return an error
-        const result = await user_repository_1.default.findUserById(refreshDecode.user_id);
+        const result = await userRepository.findUserById(refreshDecode.user_id);
         if (!result)
             return next(exception_1.default.notFound("User not found"));
         // if the refresh token is expired, generate a new refresh token and access token

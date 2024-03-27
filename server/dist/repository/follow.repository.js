@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../database/database"));
 const database_2 = __importDefault(require("../exception/database"));
 class FollowRepository {
-    static async getFollowsStats(user_id) {
+    async getFollowStats(user_id) {
         try {
             const queryFollowers = database_1.default
                 .selectFrom("followers")
@@ -31,20 +31,15 @@ class FollowRepository {
         catch (error) {
             throw database_2.default.fromError(error);
         }
-        ;
     }
-    ;
-    static async getFollowerFollowingLists(user_id, fetch, listsId) {
+    async getFollowersLists(user_id, listsId) {
         try {
-            const listIdsToExclude = listsId?.length ? listsId : [0];
-            const myId = fetch === "followers" ? "followed_id" : "follower_id";
-            const otherId = fetch !== "followers" ? "followed_id" : "follower_id";
             const result = await database_1.default
                 .selectFrom("followers")
-                .innerJoin("users", `followers.${otherId}`, "users.user_id")
+                .innerJoin("users", "followers.follower_id", "users.user_id")
                 .where((eb) => eb.and([
-                eb(`followers.${myId}`, "=", user_id),
-                eb(`followers.${otherId}`, "not in", listIdsToExclude),
+                eb("followers.followed_id", "=", user_id),
+                eb("followers.follower_id", "not in", listsId),
             ]))
                 .selectAll()
                 .limit(10)
@@ -54,10 +49,26 @@ class FollowRepository {
         catch (error) {
             throw database_2.default.fromError(error);
         }
-        ;
     }
-    ;
-    static async isFollowUser(identifier) {
+    async getFollowingLists(user_id, listsId) {
+        try {
+            const result = await database_1.default
+                .selectFrom("followers")
+                .innerJoin("users", "followers.followed_id", "users.user_id")
+                .where((eb) => eb.and([
+                eb("followers.follower_id", "=", user_id),
+                eb("followers.followed_id", "not in", listsId),
+            ]))
+                .selectAll()
+                .limit(10)
+                .execute();
+            return result;
+        }
+        catch (error) {
+            throw database_2.default.fromError(error);
+        }
+    }
+    async isFollowUser(identifier) {
         try {
             const result = await database_1.default
                 .selectFrom("followers")
@@ -72,18 +83,12 @@ class FollowRepository {
         catch (error) {
             throw database_2.default.fromError(error);
         }
-        ;
     }
-    ;
-    static async followUser(identifier) {
-        await database_1.default
-            .insertInto("followers")
-            .values(identifier)
-            .execute();
+    async followUser(identifier) {
+        await database_1.default.insertInto("followers").values(identifier).execute();
         return "User followed successfully";
     }
-    ;
-    static async unfollowUser(identifier) {
+    async unfollowUser(identifier) {
         try {
             await database_1.default
                 .deleteFrom("followers")
@@ -97,9 +102,7 @@ class FollowRepository {
         catch (error) {
             throw database_2.default.fromError(error);
         }
-        ;
     }
-    ;
 }
 ;
 exports.default = FollowRepository;

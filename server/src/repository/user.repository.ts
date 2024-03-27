@@ -4,8 +4,13 @@ import DatabaseException            from "../exception/database";
 import { SelectUsers, UpdateUsers } from "../types/table.types";
 
 class UserRepository {
-  
-  static async findUserById(user_id: number): Promise<SelectUsers | undefined> {
+  private userRepository: UserRepository;
+
+  constructor() {
+    this.userRepository = new UserRepository();
+  }
+
+  async findUserById(user_id: number): Promise<SelectUsers | undefined> {
     try {
       return await db
         .selectFrom("users")
@@ -14,10 +19,10 @@ class UserRepository {
         .executeTakeFirst();
     } catch (error) {
       throw DatabaseException.fromError(error);
-    };
-  };
+    }
+  }
 
-  static async findUserByUsername(username: string): Promise<SelectUsers | undefined> {
+  async findUserByUsername(username: string): Promise<SelectUsers | undefined> {
     try {
       return await db
         .selectFrom("users")
@@ -26,10 +31,10 @@ class UserRepository {
         .executeTakeFirst();
     } catch (error) {
       throw DatabaseException.fromError(error);
-    };
-  };
+    }
+  }
 
-  static async searchUsersByQuery(search: string): Promise<SelectUsers[] | undefined> {
+  async searchUsersByQuery(search: string): Promise<SelectUsers[] | undefined> {
     try {
       return await db
         .selectFrom("users")
@@ -42,7 +47,7 @@ class UserRepository {
               sql<string>`
                 concat(
                   ${eb.ref("first_name")}, "", 
-                  ${eb.ref("last_name" )}
+                  ${eb.ref("last_name")}
                 )
               `,
               "=",
@@ -54,10 +59,10 @@ class UserRepository {
         .execute();
     } catch (error) {
       throw DatabaseException.fromError(error);
-    };
-  };
+    }
+  }
 
-  static async findUserByEmail(email: string): Promise<SelectUsers | undefined> {
+  async findUserByEmail(email: string): Promise<SelectUsers | undefined> {
     try {
       return await db
         .selectFrom("users")
@@ -66,28 +71,30 @@ class UserRepository {
         .executeTakeFirst();
     } catch (error) {
       throw DatabaseException.fromError(error);
-    };
-  };
+    }
+  }
 
-  static async findUserByCredentials(username: string, email: string): Promise<SelectUsers | undefined> {
+  async findUserByCredentials(
+    username: string,
+    email: string
+  ): Promise<SelectUsers | undefined> {
     try {
       return await db
         .selectFrom("users")
         .selectAll()
         .where((eb) =>
-          eb.or([
-            eb("email", "=", email), 
-            eb("username", "=", username)
-          ])
+          eb.or([eb("email", "=", email), eb("username", "=", username)])
         )
         .executeTakeFirst();
     } catch (error) {
       throw DatabaseException.fromError(error);
-    };
-  };
+    }
+  }
 
-
-  static async updateUser( user_id: number, user: UpdateUsers): Promise<SelectUsers | undefined> {
+  async updateUser(
+    user_id: number,
+    user: UpdateUsers
+  ): Promise<SelectUsers | undefined> {
     try {
       await db
         .updateTable("users")
@@ -95,24 +102,21 @@ class UserRepository {
         .where("user_id", "=", user_id)
         .executeTakeFirstOrThrow();
 
-      return await UserRepository.findUserById(user_id);
+      return await this.userRepository.findUserById(user_id);
     } catch (error) {
       throw DatabaseException.fromError(error);
-    };
-  };
+    }
+  }
 
-  static async deleteUser(user_id: number): Promise<string | undefined> {
+  async deleteUser(user_id: number): Promise<string | undefined> {
     try {
-      await db
-        .deleteFrom("users")
-        .where("user_id", "=", user_id)
-        .execute();
+      await db.deleteFrom("users").where("user_id", "=", user_id).execute();
 
       return "User deleted successfully";
     } catch (error) {
       throw DatabaseException.fromError(error);
-    };
-  };
+    }
+  }
 };
 
 export default UserRepository;

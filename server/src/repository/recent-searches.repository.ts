@@ -3,7 +3,7 @@ import DatabaseException        from "../exception/database";
 import { SelectRecentSearches } from "../types/table.types";
 
 class RecentSearchesRepository {
-  static async findUsersSearchByRecentId(
+  async findUsersSearchByRecentId(
     recent_id: number
   ): Promise<SelectRecentSearches | undefined> {
     try {
@@ -14,10 +14,10 @@ class RecentSearchesRepository {
         .executeTakeFirst();
     } catch (error) {
       throw DatabaseException.fromError(error);
-    }
-  }
+    };
+  };
 
-  static async findUsersSearchByUserId(
+  async findUsersSearchByUserId(
     user_id: number,
     search_user_id: number
   ): Promise<SelectRecentSearches | undefined> {
@@ -34,10 +34,10 @@ class RecentSearchesRepository {
         .executeTakeFirst();
     } catch (error) {
       throw DatabaseException.fromError(error);
-    }
-  }
+    };
+  };
 
-  static async getRecentSearches(
+  async getRecentSearches(
     user_id: number
   ): Promise<SelectRecentSearches[] | undefined> {
     try {
@@ -50,10 +50,10 @@ class RecentSearchesRepository {
         .execute();
     } catch (error) {
       throw DatabaseException.fromError(error);
-    }
-  }
+    };
+  };
 
-  static async saveRecentSearches(
+  async saveRecentSearches(
     user_id: number,
     search_user_id: number
   ): Promise<string | undefined> {
@@ -66,10 +66,10 @@ class RecentSearchesRepository {
       return "User saved successfully";
     } catch (error) {
       throw DatabaseException.fromError(error);
-    }
-  }
+    };
+  };
 
-  static async deleteRecentSearches(
+  async deleteRecentSearches(
     recent_id: number
   ): Promise<string | undefined> {
     try {
@@ -81,8 +81,8 @@ class RecentSearchesRepository {
       return "User deleted successfully";
     } catch (error) {
       throw DatabaseException.fromError(error);
-    }
-  }
-}
+    };
+  };
+};
 
 export default RecentSearchesRepository;

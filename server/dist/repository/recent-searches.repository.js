@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../database/database"));
 const database_2 = __importDefault(require("../exception/database"));
 class RecentSearchesRepository {
-    static async findUsersSearchByRecentId(recent_id) {
+    async findUsersSearchByRecentId(recent_id) {
         try {
             return await database_1.default
                 .selectFrom("recent_searches")
@@ -17,8 +17,10 @@ class RecentSearchesRepository {
         catch (error) {
             throw database_2.default.fromError(error);
         }
+        ;
     }
-    static async findUsersSearchByUserId(user_id, search_user_id) {
+    ;
+    async findUsersSearchByUserId(user_id, search_user_id) {
         try {
             return await database_1.default
                 .selectFrom("recent_searches")
@@ -32,8 +34,10 @@ class RecentSearchesRepository {
         catch (error) {
             throw database_2.default.fromError(error);
         }
+        ;
     }
-    static async getRecentSearches(user_id) {
+    ;
+    async getRecentSearches(user_id) {
         try {
             return await database_1.default
                 .selectFrom("recent_searches")
@@ -46,8 +50,10 @@ class RecentSearchesRepository {
         catch (error) {
             throw database_2.default.fromError(error);
         }
+        ;
     }
-    static async saveRecentSearches(user_id, search_user_id) {
+    ;
+    async saveRecentSearches(user_id, search_user_id) {
         try {
             await database_1.default
                 .insertInto("recent_searches")
@@ -58,8 +64,10 @@ class RecentSearchesRepository {
         catch (error) {
             throw database_2.default.fromError(error);
         }
+        ;
     }
-    static async deleteRecentSearches(recent_id) {
+    ;
+    async deleteRecentSearches(recent_id) {
         try {
             await database_1.default
                 .deleteFrom("recent_searches")
@@ -70,6 +78,9 @@ class RecentSearchesRepository {
         catch (error) {
             throw database_2.default.fromError(error);
         }
+        ;
     }
+    ;
 }
+;
 exports.default = RecentSearchesRepository;

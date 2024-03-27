@@ -7,7 +7,10 @@ const database_1 = __importDefault(require("../database/database"));
 const kysely_1 = require("kysely");
 const database_2 = __importDefault(require("../exception/database"));
 class UserRepository {
-    static async findUserById(user_id) {
+    constructor() {
+        this.userRepository = new UserRepository();
+    }
+    async findUserById(user_id) {
         try {
             return await database_1.default
                 .selectFrom("users")
@@ -18,10 +21,8 @@ class UserRepository {
         catch (error) {
             throw database_2.default.fromError(error);
         }
-        ;
     }
-    ;
-    static async findUserByUsername(username) {
+    async findUserByUsername(username) {
         try {
             return await database_1.default
                 .selectFrom("users")
@@ -32,10 +33,8 @@ class UserRepository {
         catch (error) {
             throw database_2.default.fromError(error);
         }
-        ;
     }
-    ;
-    static async searchUsersByQuery(search) {
+    async searchUsersByQuery(search) {
         try {
             return await database_1.default
                 .selectFrom("users")
@@ -56,10 +55,8 @@ class UserRepository {
         catch (error) {
             throw database_2.default.fromError(error);
         }
-        ;
     }
-    ;
-    static async findUserByEmail(email) {
+    async findUserByEmail(email) {
         try {
             return await database_1.default
                 .selectFrom("users")
@@ -70,55 +67,41 @@ class UserRepository {
         catch (error) {
             throw database_2.default.fromError(error);
         }
-        ;
     }
-    ;
-    static async findUserByCredentials(username, email) {
+    async findUserByCredentials(username, email) {
         try {
             return await database_1.default
                 .selectFrom("users")
                 .selectAll()
-                .where((eb) => eb.or([
-                eb("email", "=", email),
-                eb("username", "=", username)
-            ]))
+                .where((eb) => eb.or([eb("email", "=", email), eb("username", "=", username)]))
                 .executeTakeFirst();
         }
         catch (error) {
             throw database_2.default.fromError(error);
         }
-        ;
     }
-    ;
-    static async updateUser(user_id, user) {
+    async updateUser(user_id, user) {
         try {
             await database_1.default
                 .updateTable("users")
                 .set(user)
                 .where("user_id", "=", user_id)
                 .executeTakeFirstOrThrow();
-            return await UserRepository.findUserById(user_id);
+            return await this.userRepository.findUserById(user_id);
         }
         catch (error) {
             throw database_2.default.fromError(error);
         }
-        ;
     }
-    ;
-    static async deleteUser(user_id) {
+    async deleteUser(user_id) {
         try {
-            await database_1.default
-                .deleteFrom("users")
-                .where("user_id", "=", user_id)
-                .execute();
+            await database_1.default.deleteFrom("users").where("user_id", "=", user_id).execute();
             return "User deleted successfully";
         }
         catch (error) {
             throw database_2.default.fromError(error);
         }
-        ;
     }
-    ;
 }
 ;
 exports.default = UserRepository;

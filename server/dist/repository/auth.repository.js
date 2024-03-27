@@ -4,24 +4,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../database/database"));
-const user_repository_1 = __importDefault(require("./user-repository"));
+const user_repository_1 = __importDefault(require("./user.repository"));
 const database_2 = __importDefault(require("../exception/database"));
 class AuthRepository {
-    static async createUser(user) {
+    constructor() {
+        this.userRepository = new user_repository_1.default();
+    }
+    async createUser(user) {
         try {
             const { insertId } = await database_1.default
                 .insertInto("users")
                 .values(user)
                 .executeTakeFirstOrThrow();
-            return await user_repository_1.default.findUserById(Number(insertId));
+            return await this.userRepository.findUserById(Number(insertId));
         }
         catch (error) {
             throw database_2.default.fromError(error);
         }
-        ;
     }
-    ;
-    static async findResetTokenById(token_id) {
+    async findResetTokenById(token_id) {
         try {
             return await database_1.default
                 .selectFrom("reset_password_token")
@@ -32,24 +33,17 @@ class AuthRepository {
         catch (error) {
             throw database_2.default.fromError(error);
         }
-        ;
     }
-    ;
-    static async saveResetToken(token) {
+    async saveResetToken(token) {
         try {
-            await database_1.default
-                .insertInto("reset_password_token")
-                .values(token)
-                .execute();
+            await database_1.default.insertInto("reset_password_token").values(token).execute();
             return "Reset token is saved successfully";
         }
         catch (error) {
             throw database_2.default.fromError(error);
         }
-        ;
     }
-    ;
-    static async deleteResetToken(token_id) {
+    async deleteResetToken(token_id) {
         try {
             await database_1.default
                 .deleteFrom("reset_password_token")
@@ -60,9 +54,7 @@ class AuthRepository {
         catch (error) {
             throw database_2.default.fromError(error);
         }
-        ;
     }
-    ;
 }
 ;
 exports.default = AuthRepository;

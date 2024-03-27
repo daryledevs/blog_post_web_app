@@ -3,7 +3,7 @@ import Exception                                                  from "../excep
 import isTokenValid                                               from "../util/is-token-invalid";
 import { SelectUsers }                                            from "../types/table.types";
 import routeException                                             from "../util/routeException";
-import UserRepository                                             from "../repository/user-repository";
+import UserRepository                                             from "../repository/user.repository";
 import { Request, Response, NextFunction }                        from "express";
 import { generateAccessToken, generateRefreshToken, verifyToken } from "../util/authTokens";
 dotenv.config();
@@ -11,6 +11,7 @@ dotenv.config();
 const tokenHandler = async (req: Request, res: Response, next: NextFunction) => {
   try {
     if (routeException(req.path)) return next();
+    const userRepository: UserRepository = new UserRepository();
     const refreshToken = req.cookies.REFRESH_TOKEN;
     const accessToken = req.headers.authorization?.split(" ")[1];
     const refreshSecret = process.env.REFRESH_TKN_SECRET!;
@@ -29,7 +30,7 @@ const tokenHandler = async (req: Request, res: Response, next: NextFunction) => 
     if (isTokenError) return next(Exception.unauthorized("Token is not valid"));
 
     // if user is not found, return an error
-    const result: SelectUsers | undefined = await UserRepository.findUserById(refreshDecode.user_id);
+    const result: SelectUsers | undefined = await userRepository.findUserById(refreshDecode.user_id);
     if (!result) return next(Exception.notFound("User not found"));
 
     // if the refresh token is expired, generate a new refresh token and access token
