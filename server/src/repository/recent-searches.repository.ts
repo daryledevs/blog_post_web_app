@@ -1,11 +1,9 @@
 import db                       from "../database/database";
 import DatabaseException        from "../exception/database";
-import { SelectRecentSearches } from "../types/table.types";
+import { SelectSearches }       from "../types/table.types";
 
 class RecentSearchesRepository {
-  async findUsersSearchByRecentId(
-    recent_id: number
-  ): Promise<SelectRecentSearches | undefined> {
+  async findUsersSearchByRecentId(recent_id: number): Promise<SelectSearches | undefined> {
     try {
       return await db
         .selectFrom("recent_searches")
@@ -17,10 +15,7 @@ class RecentSearchesRepository {
     };
   };
 
-  async findUsersSearchByUserId(
-    user_id: number,
-    search_user_id: number
-  ): Promise<SelectRecentSearches | undefined> {
+  async findUsersSearchByUserId(user_id: number, search_user_id: number): Promise<SelectSearches | undefined> {
     try {
       return await db
         .selectFrom("recent_searches")
@@ -37,9 +32,7 @@ class RecentSearchesRepository {
     };
   };
 
-  async getRecentSearches(
-    user_id: number
-  ): Promise<SelectRecentSearches[] | undefined> {
+  async getRecentSearches(user_id: number): Promise<SelectSearches[] | undefined> {
     try {
       return await db
         .selectFrom("recent_searches")
@@ -53,10 +46,7 @@ class RecentSearchesRepository {
     };
   };
 
-  async saveRecentSearches(
-    user_id: number,
-    search_user_id: number
-  ): Promise<string | undefined> {
+  async saveRecentSearches(user_id: number, search_user_id: number): Promise<string | undefined> {
     try {
       await db
         .insertInto("recent_searches")
@@ -69,9 +59,7 @@ class RecentSearchesRepository {
     };
   };
 
-  async deleteRecentSearches(
-    recent_id: number
-  ): Promise<string | undefined> {
+  async deleteRecentSearches(recent_id: number): Promise<string | undefined> {
     try {
       await db
         .deleteFrom("recent_searches")

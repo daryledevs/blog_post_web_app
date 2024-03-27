@@ -1,5 +1,6 @@
-import { FollowStatsType }                                from "../../repository/follow.repository";
-import { SelectRecentSearches, SelectUsers, UpdateUsers } from "../../types/table.types";
+
+import { FollowStatsType }                                from "@/repository/follow.repository";
+import { SelectSearches, SelectUsers, UpdateUsers }       from "@/types/table.types";
 
 interface IUsersService {
   getUserById(id: string, person: string): Promise<SelectUsers>;
@@ -12,7 +13,7 @@ interface IUsersService {
 
   deleteUser(id: number): Promise<string | undefined>;
 
-  getAllRecentSearches(user_id: any): Promise<SelectRecentSearches[] | undefined>;
+  getAllRecentSearches(user_id: any): Promise<SelectSearches[] | undefined>;
 
   saveRecentSearches(user_id: any, search_user_id: any): Promise<string | undefined>;
 

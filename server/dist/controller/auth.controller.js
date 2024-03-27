@@ -27,7 +27,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv = __importStar(require("dotenv"));
-const auth_service_impl_1 = __importDefault(require("../service/auth/auth.service.impl"));
+const auth_service_impl_1 = __importDefault(require("@/service/auth/auth.service.impl"));
 dotenv.config();
 class AuthController {
     constructor() {

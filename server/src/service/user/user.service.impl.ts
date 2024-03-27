@@ -1,9 +1,9 @@
-import Exception                             from "../../exception/exception";
+import Exception                             from "@/exception/exception";
 import IUsersService                         from "./user.service";
-import UserRepository                        from "../../repository/user.repository";
-import RecentSearchesRepository              from "../../repository/recent-searches.repository";
-import FollowRepository, { FollowStatsType } from "../../repository/follow.repository";
-import { SelectRecentSearches, SelectUsers } from "../../types/table.types";
+import UserRepository                        from "@/repository/user.repository";
+import RecentSearchesRepository              from "@/repository/recent-searches.repository";
+import FollowRepository, { FollowStatsType } from "@/repository/follow.repository";
+import { SelectSearches, SelectUsers } from "@/types/table.types";
 
 class UsersService implements IUsersService {
   private userRepository: UserRepository;
@@ -74,7 +74,7 @@ class UsersService implements IUsersService {
     };
   };
 
-  async getAllRecentSearches(user_id: any): Promise<SelectRecentSearches[] | undefined> {
+  async getAllRecentSearches(user_id: any): Promise<SelectSearches[] | undefined> {
     try {
       return await this.recentSearchesRepository.getRecentSearches(user_id);
     } catch (error) {

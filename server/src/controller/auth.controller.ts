@@ -1,5 +1,5 @@
 import * as dotenv                         from "dotenv";
-import AuthService                         from "../service/auth/auth.service.impl";
+import AuthService                         from "@/service/auth/auth.service.impl";
 import { NextFunction, Request, Response } from "express";
 dotenv.config();
 

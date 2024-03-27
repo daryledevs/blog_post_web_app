@@ -3,10 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const exception_1 = __importDefault(require("../../exception/exception"));
-const user_repository_1 = __importDefault(require("../../repository/user.repository"));
-const recent_searches_repository_1 = __importDefault(require("../../repository/recent-searches.repository"));
-const follow_repository_1 = __importDefault(require("../../repository/follow.repository"));
+const exception_1 = __importDefault(require("@/exception/exception"));
+const user_repository_1 = __importDefault(require("@/repository/user.repository"));
+const recent_searches_repository_1 = __importDefault(require("@/repository/recent-searches.repository"));
+const follow_repository_1 = __importDefault(require("@/repository/follow.repository"));
 class UsersService {
     constructor() {
         this.userRepository = new user_repository_1.default();

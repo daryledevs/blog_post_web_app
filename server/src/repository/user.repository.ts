@@ -1,7 +1,7 @@
-import db                           from "../database/database";
+import db                           from "@/database/database";
 import { sql }                      from "kysely";
-import DatabaseException            from "../exception/database";
-import { SelectUsers, UpdateUsers } from "../types/table.types";
+import DatabaseException            from "@/exception/database";
+import { SelectUsers, UpdateUsers } from "@/types/table.types";
 
 class UserRepository {
   private userRepository: UserRepository;

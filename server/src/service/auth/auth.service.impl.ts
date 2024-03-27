@@ -3,16 +3,16 @@ import {
   generateRefreshToken,
   generateResetToken,
   referenceToken,
-}                                                      from "../../util/authTokens";
+}                                                      from "@/util/authTokens";
 import jwt                                             from "jsonwebtoken";
 import bcrypt                                          from "bcrypt";
-import Exception                                       from "../../exception/exception";
-import sendEmail                                       from "../../config/nodemailer";
-import encryptData                                     from "../../util/encrypt";
-import decryptData                                     from "../../util/decrypt";
-import { NewUsers }                                    from "../../types/table.types";
-import AuthRepository                                  from "../../repository/auth.repository";
-import UserRepository                                  from "../../repository/user.repository";
+import Exception                                       from "@/exception/exception";
+import sendEmail                                       from "@/config/nodemailer";
+import encryptData                                     from "@/util/encrypt";
+import decryptData                                     from "@/util/decrypt";
+import { NewUsers }                                    from "@/types/table.types";
+import AuthRepository                                  from "@/repository/auth.repository";
+import UserRepository                                  from "@/repository/user.repository";
 import IAuthService, { IResetPasswordForm, LoginType } from "./auth.service";
 
 class AuthService implements IAuthService {

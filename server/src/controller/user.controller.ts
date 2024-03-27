@@ -1,4 +1,4 @@
-import UsersService                        from "../service/user/user.service.impl";
+import UsersService                        from "@/service/user/user.service.impl";
 import { NextFunction, Request, Response } from "express";
 
 class UsersController {
@@ -60,11 +60,7 @@ class UsersController {
     };
   };
 
-  async getFollowerFollowingLists(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
+  async getFollowerFollowingLists(req: Request, res: Response, next: NextFunction) {
     try {
       const user_id = req.params.user_id;
       const fetch = req.query.fetch;

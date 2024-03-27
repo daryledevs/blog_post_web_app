@@ -1,4 +1,4 @@
-import { NewUsers } from "../../types/table.types";
+import { NewUsers } from "@/types/table.types";
 
 export type LoginType = {
   message: string;

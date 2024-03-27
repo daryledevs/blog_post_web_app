@@ -3,15 +3,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const authTokens_1 = require("../../util/authTokens");
+const authTokens_1 = require("@/util/authTokens");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const exception_1 = __importDefault(require("../../exception/exception"));
-const nodemailer_1 = __importDefault(require("../../config/nodemailer"));
-const encrypt_1 = __importDefault(require("../../util/encrypt"));
-const decrypt_1 = __importDefault(require("../../util/decrypt"));
-const auth_repository_1 = __importDefault(require("../../repository/auth.repository"));
-const user_repository_1 = __importDefault(require("../../repository/user.repository"));
+const exception_1 = __importDefault(require("@/exception/exception"));
+const nodemailer_1 = __importDefault(require("@/config/nodemailer"));
+const encrypt_1 = __importDefault(require("@/util/encrypt"));
+const decrypt_1 = __importDefault(require("@/util/decrypt"));
+const auth_repository_1 = __importDefault(require("@/repository/auth.repository"));
+const user_repository_1 = __importDefault(require("@/repository/user.repository"));
 class AuthService {
     constructor() {
         this.authRepository = new auth_repository_1.default();
