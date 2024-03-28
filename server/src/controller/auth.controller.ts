@@ -6,8 +6,8 @@ dotenv.config();
 class AuthController {
   private authService: AuthService;
 
-  constructor() {
-    this.authService = new AuthService();
+  constructor(authService: AuthService) {
+    this.authService = authService;
   };
 
   public async register(req: Request, res: Response, next: NextFunction): Promise<void> {

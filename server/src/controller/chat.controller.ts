@@ -4,9 +4,11 @@ import { NextFunction, Request, Response } from "express";
 class ChatsController {
   private chatsService: ChatsServices;
 
-  constructor() { this.chatsService = new ChatsServices(); };
+  constructor(chatsService: ChatsServices) {
+    this.chatsService = chatsService;
+  };
 
-  getChatHistory = async (req: Request, res: Response, next: NextFunction) => {
+  public async getChatHistory(req: Request, res: Response, next: NextFunction) {
     try {
       const user_id: any = req.query.user_id;
       const conversations = req.body || [0];
@@ -19,7 +21,7 @@ class ChatsController {
     };
   };
 
-  getChatMessages = async (req: Request, res: Response, next: NextFunction) => {
+  public async getChatMessages(req: Request, res: Response, next: NextFunction) {
     try {
       let conversation_id: any = req.params.conversation_id;
       const messages = req.body.messages || [0];
@@ -36,7 +38,7 @@ class ChatsController {
     };
   };
 
-  newMessageAndConversation = async (req: Request, res: Response, next: NextFunction) => {
+  public async newMessageAndConversation(req: Request, res: Response, next: NextFunction) {
     try {
       const { conversation_id, messageData } = req.body;
 
@@ -51,7 +53,7 @@ class ChatsController {
     };
   };
 
-  deleteConversation = async (req: Request, res: Response, next: NextFunction) => {
+  public async deleteConversation(req: Request, res: Response, next: NextFunction) {
     try {
       const { conversation_id } = req.body;
       const message = await this.chatsService.deleteConversation(conversation_id);

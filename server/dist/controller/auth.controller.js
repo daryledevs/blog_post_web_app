@@ -22,16 +22,12 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv = __importStar(require("dotenv"));
-const auth_service_impl_1 = __importDefault(require("@/service/auth/auth.service.impl"));
 dotenv.config();
 class AuthController {
-    constructor() {
-        this.authService = new auth_service_impl_1.default();
+    constructor(authService) {
+        this.authService = authService;
     }
     ;
     async register(req, res, next) {

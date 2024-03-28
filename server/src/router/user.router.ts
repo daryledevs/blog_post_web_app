@@ -1,8 +1,19 @@
-import express         from "express";
-import UsersController from "@/controller/user.controller";
+import express                  from "express";
+import UsersService             from "@/service/user/user.service.impl";
+import UserRepository           from "@/repository/user/user.repository.impl";
+import UsersController          from "@/controller/user.controller";
+import FollowRepository         from "@/repository/follow/follow.repository.impl";
+import RecentSearchesRepository from "@/repository/recent search/recent-search.repository.impl";
 
-const controller: UsersController = new UsersController();
 const router = express.Router();
+
+const controller: UsersController = new UsersController(
+  new UsersService(
+    new UserRepository(),
+    new FollowRepository(),
+    new RecentSearchesRepository(),
+  )
+);
 
 router.get("/",                                       controller.getUserData);
 router.get("/lists",                                  controller.searchUsersByQuery);

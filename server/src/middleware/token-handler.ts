@@ -3,7 +3,7 @@ import Exception                                                  from "../excep
 import isTokenValid                                               from "../util/is-token-invalid";
 import { SelectUsers }                                            from "../types/table.types";
 import routeException                                             from "../util/routeException";
-import UserRepository                                             from "../repository/user.repository";
+import UserRepository                                             from "../repository/user/user.repository.impl";
 import { Request, Response, NextFunction }                        from "express";
 import { generateAccessToken, generateRefreshToken, verifyToken } from "../util/authTokens";
 dotenv.config();

@@ -24,7 +24,7 @@ interface IAuthService {
   
   resetPasswordForm: (tokenId: string) => Promise<IResetPasswordForm>;
 
-  resetPassword: (token: string, password: string) => Promise<string>;
+  resetPassword: (data:any) => Promise<string>;
 };
 
 export default IAuthService;

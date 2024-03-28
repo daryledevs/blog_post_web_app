@@ -5,20 +5,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const path_1 = require("path");
 const exception_1 = __importDefault(require("@/exception/exception"));
-const post_repository_1 = __importDefault(require("@/repository/post.repository"));
-const user_repository_1 = __importDefault(require("@/repository/user.repository"));
 const cloudinary_1 = __importDefault(require("@/config/cloudinary"));
 class PostService {
-    constructor() {
-        this.postsRepository = new post_repository_1.default();
-        this.usersRepository = new user_repository_1.default();
+    constructor(postRepository, userRepository) {
+        this.postRepository = postRepository;
+        this.userRepository = userRepository;
     }
     ;
     async findPostsByPostId(post_id) {
         try {
             if (!post_id)
                 throw exception_1.default.badRequest("Missing post's id");
-            const data = await this.postsRepository.findPostsByPostId(post_id);
+            const data = await this.postRepository.findPostsByPostId(post_id);
             if (!data)
                 throw exception_1.default.notFound("Post doesn't exist");
             return data;
@@ -33,10 +31,10 @@ class PostService {
         try {
             if (!user_id)
                 throw exception_1.default.badRequest("Missing user's id");
-            const isUserExist = await this.usersRepository.findUserById(user_id);
+            const isUserExist = await this.userRepository.findUserById(user_id);
             if (!isUserExist)
                 throw exception_1.default.notFound("User doesn't exist");
-            return await this.postsRepository.getUserPosts(user_id);
+            return await this.postRepository.getUserPosts(user_id);
         }
         catch (error) {
             throw error;
@@ -48,10 +46,10 @@ class PostService {
         try {
             if (!user_id)
                 throw exception_1.default.badRequest("Missing user's id");
-            const isUserExist = await this.usersRepository.findUserById(user_id);
+            const isUserExist = await this.userRepository.findUserById(user_id);
             if (!isUserExist)
                 throw exception_1.default.notFound("User doesn't exist");
-            return await this.postsRepository.getUserTotalPosts(user_id);
+            return await this.postRepository.getUserTotalPosts(user_id);
         }
         catch (error) {
             throw error;
@@ -65,12 +63,12 @@ class PostService {
                 throw exception_1.default.badRequest("No image uploaded");
             if (!post.user_id)
                 throw exception_1.default.badRequest("Missing user's id");
-            const isUserExist = await this.usersRepository.findUserById(post.user_id);
+            const isUserExist = await this.userRepository.findUserById(post.user_id);
             if (!isUserExist)
                 throw exception_1.default.notFound("User doesn't exist");
             const path = (0, path_1.join)(file.destination, file.filename);
             const { image_id, image_url } = await (0, cloudinary_1.default)(path);
-            return await this.postsRepository.newPost({ ...post, image_id, image_url });
+            return await this.postRepository.newPost({ ...post, image_id, image_url });
         }
         catch (error) {
             throw error;
@@ -84,10 +82,10 @@ class PostService {
                 throw exception_1.default.badRequest("Image url is not allowed to be changed");
             if (!post_id)
                 throw exception_1.default.badRequest("Missing post's id");
-            const data = await this.postsRepository.findPostsByPostId(post_id);
+            const data = await this.postRepository.findPostsByPostId(post_id);
             if (!data)
                 throw exception_1.default.notFound("Post not found");
-            return this.postsRepository.editPost(post_id, post);
+            return this.postRepository.editPost(post_id, post);
         }
         catch (error) {
             throw error;
@@ -99,10 +97,10 @@ class PostService {
         try {
             if (!post_id)
                 throw exception_1.default.badRequest("Missing post's id");
-            const data = await this.postsRepository.findPostsByPostId(post_id);
+            const data = await this.postRepository.findPostsByPostId(post_id);
             if (!data)
                 throw exception_1.default.notFound("Post not found");
-            return await this.postsRepository.deletePost(post_id);
+            return await this.postRepository.deletePost(post_id);
         }
         catch (error) {
             throw error;
@@ -112,10 +110,10 @@ class PostService {
     ;
     async getLikesCountForPost(post_id) {
         try {
-            const data = await this.postsRepository.findPostsByPostId(post_id);
+            const data = await this.postRepository.findPostsByPostId(post_id);
             if (!data)
                 throw exception_1.default.notFound("Post not found");
-            return await this.postsRepository.getLikesCountForPost(post_id);
+            return await this.postRepository.getLikesCountForPost(post_id);
         }
         catch (error) {
             throw error;
@@ -127,7 +125,7 @@ class PostService {
         try {
             if (like.post_id || like.user_id)
                 throw exception_1.default.badRequest("Missing required fields");
-            return await this.postsRepository.isUserLikePost(like);
+            return await this.postRepository.isUserLikePost(like);
         }
         catch (error) {
             throw error;
@@ -140,14 +138,14 @@ class PostService {
             if (like.post_id || like.user_id)
                 throw exception_1.default.badRequest("Missing required fields");
             // check if the post exists
-            await this.postsRepository.findPostsByPostId(like.post_id);
+            await this.postRepository.findPostsByPostId(like.post_id);
             // Check to see if the user already likes the post.
-            const data = await this.postsRepository.isUserLikePost(like);
+            const data = await this.postRepository.isUserLikePost(like);
             // If the user hasn't liked the post yet, then create or insert.
             if (!data)
-                return await this.postsRepository.toggleUserLikeForPost(like);
+                return await this.postRepository.toggleUserLikeForPost(like);
             // If the user has already liked the post, then delete or remove.
-            return await this.postsRepository.removeUserLikeForPost(like);
+            return await this.postRepository.removeUserLikeForPost(like);
         }
         catch (error) {
             throw error;

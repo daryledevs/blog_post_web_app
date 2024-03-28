@@ -1,22 +1,27 @@
 import Exception                             from "@/exception/exception";
 import IUsersService                         from "./user.service";
-import UserRepository                        from "@/repository/user.repository";
-import RecentSearchesRepository              from "@/repository/recent-searches.repository";
+import UserRepository                        from "@/repository/user/user.repository.impl";
+import FollowRepository                      from "@/repository/follow/follow.repository.impl";
+import { FollowStatsType }                   from "@/repository/follow/follow.repository";
+import RecentSearchRepository                from "@/repository/recent search/recent-search.repository.impl";
 import { SelectSearches, SelectUsers }       from "@/types/table.types";
-import FollowRepository, { FollowStatsType } from "@/repository/follow.repository";
 
 class UsersService implements IUsersService {
   private userRepository: UserRepository;
-  private recentSearchesRepository: RecentSearchesRepository;
   private followRepository: FollowRepository;
+  private recentSearchRepository: RecentSearchRepository;
 
-  constructor() {
-    this.userRepository = new UserRepository();
-    this.recentSearchesRepository = new RecentSearchesRepository();
-    this.followRepository = new FollowRepository();
+  constructor(
+    userRepository: UserRepository,
+    followRepository: FollowRepository,
+    recentSearchRepository: RecentSearchRepository,
+  ) {
+    this.userRepository = userRepository;
+    this.followRepository = followRepository;
+    this.recentSearchRepository = recentSearchRepository;
   };
 
-  async getUserById(id: string, person: string): Promise<SelectUsers> {
+  public async getUserById(id: string, person: string): Promise<SelectUsers> {
     try {
       let data: SelectUsers | undefined;
 
@@ -39,7 +44,7 @@ class UsersService implements IUsersService {
     };
   };
 
-  async getUserByEmail(email: string): Promise<SelectUsers | undefined> {
+  public async getUserByEmail(email: string): Promise<SelectUsers | undefined> {
     try {
       return await this.userRepository.findUserByEmail(email);
     } catch (error) {
@@ -47,7 +52,7 @@ class UsersService implements IUsersService {
     };
   };
 
-  async updateUser(id: number, user: any): Promise<any> {
+  public async updateUser(id: number, user: any): Promise<any> {
     try {
       return await this.userRepository.updateUser(id, user);
     } catch (error) {
@@ -55,7 +60,7 @@ class UsersService implements IUsersService {
     };
   };
 
-  async deleteUser(id: number): Promise<string | undefined> {
+  public async deleteUser(id: number): Promise<string | undefined> {
     try {
       return await this.userRepository.deleteUser(id);
     } catch (error) {
@@ -63,7 +68,7 @@ class UsersService implements IUsersService {
     };
   };
 
-  async searchUserByFields(search: string): Promise<SelectUsers[]> {
+  public async searchUserByFields(search: string): Promise<SelectUsers[]> {
     try {
       const data = await this.userRepository.searchUsersByQuery(search);
       // If the user is not found, return an error
@@ -74,31 +79,31 @@ class UsersService implements IUsersService {
     };
   };
 
-  async getAllRecentSearches(user_id: any): Promise<SelectSearches[] | undefined> {
+  public async getAllRecentSearches(user_id: any): Promise<SelectSearches[] | undefined> {
     try {
-      return await this.recentSearchesRepository.getRecentSearches(user_id);
+      return await this.recentSearchRepository.getRecentSearches(user_id);
     } catch (error) {
       throw error;
     };
   };
 
-  async saveRecentSearches(user_id: any, search_user_id: any): Promise<string | undefined> {
+  public async saveRecentSearches(user_id: any, search_user_id: any): Promise<string | undefined> {
     try {
-      return await this.recentSearchesRepository.saveRecentSearches(user_id, search_user_id);
+      return await this.recentSearchRepository.saveRecentSearches(user_id, search_user_id);
     } catch (error) {
       throw error;
     }
   };
 
-  async removeRecentSearches(recent_id: any): Promise<string | undefined> {
+  public async removeRecentSearches(recent_id: any): Promise<string | undefined> {
     try {
-      return await this.recentSearchesRepository.deleteRecentSearches(recent_id);
+      return await this.recentSearchRepository.deleteRecentSearches(recent_id);
     } catch (error) {
       throw error;
     };
   };
 
-  async getFollowStats(user_id: any): Promise<FollowStatsType> {
+  public async getFollowStats(user_id: any): Promise<FollowStatsType> {
     try {
       return await this.followRepository.getFollowStats(user_id);
     } catch (error) {
@@ -106,7 +111,7 @@ class UsersService implements IUsersService {
     };
   };
 
-  async getFollowerFollowingLists(user_id: any, fetch: string, listsId: number[]): Promise<SelectUsers[]> {
+  public async getFollowerFollowingLists(user_id: any, fetch: string, listsId: number[]): Promise<SelectUsers[]> {
     try {
       const listIdsToExclude = listsId?.length ? listsId : [0];
 
@@ -124,7 +129,7 @@ class UsersService implements IUsersService {
     };
   };
 
-  async toggleFollow(user_id: any, followed_id: any): Promise<string | undefined> {
+  public async toggleFollow(user_id: any, followed_id: any): Promise<string | undefined> {
     try {
       let result: string | undefined = undefined;
 

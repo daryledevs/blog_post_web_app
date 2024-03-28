@@ -4,7 +4,9 @@ import { NextFunction, Request, Response } from "express";
 class UsersController {
   private userService: UsersService;
 
-  constructor() { this.userService = new UsersService(); };
+  constructor(userService: UsersService) {
+    this.userService = userService;
+  };
 
   async getUserData(req: Request, res: Response, next: NextFunction) {
     try {

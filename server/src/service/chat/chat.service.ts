@@ -1,7 +1,7 @@
 import { SelectMessages }                       from "@/types/table.types";
-import { ChatHistoryByIdType, MessageDataType } from "@/repository/chat.repository";
+import { ChatHistoryByIdType, MessageDataType } from "@/repository/chat/chat.repository";
 
-interface IChatsService {
+interface IChatService {
   getChatHistory: (userId: number, listId: number[]) => Promise<ChatHistoryByIdType[]>;
 
   getChatMessages: (chatId: number, listId: number[]) => Promise<SelectMessages[]>;
@@ -11,4 +11,4 @@ interface IChatsService {
   deleteConversation: (conversation_id: number) => Promise<string>;
 };
 
-export default IChatsService;
+export default IChatService;

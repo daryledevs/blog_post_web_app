@@ -11,17 +11,17 @@ import sendEmail                                       from "@/config/nodemailer
 import encryptData                                     from "@/util/encrypt";
 import decryptData                                     from "@/util/decrypt";
 import { NewUsers }                                    from "@/types/table.types";
-import AuthRepository                                  from "@/repository/auth.repository";
-import UserRepository                                  from "@/repository/user.repository";
+import AuthRepository                                  from "@/repository/auth/auth.repository.impl";
+import UserRepository                                  from "@/repository/user/user.repository.impl";
 import IAuthService, { IResetPasswordForm, LoginType } from "./auth.service";
 
 class AuthService implements IAuthService {
   private authRepository: AuthRepository;
   private userRepository: UserRepository;
 
-  constructor() {
-    this.authRepository = new AuthRepository();
-    this.userRepository = new UserRepository();
+  constructor(authRepository: AuthRepository, userRepository: UserRepository) {
+    this.authRepository = authRepository;
+    this.userRepository = userRepository;
   }
 
   public async register(data: NewUsers): Promise<string> {
@@ -119,7 +119,7 @@ class AuthService implements IAuthService {
     };
   };
 
-  public async resetPassword(data: any) {
+  public async resetPassword(data: any): Promise<string> {
     try {
       const { tokenId, user_id, email, password, confirmPassword } = data;
       const isPasswordMismatch = password !== confirmPassword;

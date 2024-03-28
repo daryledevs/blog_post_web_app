@@ -1,8 +1,8 @@
 
-import { FollowStatsType }                          from "@/repository/follow.repository";
+import { FollowStatsType }                          from "@/repository/follow/follow.repository";
 import { SelectSearches, SelectUsers, UpdateUsers } from "@/types/table.types";
 
-interface IUsersService {
+interface IUserService {
   getUserById(id: string, person: string): Promise<SelectUsers>;
 
   getUserByEmail(email: string): Promise<SelectUsers | undefined>;
@@ -26,4 +26,4 @@ interface IUsersService {
   toggleFollow: (user_id: any, followed_id: any) => Promise<string  | undefined>;
 };
 
-export default IUsersService;
+export default IUserService;

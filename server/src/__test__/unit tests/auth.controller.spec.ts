@@ -1,8 +1,10 @@
 import db                                            from "../../database/database";
 import { sql }                                       from "kysely";
 import { faker }                                     from "@faker-js/faker";
+import AuthService                                   from "@/service/auth/auth.service.impl";
+import AuthRepository                                from "@/repository/auth/auth.repository.impl";
+import UserRepository                                from "@/repository/user/user.repository.impl";
 import { describe, it, expect, vi, Mock, afterEach } from "vitest";
-import AuthService from "@/service/auth/auth.service.impl";
 
 let user = {
   username: faker.internet.userName(),
@@ -17,7 +19,11 @@ let user = {
 };
 
 describe("AuthRepository", () => {
-  const auth: AuthService = new AuthService();
+
+  const auth: AuthService = new AuthService(
+    new AuthRepository(),
+    new UserRepository()
+  );
 
   afterEach(async () => {
     await sql`SET FOREIGN_KEY_CHECKS = 0`.execute(db);

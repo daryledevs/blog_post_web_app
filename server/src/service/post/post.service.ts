@@ -1,6 +1,6 @@
 import { NewPosts, SelectLikes, SelectPosts, UpdatePosts } from "@/types/table.types";
 
-interface IPostsService {
+interface IPostService {
   findPostsByPostId: (post_id: number) => Promise<SelectPosts | undefined>;
 
   getUserPosts: (user_id: number) => Promise<SelectPosts[]>;
@@ -20,4 +20,4 @@ interface IPostsService {
   toggleUserLikeForPost: (like: SelectLikes) => Promise<string>;
 };
 
-export default IPostsService;
+export default IPostService;

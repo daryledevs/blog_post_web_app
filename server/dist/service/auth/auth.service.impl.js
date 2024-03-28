@@ -10,12 +10,10 @@ const exception_1 = __importDefault(require("@/exception/exception"));
 const nodemailer_1 = __importDefault(require("@/config/nodemailer"));
 const encrypt_1 = __importDefault(require("@/util/encrypt"));
 const decrypt_1 = __importDefault(require("@/util/decrypt"));
-const auth_repository_1 = __importDefault(require("@/repository/auth.repository"));
-const user_repository_1 = __importDefault(require("@/repository/user.repository"));
 class AuthService {
-    constructor() {
-        this.authRepository = new auth_repository_1.default();
-        this.userRepository = new user_repository_1.default();
+    constructor(authRepository, userRepository) {
+        this.authRepository = authRepository;
+        this.userRepository = userRepository;
     }
     async register(data) {
         try {

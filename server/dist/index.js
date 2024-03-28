@@ -35,7 +35,7 @@ const auth_route_1 = __importDefault(require("./router/auth.route"));
 const user_router_1 = __importDefault(require("./router/user.router"));
 const chat_router_1 = __importDefault(require("./router/chat.router"));
 const post_router_1 = __importDefault(require("./router/post.router"));
-const feed_1 = __importDefault(require("./router/feed"));
+const feed_router_1 = __importDefault(require("./router/feed.router"));
 const dotenv = __importStar(require("dotenv"));
 const corsOption_1 = __importDefault(require("./config/corsOption"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
@@ -62,7 +62,7 @@ app.use(`${API}/`, auth_route_1.default);
 app.use(`${API}/chats`, chat_router_1.default);
 app.use(`${API}/users`, user_router_1.default);
 app.use(`${API}/posts`, post_router_1.default);
-app.use(`${API}/feeds`, feed_1.default);
+app.use(`${API}/feeds`, feed_router_1.default);
 app.use(error_handler_1.default);
 app.listen(PORT, HOST, () => {
     (0, socket_1.default)();
