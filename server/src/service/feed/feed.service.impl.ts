@@ -13,7 +13,7 @@ class FeedService implements IFeedService {
     this.userRepository = userRepository;
   };
 
-  async getTotalFeed(): Promise<number> {
+  public async getTotalFeed(): Promise<number> {
     try {
       return await this.feedRepository.getTotalFeed();
     } catch (error) {
@@ -21,7 +21,7 @@ class FeedService implements IFeedService {
     };
   };
 
-  async getUserFeed(user_id: number, post_ids: number[]): Promise<SelectPosts[]> {
+  public async getUserFeed(user_id: number, post_ids: number[]): Promise<SelectPosts[]> {
     try {
       if(!user_id) throw Exception.badRequest("Missing required fields");
       const isUserExists = await this.userRepository.findUserById(user_id);
@@ -32,7 +32,7 @@ class FeedService implements IFeedService {
     };
   };
 
-  async getExploreFeed(user_id: number): Promise<SelectPosts[]> {
+  public async getExploreFeed(user_id: number): Promise<SelectPosts[]> {
     try {
       if(!user_id) throw Exception.badRequest("Missing required fields");
       const isUserExists = await this.userRepository.findUserById(user_id);

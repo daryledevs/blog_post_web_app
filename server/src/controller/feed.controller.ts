@@ -1,4 +1,4 @@
-import FeedService from "@/service/feed/feed.service.impl";
+import FeedService                         from "@/service/feed/feed.service.impl";
 import { NextFunction, Request, Response } from "express";
 
 class FeedController {
@@ -8,7 +8,7 @@ class FeedController {
     this.feedService = feedService;
   };
 
-  async getTotalFeed(req: Request, res: Response, next: NextFunction) {
+  public async getTotalFeed(req: Request, res: Response, next: NextFunction) {
     try {
       const data = await this.feedService.getTotalFeed();
       res.status(200).send({ count: data });
@@ -17,7 +17,7 @@ class FeedController {
     };
   };
 
-  async getUserFeed(req: Request, res: Response, next: NextFunction) {
+  public async getUserFeed(req: Request, res: Response, next: NextFunction) {
     try {
       const { post_ids, user_id } = req.body;
       const values = post_ids.length ? post_ids : [0];
@@ -28,7 +28,7 @@ class FeedController {
     };
   };
 
-  async getExploreFeed(req: Request, res: Response, next: NextFunction) {
+  public async getExploreFeed(req: Request, res: Response, next: NextFunction) {
     try {
       const { user_id } = req.body;
       const data = await this.feedService.getExploreFeed(user_id);

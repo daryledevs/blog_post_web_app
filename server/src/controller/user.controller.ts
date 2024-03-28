@@ -8,7 +8,7 @@ class UsersController {
     this.userService = userService;
   };
 
-  async getUserData(req: Request, res: Response, next: NextFunction) {
+  public async getUserData(req: Request, res: Response, next: NextFunction) {
     try {
       const user_id = req.body.user_id;
       const person = req.query.person || "";
@@ -22,7 +22,7 @@ class UsersController {
     };
   };
 
-  async searchUsersByQuery(req: Request, res: Response, next: NextFunction) {
+  public async searchUsersByQuery(req: Request, res: Response, next: NextFunction) {
     try {
       const search = req.query.search;
       const users = await this.userService.searchUserByFields(search as string);
@@ -32,7 +32,7 @@ class UsersController {
     };
   };
 
-  async deleteUser(req: Request, res: Response, next: NextFunction) {
+  public async deleteUser(req: Request, res: Response, next: NextFunction) {
     try {
       const user_id: any = req.params.user_id;
       const message = await this.userService.deleteUser(user_id);
@@ -42,7 +42,7 @@ class UsersController {
     };
   };
 
-  async getFollowStats(req: Request, res: Response, next: NextFunction) {
+  public async getFollowStats(req: Request, res: Response, next: NextFunction) {
     try {
       const user_id = req.params.user_id;
       const stats = await this.userService.getFollowStats(user_id);
@@ -52,7 +52,7 @@ class UsersController {
     };
   };
 
-  async getRecentSearches(req: Request, res: Response, next: NextFunction) {
+  public async getRecentSearches(req: Request, res: Response, next: NextFunction) {
     try {
       const user_id = req.params.user_id;
       const searches = await this.userService.getAllRecentSearches(user_id);
@@ -62,7 +62,7 @@ class UsersController {
     };
   };
 
-  async getFollowerFollowingLists(req: Request, res: Response, next: NextFunction) {
+  public async getFollowerFollowingLists(req: Request, res: Response, next: NextFunction) {
     try {
       const user_id = req.params.user_id;
       const fetch = req.query.fetch;
@@ -78,7 +78,7 @@ class UsersController {
     };
   };
 
-  async toggleFollow(req: Request, res: Response, next: NextFunction) {
+  public async toggleFollow(req: Request, res: Response, next: NextFunction) {
     try {
       const user_id = req.params.user_id;
       const followed_id = req.params.followed_id;
@@ -89,7 +89,7 @@ class UsersController {
     };
   };
 
-  async saveRecentSearches(req: Request, res: Response, next: NextFunction) {
+  public async saveRecentSearches(req: Request, res: Response, next: NextFunction) {
     try {
       const user_id = req.params.user_id;
       const search_user_id = req.params.searched_id;
@@ -103,7 +103,7 @@ class UsersController {
     };
   };
 
-  async removeRecentSearches(req: Request, res: Response, next: NextFunction) {
+  public async removeRecentSearches(req: Request, res: Response, next: NextFunction) {
     try {
       const recent_id = req.params.recent_id;
       const message = await this.userService.removeRecentSearches(recent_id);
