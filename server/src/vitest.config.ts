@@ -1,8 +1,7 @@
-
 import tsconfigPaths from "vite-tsconfig-paths";
-import { defineConfig } from "vitest/config";
+const defineConfig = import("vitest/config").then((mod) => mod.defineConfig);
 
-export default defineConfig({
+export default (await defineConfig)({
   test: {
     globals: true,
   },
