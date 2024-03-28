@@ -3,12 +3,27 @@ import {
   NewMessages,
   SelectConversations,
   SelectMessages,
-}                                        from "../types/table.types";
-import db                                from "../database/database";
-import DatabaseException                 from "../exception/database";
+}                        from "../types/table.types";
+import db                from "../database/database";
+import DatabaseException from "../exception/database";
 
-class ChatRepository {
-  static async getUserConversationHistoryByUserId(user_id: number, conversations: number[]): Promise<any> {
+export interface MessageDataType extends NewMessages {
+  receiver_id: number;
+};
+
+export type ChatHistoryByIdType = {
+  conversation_id: number;
+  user_one_id: number;
+  user_two_id: number;
+  user_id: number | null;
+  username: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  avatar_url: string | null;
+};
+
+class ChatsRepository {
+  async getUserConversationHistoryByUserId(user_id: number, conversations: number[]): Promise<ChatHistoryByIdType[]> {
     try {
       return await db
         .selectFrom("conversations")
@@ -47,7 +62,7 @@ class ChatRepository {
     }
   };
 
-  static async getHistoryByConversationId(conversation_id: number): Promise<SelectConversations | undefined> {
+  async findConversationByConversationId(conversation_id: number): Promise<SelectConversations | undefined> {
     try {
       return await db
         .selectFrom("conversations")
@@ -59,7 +74,7 @@ class ChatRepository {
     }
   };
 
-  static async findConversationByUserId(user_id: number[]): Promise<SelectConversations | undefined> {
+  async findConversationByUserId(user_id: number[]): Promise<SelectConversations | undefined> {
     try {
       return await db
         .selectFrom("conversations")
@@ -82,7 +97,7 @@ class ChatRepository {
     };
   };
 
-  static async getMessagesByConversationId(conversation_id: number, ids: number[] | number): Promise<SelectMessages[]> {
+  async getMessagesByConversationId(conversation_id: number, ids: number[] | number): Promise<SelectMessages[]> {
     try {
       return await db
         .selectFrom("messages")
@@ -98,7 +113,7 @@ class ChatRepository {
     };
   };
 
-  static async saveNewConversation(conversation: NewConversations): Promise<bigint | undefined> {
+  async saveNewConversation(conversation: NewConversations): Promise<bigint | undefined> {
     try {
       const { insertId } = await db
         .insertInto("conversations")
@@ -111,7 +126,7 @@ class ChatRepository {
     };
   };
 
-  static async saveNewMessage(message: NewMessages): Promise<string> {
+  async saveNewMessage(message: MessageDataType): Promise<string> {
     try {
       await db
         .insertInto("messages")
@@ -123,6 +138,19 @@ class ChatRepository {
       throw DatabaseException.fromError(error);
     };
   };
+
+  async deleteConversation(conversation_id: number): Promise<string> {
+    try {
+      await db
+        .deleteFrom("conversations")
+        .where("conversation_id", "=", conversation_id)
+        .execute();
+
+      return "Conversation deleted";
+    } catch (error) {
+      throw DatabaseException.fromError(error);
+    };
+  };
 };
 
-export default ChatRepository;
+export default ChatsRepository;

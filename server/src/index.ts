@@ -5,7 +5,7 @@ import rootPath         from "./config/path";
 import bodyParser       from "body-parser";
 import authRoutes       from "./router/auth.route";
 import userRoutes       from './router/user.router';
-import chatRoutes       from "./router/chat";
+import chatRoutes       from "./router/chat.router";
 import postRouter       from "./router/post.router";
 import feedRouter       from "./router/feed";
 import * as dotenv      from "dotenv";

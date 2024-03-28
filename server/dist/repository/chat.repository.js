@@ -5,8 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../database/database"));
 const database_2 = __importDefault(require("../exception/database"));
-class ChatRepository {
-    static async getUserConversationHistoryByUserId(user_id, conversations) {
+;
+class ChatsRepository {
+    async getUserConversationHistoryByUserId(user_id, conversations) {
         try {
             return await database_1.default
                 .selectFrom("conversations")
@@ -39,7 +40,7 @@ class ChatRepository {
         }
     }
     ;
-    static async getHistoryByConversationId(conversation_id) {
+    async findConversationByConversationId(conversation_id) {
         try {
             return await database_1.default
                 .selectFrom("conversations")
@@ -52,7 +53,7 @@ class ChatRepository {
         }
     }
     ;
-    static async findConversationByUserId(user_id) {
+    async findConversationByUserId(user_id) {
         try {
             return await database_1.default
                 .selectFrom("conversations")
@@ -75,7 +76,7 @@ class ChatRepository {
         ;
     }
     ;
-    static async getMessagesByConversationId(conversation_id, ids) {
+    async getMessagesByConversationId(conversation_id, ids) {
         try {
             return await database_1.default
                 .selectFrom("messages")
@@ -93,7 +94,7 @@ class ChatRepository {
         ;
     }
     ;
-    static async saveNewConversation(conversation) {
+    async saveNewConversation(conversation) {
         try {
             const { insertId } = await database_1.default
                 .insertInto("conversations")
@@ -107,7 +108,7 @@ class ChatRepository {
         ;
     }
     ;
-    static async saveNewMessage(message) {
+    async saveNewMessage(message) {
         try {
             await database_1.default
                 .insertInto("messages")
@@ -121,6 +122,20 @@ class ChatRepository {
         ;
     }
     ;
+    async deleteConversation(conversation_id) {
+        try {
+            await database_1.default
+                .deleteFrom("conversations")
+                .where("conversation_id", "=", conversation_id)
+                .execute();
+            return "Conversation deleted";
+        }
+        catch (error) {
+            throw database_2.default.fromError(error);
+        }
+        ;
+    }
+    ;
 }
 ;
-exports.default = ChatRepository;
+exports.default = ChatsRepository;

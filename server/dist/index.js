@@ -33,7 +33,7 @@ const path_1 = __importDefault(require("./config/path"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const auth_route_1 = __importDefault(require("./router/auth.route"));
 const user_router_1 = __importDefault(require("./router/user.router"));
-const chat_1 = __importDefault(require("./router/chat"));
+const chat_router_1 = __importDefault(require("./router/chat.router"));
 const post_router_1 = __importDefault(require("./router/post.router"));
 const feed_1 = __importDefault(require("./router/feed"));
 const dotenv = __importStar(require("dotenv"));
@@ -59,7 +59,7 @@ app.set('view engine', 'ejs'); // Set EJS as the template engine
 app.use((0, morgan_1.default)("tiny"));
 // Routes
 app.use(`${API}/`, auth_route_1.default);
-app.use(`${API}/chats`, chat_1.default);
+app.use(`${API}/chats`, chat_router_1.default);
 app.use(`${API}/users`, user_router_1.default);
 app.use(`${API}/posts`, post_router_1.default);
 app.use(`${API}/feeds`, feed_1.default);
