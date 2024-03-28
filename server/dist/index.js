@@ -43,8 +43,10 @@ const error_handler_1 = __importDefault(require("./helper/error-handler"));
 const token_handler_1 = __importDefault(require("./middleware/token-handler"));
 const cookie_options_1 = __importDefault(require("./middleware/cookie-options"));
 const socket_1 = __importDefault(require("./socket"));
+const http_1 = require("http");
 dotenv.config();
 const app = (0, express_1.default)();
+const server = (0, http_1.createServer)(app);
 const PORT = parseInt(process.env.SERVER_PORT ?? "5000");
 const HOST = process.env.SERVER_HOST || "localhost";
 const API = process.env.API;
@@ -64,8 +66,8 @@ app.use(`${API}/users`, user_router_1.default);
 app.use(`${API}/posts`, post_router_1.default);
 app.use(`${API}/feeds`, feed_router_1.default);
 app.use(error_handler_1.default);
-app.listen(PORT, HOST, () => {
+server.listen(PORT, HOST, () => {
     (0, socket_1.default)();
     console.log("Connected to", PORT, HOST, "in: ", app.settings.env);
 });
-exports.default = app;
+exports.default = server;

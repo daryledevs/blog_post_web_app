@@ -16,9 +16,11 @@ import tokenHandler     from "./middleware/token-handler";
 import cookieOptions    from "./middleware/cookie-options";
 import responseHandler  from "./middleware/response-handler";
 import socketController from "./socket";
+import { createServer } from "http";
 dotenv.config();
 
 const app = express();
+const server = createServer(app);
 const PORT = parseInt(process.env.SERVER_PORT ?? "5000");
 const HOST = process.env.SERVER_HOST || "localhost";
 const API = process.env.API;
@@ -41,9 +43,9 @@ app.use(`${API}/posts`, postRouter);
 app.use(`${API}/feeds`, feedRouter);
 app.use(errorHandler);
 
-app.listen(PORT, HOST, () => {
+server.listen(PORT, HOST, () => {
   socketController();
   console.log("Connected to", PORT, HOST, "in: ", app.settings.env);
 });
 
-export default app;
+export default server;

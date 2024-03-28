@@ -1,7 +1,8 @@
 import { Server } from "socket.io";
 import { Socket } from "socket.io";
+import server from "./index";
 
-const socketIO = new Server(8900, {
+const socketIO = new Server(server, {
   cors: {
     origin: [
       `${process.env.SERVER_URL_ONE}`,
@@ -9,6 +10,7 @@ const socketIO = new Server(8900, {
       `${process.env.SERVER_URL_THREE}`,
     ],
   },
+  path: `${process.env.API}/socket`,
 });
 
 let users: any[] = [];
@@ -23,7 +25,6 @@ const removeUser = (socketId: any) => {
 };
 
 const getUser = (userId: any) => {
-  console.log("getUser: ", userId);
   return users.find((user) => user.userId === userId);
 };
 
@@ -37,11 +38,11 @@ function socketController() {
     socket.on("send-message", ({ conversation_id, sender_id, receiver_id, text_message }) => {
       const user = getUser(receiver_id);
       if(user?.socketId){
-         socket.to(user.socketId).emit("get-message", {
-           conversation_id,
-           sender_id,
-           text_message,
-         });
+        socket.to(user.socketId).emit("get-message", {
+          conversation_id,
+          sender_id,
+          text_message,
+        });
       };
     });
 
