@@ -7,8 +7,8 @@ import {
 import { join }             from "path";
 import Exception            from "@/exception/exception";
 import IPostService         from "./post.service";
-import PostRepository      from "@/repository/post/post.repository.impl";
-import UserRepository      from "@/repository/user/user.repository.impl";
+import PostRepository       from "@/repository/post/post.repository.impl";
+import UserRepository       from "@/repository/user/user.repository.impl";
 import uploadAndDeleteLocal from "@/config/cloudinary";
 
 class PostService implements IPostService {
@@ -53,7 +53,7 @@ class PostService implements IPostService {
     };
   };
 
-  public async newPost(file: Express.Multer.File, post: NewPosts): Promise<string> {
+  public async newPost(file: Express.Multer.File | null | undefined, post: NewPosts): Promise<string> {
     try {
       if(!file) throw Exception.badRequest("No image uploaded");
       if(!post.user_id) throw Exception.badRequest("Missing user's id");

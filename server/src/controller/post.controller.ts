@@ -1,5 +1,5 @@
 import * as dotenv                         from "dotenv";
-import PostsService                        from "@/service/post/post.service.impl";
+import PostsService                        from "../service/post/post.service.impl";
 import { Response, Request, NextFunction } from "express";
 dotenv.config();
 
@@ -10,7 +10,7 @@ class PostsController {
     this.postsService = postsService;
   };
 
-  public async getUserPost(req: Request, res: Response, next: NextFunction) {
+  public getUserPost = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { user_id } = req.query;
       const data = await this.postsService.getUserPosts(user_id as any);
@@ -20,7 +20,7 @@ class PostsController {
     };
   };
 
-  public async getUserTotalPosts(req: Request, res: Response, next: NextFunction) {
+  public getUserTotalPosts = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { user_id } = req.query;
       const data = await this.postsService.getUserTotalPosts(user_id as any);
@@ -30,12 +30,14 @@ class PostsController {
     };
   };
 
-  public async newPost(req: Request, res: Response, next: NextFunction) {
+  public newPost = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { cookieOptions, ...rest } = req.body;
+      
       const files = (
         req.files as { [fieldname: string]: Express.Multer.File[] }
-      )?.img;
+      )?.img as Express.Multer.File[] || null;
+      
       const data = await this.postsService.newPost(files[0], rest);
       res.status(200).send({ message: data });
     } catch (error) {
@@ -43,7 +45,7 @@ class PostsController {
     };
   };
 
-  public async editPost(req: Request, res: Response, next: NextFunction) {
+  public editPost = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const post_id: any = req.params;
       const { user_id, roles, cookieOptions, ...rest } = req.body;
@@ -54,7 +56,7 @@ class PostsController {
     };
   };
 
-  public async deletePost(req: Request, res: Response, next: NextFunction) {
+  public deletePost = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const post_id: any = req.params;
       const data = await this.postsService.deletePost(post_id);
@@ -64,7 +66,7 @@ class PostsController {
     };
   };
 
-  public async getLikesCountForPost(req: Request, res: Response, next: NextFunction) {
+  public getLikesCountForPost = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const post_id: any = req.params;
       const data = await this.postsService.getLikesCountForPost(post_id);
@@ -74,7 +76,7 @@ class PostsController {
     };
   };
 
-  public async checkUserLikeStatusForPost(req: Request, res: Response, next: NextFunction) {
+  public checkUserLikeStatusForPost = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const args: any = req.params;
       const data = await this.postsService.checkUserLikeStatusForPost(args);
@@ -84,7 +86,7 @@ class PostsController {
     };
   };
 
-  public async toggleUserLikeForPost(req: Request, res: Response, next: NextFunction) {
+  public toggleUserLikeForPost = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const args: any = req.params;
       const data = await this.postsService.toggleUserLikeForPost(args);

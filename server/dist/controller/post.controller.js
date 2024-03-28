@@ -26,11 +26,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv = __importStar(require("dotenv"));
 dotenv.config();
 class PostsController {
+    postsService;
     constructor(postsService) {
         this.postsService = postsService;
     }
     ;
-    async getUserPost(req, res, next) {
+    getUserPost = async (req, res, next) => {
         try {
             const { user_id } = req.query;
             const data = await this.postsService.getUserPosts(user_id);
@@ -40,9 +41,8 @@ class PostsController {
             next(error);
         }
         ;
-    }
-    ;
-    async getUserTotalPosts(req, res, next) {
+    };
+    getUserTotalPosts = async (req, res, next) => {
         try {
             const { user_id } = req.query;
             const data = await this.postsService.getUserTotalPosts(user_id);
@@ -52,12 +52,11 @@ class PostsController {
             next(error);
         }
         ;
-    }
-    ;
-    async newPost(req, res, next) {
+    };
+    newPost = async (req, res, next) => {
         try {
             const { cookieOptions, ...rest } = req.body;
-            const files = req.files?.img;
+            const files = req.files?.img || null;
             const data = await this.postsService.newPost(files[0], rest);
             res.status(200).send({ message: data });
         }
@@ -65,9 +64,8 @@ class PostsController {
             next(error);
         }
         ;
-    }
-    ;
-    async editPost(req, res, next) {
+    };
+    editPost = async (req, res, next) => {
         try {
             const post_id = req.params;
             const { user_id, roles, cookieOptions, ...rest } = req.body;
@@ -78,9 +76,8 @@ class PostsController {
             next(error);
         }
         ;
-    }
-    ;
-    async deletePost(req, res, next) {
+    };
+    deletePost = async (req, res, next) => {
         try {
             const post_id = req.params;
             const data = await this.postsService.deletePost(post_id);
@@ -90,9 +87,8 @@ class PostsController {
             next(error);
         }
         ;
-    }
-    ;
-    async getLikesCountForPost(req, res, next) {
+    };
+    getLikesCountForPost = async (req, res, next) => {
         try {
             const post_id = req.params;
             const data = await this.postsService.getLikesCountForPost(post_id);
@@ -102,9 +98,8 @@ class PostsController {
             next(error);
         }
         ;
-    }
-    ;
-    async checkUserLikeStatusForPost(req, res, next) {
+    };
+    checkUserLikeStatusForPost = async (req, res, next) => {
         try {
             const args = req.params;
             const data = await this.postsService.checkUserLikeStatusForPost(args);
@@ -114,9 +109,8 @@ class PostsController {
             next(error);
         }
         ;
-    }
-    ;
-    async toggleUserLikeForPost(req, res, next) {
+    };
+    toggleUserLikeForPost = async (req, res, next) => {
         try {
             const args = req.params;
             const data = await this.postsService.toggleUserLikeForPost(args);
@@ -126,8 +120,7 @@ class PostsController {
             next(error);
         }
         ;
-    }
-    ;
+    };
 }
 ;
 exports.default = PostsController;

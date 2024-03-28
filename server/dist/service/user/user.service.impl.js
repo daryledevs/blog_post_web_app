@@ -5,6 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const exception_1 = __importDefault(require("@/exception/exception"));
 class UsersService {
+    userRepository;
+    followRepository;
+    recentSearchRepository;
     constructor(userRepository, followRepository, recentSearchRepository) {
         this.userRepository = userRepository;
         this.followRepository = followRepository;

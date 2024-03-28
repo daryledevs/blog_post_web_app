@@ -70,10 +70,10 @@ class ChatsRepository implements IChatRepository {
         ])
         .where((eb) =>
           eb.or([
-            eb("conversations.user_one_id", "=", user_id[0])
-            .and("conversations.user_two_id", "=", user_id[1]),
-            eb("conversations.user_one_id", "=", user_id[2])
-            .and("conversations.user_two_id", "=", user_id[3]),
+            eb("conversations.user_one_id",   "=", user_id[0] as number)
+            .and("conversations.user_two_id", "=", user_id[1] as number),
+            eb("conversations.user_one_id",   "=", user_id[2] as number)
+            .and("conversations.user_two_id", "=", user_id[3] as number),
           ])
         )
         .executeTakeFirst();

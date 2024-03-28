@@ -7,6 +7,8 @@ const path_1 = require("path");
 const exception_1 = __importDefault(require("@/exception/exception"));
 const cloudinary_1 = __importDefault(require("@/config/cloudinary"));
 class PostService {
+    postRepository;
+    userRepository;
     constructor(postRepository, userRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;

@@ -5,6 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const exception_1 = __importDefault(require("@/exception/exception"));
 class FeedService {
+    feedRepository;
+    userRepository;
     constructor(feedRepository, userRepository) {
         this.feedRepository = feedRepository;
         this.userRepository = userRepository;

@@ -10,7 +10,7 @@ class AuthController {
     this.authService = authService;
   };
 
-  public async register(req: Request, res: Response, next: NextFunction) {
+  public register = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { cookieOptions, ...rest } = req.body;
       const result = await this.authService.register(rest);
@@ -20,7 +20,7 @@ class AuthController {
     };
   };
 
-  public async login(req: Request, res: Response, next: NextFunction) {
+  public login = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { userCredential, password } = req.body;
       const result = await this.authService.login(userCredential, password);
@@ -33,7 +33,7 @@ class AuthController {
     };
   };
 
-  public async forgotPassword(req: Request, res: Response, next: NextFunction) {
+  public forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = await this.authService.forgotPassword(req.body);
       res.status(200).send({ message: result });
@@ -42,7 +42,7 @@ class AuthController {
     };
   };
 
-  public async resetPasswordForm(req: Request, res: Response, next: NextFunction) {
+  public resetPasswordForm = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = await this.authService.resetPasswordForm(req.body);
       res.status(201).render(result.render, result.data);
@@ -51,7 +51,7 @@ class AuthController {
     };
   };
 
-  public async resetPassword(req: Request, res: Response, next: NextFunction) {
+  public resetPassword = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = await this.authService.resetPassword(req.body);
       res.status(200).send({ message: result });
@@ -60,7 +60,7 @@ class AuthController {
     };
   };
 
-  public async logout(req: Request, res: Response, next: NextFunction) {
+  public logout = async (req: Request, res: Response, next: NextFunction) => {
     try {
       res
         .clearCookie("REFRESH_TOKEN", {

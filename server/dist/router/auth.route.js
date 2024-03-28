@@ -4,8 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const auth_controller_1 = __importDefault(require("@/controller/auth.controller"));
 const auth_service_impl_1 = __importDefault(require("@/service/auth/auth.service.impl"));
+const auth_controller_1 = __importDefault(require("@/controller/auth.controller"));
 const user_repository_impl_1 = __importDefault(require("@/repository/user/user.repository.impl"));
 const auth_repository_impl_1 = __importDefault(require("@/repository/auth/auth.repository.impl"));
 const router = express_1.default.Router();

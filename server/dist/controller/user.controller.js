@@ -1,11 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class UsersController {
+    userService;
     constructor(userService) {
         this.userService = userService;
     }
     ;
-    async getUserData(req, res, next) {
+    getUserData = async (req, res, next) => {
         try {
             const user_id = req.body.user_id;
             const person = req.query.person || "";
@@ -16,9 +17,8 @@ class UsersController {
             next(error);
         }
         ;
-    }
-    ;
-    async searchUsersByQuery(req, res, next) {
+    };
+    searchUsersByQuery = async (req, res, next) => {
         try {
             const search = req.query.search;
             const users = await this.userService.searchUserByFields(search);
@@ -28,9 +28,8 @@ class UsersController {
             next(error);
         }
         ;
-    }
-    ;
-    async deleteUser(req, res, next) {
+    };
+    deleteUser = async (req, res, next) => {
         try {
             const user_id = req.params.user_id;
             const message = await this.userService.deleteUser(user_id);
@@ -40,9 +39,8 @@ class UsersController {
             next(error);
         }
         ;
-    }
-    ;
-    async getFollowStats(req, res, next) {
+    };
+    getFollowStats = async (req, res, next) => {
         try {
             const user_id = req.params.user_id;
             const stats = await this.userService.getFollowStats(user_id);
@@ -52,9 +50,8 @@ class UsersController {
             next(error);
         }
         ;
-    }
-    ;
-    async getRecentSearches(req, res, next) {
+    };
+    getRecentSearches = async (req, res, next) => {
         try {
             const user_id = req.params.user_id;
             const searches = await this.userService.getAllRecentSearches(user_id);
@@ -64,9 +61,8 @@ class UsersController {
             next(error);
         }
         ;
-    }
-    ;
-    async getFollowerFollowingLists(req, res, next) {
+    };
+    getFollowerFollowingLists = async (req, res, next) => {
         try {
             const user_id = req.params.user_id;
             const fetch = req.query.fetch;
@@ -78,9 +74,8 @@ class UsersController {
             next(error);
         }
         ;
-    }
-    ;
-    async toggleFollow(req, res, next) {
+    };
+    toggleFollow = async (req, res, next) => {
         try {
             const user_id = req.params.user_id;
             const followed_id = req.params.followed_id;
@@ -91,9 +86,8 @@ class UsersController {
             next(error);
         }
         ;
-    }
-    ;
-    async saveRecentSearches(req, res, next) {
+    };
+    saveRecentSearches = async (req, res, next) => {
         try {
             const user_id = req.params.user_id;
             const search_user_id = req.params.searched_id;
@@ -104,9 +98,8 @@ class UsersController {
             next(error);
         }
         ;
-    }
-    ;
-    async removeRecentSearches(req, res, next) {
+    };
+    removeRecentSearches = async (req, res, next) => {
         try {
             const recent_id = req.params.recent_id;
             const message = await this.userService.removeRecentSearches(recent_id);
@@ -116,8 +109,7 @@ class UsersController {
             next(error);
         }
         ;
-    }
-    ;
+    };
 }
 ;
 exports.default = UsersController;

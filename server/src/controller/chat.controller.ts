@@ -8,7 +8,7 @@ class ChatsController {
     this.chatsService = chatsService;
   };
 
-  public async getChatHistory(req: Request, res: Response, next: NextFunction) {
+  public getChatHistory = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user_id: any = req.query.user_id;
       const conversations = req.body || [0];
@@ -21,7 +21,7 @@ class ChatsController {
     };
   };
 
-  public async getChatMessages(req: Request, res: Response, next: NextFunction) {
+  public getChatMessages = async (req: Request, res: Response, next: NextFunction) => {
     try {
       let conversation_id: any = req.params.conversation_id;
       const messages = req.body.messages || [0];
@@ -38,7 +38,7 @@ class ChatsController {
     };
   };
 
-  public async newMessageAndConversation(req: Request, res: Response, next: NextFunction) {
+  public newMessageAndConversation = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { conversation_id, messageData } = req.body;
 
@@ -53,7 +53,7 @@ class ChatsController {
     };
   };
 
-  public async deleteConversation(req: Request, res: Response, next: NextFunction) {
+  public deleteConversation = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { conversation_id } = req.body;
       const message = await this.chatsService.deleteConversation(conversation_id);

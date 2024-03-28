@@ -1,11 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class ChatsController {
+    chatsService;
     constructor(chatsService) {
         this.chatsService = chatsService;
     }
     ;
-    async getChatHistory(req, res, next) {
+    getChatHistory = async (req, res, next) => {
         try {
             const user_id = req.query.user_id;
             const conversations = req.body || [0];
@@ -17,9 +18,8 @@ class ChatsController {
             next(error);
         }
         ;
-    }
-    ;
-    async getChatMessages(req, res, next) {
+    };
+    getChatMessages = async (req, res, next) => {
         try {
             let conversation_id = req.params.conversation_id;
             const messages = req.body.messages || [0];
@@ -31,9 +31,8 @@ class ChatsController {
             next(error);
         }
         ;
-    }
-    ;
-    async newMessageAndConversation(req, res, next) {
+    };
+    newMessageAndConversation = async (req, res, next) => {
         try {
             const { conversation_id, messageData } = req.body;
             const message = await this.chatsService.newMessageAndConversation(conversation_id, messageData);
@@ -43,9 +42,8 @@ class ChatsController {
             next(error);
         }
         ;
-    }
-    ;
-    async deleteConversation(req, res, next) {
+    };
+    deleteConversation = async (req, res, next) => {
         try {
             const { conversation_id } = req.body;
             const message = await this.chatsService.deleteConversation(conversation_id);
@@ -55,8 +53,7 @@ class ChatsController {
             next(error);
         }
         ;
-    }
-    ;
+    };
 }
 ;
 exports.default = ChatsController;

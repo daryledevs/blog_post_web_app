@@ -5,17 +5,15 @@ import DatabaseException            from "@/exception/database";
 import { SelectUsers, UpdateUsers } from "@/types/table.types";
 
 class UserRepository implements IUserRepository {
-  private userRepository: UserRepository;
-
-  constructor() { this.userRepository = new UserRepository(); }
-
   async findUserById(user_id: number): Promise<SelectUsers | undefined> {
     try {
-      return await db
+      const result = await db
         .selectFrom("users")
         .where("user_id", "=", user_id)
         .selectAll()
         .executeTakeFirst();
+
+      return result;
     } catch (error) {
       throw DatabaseException.fromError(error);
     }
@@ -95,7 +93,7 @@ class UserRepository implements IUserRepository {
         .where("user_id", "=", user_id)
         .executeTakeFirstOrThrow();
 
-      return await this.userRepository.findUserById(user_id);
+      return await this.findUserById(user_id);
     } catch (error) {
       throw DatabaseException.fromError(error);
     }

@@ -1,6 +1,6 @@
 import express        from "express";
+import AuthService    from "@/service/auth/auth.service.impl";
 import AuthController from "@/controller/auth.controller";
-import AuthService from "@/service/auth/auth.service.impl";
 import UserRepository from "@/repository/user/user.repository.impl";
 import AuthRepository from "@/repository/auth/auth.repository.impl";
 

@@ -1,9 +1,9 @@
 import express                  from "express";
-import UsersService             from "@/service/user/user.service.impl";
-import UserRepository           from "@/repository/user/user.repository.impl";
-import UsersController          from "@/controller/user.controller";
-import FollowRepository         from "@/repository/follow/follow.repository.impl";
-import RecentSearchesRepository from "@/repository/recent search/recent-search.repository.impl";
+import UsersService             from "../service/user/user.service.impl";
+import UserRepository           from "../repository/user/user.repository.impl";
+import UsersController          from "../controller/user.controller";
+import FollowRepository         from "../repository/follow/follow.repository.impl";
+import RecentSearchesRepository from "../repository/recent search/recent-search.repository.impl";
 
 const router = express.Router();
 

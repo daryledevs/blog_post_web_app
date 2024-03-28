@@ -1,6 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class DatabaseException {
+    errorCode;
+    errorType;
+    message;
+    state;
+    query;
+    node;
     constructor(errno, code, sqlState, sqlMessage, sql, node) {
         this.errorCode = errno;
         this.message = sqlMessage;

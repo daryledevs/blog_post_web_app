@@ -1,11 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class FeedController {
+    feedService;
     constructor(feedService) {
         this.feedService = feedService;
     }
     ;
-    async getTotalFeed(req, res, next) {
+    getTotalFeed = async (req, res, next) => {
         try {
             const data = await this.feedService.getTotalFeed();
             res.status(200).send({ count: data });
@@ -14,9 +15,8 @@ class FeedController {
             next(error);
         }
         ;
-    }
-    ;
-    async getUserFeed(req, res, next) {
+    };
+    getUserFeed = async (req, res, next) => {
         try {
             const { post_ids, user_id } = req.body;
             const values = post_ids.length ? post_ids : [0];
@@ -27,9 +27,8 @@ class FeedController {
             next(error);
         }
         ;
-    }
-    ;
-    async getExploreFeed(req, res, next) {
+    };
+    getExploreFeed = async (req, res, next) => {
         try {
             const { user_id } = req.body;
             const data = await this.feedService.getExploreFeed(user_id);
@@ -39,8 +38,7 @@ class FeedController {
             next(error);
         }
         ;
-    }
-    ;
+    };
 }
 ;
 exports.default = FeedController;

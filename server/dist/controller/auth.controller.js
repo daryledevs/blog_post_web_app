@@ -26,11 +26,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv = __importStar(require("dotenv"));
 dotenv.config();
 class AuthController {
+    authService;
     constructor(authService) {
         this.authService = authService;
     }
     ;
-    async register(req, res, next) {
+    register = async (req, res, next) => {
         try {
             const { cookieOptions, ...rest } = req.body;
             const result = await this.authService.register(rest);
@@ -40,9 +41,8 @@ class AuthController {
             next(error);
         }
         ;
-    }
-    ;
-    async login(req, res, next) {
+    };
+    login = async (req, res, next) => {
         try {
             const { userCredential, password } = req.body;
             const result = await this.authService.login(userCredential, password);
@@ -55,9 +55,8 @@ class AuthController {
             next(error);
         }
         ;
-    }
-    ;
-    async forgotPassword(req, res, next) {
+    };
+    forgotPassword = async (req, res, next) => {
         try {
             const result = await this.authService.forgotPassword(req.body);
             res.status(200).send({ message: result });
@@ -66,9 +65,8 @@ class AuthController {
             next(error);
         }
         ;
-    }
-    ;
-    async resetPasswordForm(req, res, next) {
+    };
+    resetPasswordForm = async (req, res, next) => {
         try {
             const result = await this.authService.resetPasswordForm(req.body);
             res.status(201).render(result.render, result.data);
@@ -77,9 +75,8 @@ class AuthController {
             next(error);
         }
         ;
-    }
-    ;
-    async resetPassword(req, res, next) {
+    };
+    resetPassword = async (req, res, next) => {
         try {
             const result = await this.authService.resetPassword(req.body);
             res.status(200).send({ message: result });
@@ -88,9 +85,8 @@ class AuthController {
             next(error);
         }
         ;
-    }
-    ;
-    async logout(req, res, next) {
+    };
+    logout = async (req, res, next) => {
         try {
             res
                 .clearCookie("REFRESH_TOKEN", {
@@ -105,8 +101,7 @@ class AuthController {
             next(error);
         }
         ;
-    }
-    ;
+    };
 }
 ;
 exports.default = AuthController;

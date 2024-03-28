@@ -7,6 +7,7 @@ const database_1 = __importDefault(require("../../database/database"));
 const user_repository_impl_1 = __importDefault(require("../user/user.repository.impl"));
 const database_2 = __importDefault(require("../../exception/database"));
 class AuthRepository {
+    userRepository;
     constructor() { this.userRepository = new user_repository_impl_1.default(); }
     ;
     async createUser(user) {

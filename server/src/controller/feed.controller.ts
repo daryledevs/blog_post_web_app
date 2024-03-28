@@ -8,7 +8,7 @@ class FeedController {
     this.feedService = feedService;
   };
 
-  public async getTotalFeed(req: Request, res: Response, next: NextFunction) {
+  public getTotalFeed = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const data = await this.feedService.getTotalFeed();
       res.status(200).send({ count: data });
@@ -17,7 +17,7 @@ class FeedController {
     };
   };
 
-  public async getUserFeed(req: Request, res: Response, next: NextFunction) {
+  public getUserFeed = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { post_ids, user_id } = req.body;
       const values = post_ids.length ? post_ids : [0];
@@ -28,7 +28,7 @@ class FeedController {
     };
   };
 
-  public async getExploreFeed(req: Request, res: Response, next: NextFunction) {
+  public getExploreFeed = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { user_id } = req.body;
       const data = await this.feedService.getExploreFeed(user_id);

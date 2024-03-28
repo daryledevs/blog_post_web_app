@@ -7,14 +7,14 @@ const database_1 = __importDefault(require("@/database/database"));
 const kysely_1 = require("kysely");
 const database_2 = __importDefault(require("@/exception/database"));
 class UserRepository {
-    constructor() { this.userRepository = new UserRepository(); }
     async findUserById(user_id) {
         try {
-            return await database_1.default
+            const result = await database_1.default
                 .selectFrom("users")
                 .where("user_id", "=", user_id)
                 .selectAll()
                 .executeTakeFirst();
+            return result;
         }
         catch (error) {
             throw database_2.default.fromError(error);
@@ -85,7 +85,7 @@ class UserRepository {
                 .set(user)
                 .where("user_id", "=", user_id)
                 .executeTakeFirstOrThrow();
-            return await this.userRepository.findUserById(user_id);
+            return await this.findUserById(user_id);
         }
         catch (error) {
             throw database_2.default.fromError(error);

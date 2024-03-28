@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Exception {
+    message;
+    status;
     constructor(message, status) {
         this.message = message;
         this.status = status;

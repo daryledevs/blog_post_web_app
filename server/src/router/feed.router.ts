@@ -1,8 +1,8 @@
+import express        from "express";
+import FeedService    from "@/service/feed/feed.service.impl";
 import FeedController from "@/controller/feed.controller";
 import FeedRepository from "@/repository/feed/feed.repository.impl";
 import UserRepository from "@/repository/user/user.repository.impl";
-import FeedService from "@/service/feed/feed.service.impl";
-import express from "express";
 
 const router = express.Router();
 

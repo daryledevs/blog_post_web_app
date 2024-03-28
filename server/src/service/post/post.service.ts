@@ -7,7 +7,7 @@ interface IPostService {
 
   getUserTotalPosts: (user_id: number) => Promise<string | number | bigint>;
 
-  newPost: (file: Express.Multer.File, post: NewPosts) => Promise<string>;
+  newPost: (file: Express.Multer.File | null | undefined, post: NewPosts) => Promise<string>;
 
   editPost: (post_id: number, post: UpdatePosts) => Promise<string | undefined>;
 

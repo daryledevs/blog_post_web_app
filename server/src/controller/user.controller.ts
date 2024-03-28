@@ -1,4 +1,4 @@
-import UsersService                        from "@/service/user/user.service.impl";
+import UsersService                        from "../service/user/user.service.impl";
 import { NextFunction, Request, Response } from "express";
 
 class UsersController {
@@ -8,7 +8,7 @@ class UsersController {
     this.userService = userService;
   };
 
-  public async getUserData(req: Request, res: Response, next: NextFunction) {
+  public getUserData = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user_id = req.body.user_id;
       const person = req.query.person || "";
@@ -22,7 +22,7 @@ class UsersController {
     };
   };
 
-  public async searchUsersByQuery(req: Request, res: Response, next: NextFunction) {
+  public searchUsersByQuery = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const search = req.query.search;
       const users = await this.userService.searchUserByFields(search as string);
@@ -32,7 +32,7 @@ class UsersController {
     };
   };
 
-  public async deleteUser(req: Request, res: Response, next: NextFunction) {
+  public deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user_id: any = req.params.user_id;
       const message = await this.userService.deleteUser(user_id);
@@ -42,7 +42,7 @@ class UsersController {
     };
   };
 
-  public async getFollowStats(req: Request, res: Response, next: NextFunction) {
+  public getFollowStats = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user_id = req.params.user_id;
       const stats = await this.userService.getFollowStats(user_id);
@@ -52,7 +52,7 @@ class UsersController {
     };
   };
 
-  public async getRecentSearches(req: Request, res: Response, next: NextFunction) {
+  public getRecentSearches = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user_id = req.params.user_id;
       const searches = await this.userService.getAllRecentSearches(user_id);
@@ -62,7 +62,7 @@ class UsersController {
     };
   };
 
-  public async getFollowerFollowingLists(req: Request, res: Response, next: NextFunction) {
+  public getFollowerFollowingLists = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user_id = req.params.user_id;
       const fetch = req.query.fetch;
@@ -78,7 +78,7 @@ class UsersController {
     };
   };
 
-  public async toggleFollow(req: Request, res: Response, next: NextFunction) {
+  public toggleFollow = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user_id = req.params.user_id;
       const followed_id = req.params.followed_id;
@@ -89,7 +89,7 @@ class UsersController {
     };
   };
 
-  public async saveRecentSearches(req: Request, res: Response, next: NextFunction) {
+  public saveRecentSearches = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user_id = req.params.user_id;
       const search_user_id = req.params.searched_id;
@@ -103,7 +103,7 @@ class UsersController {
     };
   };
 
-  public async removeRecentSearches(req: Request, res: Response, next: NextFunction) {
+  public removeRecentSearches = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const recent_id = req.params.recent_id;
       const message = await this.userService.removeRecentSearches(recent_id);

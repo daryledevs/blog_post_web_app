@@ -11,6 +11,8 @@ const nodemailer_1 = __importDefault(require("@/config/nodemailer"));
 const encrypt_1 = __importDefault(require("@/util/encrypt"));
 const decrypt_1 = __importDefault(require("@/util/decrypt"));
 class AuthService {
+    authRepository;
+    userRepository;
     constructor(authRepository, userRepository) {
         this.authRepository = authRepository;
         this.userRepository = userRepository;
