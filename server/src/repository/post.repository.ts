@@ -3,14 +3,26 @@ import {
   SelectLikes,
   SelectPosts,
   UpdatePosts,
-} from "../types/table.types";
-import db                            from "../database/database";
-import Exception                     from "../exception/exception";
+}                                    from "@/types/table.types";
+import db                            from "@/database/database";
+import Exception                     from "@/exception/exception";
 import cloudinary                    from "cloudinary";
-import DatabaseException             from "../exception/database";
+import DatabaseException             from "@/exception/database";
 
 class PostRepository {
-  static async getUserPosts(user_id: number): Promise<SelectPosts[]> {
+  async findPostsByPostId (post_id: number): Promise<SelectPosts | undefined>{
+    try {
+      return db
+        .selectFrom("posts")
+        .selectAll()
+        .where("posts.post_id", "=", post_id)
+        .executeTakeFirst();
+    } catch (error) {
+      throw error;
+    };
+  };
+
+  async getUserPosts(user_id: number): Promise<SelectPosts[]> {
     try {
       return await db
         .selectFrom("posts")
@@ -38,7 +50,7 @@ class PostRepository {
     };
   };
 
-  static async getUserTotalPosts(user_id: number): Promise<string | number | bigint> {
+  async getUserTotalPosts(user_id: number): Promise<string | number | bigint> {
     try {
       const query = db
         .selectFrom("posts")
@@ -55,7 +67,7 @@ class PostRepository {
     };
   };
 
-  static async newPost(post: NewPosts): Promise<string> {
+  async newPost(post: NewPosts): Promise<string> {
     try {
       await db
         .insertInto("posts")
@@ -67,7 +79,7 @@ class PostRepository {
     };
   };
 
-  static async editPost(post_id: number, post: UpdatePosts): Promise<string> {
+  async editPost(post_id: number, post: UpdatePosts): Promise<string> {
     try {
       await db
         .updateTable("posts")
@@ -81,7 +93,7 @@ class PostRepository {
     };
   };
 
-  static async deletePost(post_id: number): Promise<string> {
+  async deletePost(post_id: number): Promise<string> {
     try {
       const { image_id } = await db
         .selectFrom("posts")
@@ -103,7 +115,7 @@ class PostRepository {
     };
   };
 
-  static async getLikesCountForPost(post_id:number): Promise<number> {
+  async getLikesCountForPost(post_id:number): Promise<number> {
     try {
       const query = db
         .selectFrom("likes")
@@ -120,7 +132,7 @@ class PostRepository {
     };
   };
 
-  static async isUserLikePost(like: SelectLikes): Promise<SelectLikes | undefined> {
+  async isUserLikePost(like: SelectLikes): Promise<SelectLikes | undefined> {
     try {
       return await db
         .selectFrom("likes")
@@ -135,7 +147,7 @@ class PostRepository {
     };
   };
 
-  static async toggleUserLikeForPost(like: SelectLikes): Promise<string> {
+  async toggleUserLikeForPost(like: SelectLikes): Promise<string> {
     try {
       await db
       .insertInto("likes")
@@ -145,10 +157,10 @@ class PostRepository {
     return "Like post successfully";
     } catch (error) {
       throw DatabaseException.fromError(error);
-    }
+    };
   };
 
-  static async removeUserLikeForPost(like: SelectLikes): Promise<string> {
+  async removeUserLikeForPost(like: SelectLikes): Promise<string> {
     try {
       await db
       .deleteFrom("likes")
@@ -161,7 +173,7 @@ class PostRepository {
       return "Removed like from a post";
     } catch (error) {
       throw DatabaseException.fromError(error);
-    }
+    };
   };
 };
 

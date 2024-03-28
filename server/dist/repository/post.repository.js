@@ -3,12 +3,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const database_1 = __importDefault(require("../database/database"));
-const exception_1 = __importDefault(require("../exception/exception"));
+const database_1 = __importDefault(require("@/database/database"));
+const exception_1 = __importDefault(require("@/exception/exception"));
 const cloudinary_1 = __importDefault(require("cloudinary"));
-const database_2 = __importDefault(require("../exception/database"));
+const database_2 = __importDefault(require("@/exception/database"));
 class PostRepository {
-    static async getUserPosts(user_id) {
+    async findPostsByPostId(post_id) {
+        try {
+            return database_1.default
+                .selectFrom("posts")
+                .selectAll()
+                .where("posts.post_id", "=", post_id)
+                .executeTakeFirst();
+        }
+        catch (error) {
+            throw error;
+        }
+        ;
+    }
+    ;
+    async getUserPosts(user_id) {
         try {
             return await database_1.default
                 .selectFrom("posts")
@@ -38,7 +52,7 @@ class PostRepository {
         ;
     }
     ;
-    static async getUserTotalPosts(user_id) {
+    async getUserTotalPosts(user_id) {
         try {
             const query = database_1.default
                 .selectFrom("posts")
@@ -55,7 +69,7 @@ class PostRepository {
         ;
     }
     ;
-    static async newPost(post) {
+    async newPost(post) {
         try {
             await database_1.default
                 .insertInto("posts")
@@ -69,7 +83,7 @@ class PostRepository {
         ;
     }
     ;
-    static async editPost(post_id, post) {
+    async editPost(post_id, post) {
         try {
             await database_1.default
                 .updateTable("posts")
@@ -84,7 +98,7 @@ class PostRepository {
         ;
     }
     ;
-    static async deletePost(post_id) {
+    async deletePost(post_id) {
         try {
             const { image_id } = await database_1.default
                 .selectFrom("posts")
@@ -106,7 +120,7 @@ class PostRepository {
         ;
     }
     ;
-    static async getLikesCountForPost(post_id) {
+    async getLikesCountForPost(post_id) {
         try {
             const query = database_1.default
                 .selectFrom("likes")
@@ -123,7 +137,7 @@ class PostRepository {
         ;
     }
     ;
-    static async isUserLikePost(like) {
+    async isUserLikePost(like) {
         try {
             return await database_1.default
                 .selectFrom("likes")
@@ -140,7 +154,7 @@ class PostRepository {
         ;
     }
     ;
-    static async toggleUserLikeForPost(like) {
+    async toggleUserLikeForPost(like) {
         try {
             await database_1.default
                 .insertInto("likes")
@@ -151,9 +165,10 @@ class PostRepository {
         catch (error) {
             throw database_2.default.fromError(error);
         }
+        ;
     }
     ;
-    static async removeUserLikeForPost(like) {
+    async removeUserLikeForPost(like) {
         try {
             await database_1.default
                 .deleteFrom("likes")
@@ -167,6 +182,7 @@ class PostRepository {
         catch (error) {
             throw database_2.default.fromError(error);
         }
+        ;
     }
     ;
 }

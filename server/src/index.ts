@@ -6,7 +6,7 @@ import bodyParser       from "body-parser";
 import authRoutes       from "./router/auth.route";
 import userRoutes       from './router/user.router';
 import chatRoutes       from "./router/chat";
-import postRouter       from "./router/post";
+import postRouter       from "./router/post.router";
 import feedRouter       from "./router/feed";
 import * as dotenv      from "dotenv";
 import corsOptions      from "./config/corsOption";
