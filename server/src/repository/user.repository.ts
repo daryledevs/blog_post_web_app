@@ -74,10 +74,7 @@ class UserRepository {
     }
   }
 
-  async findUserByCredentials(
-    username: string,
-    email: string
-  ): Promise<SelectUsers | undefined> {
+  async findUserByCredentials(username: string, email: string): Promise<SelectUsers | undefined> {
     try {
       return await db
         .selectFrom("users")
@@ -91,10 +88,7 @@ class UserRepository {
     }
   }
 
-  async updateUser(
-    user_id: number,
-    user: UpdateUsers
-  ): Promise<SelectUsers | undefined> {
+  async updateUser(user_id: number, user: UpdateUsers): Promise<SelectUsers | undefined> {
     try {
       await db
         .updateTable("users")

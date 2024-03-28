@@ -3,17 +3,15 @@ import {
   NewUsers,
   SelectResetPasswordToken,
   SelectUsers,
-}                                                    from "../types/table.types";
-import db                                            from "../database/database";
-import UserRepository                                from "./user.repository";
-import DatabaseException                             from "../exception/database";
+}                        from "../types/table.types";
+import db                from "../database/database";
+import UserRepository    from "./user.repository";
+import DatabaseException from "../exception/database";
 
 class AuthRepository {
   private userRepository: UserRepository;
 
-  constructor() {
-    this.userRepository = new UserRepository();
-  }
+  constructor() { this.userRepository = new UserRepository(); };
 
   async createUser(user: NewUsers): Promise<SelectUsers | undefined> {
     try {

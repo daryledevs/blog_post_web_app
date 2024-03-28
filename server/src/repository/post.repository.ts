@@ -3,11 +3,11 @@ import {
   SelectLikes,
   SelectPosts,
   UpdatePosts,
-}                                    from "@/types/table.types";
-import db                            from "@/database/database";
-import Exception                     from "@/exception/exception";
-import cloudinary                    from "cloudinary";
-import DatabaseException             from "@/exception/database";
+}                        from "@/types/table.types";
+import db                from "@/database/database";
+import Exception         from "@/exception/exception";
+import cloudinary        from "cloudinary";
+import DatabaseException from "@/exception/database";
 
 class PostRepository {
   async findPostsByPostId (post_id: number): Promise<SelectPosts | undefined>{

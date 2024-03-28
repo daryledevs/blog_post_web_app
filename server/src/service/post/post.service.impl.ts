@@ -3,13 +3,13 @@ import {
   SelectLikes,
   SelectPosts,
   UpdatePosts,
-}                                 from "@/types/table.types";
-import { join }                   from "path";
-import Exception                  from "@/exception/exception";
-import IPostService               from "./post.service";
-import PostsRepository            from "@/repository/post.repository";
-import UsersRepository            from "@/repository/user.repository";
-import uploadAndDeleteLocal       from "@/config/cloudinary";
+}                           from "@/types/table.types";
+import { join }             from "path";
+import Exception            from "@/exception/exception";
+import IPostService         from "./post.service";
+import PostsRepository      from "@/repository/post.repository";
+import UsersRepository      from "@/repository/user.repository";
+import uploadAndDeleteLocal from "@/config/cloudinary";
 
 class PostService implements IPostService {
   private postsRepository: PostsRepository;

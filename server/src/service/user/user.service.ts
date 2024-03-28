@@ -1,6 +1,6 @@
 
-import { FollowStatsType }                                from "@/repository/follow.repository";
-import { SelectSearches, SelectUsers, UpdateUsers }       from "@/types/table.types";
+import { FollowStatsType }                          from "@/repository/follow.repository";
+import { SelectSearches, SelectUsers, UpdateUsers } from "@/types/table.types";
 
 interface IUsersService {
   getUserById(id: string, person: string): Promise<SelectUsers>;

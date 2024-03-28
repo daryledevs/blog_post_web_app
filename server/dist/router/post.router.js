@@ -10,11 +10,12 @@ const router = express_1.default.Router();
 const controller = new post_controller_1.default();
 const uploadOption = (0, multer_1.default)("./uploads/post");
 const option_field = [{ name: "img", maxCount: 1 }, { name: "imgs", maxCount: 7 }];
+const middleware = uploadOption.fields(option_field);
 // post
 router.get("/", controller.getUserPost);
 router.get("/stats", controller.getUserTotalPosts);
 router.patch("/:post_id", controller.editPost);
-router.post("/", uploadOption.fields(option_field), controller.newPost);
+router.post("/", middleware, controller.newPost);
 router.delete("/:post_id", controller.deletePost);
 // likes
 router.get("/:post_id/likes", controller.getLikesCountForPost);

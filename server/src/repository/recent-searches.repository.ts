@@ -1,6 +1,6 @@
-import db                       from "../database/database";
-import DatabaseException        from "../exception/database";
-import { SelectSearches }       from "../types/table.types";
+import db                 from "../database/database";
+import DatabaseException  from "../exception/database";
+import { SelectSearches } from "../types/table.types";
 
 class RecentSearchesRepository {
   async findUsersSearchByRecentId(recent_id: number): Promise<SelectSearches | undefined> {

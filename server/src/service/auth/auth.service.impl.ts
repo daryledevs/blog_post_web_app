@@ -125,10 +125,8 @@ class AuthService implements IAuthService {
       const isPasswordMismatch = password !== confirmPassword;
       const passwordLength = password.length <= 5;
 
-      if (isPasswordMismatch)
-        throw Exception.badRequest("Password does not match");
-      if (passwordLength)
-        throw Exception.badRequest("Password must be at least 6 characters");
+      if (isPasswordMismatch) throw Exception.badRequest("Password does not match");
+      if (passwordLength) throw Exception.badRequest("Password must be at least 6 characters");
 
       const decodedTokenId: any = decodeURIComponent(tokenId);
       const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
