@@ -28,16 +28,6 @@
     "paths": {
       "@/*": [
         "src/*",
-        "src/router/*",
-        "src/controller/*",
-        "src/service/*",
-        "src/repository/*",
-        "src/types/*",
-        "src/database/*",
-        "src/middleware/*",
-        "src/exception/*",
-        "src/config/*",
-        "src/util/*"
       ]
     },
   },
