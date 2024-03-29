@@ -2,11 +2,11 @@
   "extends": "ts-node/node16/tsconfig.json",
   "ts-node": {
     "transpileOnly": true,
-    "files": true,
+    "files": true
   },
   "compilerOptions": {
     /* Base Options: */
-    "target": "es2022",
+    "target": "ES2022",
     "moduleDetection": "force",
     "moduleResolution": "NodeNext",
     "module": "NodeNext",
@@ -14,22 +14,21 @@
     "esModuleInterop": true,
     "isolatedModules": true,
     "resolveJsonModule": true,
-    "lib": ["es2022"],
+    "lib": ["ES2022"],
     "types": ["vitest/globals"],
 
     /* Strictness */
     "strict": true,
     "noUncheckedIndexedAccess": true,
-    
+
     /* Module Resolution Options: */
     "rootDir": "src",
     "outDir": "dist",
-    "baseUrl": ".",
+    "baseUrl": "./",
     "paths": {
-      "@/*": [
-        "src/*",
-      ]
-    },
+      "@/*": ["src/*"]
+    }
   },
-  "exclude": ["node_modules"]
+  "include": ["./src","../vitest.config.ts"],
+  "exclude": ["node_modules", ".vscode-test"]
 }
