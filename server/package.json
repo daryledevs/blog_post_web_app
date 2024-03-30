@@ -78,6 +78,7 @@
     "@types/nodemailer": "^6.4.14",
     "@types/nodemon": "^1.19.6",
     "@types/supertest": "^6.0.2",
+    "@vitest/coverage-v8": "^1.4.0",
     "@vitest/ui": "^1.4.0",
     "esm": "^3.2.25",
     "kysely-codegen": "^0.14.1",
