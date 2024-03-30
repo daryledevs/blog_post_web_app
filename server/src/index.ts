@@ -3,7 +3,7 @@ import morgan           from "morgan";
 import express          from "express";
 import rootPath         from "./config/path";
 import bodyParser       from "body-parser";
-import authRoutes       from "./router/auth.route";
+import authRoutes       from "./router/auth.router";
 import userRoutes       from './router/user.router';
 import chatRoutes       from "./router/chat.router";
 import postRouter       from "./router/post.router";
