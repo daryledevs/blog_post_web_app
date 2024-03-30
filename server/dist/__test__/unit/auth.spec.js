@@ -23,6 +23,6 @@ let user = {
 (0, vitest_1.describe)("UserService", () => {
     (0, vitest_1.test)("should create an instance of UserService", () => {
         const userService = new user_service_impl_js_1.default(new user_repository_impl_js_1.default(), new follow_repository_impl_js_1.default(), new recent_search_repository_impl_js_1.default());
-        (0, vitest_1.expect)(userService).toBeInstanceOf(userService);
+        (0, vitest_1.expect)(userService).toBeInstanceOf(user_service_impl_js_1.default);
     });
 });

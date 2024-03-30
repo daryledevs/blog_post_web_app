@@ -25,6 +25,7 @@ describe("UserService", () => {
       new FollowRepository(),
       new RecentSearchesRepository()
     );
-    expect(userService).toBeInstanceOf(userService);
+    
+    expect(userService).toBeInstanceOf(UsersService);
   });
 });
