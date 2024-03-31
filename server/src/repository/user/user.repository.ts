@@ -9,7 +9,7 @@ interface IUserRepository {
 
   findUserByEmail: (email: string) => Promise<SelectUsers | undefined>;
 
-  findUserByCredentials: (username: string, email: string) =>  Promise<SelectUsers | undefined>;
+  findUserByCredentials: (userCredential: string) =>  Promise<SelectUsers | undefined>;
   
   updateUser: (user_id: number, user: UpdateUsers) => Promise<SelectUsers | undefined>;
 

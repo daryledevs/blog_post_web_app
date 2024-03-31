@@ -29,9 +29,15 @@ class AuthService implements IAuthService {
       const { email, username, password } = data;
       const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 
+      if(!email || !username || !password) throw Exception.badRequest("All fields are required");
+      if(password.length <= 5) throw Exception.badRequest("Password must be at least 6 characters");
+
       // Check to see if the user is already in the database.
-      const user = await this.userRepository.findUserByCredentials(username, email);
-      if (user) throw  Exception.conflict("User already exists");
+      const userByEmail    = await this.userRepository.findUserByEmail(email);
+      const userByUsername = await this.userRepository.findUserByUsername(username);
+
+      if (userByUsername) throw Exception.conflict("Username already exists");
+      if(userByEmail) throw Exception.conflict("Email already exists");
 
       // Save the user to the database
       await this.authRepository.createUser({ ...data, password: hashPassword });
@@ -43,10 +49,7 @@ class AuthService implements IAuthService {
 
   public async login(userCredential: string, password: string): Promise<LoginType> {
     try {
-      const user: any = await this.userRepository.findUserByCredentials(
-        userCredential, // username 
-        userCredential // or email
-      );
+      const user: any = await this.userRepository.findUserByCredentials(userCredential);
 
       if (!user) throw Exception.notFound("User not found");
 

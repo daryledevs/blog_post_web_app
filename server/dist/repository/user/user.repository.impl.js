@@ -66,12 +66,15 @@ class UserRepository {
             throw database_2.default.fromError(error);
         }
     }
-    async findUserByCredentials(username, email) {
+    async findUserByCredentials(userCredential) {
         try {
             return await database_1.default
                 .selectFrom("users")
                 .selectAll()
-                .where((eb) => eb.or([eb("email", "=", email), eb("username", "=", username)]))
+                .where((eb) => eb.or([
+                eb("email", "=", userCredential),
+                eb("username", "=", userCredential),
+            ]))
                 .executeTakeFirst();
         }
         catch (error) {

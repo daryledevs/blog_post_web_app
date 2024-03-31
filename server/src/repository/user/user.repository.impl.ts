@@ -71,13 +71,16 @@ class UserRepository implements IUserRepository {
     }
   }
 
-  async findUserByCredentials(username: string, email: string): Promise<SelectUsers | undefined> {
-    try {
+  async findUserByCredentials(userCredential: string): Promise<SelectUsers | undefined> {
+  try {
       return await db
         .selectFrom("users")
         .selectAll()
         .where((eb) =>
-          eb.or([eb("email", "=", email), eb("username", "=", username)])
+          eb.or([
+            eb("email", "=", userCredential),
+            eb("username", "=", userCredential),
+          ])
         )
         .executeTakeFirst();
     } catch (error) {
