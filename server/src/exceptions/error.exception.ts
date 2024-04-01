@@ -1,5 +1,14 @@
-class ErrorException {
-  constructor(public message: string, public status: number) {
+interface HttpException {
+  status: number;
+  message: string;
+};
+
+class ErrorException extends Error implements HttpException {
+  public status: number;
+  public message: string;
+  
+  constructor(message: string, status: number) {
+    super(message)
     this.status = status;
     this.message = message;
   };

@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-class ErrorException {
-    message;
+;
+class ErrorException extends Error {
     status;
+    message;
     constructor(message, status) {
-        this.message = message;
-        this.status = status;
+        super(message);
         this.status = status;
         this.message = message;
     }
