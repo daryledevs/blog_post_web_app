@@ -46,6 +46,7 @@ app.use(errorHandler);
 
 server.listen(PORT, HOST, () => {
   console.log(`Server listening on ${HOST}:${PORT} in ${app.settings.env}`);
+  socketController()
 });
 
 pool.getConnection((err, connection) => {
