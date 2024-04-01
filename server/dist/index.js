@@ -29,19 +29,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const cors_1 = __importDefault(require("cors"));
 const morgan_1 = __importDefault(require("morgan"));
 const express_1 = __importDefault(require("express"));
-const path_1 = __importDefault(require("./config/path"));
+const path_util_1 = __importDefault(require("./utils/path.util"));
 const body_parser_1 = __importDefault(require("body-parser"));
-const auth_router_1 = __importDefault(require("./router/auth.router"));
-const user_router_1 = __importDefault(require("./router/user.router"));
-const chat_router_1 = __importDefault(require("./router/chat.router"));
-const post_router_1 = __importDefault(require("./router/post.router"));
-const feed_router_1 = __importDefault(require("./router/feed.router"));
+const auth_router_1 = __importDefault(require("./routers/auth.router"));
+const user_router_1 = __importDefault(require("./routers/user.router"));
+const chat_router_1 = __importDefault(require("./routers/chat.router"));
+const post_router_1 = __importDefault(require("./routers/post.router"));
+const feed_router_1 = __importDefault(require("./routers/feed.router"));
 const dotenv = __importStar(require("dotenv"));
-const corsOption_1 = __importDefault(require("./config/corsOption"));
+const cors_option_config_1 = __importDefault(require("./config/cors-option.config"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
-const error_handler_1 = __importDefault(require("./helper/error-handler"));
-const token_handler_1 = __importDefault(require("./middleware/token-handler"));
-const cookie_options_1 = __importDefault(require("./middleware/cookie-options"));
+const error_handler_helper_1 = __importDefault(require("./helpers/error-handler.helper"));
+const token_handler_middleware_1 = __importDefault(require("./middleware/token-handler.middleware"));
+const cookie_options_middleware_1 = __importDefault(require("./middleware/cookie-options.middleware"));
 const socket_1 = __importDefault(require("./socket"));
 const http_1 = require("http");
 dotenv.config();
@@ -53,10 +53,10 @@ const API = process.env.API;
 app.disable("x-powered-by");
 app.use(body_parser_1.default.json());
 app.use((0, cookie_parser_1.default)());
-app.use(cookie_options_1.default);
-app.use((0, cors_1.default)(corsOption_1.default));
-app.use(token_handler_1.default);
-app.set("views", path_1.default); // Set the views directory
+app.use(cookie_options_middleware_1.default);
+app.use((0, cors_1.default)(cors_option_config_1.default));
+app.use(token_handler_middleware_1.default);
+app.set("views", path_util_1.default); // Set the views directory
 app.set('view engine', 'ejs'); // Set EJS as the template engine
 app.use((0, morgan_1.default)("tiny"));
 // Routes
@@ -65,7 +65,7 @@ app.use(`${API}/chats`, chat_router_1.default);
 app.use(`${API}/users`, user_router_1.default);
 app.use(`${API}/posts`, post_router_1.default);
 app.use(`${API}/feeds`, feed_router_1.default);
-app.use(error_handler_1.default);
+app.use(error_handler_helper_1.default);
 server.listen(PORT, HOST, () => {
     (0, socket_1.default)();
     console.log("Connected to", PORT, HOST, "in: ", app.settings.env);
