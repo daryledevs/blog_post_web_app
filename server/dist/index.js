@@ -30,6 +30,7 @@ const cors_1 = __importDefault(require("cors"));
 const morgan_1 = __importDefault(require("morgan"));
 const express_1 = __importDefault(require("express"));
 const path_util_1 = __importDefault(require("./utils/path.util"));
+const db_database_1 = require("./database/db.database");
 const body_parser_1 = __importDefault(require("body-parser"));
 const auth_router_1 = __importDefault(require("./routers/auth.router"));
 const user_router_1 = __importDefault(require("./routers/user.router"));
@@ -42,7 +43,6 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const error_handler_helper_1 = __importDefault(require("./helpers/error-handler.helper"));
 const token_handler_middleware_1 = __importDefault(require("./middleware/token-handler.middleware"));
 const cookie_options_middleware_1 = __importDefault(require("./middleware/cookie-options.middleware"));
-const socket_1 = __importDefault(require("./socket"));
 const http_1 = require("http");
 dotenv.config();
 const app = (0, express_1.default)();
@@ -67,7 +67,11 @@ app.use(`${API}/posts`, post_router_1.default);
 app.use(`${API}/feeds`, feed_router_1.default);
 app.use(error_handler_helper_1.default);
 server.listen(PORT, HOST, () => {
-    (0, socket_1.default)();
-    console.log("Connected to", PORT, HOST, "in: ", app.settings.env);
+    console.log(`Server listening on ${HOST}:${PORT} in ${app.settings.env}`);
+});
+db_database_1.pool.getConnection((err, connection) => {
+    if (err)
+        return console.error("error connecting: " + err.stack);
+    console.log("Database connection ready!");
 });
 exports.default = server;

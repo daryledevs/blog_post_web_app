@@ -2,6 +2,7 @@ import cors             from "cors";
 import morgan           from "morgan";
 import express          from "express";
 import rootPath         from "./utils/path.util";
+import { pool }         from "./database/db.database";
 import bodyParser       from "body-parser";
 import authRoutes       from "./routers/auth.router";
 import userRoutes       from './routers/user.router';
@@ -44,8 +45,12 @@ app.use(`${API}/feeds`, feedRouter);
 app.use(errorHandler);
 
 server.listen(PORT, HOST, () => {
-  socketController();
-  console.log("Connected to", PORT, HOST, "in: ", app.settings.env);
+  console.log(`Server listening on ${HOST}:${PORT} in ${app.settings.env}`);
+});
+
+pool.getConnection((err, connection) => {
+  if (err) return console.error("error connecting: " + err.stack);
+  console.log("Database connection ready!")
 });
 
 export default server;
