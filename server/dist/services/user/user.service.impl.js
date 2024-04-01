@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const error_exception_1 = __importDefault(require("@/exceptions/error.exception"));
-class UsersService {
+class UserService {
     userRepository;
     followRepository;
     recentSearchRepository;
@@ -14,18 +14,31 @@ class UsersService {
         this.recentSearchRepository = recentSearchRepository;
     }
     ;
-    async getUserById(id, person) {
+    async getUserById(id) {
         try {
-            let data;
             // If no parameters are provided, return an error
-            if (!id && !person)
+            if (!id)
                 throw error_exception_1.default.badRequest("No parameters provided");
-            // If the person is provided, search the user by username
-            if (person)
-                data = await this.userRepository.findUserByUsername(person);
-            // If the user_id is provided, search the user by user_id
-            if (!person && id)
-                data = await this.userRepository.findUserById(id);
+            // search the user by user_id
+            const data = await this.userRepository.findUserById(id);
+            // If the user is not found, return an error
+            if (!data)
+                throw error_exception_1.default.notFound("User not found");
+            return data;
+        }
+        catch (error) {
+            throw error;
+        }
+        ;
+    }
+    ;
+    async getUserByUsername(username) {
+        try {
+            // If no parameters are provided, return an error
+            if (!username)
+                throw error_exception_1.default.badRequest("No parameters provided");
+            // search the user by username
+            const data = await this.userRepository.findUserByUsername(username);
             // If the user is not found, return an error
             if (!data)
                 throw error_exception_1.default.notFound("User not found");
@@ -39,7 +52,15 @@ class UsersService {
     ;
     async getUserByEmail(email) {
         try {
-            return await this.userRepository.findUserByEmail(email);
+            // If no parameters are provided, return an error
+            if (!email)
+                throw error_exception_1.default.badRequest("No parameters provided");
+            // search the user by email
+            const data = await this.userRepository.findUserByEmail(email);
+            // If the user is not found, return an error
+            if (!data)
+                throw error_exception_1.default.notFound("User not found");
+            return data;
         }
         catch (error) {
             throw error;
@@ -49,6 +70,14 @@ class UsersService {
     ;
     async updateUser(id, user) {
         try {
+            // If no parameters are provided, return an error
+            if (!id)
+                throw error_exception_1.default.badRequest("No parameters provided");
+            // search the user by email
+            const data = await this.userRepository.findUserById(id);
+            // If the user is not found, return an error
+            if (!data)
+                throw error_exception_1.default.notFound("User not found");
             return await this.userRepository.updateUser(id, user);
         }
         catch (error) {
@@ -57,8 +86,16 @@ class UsersService {
         ;
     }
     ;
-    async deleteUser(id) {
+    async deleteUserById(id) {
         try {
+            // If no parameters are provided, return an error
+            if (!id)
+                throw error_exception_1.default.badRequest("No parameters provided");
+            // search the user by email
+            const data = await this.userRepository.findUserById(id);
+            // If the user is not found, return an error
+            if (!data)
+                throw error_exception_1.default.notFound("User not found");
             return await this.userRepository.deleteUser(id);
         }
         catch (error) {
@@ -164,4 +201,4 @@ class UsersService {
     ;
 }
 ;
-exports.default = UsersService;
+exports.default = UserService;

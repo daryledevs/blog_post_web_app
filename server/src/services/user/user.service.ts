@@ -3,7 +3,9 @@ import { FollowStatsType }                          from "@/repositories/follow/
 import { SelectSearches, SelectUsers, UpdateUsers } from "@/types/table.types";
 
 interface IUserService {
-  getUserById(id: string, person: string): Promise<SelectUsers>;
+  getUserById(id: number): Promise<SelectUsers | undefined>;
+
+  getUserByUsername(person: string): Promise<SelectUsers | undefined>;
 
   getUserByEmail(email: string): Promise<SelectUsers | undefined>;
   
@@ -11,7 +13,7 @@ interface IUserService {
 
   updateUser(id: number, user: UpdateUsers): Promise<UpdateUsers | undefined>;
 
-  deleteUser(id: number): Promise<string | undefined>;
+  deleteUserById(id: number): Promise<string | undefined>;
 
   getAllRecentSearches(user_id: any): Promise<SelectSearches[] | undefined>;
 

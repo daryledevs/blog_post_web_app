@@ -1,4 +1,4 @@
-import IUsersService                         from "./user.service";
+import IUserService                         from "./user.service";
 import ErrorException                        from "@/exceptions/error.exception";
 import UserRepository                        from "@/repositories/user/user.repository.impl";
 import FollowRepository                      from "@/repositories/follow/follow.repository.impl";
@@ -6,7 +6,7 @@ import { FollowStatsType }                   from "@/repositories/follow/follow.
 import RecentSearchRepository                from "@/repositories/recent search/recent-search.repository.impl";
 import { SelectSearches, SelectUsers }       from "@/types/table.types";
 
-class UsersService implements IUsersService {
+class UserService implements IUserService {
   private userRepository: UserRepository;
   private followRepository: FollowRepository;
   private recentSearchRepository: RecentSearchRepository;
@@ -21,19 +21,29 @@ class UsersService implements IUsersService {
     this.recentSearchRepository = recentSearchRepository;
   };
 
-  public async getUserById(id: string, person: string): Promise<SelectUsers> {
+  public async getUserById(id: number): Promise<SelectUsers | undefined> {
     try {
-      let data: SelectUsers | undefined;
-
       // If no parameters are provided, return an error
-      if (!id && !person) throw ErrorException.badRequest("No parameters provided");
+      if (!id) throw ErrorException.badRequest("No parameters provided");
+      
+      // search the user by user_id
+      const data = await this.userRepository.findUserById(id as any);
 
-      // If the person is provided, search the user by username
-      if (person)
-        data = await this.userRepository.findUserByUsername(person as string);
+      // If the user is not found, return an error
+      if (!data) throw ErrorException.notFound("User not found");
+      return data;
+    } catch (error) {
+      throw error;
+    };
+  };
 
-      // If the user_id is provided, search the user by user_id
-      if (!person && id) data = await this.userRepository.findUserById(id as any);
+  public async getUserByUsername(username: string): Promise<SelectUsers | undefined> {
+    try {
+      // If no parameters are provided, return an error
+      if (!username) throw ErrorException.badRequest("No parameters provided");
+
+      // search the user by username
+      const data = await this.userRepository.findUserByUsername(username);
 
       // If the user is not found, return an error
       if (!data) throw ErrorException.notFound("User not found");
@@ -46,7 +56,16 @@ class UsersService implements IUsersService {
 
   public async getUserByEmail(email: string): Promise<SelectUsers | undefined> {
     try {
-      return await this.userRepository.findUserByEmail(email);
+      // If no parameters are provided, return an error
+      if (!email) throw ErrorException.badRequest("No parameters provided");
+
+      // search the user by email
+      const data = await this.userRepository.findUserByEmail(email);
+
+      // If the user is not found, return an error
+      if (!data) throw ErrorException.notFound("User not found");
+
+      return data;
     } catch (error) {
       throw error;
     };
@@ -54,14 +73,32 @@ class UsersService implements IUsersService {
 
   public async updateUser(id: number, user: any): Promise<any> {
     try {
+      // If no parameters are provided, return an error
+      if (!id) throw ErrorException.badRequest("No parameters provided");
+
+      // search the user by email
+      const data = await this.userRepository.findUserById(id);
+
+      // If the user is not found, return an error
+      if (!data) throw ErrorException.notFound("User not found");
+
       return await this.userRepository.updateUser(id, user);
     } catch (error) {
       throw error;
     };
   };
 
-  public async deleteUser(id: number): Promise<string | undefined> {
+  public async deleteUserById(id: number): Promise<string | undefined> {
     try {
+      // If no parameters are provided, return an error
+      if (!id) throw ErrorException.badRequest("No parameters provided");
+
+      // search the user by email
+      const data = await this.userRepository.findUserById(id);
+
+      // If the user is not found, return an error
+      if (!data) throw ErrorException.notFound("User not found");
+
       return await this.userRepository.deleteUser(id);
     } catch (error) {
       throw error;
@@ -154,4 +191,4 @@ class UsersService implements IUsersService {
   };
 };
 
-export default UsersService;
+export default UserService;

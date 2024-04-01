@@ -8,9 +8,16 @@ class UsersController {
     ;
     getUserData = async (req, res, next) => {
         try {
+            let user;
             const user_id = req.body.user_id;
             const person = req.query.person || "";
-            const user = await this.userService.getUserById(user_id, person);
+            if (person) {
+                user = await this.userService.getUserByUsername(person);
+            }
+            else {
+                user = await this.userService.getUserById(user_id);
+            }
+            ;
             res.status(200).send(user);
         }
         catch (error) {
@@ -32,7 +39,7 @@ class UsersController {
     deleteUser = async (req, res, next) => {
         try {
             const user_id = req.params.user_id;
-            const message = await this.userService.deleteUser(user_id);
+            const message = await this.userService.deleteUserById(user_id);
             res.status(200).send(message);
         }
         catch (error) {

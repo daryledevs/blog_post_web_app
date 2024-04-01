@@ -1,4 +1,5 @@
 import UsersService                        from "@/services/user/user.service.impl";
+import { SelectUsers } from "@/types/table.types";
 import { NextFunction, Request, Response } from "express";
 
 class UsersController {
@@ -10,12 +11,16 @@ class UsersController {
 
   public getUserData = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      let user: SelectUsers | undefined;
       const user_id = req.body.user_id;
       const person = req.query.person || "";
-      const user = await this.userService.getUserById(
-        user_id,
-        person as string
-      );
+
+      if (person) {
+        user = await this.userService.getUserByUsername(person as string);
+      } else {
+        user = await this.userService.getUserById(user_id);
+      };
+
       res.status(200).send(user);
     } catch (error) {
       next(error);
@@ -35,7 +40,7 @@ class UsersController {
   public deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user_id: any = req.params.user_id;
-      const message = await this.userService.deleteUser(user_id);
+      const message = await this.userService.deleteUserById(user_id);
       res.status(200).send(message);
     } catch (error) {
       next(error);
