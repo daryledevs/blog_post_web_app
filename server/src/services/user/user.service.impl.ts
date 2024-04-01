@@ -3,7 +3,7 @@ import ErrorException                        from "@/exceptions/error.exception"
 import UserRepository                        from "@/repositories/user/user.repository.impl";
 import FollowRepository                      from "@/repositories/follow/follow.repository.impl";
 import { FollowStatsType }                   from "@/repositories/follow/follow.repository";
-import RecentSearchRepository                from "@/repositories/recent search/recent-search.repository.impl";
+import RecentSearchRepository                from "@/repositories/recent-search/recent-search.repository.impl";
 import { SelectSearches, SelectUsers }       from "@/types/table.types";
 
 class UserService implements IUserService {

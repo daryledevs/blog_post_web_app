@@ -8,7 +8,7 @@ const user_service_impl_1 = __importDefault(require("@/services/user/user.servic
 const user_repository_impl_1 = __importDefault(require("@/repositories/user/user.repository.impl"));
 const user_controller_1 = __importDefault(require("@/controllers/user.controller"));
 const follow_repository_impl_1 = __importDefault(require("@/repositories/follow/follow.repository.impl"));
-const recent_search_repository_impl_1 = __importDefault(require("@/repositories/recent search/recent-search.repository.impl"));
+const recent_search_repository_impl_1 = __importDefault(require("@/repositories/recent-search/recent-search.repository.impl"));
 const router = express_1.default.Router();
 const controller = new user_controller_1.default(new user_service_impl_1.default(new user_repository_impl_1.default(), new follow_repository_impl_1.default(), new recent_search_repository_impl_1.default()));
 router.get("/", controller.getUserData);

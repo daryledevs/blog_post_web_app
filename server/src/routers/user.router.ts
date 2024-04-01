@@ -3,7 +3,7 @@ import UsersService             from "@/services/user/user.service.impl";
 import UserRepository           from "@/repositories/user/user.repository.impl";
 import UsersController          from "@/controllers/user.controller";
 import FollowRepository         from "@/repositories/follow/follow.repository.impl";
-import RecentSearchesRepository from "@/repositories/recent search/recent-search.repository.impl";
+import RecentSearchesRepository from "@/repositories/recent-search/recent-search.repository.impl";
 
 const router = express.Router();
 

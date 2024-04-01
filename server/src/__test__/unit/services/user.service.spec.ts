@@ -2,7 +2,7 @@ import UserService                                           from "@/services/us
 import ErrorException                                        from "@/exceptions/error.exception";
 import UserRepository                                        from "@/repositories/user/user.repository.impl";
 import FollowRepository                                      from "@/repositories/follow/follow.repository.impl";
-import RecentSearchesRepository                              from "@/repositories/recent search/recent-search.repository.impl";
+import RecentSearchesRepository                              from "@/repositories/recent-search/recent-search.repository.impl";
 import { createUserList, createUser }                        from "@/__mock__/user/user.mock";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 
@@ -50,7 +50,7 @@ vi.mock("@/repositories/follow/follow.repository.impl", async (importOriginal) =
 });
 
 vi.mock("@/repositories/recent search/recent-search.repository.impl", async (importOriginal) => {
-  const original = await importOriginal<typeof import("@/repositories/recent search/recent-search.repository.impl")>();
+  const original = await importOriginal<typeof import("@/repositories/recent-search/recent-search.repository.impl")>();
   return {
     ...original,
     default: vi.fn().mockImplementation(() => ({
