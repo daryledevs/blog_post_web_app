@@ -6,9 +6,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const db_database_1 = __importDefault(require("@/database/db.database"));
 const database_exception_1 = __importDefault(require("@/exceptions/database.exception"));
 class ChatsRepository {
+    database;
+    constructor() { this.database = db_database_1.default; }
+    ;
     async getUserConversationHistoryByUserId(user_id, conversations) {
         try {
-            return await db_database_1.default
+            return await this.database
                 .selectFrom("conversations")
                 .select([
                 "conversations.conversation_id",
@@ -41,7 +44,7 @@ class ChatsRepository {
     ;
     async findConversationByConversationId(conversation_id) {
         try {
-            return await db_database_1.default
+            return await this.database
                 .selectFrom("conversations")
                 .selectAll()
                 .where("conversation_id", "=", conversation_id)
@@ -54,7 +57,7 @@ class ChatsRepository {
     ;
     async findConversationByUserId(user_id) {
         try {
-            return await db_database_1.default
+            return await this.database
                 .selectFrom("conversations")
                 .select([
                 "conversations.conversation_id",
@@ -77,7 +80,7 @@ class ChatsRepository {
     ;
     async getMessagesByConversationId(conversation_id, ids) {
         try {
-            return await db_database_1.default
+            return await this.database
                 .selectFrom("messages")
                 .selectAll()
                 .where((eb) => eb.and([
@@ -95,7 +98,7 @@ class ChatsRepository {
     ;
     async saveNewConversation(conversation) {
         try {
-            const { insertId } = await db_database_1.default
+            const { insertId } = await this.database
                 .insertInto("conversations")
                 .values(conversation)
                 .executeTakeFirst();
@@ -109,7 +112,7 @@ class ChatsRepository {
     ;
     async saveNewMessage(message) {
         try {
-            await db_database_1.default
+            await this.database
                 .insertInto("messages")
                 .values(message)
                 .executeTakeFirst();
@@ -123,7 +126,7 @@ class ChatsRepository {
     ;
     async deleteConversation(conversation_id) {
         try {
-            await db_database_1.default
+            await this.database
                 .deleteFrom("conversations")
                 .where("conversation_id", "=", conversation_id)
                 .execute();

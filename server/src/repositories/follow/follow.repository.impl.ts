@@ -1,19 +1,25 @@
 import db                                     from "@/database/db.database";
+import { DB }                                 from "@/types/schema.types";
+import { Kysely }                             from "kysely";
 import DatabaseException                      from "@/exceptions/database.exception";
 import { NewFollowers, SelectFollowers }      from "@/types/table.types";
 import IFollowRepository, { FollowStatsType } from "./follow.repository";
 
 class FollowRepository implements IFollowRepository {
+  private database: Kysely<DB>;
+
+  constructor() { this.database = db; };
+
   async getFollowStats(user_id: number): Promise<FollowStatsType> {
     try {
-      const queryFollowers = db
+      const queryFollowers = this.database
         .selectFrom("followers")
         .innerJoin("users", "followers.followed_id", "users.user_id")
         .select((eb) => [eb.fn.count<number>("followed_id").as("followers")])
         .where("followers.followed_id", "=", user_id)
         .groupBy("followers.followed_id");
 
-      const queryFollowing = db
+      const queryFollowing = this.database
         .selectFrom("followers")
         .innerJoin("users", "followers.follower_id", "users.user_id")
         .select((eb) =>
@@ -22,7 +28,7 @@ class FollowRepository implements IFollowRepository {
         .where("followers.follower_id", "=", user_id)
         .groupBy("followers.follower_id");
 
-      const { followers, following } = await db
+      const { followers, following } = await this.database
         .selectNoFrom((eb) => [
           eb.fn.coalesce(queryFollowers, eb.lit(0)).as("followers"),
           eb.fn.coalesce(queryFollowing, eb.lit(0)).as("following"),
@@ -37,7 +43,7 @@ class FollowRepository implements IFollowRepository {
 
   async getFollowersLists(user_id: number, listsId: number[]): Promise<any> {
     try {
-      const result = await db
+      const result = await this.database
         .selectFrom("followers")
         .innerJoin("users", "followers.follower_id", "users.user_id")
         .where((eb) =>
@@ -58,7 +64,7 @@ class FollowRepository implements IFollowRepository {
 
   async getFollowingLists(user_id: number, listsId: number[]): Promise<any> {
     try {
-      const result = await db
+      const result = await this.database
         .selectFrom("followers")
         .innerJoin("users", "followers.followed_id", "users.user_id")
         .where((eb) =>
@@ -79,7 +85,7 @@ class FollowRepository implements IFollowRepository {
 
   async isFollowUser(identifier: SelectFollowers): Promise<boolean> {
     try {
-      const result = await db
+      const result = await this.database
         .selectFrom("followers")
         .selectAll()
         .where((eb) =>
@@ -97,14 +103,14 @@ class FollowRepository implements IFollowRepository {
   }
 
   async followUser(identifier: NewFollowers): Promise<string | undefined> {
-    await db.insertInto("followers").values(identifier).execute();
+    await this.database.insertInto("followers").values(identifier).execute();
 
     return "User followed successfully";
   }
 
   async unfollowUser(identifier: SelectFollowers): Promise<string | undefined> {
     try {
-      await db
+      await this.database
         .deleteFrom("followers")
         .where((eb) =>
           eb.and([

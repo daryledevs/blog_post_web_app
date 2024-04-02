@@ -1,13 +1,18 @@
 import db                           from "@/database/db.database";
-import { sql }                      from "kysely";
+import { DB }                       from "@/types/schema.types";
+import { Kysely, sql }              from "kysely";
 import IUserRepository              from "./user.repository";
 import DatabaseException            from "@/exceptions/database.exception";
 import { SelectUsers, UpdateUsers } from "@/types/table.types";
 
 class UserRepository implements IUserRepository {
+  private database: Kysely<DB>;
+
+  constructor() { this.database = db; };
+
   async findUserById(user_id: number): Promise<SelectUsers | undefined> {
     try {
-      const result = await db
+      const result = await this.database
         .selectFrom("users")
         .where("user_id", "=", user_id)
         .selectAll()
@@ -21,7 +26,7 @@ class UserRepository implements IUserRepository {
 
   async findUserByUsername(username: string): Promise<SelectUsers | undefined> {
     try {
-      return await db
+      return await this.database
         .selectFrom("users")
         .where("username", "like", username + "%")
         .selectAll()
@@ -33,7 +38,7 @@ class UserRepository implements IUserRepository {
 
   async searchUsersByQuery(search: string): Promise<SelectUsers[] | undefined> {
     try {
-      return await db
+      return await this.database
         .selectFrom("users")
         .where((eb) =>
           eb.or([
@@ -61,7 +66,7 @@ class UserRepository implements IUserRepository {
 
   async findUserByEmail(email: string): Promise<SelectUsers | undefined> {
     try {
-      return await db
+      return await this.database
         .selectFrom("users")
         .where("email", "=", email)
         .selectAll()
@@ -73,7 +78,7 @@ class UserRepository implements IUserRepository {
 
   async findUserByCredentials(userCredential: string): Promise<SelectUsers | undefined> {
   try {
-      return await db
+      return await this.database
         .selectFrom("users")
         .selectAll()
         .where((eb) =>
@@ -90,7 +95,7 @@ class UserRepository implements IUserRepository {
 
   async updateUser(user_id: number, user: UpdateUsers): Promise<SelectUsers | undefined> {
     try {
-      await db
+      await this.database
         .updateTable("users")
         .set(user)
         .where("user_id", "=", user_id)
@@ -104,7 +109,10 @@ class UserRepository implements IUserRepository {
 
   async deleteUser(user_id: number): Promise<string | undefined> {
     try {
-      await db.deleteFrom("users").where("user_id", "=", user_id).execute();
+      await this.database
+        .deleteFrom("users")
+        .where("user_id", "=", user_id)
+        .execute();
 
       return "User deleted successfully";
     } catch (error) {

@@ -4,13 +4,19 @@ import {
   SelectMessages,
 }                                                                from "@/types/table.types";
 import db                                                        from "@/database/db.database";
+import { DB }                                                    from "@/types/schema.types";
+import { Kysely }                                                from "kysely";
 import DatabaseException                                         from "@/exceptions/database.exception";
 import IChatRepository, { ChatHistoryByIdType, MessageDataType } from "./chat.repository";
 
 class ChatsRepository implements IChatRepository {
+  private database: Kysely<DB>;
+
+  constructor() { this.database = db; };
+
   async getUserConversationHistoryByUserId(user_id: number, conversations: number[]): Promise<ChatHistoryByIdType[]> {
     try {
-      return await db
+      return await this.database
         .selectFrom("conversations")
         .select([
           "conversations.conversation_id",
@@ -49,7 +55,7 @@ class ChatsRepository implements IChatRepository {
 
   async findConversationByConversationId(conversation_id: number): Promise<SelectConversations | undefined> {
     try {
-      return await db
+      return await this.database
         .selectFrom("conversations")
         .selectAll()
         .where("conversation_id", "=", conversation_id)
@@ -61,7 +67,7 @@ class ChatsRepository implements IChatRepository {
 
   async findConversationByUserId(user_id: number[]): Promise<SelectConversations | undefined> {
     try {
-      return await db
+      return await this.database
         .selectFrom("conversations")
         .select([
           "conversations.conversation_id",
@@ -84,7 +90,7 @@ class ChatsRepository implements IChatRepository {
 
   async getMessagesByConversationId(conversation_id: number, ids: number[] | number): Promise<SelectMessages[]> {
     try {
-      return await db
+      return await this.database
         .selectFrom("messages")
         .selectAll()
         .where((eb) => eb.and([
@@ -100,7 +106,7 @@ class ChatsRepository implements IChatRepository {
 
   async saveNewConversation(conversation: NewConversations): Promise<bigint | undefined> {
     try {
-      const { insertId } = await db
+      const { insertId } = await this.database
         .insertInto("conversations")
         .values(conversation)
         .executeTakeFirst();
@@ -113,7 +119,7 @@ class ChatsRepository implements IChatRepository {
 
   async saveNewMessage(message: MessageDataType): Promise<string> {
     try {
-      await db
+      await this.database
         .insertInto("messages")
         .values(message)
         .executeTakeFirst();
@@ -126,7 +132,7 @@ class ChatsRepository implements IChatRepository {
 
   async deleteConversation(conversation_id: number): Promise<string> {
     try {
-      await db
+      await this.database
         .deleteFrom("conversations")
         .where("conversation_id", "=", conversation_id)
         .execute();

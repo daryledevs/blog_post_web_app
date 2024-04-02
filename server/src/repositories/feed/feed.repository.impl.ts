@@ -1,18 +1,25 @@
 import db                from "@/database/db.database";
-import { sql }           from "kysely";
+import { DB }            from "@/types/schema.types";
+import { Kysely, sql }   from "kysely";
 import { SelectPosts }   from "@/types/table.types";
 import IFeedRepository   from "./feed.repository";
 import DatabaseException from "@/exceptions/database.exception";
 
 class FeedRepository implements IFeedRepository {
+  private database: Kysely<DB>;
+
+  constructor() { this.database = db; };
+
   async getTotalFeed(): Promise<number> {
     try {
-      const query = db
+      const query = this.database
         .selectFrom("posts")
         .select((eb) => eb.fn.countAll<number>().as("count"))
-        .where((eb) => eb("post_date", ">", sql<Date>`DATE_SUB(CURDATE(), INTERVAL 3 DAY)`));
+        .where((eb) =>
+          eb("post_date", ">", sql<Date>`DATE_SUB(CURDATE(), INTERVAL 3 DAY)`)
+        );
 
-      const { count } = await db
+      const { count } = await this.database
         .selectNoFrom((eb) => [eb.fn.coalesce(query, eb.lit(0)).as("count")])
         .executeTakeFirstOrThrow();
 
@@ -24,7 +31,7 @@ class FeedRepository implements IFeedRepository {
 
   async getUserFeed(user_id: number, post_ids: number[]): Promise<SelectPosts[]> {
     try {
-      return await db
+      return await this.database
         .selectFrom("followers")
         .innerJoin("posts", "followers.followed_id", "posts.user_id")
         .innerJoin("users", "users.user_id", "posts.user_id")
@@ -62,7 +69,7 @@ class FeedRepository implements IFeedRepository {
   };
 
   async getExploreFeed(user_id: number): Promise<SelectPosts[]> {
-    return await db
+    return await this.database
       .selectFrom("posts")
       .innerJoin("users", "users.user_id", "posts.user_id")
       .leftJoin("followers", (join) =>

@@ -6,9 +6,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const db_database_1 = __importDefault(require("@/database/db.database"));
 const database_exception_1 = __importDefault(require("@/exceptions/database.exception"));
 class RecentSearchesRepository {
+    database;
+    constructor() { this.database = db_database_1.default; }
+    ;
     async findUsersSearchByRecentId(recent_id) {
         try {
-            return await db_database_1.default
+            return await this.database
                 .selectFrom("recent_searches")
                 .selectAll()
                 .where("recent_id", "=", recent_id)
@@ -22,7 +25,7 @@ class RecentSearchesRepository {
     ;
     async findUsersSearchByUserId(user_id, search_user_id) {
         try {
-            return await db_database_1.default
+            return await this.database
                 .selectFrom("recent_searches")
                 .selectAll()
                 .where((eb) => eb.and([
@@ -39,7 +42,7 @@ class RecentSearchesRepository {
     ;
     async getRecentSearches(user_id) {
         try {
-            return await db_database_1.default
+            return await this.database
                 .selectFrom("recent_searches")
                 .innerJoin("users", "users.user_id", "recent_searches.search_user_id")
                 .where("recent_searches.user_id", "=", user_id)
@@ -55,7 +58,7 @@ class RecentSearchesRepository {
     ;
     async saveRecentSearches(user_id, search_user_id) {
         try {
-            await db_database_1.default
+            await this.database
                 .insertInto("recent_searches")
                 .values({ user_id, search_user_id })
                 .execute();
@@ -69,7 +72,7 @@ class RecentSearchesRepository {
     ;
     async deleteRecentSearches(recent_id) {
         try {
-            await db_database_1.default
+            await this.database
                 .deleteFrom("recent_searches")
                 .where("recent_id", "=", recent_id)
                 .execute();

@@ -7,13 +7,16 @@ const db_database_1 = __importDefault(require("@/database/db.database"));
 const kysely_1 = require("kysely");
 const database_exception_1 = __importDefault(require("@/exceptions/database.exception"));
 class FeedRepository {
+    database;
+    constructor() { this.database = db_database_1.default; }
+    ;
     async getTotalFeed() {
         try {
-            const query = db_database_1.default
+            const query = this.database
                 .selectFrom("posts")
                 .select((eb) => eb.fn.countAll().as("count"))
                 .where((eb) => eb("post_date", ">", (0, kysely_1.sql) `DATE_SUB(CURDATE(), INTERVAL 3 DAY)`));
-            const { count } = await db_database_1.default
+            const { count } = await this.database
                 .selectNoFrom((eb) => [eb.fn.coalesce(query, eb.lit(0)).as("count")])
                 .executeTakeFirstOrThrow();
             return count;
@@ -25,7 +28,7 @@ class FeedRepository {
     ;
     async getUserFeed(user_id, post_ids) {
         try {
-            return await db_database_1.default
+            return await this.database
                 .selectFrom("followers")
                 .innerJoin("posts", "followers.followed_id", "posts.user_id")
                 .innerJoin("users", "users.user_id", "posts.user_id")
@@ -62,7 +65,7 @@ class FeedRepository {
     }
     ;
     async getExploreFeed(user_id) {
-        return await db_database_1.default
+        return await this.database
             .selectFrom("posts")
             .innerJoin("users", "users.user_id", "posts.user_id")
             .leftJoin("followers", (join) => join.on((eb) => eb.and([

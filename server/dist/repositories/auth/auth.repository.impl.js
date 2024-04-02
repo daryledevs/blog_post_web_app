@@ -7,12 +7,16 @@ const db_database_1 = __importDefault(require("@/database/db.database"));
 const user_repository_impl_1 = __importDefault(require("../user/user.repository.impl"));
 const database_exception_1 = __importDefault(require("@/exceptions/database.exception"));
 class AuthRepository {
+    database;
     userRepository;
-    constructor() { this.userRepository = new user_repository_impl_1.default(); }
+    constructor() {
+        this.database = db_database_1.default;
+        this.userRepository = new user_repository_impl_1.default();
+    }
     ;
     async createUser(user) {
         try {
-            const { insertId } = await db_database_1.default
+            const { insertId } = await this.database
                 .insertInto("users")
                 .values(user)
                 .executeTakeFirstOrThrow();
@@ -24,7 +28,7 @@ class AuthRepository {
     }
     async findResetTokenById(token_id) {
         try {
-            return await db_database_1.default
+            return await this.database
                 .selectFrom("reset_password_token")
                 .selectAll()
                 .where("token_id", "=", token_id)
@@ -36,7 +40,7 @@ class AuthRepository {
     }
     async saveResetToken(token) {
         try {
-            await db_database_1.default.insertInto("reset_password_token").values(token).execute();
+            await this.database.insertInto("reset_password_token").values(token).execute();
             return "Reset token is saved successfully";
         }
         catch (error) {
@@ -45,7 +49,7 @@ class AuthRepository {
     }
     async deleteResetToken(token_id) {
         try {
-            await db_database_1.default
+            await this.database
                 .deleteFrom("reset_password_token")
                 .where("token_id", "=", token_id)
                 .execute();

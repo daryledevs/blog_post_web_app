@@ -5,15 +5,21 @@ import {
   UpdatePosts,
 }                        from "@/types/table.types";
 import db                from "@/database/db.database";
+import { DB }            from "@/types/schema.types";
+import { Kysely }        from "kysely";
 import Exception         from "@/exceptions/error.exception";
 import cloudinary        from "cloudinary";
 import IPostRepository   from "./post.repository";
 import DatabaseException from "@/exceptions/database.exception";
 
 class PostRepository implements IPostRepository {
+  private database: Kysely<DB>;
+
+  constructor() { this.database = db; };
+  
   async findPostsByPostId (post_id: number): Promise<SelectPosts | undefined>{
     try {
-      return db
+      return this.database
         .selectFrom("posts")
         .selectAll()
         .where("posts.post_id", "=", post_id)
@@ -25,7 +31,7 @@ class PostRepository implements IPostRepository {
 
   async getUserPosts(user_id: number): Promise<SelectPosts[]> {
     try {
-      return await db
+      return await this.database
         .selectFrom("posts")
         .innerJoin("users", "posts.user_id", "users.user_id")
         .leftJoin("likes", "posts.post_id", "likes.post_id")
@@ -53,12 +59,12 @@ class PostRepository implements IPostRepository {
 
   async getUserTotalPosts(user_id: number): Promise<string | number | bigint> {
     try {
-      const query = db
+      const query = this.database
         .selectFrom("posts")
         .select((eb) => eb.fn.count<number>("posts.post_id").as("count"))
         .where("user_id", "=", user_id);
 
-      const { count } = await db
+      const { count } = await this.database
         .selectNoFrom((eb) => eb.fn.coalesce(query, eb.lit(0)).as("count"))
         .executeTakeFirstOrThrow();
 
@@ -70,7 +76,7 @@ class PostRepository implements IPostRepository {
 
   async newPost(post: NewPosts): Promise<string> {
     try {
-      await db
+      await this.database
         .insertInto("posts")
         .values(post)
         .execute();
@@ -82,7 +88,7 @@ class PostRepository implements IPostRepository {
 
   async editPost(post_id: number, post: UpdatePosts): Promise<string> {
     try {
-      await db
+      await this.database
         .updateTable("posts")
         .set(post)
         .where("post_id", "=", post_id)
@@ -96,7 +102,7 @@ class PostRepository implements IPostRepository {
 
   async deletePost(post_id: number): Promise<string> {
     try {
-      const { image_id } = await db
+      const { image_id } = await this.database
         .selectFrom("posts")
         .select(["image_id"])
         .where("post_id", "=", post_id)
@@ -105,7 +111,7 @@ class PostRepository implements IPostRepository {
       const status = await cloudinary.v2.uploader.destroy(image_id);
       if(status.result !== "ok") throw Exception.badRequest("Delete image failed");
 
-      await db
+      await this.database
         .deleteFrom("posts")
         .where("post_id", "=", post_id)
         .executeTakeFirst();
@@ -118,12 +124,12 @@ class PostRepository implements IPostRepository {
 
   async getLikesCountForPost(post_id:number): Promise<number> {
     try {
-      const query = db
+      const query = this.database
         .selectFrom("likes")
         .select((eb) => eb.fn.count<number>("likes.post_id").as("count"))
         .where("likes.post_id", "=", post_id);
 
-      const { count } = await db
+      const { count } = await this.database
         .selectNoFrom((eb) => eb.fn.coalesce(query, eb.lit(0)).as("count"))
         .executeTakeFirstOrThrow();
 
@@ -135,7 +141,7 @@ class PostRepository implements IPostRepository {
 
   async isUserLikePost(like: SelectLikes): Promise<SelectLikes | undefined> {
     try {
-      return await db
+      return await this.database
         .selectFrom("likes")
         .selectAll()
         .where((eb) => eb.and([
@@ -150,7 +156,7 @@ class PostRepository implements IPostRepository {
 
   async toggleUserLikeForPost(like: SelectLikes): Promise<string> {
     try {
-      await db
+      await this.database
       .insertInto("likes")
       .values(like)
       .execute();
@@ -163,7 +169,7 @@ class PostRepository implements IPostRepository {
 
   async removeUserLikeForPost(like: SelectLikes): Promise<string> {
     try {
-      await db
+      await this.database
       .deleteFrom("likes")
       .where((eb) => eb.and([
         eb("likes.post_id", "=", like.post_id),

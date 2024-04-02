@@ -7,9 +7,12 @@ const db_database_1 = __importDefault(require("@/database/db.database"));
 const kysely_1 = require("kysely");
 const database_exception_1 = __importDefault(require("@/exceptions/database.exception"));
 class UserRepository {
+    database;
+    constructor() { this.database = db_database_1.default; }
+    ;
     async findUserById(user_id) {
         try {
-            const result = await db_database_1.default
+            const result = await this.database
                 .selectFrom("users")
                 .where("user_id", "=", user_id)
                 .selectAll()
@@ -22,7 +25,7 @@ class UserRepository {
     }
     async findUserByUsername(username) {
         try {
-            return await db_database_1.default
+            return await this.database
                 .selectFrom("users")
                 .where("username", "like", username + "%")
                 .selectAll()
@@ -34,7 +37,7 @@ class UserRepository {
     }
     async searchUsersByQuery(search) {
         try {
-            return await db_database_1.default
+            return await this.database
                 .selectFrom("users")
                 .where((eb) => eb.or([
                 eb("username", "=", search + "%"),
@@ -56,7 +59,7 @@ class UserRepository {
     }
     async findUserByEmail(email) {
         try {
-            return await db_database_1.default
+            return await this.database
                 .selectFrom("users")
                 .where("email", "=", email)
                 .selectAll()
@@ -68,7 +71,7 @@ class UserRepository {
     }
     async findUserByCredentials(userCredential) {
         try {
-            return await db_database_1.default
+            return await this.database
                 .selectFrom("users")
                 .selectAll()
                 .where((eb) => eb.or([
@@ -83,7 +86,7 @@ class UserRepository {
     }
     async updateUser(user_id, user) {
         try {
-            await db_database_1.default
+            await this.database
                 .updateTable("users")
                 .set(user)
                 .where("user_id", "=", user_id)
@@ -96,7 +99,10 @@ class UserRepository {
     }
     async deleteUser(user_id) {
         try {
-            await db_database_1.default.deleteFrom("users").where("user_id", "=", user_id).execute();
+            await this.database
+                .deleteFrom("users")
+                .where("user_id", "=", user_id)
+                .execute();
             return "User deleted successfully";
         }
         catch (error) {
