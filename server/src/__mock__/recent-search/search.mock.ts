@@ -1,15 +1,19 @@
+import { faker }          from "@faker-js/faker";
 import { SelectSearches } from "@/types/table.types";
-import { faker } from "@faker-js/faker";
 
-const createRecentSearch = (): SelectSearches => ({
+const createRecentSearch = (user_id: number, search_user_id: number): SelectSearches => ({
   recent_id: faker.number.int({ min: 1, max: 1000 }),
-  search_user_id: faker.number.int({ min: 1, max: 1000 }),
-  user_id: faker.number.int({ min: 1, max: 1000 }),
+  user_id: user_id,
+  search_user_id: search_user_id,
   create_time: new Date(faker.date.past().toISOString()),
 });
 
-const createSearchList = (count: number): SelectSearches[] => {
-  return Array.from({ length: count }, createRecentSearch);
+const createSearchList = (
+  count: number,
+  user_id: number,
+  search_user_id: number
+): SelectSearches[] => {
+  return Array.from({ length: count }, () => createRecentSearch(user_id, search_user_id));
 };
 
 export { createRecentSearch, createSearchList };
