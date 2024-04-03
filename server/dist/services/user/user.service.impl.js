@@ -18,7 +18,7 @@ class UserService {
         try {
             // If no parameters are provided, return an error
             if (!id)
-                throw error_exception_1.default.badRequest("No parameters provided");
+                throw error_exception_1.default.badRequest("No arguments provided");
             // search the user by user_id
             const data = await this.userRepository.findUserById(id);
             // If the user is not found, return an error
@@ -36,7 +36,7 @@ class UserService {
         try {
             // If no parameters are provided, return an error
             if (!username)
-                throw error_exception_1.default.badRequest("No parameters provided");
+                throw error_exception_1.default.badRequest("No arguments provided");
             // search the user by username
             const data = await this.userRepository.findUserByUsername(username);
             // If the user is not found, return an error
@@ -54,7 +54,7 @@ class UserService {
         try {
             // If no parameters are provided, return an error
             if (!email)
-                throw error_exception_1.default.badRequest("No parameters provided");
+                throw error_exception_1.default.badRequest("No arguments provided");
             // search the user by email
             const data = await this.userRepository.findUserByEmail(email);
             // If the user is not found, return an error
@@ -72,7 +72,7 @@ class UserService {
         try {
             // If no parameters are provided, return an error
             if (!id)
-                throw error_exception_1.default.badRequest("No parameters provided");
+                throw error_exception_1.default.badRequest("No arguments provided");
             // search the user by email
             const data = await this.userRepository.findUserById(id);
             // If the user is not found, return an error
@@ -90,7 +90,7 @@ class UserService {
         try {
             // If no parameters are provided, return an error
             if (!id)
-                throw error_exception_1.default.badRequest("No parameters provided");
+                throw error_exception_1.default.badRequest("No arguments provided");
             // search the user by email
             const data = await this.userRepository.findUserById(id);
             // If the user is not found, return an error
@@ -106,6 +106,10 @@ class UserService {
     ;
     async searchUserByFields(search) {
         try {
+            // If no parameters are provided, return an error
+            if (!search)
+                throw error_exception_1.default.badRequest("No arguments provided");
+            // search the user by search query
             const data = await this.userRepository.searchUsersByQuery(search);
             // If the user is not found, return an error
             if (!data?.length)
@@ -120,6 +124,15 @@ class UserService {
     ;
     async getAllRecentSearches(user_id) {
         try {
+            // If no parameters are provided, return an error
+            if (!user_id)
+                throw error_exception_1.default.badRequest("No arguments provided");
+            // Check if the user is already following the other user
+            const isExist = await this.userRepository.findUserById(user_id);
+            // If the user is not found, return an error
+            if (!isExist)
+                throw error_exception_1.default.notFound("User not found");
+            // search the user by search query
             return await this.recentSearchRepository.getRecentSearches(user_id);
         }
         catch (error) {

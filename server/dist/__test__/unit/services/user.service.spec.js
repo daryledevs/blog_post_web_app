@@ -9,23 +9,33 @@ const user_repository_impl_1 = __importDefault(require("@/repositories/user/user
 const follow_repository_impl_1 = __importDefault(require("@/repositories/follow/follow.repository.impl"));
 const recent_search_repository_impl_1 = __importDefault(require("@/repositories/recent-search/recent-search.repository.impl"));
 const user_mock_1 = require("@/__mock__/user/user.mock");
+const search_mock_1 = require("@/__mock__/recent-search/search.mock");
 const vitest_1 = require("vitest");
 let users = (0, user_mock_1.createUserList)(5);
 const notFoundUser = (0, user_mock_1.createUser)();
 const existingUser = users[0] || (0, user_mock_1.createUser)();
+let recentSearches = (0, search_mock_1.createSearchList)(5);
+const notFoundSearch = (0, search_mock_1.createRecentSearch)();
+const existingSearch = recentSearches[0] || (0, search_mock_1.createRecentSearch)();
 vitest_1.vi.mock("@/repositories/user/user.repository.impl", async (importOriginal) => {
     const original = await importOriginal();
     return {
         ...original,
         default: vitest_1.vi.fn().mockImplementation(() => ({
-            findUserById: vitest_1.vi.fn().mockImplementation((id) => users.find((u) => u.user_id === id)),
-            findUserByUsername: vitest_1.vi.fn().mockImplementation((username) => users.find((u) => u.username === username)),
-            findUserByEmail: vitest_1.vi.fn().mockImplementation((email) => users.find((u) => u.email === email)),
+            findUserById: vitest_1.vi
+                .fn()
+                .mockImplementation((id) => users.find((u) => u.user_id === id)),
+            findUserByUsername: vitest_1.vi
+                .fn()
+                .mockImplementation((username) => users.find((u) => u.username === username)),
+            findUserByEmail: vitest_1.vi
+                .fn()
+                .mockImplementation((email) => users.find((u) => u.email === email)),
             updateUser: vitest_1.vi.fn().mockImplementation((id, user) => {
                 const index = users.findIndex((u) => u.user_id === id);
                 if (index === -1)
                     throw error_exception_1.default.badRequest("User not found");
-                return users[index] = { ...users[index], ...user };
+                return (users[index] = { ...users[index], ...user });
             }),
             deleteUser: vitest_1.vi.fn().mockImplementation((id) => {
                 const index = users.findIndex((u) => u.user_id === id);
@@ -34,6 +44,12 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl", async (importOrigin
                 users.splice(index, 1);
                 return "User deleted successfully";
             }),
+            searchUserByFields: vitest_1.vi
+                .fn()
+                .mockImplementation((search) => users.find((u) => u.username === search)),
+            getAllRecentSearches: vitest_1.vi
+                .fn()
+                .mockImplementation((user_id) => recentSearches.filter((r) => r.user_id === user_id)),
         })),
     };
 });
@@ -53,134 +69,137 @@ vitest_1.vi.mock("@/repositories/recent search/recent-search.repository.impl", a
 });
 (0, vitest_1.describe)('UserService', () => {
     let userService;
+    let noArgsMsg;
+    let notFoundMsg;
     (0, vitest_1.beforeEach)(() => {
         userService = new user_service_impl_1.default(new user_repository_impl_1.default(), new follow_repository_impl_1.default(), new recent_search_repository_impl_1.default());
+        noArgsMsg = error_exception_1.default.badRequest("No arguments provided");
+        notFoundMsg = error_exception_1.default.badRequest("User not found");
     });
     (0, vitest_1.afterEach)(() => {
         vitest_1.vi.clearAllMocks();
     });
     (0, vitest_1.describe)("Get user's data by id", () => {
-        (0, vitest_1.test)("it should get the data", async () => {
-            const mockGetUserById = vitest_1.vi.spyOn(userService, "getUserById");
-            mockGetUserById.mockResolvedValue(existingUser);
-            const result = await userService.getUserById(existingUser.user_id);
-            (0, vitest_1.expect)(result).toBe(existingUser);
-            (0, vitest_1.expect)(mockGetUserById).toHaveBeenCalledWith(existingUser.user_id);
-            (0, vitest_1.expect)(mockGetUserById).toHaveBeenCalledTimes(1);
-        });
-        (0, vitest_1.test)("it should throw error 'no parameters provided'", async () => {
-            const arg = undefined;
-            const mockGetUserById = vitest_1.vi.spyOn(userService, "getUserById");
-            await (0, vitest_1.expect)(userService.getUserById(arg)).rejects.toThrow("No parameters provided");
-            (0, vitest_1.expect)(mockGetUserById).toHaveBeenCalledWith(arg);
-            (0, vitest_1.expect)(mockGetUserById).toHaveBeenCalledTimes(1);
-        });
-        (0, vitest_1.test)("it should throw 'user not found'", async () => {
-            const mockGetUserById = vitest_1.vi.spyOn(userService, "getUserById");
-            mockGetUserById.mockRejectedValue(error_exception_1.default.badRequest("User not found"));
-            await (0, vitest_1.expect)(userService.getUserById(notFoundUser.user_id)).rejects.toThrow("User not found");
-            (0, vitest_1.expect)(mockGetUserById).toHaveBeenCalledWith(notFoundUser.user_id);
-            (0, vitest_1.expect)(mockGetUserById).toHaveBeenCalledTimes(1);
+        const cases = [
+            { args: existingUser.user_id, expected: existingUser, },
+            { args: undefined, expected: noArgsMsg, },
+            { args: notFoundUser.user_id, expected: notFoundMsg, },
+        ];
+        vitest_1.test.each(cases)("getUserById should return the correct result and error message", async ({ args, expected }) => {
+            const mockMethod = vitest_1.vi.spyOn(userService, "getUserById");
+            mockMethod.mockResolvedValue(expected);
+            const result = await userService.getUserById(args);
+            (0, vitest_1.expect)(result).toBe(expected);
+            (0, vitest_1.expect)(mockMethod).toHaveBeenCalledWith(args);
+            (0, vitest_1.expect)(mockMethod).toHaveBeenCalledTimes(1);
         });
     });
     (0, vitest_1.describe)("Get user's data by username", () => {
-        (0, vitest_1.test)("it should get user's data", async () => {
-            const mockGetUserByUsername = vitest_1.vi.spyOn(userService, "getUserByUsername");
-            mockGetUserByUsername.mockResolvedValue(existingUser);
-            const result = await userService.getUserByUsername(existingUser.username);
-            (0, vitest_1.expect)(result).toBe(existingUser);
-            (0, vitest_1.expect)(mockGetUserByUsername).toHaveBeenCalledWith(existingUser.username);
-            (0, vitest_1.expect)(mockGetUserByUsername).toHaveBeenCalledTimes(1);
-        });
-        (0, vitest_1.test)("it should throw error 'user not found'", async () => {
-            const mockGetUserByUsername = vitest_1.vi.spyOn(userService, "getUserByUsername");
-            mockGetUserByUsername.mockRejectedValue(error_exception_1.default.badRequest("User not found"));
-            await (0, vitest_1.expect)(userService.getUserByUsername(notFoundUser.username)).rejects.toThrow("User not found");
-            (0, vitest_1.expect)(mockGetUserByUsername).toHaveBeenCalledWith(notFoundUser.username);
-            (0, vitest_1.expect)(mockGetUserByUsername).toHaveBeenCalledTimes(1);
-        });
-        (0, vitest_1.test)("it should throw 'no parameters provided'", async () => {
-            const arg = undefined;
-            const mockGetUserByUsername = vitest_1.vi.spyOn(userService, "getUserByUsername");
-            mockGetUserByUsername.mockRejectedValue(error_exception_1.default.badRequest("No parameters provided"));
-            await (0, vitest_1.expect)(userService.getUserByUsername(arg)).rejects.toThrow("No parameters provided");
-            (0, vitest_1.expect)(mockGetUserByUsername).toHaveBeenCalledWith(arg);
-            (0, vitest_1.expect)(mockGetUserByUsername).toHaveBeenCalledTimes(1);
+        const cases = [
+            { args: existingUser.username, expected: existingUser },
+            { args: undefined, expected: noArgsMsg },
+            { args: notFoundUser.username, expected: notFoundMsg },
+        ];
+        vitest_1.test.each(cases)("getUserByUsername should return the correct result and error message", async ({ args, expected }) => {
+            const mockMethod = vitest_1.vi.spyOn(userService, "getUserByUsername");
+            mockMethod.mockResolvedValue(expected);
+            const result = await userService.getUserByUsername(args);
+            (0, vitest_1.expect)(result).toBe(expected);
+            (0, vitest_1.expect)(mockMethod).toHaveBeenCalledWith(args);
+            (0, vitest_1.expect)(mockMethod).toHaveBeenCalledTimes(1);
         });
     });
     (0, vitest_1.describe)("Get user data by email", async () => {
-        (0, vitest_1.test)("it should get user's data", async () => {
-            const mockGetUserByEmail = vitest_1.vi.spyOn(userService, "getUserByEmail");
-            mockGetUserByEmail.mockResolvedValue(existingUser);
-            const result = await userService.getUserByEmail(existingUser.email);
-            (0, vitest_1.expect)(result).toBe(existingUser);
-            (0, vitest_1.expect)(mockGetUserByEmail).toHaveBeenCalledWith(existingUser.email);
-            (0, vitest_1.expect)(mockGetUserByEmail).toHaveBeenCalledTimes(1);
-        });
-        (0, vitest_1.test)("it should throw error 'user not found'", async () => {
-            const mockGetUserByEmail = vitest_1.vi.spyOn(userService, "getUserByEmail");
-            mockGetUserByEmail.mockRejectedValue(error_exception_1.default.badRequest("User not found"));
-            await (0, vitest_1.expect)(userService.getUserByEmail(notFoundUser.email)).rejects.toThrow("User not found");
-            (0, vitest_1.expect)(mockGetUserByEmail).toHaveBeenCalledWith(notFoundUser.email);
-            (0, vitest_1.expect)(mockGetUserByEmail).toHaveBeenCalledTimes(1);
-        });
-        (0, vitest_1.test)("it should throw 'no parameters provided'", async () => {
-            const arg = undefined;
-            const mockGetUserByEmail = vitest_1.vi.spyOn(userService, "getUserByEmail");
-            mockGetUserByEmail.mockRejectedValue(error_exception_1.default.badRequest("No parameters provided"));
-            await (0, vitest_1.expect)(userService.getUserByEmail(arg)).rejects.toThrow("No parameters provided");
-            (0, vitest_1.expect)(mockGetUserByEmail).toHaveBeenCalledWith(arg);
-            (0, vitest_1.expect)(mockGetUserByEmail).toHaveBeenCalledTimes(1);
+        const cases = [
+            { args: existingUser.email, expected: existingUser },
+            { args: notFoundUser.email, expected: notFoundMsg },
+            { args: undefined, expected: noArgsMsg },
+        ];
+        vitest_1.test.each(cases)("getUserByEmail should return the correct result and error message", async ({ args, expected }) => {
+            const mockMethod = vitest_1.vi.spyOn(userService, "getUserByEmail");
+            mockMethod.mockResolvedValue(expected);
+            const result = await userService.getUserByEmail(args);
+            (0, vitest_1.expect)(result).toBe(expected);
+            (0, vitest_1.expect)(mockMethod).toHaveBeenCalledWith(args);
+            (0, vitest_1.expect)(mockMethod).toHaveBeenCalledTimes(1);
         });
     });
     (0, vitest_1.describe)("Update user's data", async () => {
-        (0, vitest_1.test)("it should update user's data", async () => {
-            const mockUpdateUser = vitest_1.vi.spyOn(userService, "updateUser");
-            mockUpdateUser.mockResolvedValue(existingUser);
-            const result = await userService.updateUser(existingUser.user_id, existingUser);
-            (0, vitest_1.expect)(result).toBe(existingUser);
-            (0, vitest_1.expect)(mockUpdateUser).toHaveBeenCalledWith(existingUser.user_id, existingUser);
-            (0, vitest_1.expect)(mockUpdateUser).toHaveBeenCalledTimes(1);
-        });
-        (0, vitest_1.test)("it should throw 'user not found'", async () => {
-            const mockUpdateUser = vitest_1.vi.spyOn(userService, "updateUser");
-            mockUpdateUser.mockRejectedValue(error_exception_1.default.badRequest("User not found"));
-            await (0, vitest_1.expect)(userService.updateUser(notFoundUser.user_id, notFoundUser)).rejects.toThrow("User not found");
-            (0, vitest_1.expect)(mockUpdateUser).toHaveBeenCalledWith(notFoundUser.user_id, notFoundUser);
-            (0, vitest_1.expect)(mockUpdateUser).toHaveBeenCalledTimes(1);
-        });
-        (0, vitest_1.test)("it should throw 'no parameters provided'", async () => {
-            const arg = undefined;
-            const mockUpdateUser = vitest_1.vi.spyOn(userService, "updateUser");
-            mockUpdateUser.mockRejectedValue(error_exception_1.default.badRequest("No parameters provided"));
-            await (0, vitest_1.expect)(userService.updateUser(arg, existingUser)).rejects.toThrow("No parameters provided");
-            (0, vitest_1.expect)(mockUpdateUser).toHaveBeenCalledWith(arg, existingUser);
-            (0, vitest_1.expect)(mockUpdateUser).toHaveBeenCalledTimes(1);
+        const cases = [
+            {
+                args: [
+                    existingUser.user_id,
+                    existingUser
+                ],
+                expected: existingUser,
+            },
+            {
+                args: [
+                    notFoundUser.user_id,
+                    notFoundUser
+                ],
+                expected: notFoundMsg,
+            },
+            {
+                args: [
+                    undefined,
+                    existingUser
+                ],
+                expected: noArgsMsg,
+            },
+        ];
+        vitest_1.test.each(cases)("updateUser should return the correct result and error message", async ({ args, expected }) => {
+            const mockMethod = vitest_1.vi.spyOn(userService, "updateUser");
+            mockMethod.mockResolvedValue(expected);
+            const result = await userService.updateUser(args[0], args[1]);
+            (0, vitest_1.expect)(result).toBe(expected);
+            (0, vitest_1.expect)(mockMethod).toHaveBeenCalledWith(args[0], args[1]);
+            (0, vitest_1.expect)(mockMethod).toHaveBeenCalledTimes(1);
         });
     });
     (0, vitest_1.describe)("Delete user's data", async () => {
-        (0, vitest_1.test)("it should delete user", async () => {
-            const mockDeleteUser = vitest_1.vi.spyOn(userService, "deleteUserById");
-            mockDeleteUser.mockResolvedValue("User deleted successfully");
-            const result = await userService.deleteUserById(existingUser.user_id);
-            (0, vitest_1.expect)(result).toBe("User deleted successfully");
-            (0, vitest_1.expect)(mockDeleteUser).toHaveBeenCalledWith(existingUser.user_id);
-            (0, vitest_1.expect)(mockDeleteUser).toHaveBeenCalledTimes(1);
+        const cases = [
+            { args: existingUser.user_id, expected: "User deleted successfully" },
+            { args: notFoundUser.user_id, expected: notFoundMsg },
+            { args: undefined, expected: noArgsMsg },
+        ];
+        vitest_1.test.each(cases)("deleteUserById should return the correct result and error message", async ({ args, expected }) => {
+            const mockMethod = vitest_1.vi.spyOn(userService, "deleteUserById");
+            mockMethod.mockResolvedValue(expected);
+            const result = await userService.deleteUserById(args);
+            (0, vitest_1.expect)(result).toBe(expected);
+            (0, vitest_1.expect)(mockMethod).toHaveBeenCalledWith(args);
+            (0, vitest_1.expect)(mockMethod).toHaveBeenCalledTimes(1);
         });
-        (0, vitest_1.test)("it should throw 'user not found'", async () => {
-            const mockDeleteUser = vitest_1.vi.spyOn(userService, "deleteUserById");
-            mockDeleteUser.mockRejectedValue(error_exception_1.default.badRequest("User not found"));
-            await (0, vitest_1.expect)(userService.deleteUserById(notFoundUser.user_id)).rejects.toThrow("User not found");
-            (0, vitest_1.expect)(mockDeleteUser).toHaveBeenCalledWith(notFoundUser.user_id);
-            (0, vitest_1.expect)(mockDeleteUser).toHaveBeenCalledTimes(1);
+    });
+    (0, vitest_1.describe)("Find users by search", async () => {
+        const cases = [
+            { args: existingUser.username, expected: existingUser },
+            { args: notFoundUser.username, expected: notFoundMsg },
+            { args: undefined, expected: noArgsMsg },
+        ];
+        vitest_1.test.each(cases)("searchUserByFields should return the correct result and error message", async ({ args, expected }) => {
+            const mockMethod = vitest_1.vi.spyOn(userService, "searchUserByFields");
+            mockMethod.mockResolvedValue(vitest_1.expect.objectContaining(expected));
+            const result = await userService.searchUserByFields(args);
+            (0, vitest_1.expect)(result).toStrictEqual(vitest_1.expect.objectContaining(expected));
+            (0, vitest_1.expect)(mockMethod).toHaveBeenCalledWith(args);
+            (0, vitest_1.expect)(mockMethod).toHaveBeenCalledTimes(1);
         });
-        (0, vitest_1.test)("it should throw 'no parameters provided'", async () => {
-            const arg = undefined;
-            const mockDeleteUser = vitest_1.vi.spyOn(userService, "deleteUserById");
-            mockDeleteUser.mockRejectedValue(error_exception_1.default.badRequest("No parameters provided"));
-            await (0, vitest_1.expect)(userService.deleteUserById(arg)).rejects.toThrow("No parameters provided");
-            (0, vitest_1.expect)(mockDeleteUser).toHaveBeenCalledWith(arg);
-            (0, vitest_1.expect)(mockDeleteUser).toHaveBeenCalledTimes(1);
+    });
+    (0, vitest_1.describe)("Get all the recent searches", async () => {
+        const cases = [
+            { args: existingSearch.user_id, expected: recentSearches },
+            { args: notFoundSearch.user_id, expected: notFoundMsg },
+            { args: undefined, expected: noArgsMsg },
+        ];
+        vitest_1.test.each(cases)("getAllRecentSearches should return the correct result and error message", async ({ args, expected }) => {
+            const mockMethod = vitest_1.vi.spyOn(userService, "getAllRecentSearches");
+            mockMethod.mockResolvedValue(expected);
+            const result = await userService.getAllRecentSearches(args);
+            (0, vitest_1.expect)(result).toBe(expected);
+            (0, vitest_1.expect)(mockMethod).toHaveBeenCalledWith(args);
+            (0, vitest_1.expect)(mockMethod).toHaveBeenCalledTimes(1);
         });
     });
 });

@@ -24,7 +24,7 @@ class UserService implements IUserService {
   public async getUserById(id: number): Promise<SelectUsers | undefined> {
     try {
       // If no parameters are provided, return an error
-      if (!id) throw ErrorException.badRequest("No parameters provided");
+      if (!id) throw ErrorException.badRequest("No arguments provided");
       
       // search the user by user_id
       const data = await this.userRepository.findUserById(id as any);
@@ -40,7 +40,7 @@ class UserService implements IUserService {
   public async getUserByUsername(username: string): Promise<SelectUsers | undefined> {
     try {
       // If no parameters are provided, return an error
-      if (!username) throw ErrorException.badRequest("No parameters provided");
+      if (!username) throw ErrorException.badRequest("No arguments provided");
 
       // search the user by username
       const data = await this.userRepository.findUserByUsername(username);
@@ -57,7 +57,7 @@ class UserService implements IUserService {
   public async getUserByEmail(email: string): Promise<SelectUsers | undefined> {
     try {
       // If no parameters are provided, return an error
-      if (!email) throw ErrorException.badRequest("No parameters provided");
+      if (!email) throw ErrorException.badRequest("No arguments provided");
 
       // search the user by email
       const data = await this.userRepository.findUserByEmail(email);
@@ -74,7 +74,7 @@ class UserService implements IUserService {
   public async updateUser(id: number, user: any): Promise<any> {
     try {
       // If no parameters are provided, return an error
-      if (!id) throw ErrorException.badRequest("No parameters provided");
+      if (!id) throw ErrorException.badRequest("No arguments provided");
 
       // search the user by email
       const data = await this.userRepository.findUserById(id);
@@ -91,7 +91,7 @@ class UserService implements IUserService {
   public async deleteUserById(id: number): Promise<string | undefined> {
     try {
       // If no parameters are provided, return an error
-      if (!id) throw ErrorException.badRequest("No parameters provided");
+      if (!id) throw ErrorException.badRequest("No arguments provided");
 
       // search the user by email
       const data = await this.userRepository.findUserById(id);
@@ -107,9 +107,15 @@ class UserService implements IUserService {
 
   public async searchUserByFields(search: string): Promise<SelectUsers[]> {
     try {
+      // If no parameters are provided, return an error
+      if (!search) throw ErrorException.badRequest("No arguments provided");
+
+      // search the user by search query
       const data = await this.userRepository.searchUsersByQuery(search);
+
       // If the user is not found, return an error
       if (!data?.length) throw ErrorException.notFound("User not found");
+
       return data;
     } catch (error) {
       throw error;
@@ -118,6 +124,16 @@ class UserService implements IUserService {
 
   public async getAllRecentSearches(user_id: any): Promise<SelectSearches[] | undefined> {
     try {
+      // If no parameters are provided, return an error
+      if (!user_id) throw ErrorException.badRequest("No arguments provided");
+
+      // Check if the user is already following the other user
+      const isExist = await this.userRepository.findUserById(user_id);
+
+      // If the user is not found, return an error
+      if (!isExist) throw ErrorException.notFound("User not found");
+
+      // search the user by search query
       return await this.recentSearchRepository.getRecentSearches(user_id);
     } catch (error) {
       throw error;
