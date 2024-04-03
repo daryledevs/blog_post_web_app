@@ -5,7 +5,7 @@ interface IUserRepository {
 
   findUserByUsername: (username: string) => Promise<SelectUsers | undefined>;
 
-  searchUsersByQuery: (search: string) => Promise<SelectUsers[] | undefined>;
+  searchUsersByQuery: (search: string) => Promise<SelectUsers[]>;
 
   findUserByEmail: (email: string) => Promise<SelectUsers | undefined>;
 
@@ -13,7 +13,7 @@ interface IUserRepository {
   
   updateUser: (user_id: number, user: UpdateUsers) => Promise<SelectUsers | undefined>;
 
-  deleteUser: (user_id: number) => Promise<string | undefined>;
+  deleteUser: (user_id: number) => Promise<void>;
 };
 
 export default IUserRepository;

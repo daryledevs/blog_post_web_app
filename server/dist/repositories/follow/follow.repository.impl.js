@@ -89,7 +89,6 @@ class FollowRepository {
     }
     async followUser(identifier) {
         await this.database.insertInto("followers").values(identifier).execute();
-        return "User followed successfully";
     }
     async unfollowUser(identifier) {
         try {
@@ -100,7 +99,6 @@ class FollowRepository {
                 eb("followed_id", "=", identifier.followed_id),
             ]))
                 .execute();
-            return "User unfollowed successfully";
         }
         catch (error) {
             throw database_exception_1.default.fromError(error);

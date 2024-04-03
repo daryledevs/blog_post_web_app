@@ -62,7 +62,6 @@ class RecentSearchesRepository {
                 .insertInto("recent_searches")
                 .values({ user_id, search_user_id })
                 .execute();
-            return "User saved successfully";
         }
         catch (error) {
             throw database_exception_1.default.fromError(error);
@@ -76,7 +75,6 @@ class RecentSearchesRepository {
                 .deleteFrom("recent_searches")
                 .where("recent_id", "=", recent_id)
                 .execute();
-            return "User deleted successfully";
         }
         catch (error) {
             throw database_exception_1.default.fromError(error);

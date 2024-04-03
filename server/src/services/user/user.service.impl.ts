@@ -99,7 +99,8 @@ class UserService implements IUserService {
       // If the user is not found, return an error
       if (!data) throw ErrorException.notFound("User not found");
 
-      return await this.userRepository.deleteUser(id);
+      await this.userRepository.deleteUser(id);
+      return "User deleted successfully";
     } catch (error) {
       throw error;
     };
@@ -111,12 +112,7 @@ class UserService implements IUserService {
       if (!search) throw ErrorException.badRequest("No arguments provided");
 
       // search the user by search query
-      const data = await this.userRepository.searchUsersByQuery(search);
-
-      // If the user is not found, return an error
-      if (!data?.length) throw ErrorException.notFound("User not found");
-
-      return data;
+      return await this.userRepository.searchUsersByQuery(search);
     } catch (error) {
       throw error;
     };
@@ -140,17 +136,36 @@ class UserService implements IUserService {
     };
   };
 
-  public async saveRecentSearches(user_id: any, search_user_id: any): Promise<string | undefined> {
+  public async saveRecentSearches(user_id: any, search_user_id: any): Promise<string> {
     try {
-      return await this.recentSearchRepository.saveRecentSearches(user_id, search_user_id);
+      // If no parameters are provided, return an error
+      if (!user_id || !search_user_id) throw ErrorException.badRequest("No arguments provided");
+
+      // Check if the user is already following the other user
+      const user = await this.userRepository.findUserById(user_id);
+      if (!user) throw ErrorException.notFound("User not found");
+
+      // Check if the user is already following the other user
+      const searchUser = await this.userRepository.findUserById(search_user_id);
+      if (!searchUser) throw ErrorException.notFound("Search user not found");
+
+      const isExist = await this.recentSearchRepository
+        .findUsersSearchByUserId(user_id, search_user_id);
+
+      if (isExist) return "Search user already saved";
+
+      await this.recentSearchRepository.saveRecentSearches( user_id, search_user_id);
+
+      return "Search user saved successfully";
     } catch (error) {
       throw error;
     }
   };
 
-  public async removeRecentSearches(recent_id: any): Promise<string | undefined> {
+  public async removeRecentSearches(recent_id: any): Promise<string> {
     try {
-      return await this.recentSearchRepository.deleteRecentSearches(recent_id);
+      await this.recentSearchRepository.deleteRecentSearches(recent_id);
+      return "User deleted successfully";
     } catch (error) {
       throw error;
     };
@@ -182,10 +197,8 @@ class UserService implements IUserService {
     };
   };
 
-  public async toggleFollow(user_id: any, followed_id: any): Promise<string | undefined> {
+  public async toggleFollow(user_id: any, followed_id: any): Promise<string> {
     try {
-      let result: string | undefined = undefined;
-
       const args = {
         follower_id: user_id as unknown as number,
         followed_id: followed_id as unknown as number,
@@ -195,12 +208,14 @@ class UserService implements IUserService {
       const isExist = await this.followRepository.isFollowUser(args);
 
       // If it already exists, delete the data from the database
-      if (isExist) result = await this.followRepository.unfollowUser(args);
+      if (isExist) {
+        await this.followRepository.unfollowUser(args);
+        return "User followed successfully";
+      };
 
       // if there is no data in the database, create one
-      if (!isExist) result = await this.followRepository.followUser(args);
-
-      return result;
+      await this.followRepository.followUser(args);
+      return "User unfollowed successfully";
     } catch (error) {
       throw error;
     };

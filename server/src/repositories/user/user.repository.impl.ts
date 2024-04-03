@@ -36,7 +36,7 @@ class UserRepository implements IUserRepository {
     }
   }
 
-  async searchUsersByQuery(search: string): Promise<SelectUsers[] | undefined> {
+  async searchUsersByQuery(search: string): Promise<SelectUsers[]> {
     try {
       return await this.database
         .selectFrom("users")
@@ -107,14 +107,12 @@ class UserRepository implements IUserRepository {
     }
   }
 
-  async deleteUser(user_id: number): Promise<string | undefined> {
+  async deleteUser(user_id: number): Promise<void> {
     try {
       await this.database
         .deleteFrom("users")
         .where("user_id", "=", user_id)
         .execute();
-
-      return "User deleted successfully";
     } catch (error) {
       throw DatabaseException.fromError(error);
     }

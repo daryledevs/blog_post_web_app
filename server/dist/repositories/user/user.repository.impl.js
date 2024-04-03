@@ -103,7 +103,6 @@ class UserRepository {
                 .deleteFrom("users")
                 .where("user_id", "=", user_id)
                 .execute();
-            return "User deleted successfully";
         }
         catch (error) {
             throw database_exception_1.default.fromError(error);

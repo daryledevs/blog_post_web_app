@@ -102,13 +102,13 @@ class FollowRepository implements IFollowRepository {
     }
   }
 
-  async followUser(identifier: NewFollowers): Promise<string | undefined> {
+  async followUser(identifier: NewFollowers): Promise<void> {
     await this.database.insertInto("followers").values(identifier).execute();
 
-    return "User followed successfully";
+    
   }
 
-  async unfollowUser(identifier: SelectFollowers): Promise<string | undefined> {
+  async unfollowUser(identifier: SelectFollowers): Promise<void> {
     try {
       await this.database
         .deleteFrom("followers")
@@ -119,8 +119,6 @@ class FollowRepository implements IFollowRepository {
           ])
         )
         .execute();
-
-      return "User unfollowed successfully";
     } catch (error) {
       throw DatabaseException.fromError(error);
     }

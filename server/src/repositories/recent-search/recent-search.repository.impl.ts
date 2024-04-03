@@ -53,27 +53,23 @@ class RecentSearchesRepository implements IRecentSearchRepository {
     };
   };
 
-  async saveRecentSearches(user_id: number, search_user_id: number): Promise<string | undefined> {
+  async saveRecentSearches(user_id: number, search_user_id: number): Promise<void> {
     try {
       await this.database
         .insertInto("recent_searches")
         .values({ user_id, search_user_id })
         .execute();
-
-      return "User saved successfully";
     } catch (error) {
       throw DatabaseException.fromError(error);
     };
   };
 
-  async deleteRecentSearches(recent_id: number): Promise<string | undefined> {
+  async deleteRecentSearches(recent_id: number): Promise<void> {
     try {
       await this.database
         .deleteFrom("recent_searches")
         .where("recent_id", "=", recent_id)
         .execute();
-
-      return "User deleted successfully";
     } catch (error) {
       throw DatabaseException.fromError(error);
     };

@@ -14,9 +14,9 @@ interface IFollowRepository {
 
   isFollowUser: (identifier: SelectFollowers) => Promise<boolean>;
 
-  followUser: (identifier: NewFollowers) => Promise<string | undefined>;
+  followUser: (identifier: NewFollowers) => Promise<void>;
 
-  unfollowUser: (identifier: SelectFollowers) => Promise<string | undefined>;
+  unfollowUser: (identifier: SelectFollowers) => Promise<void>;
 }
 
 export default IFollowRepository;
