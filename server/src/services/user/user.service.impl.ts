@@ -4,7 +4,7 @@ import UserRepository                        from "@/repositories/user/user.repo
 import FollowRepository                      from "@/repositories/follow/follow.repository.impl";
 import { FollowStatsType }                   from "@/repositories/follow/follow.repository";
 import RecentSearchRepository                from "@/repositories/recent-search/recent-search.repository.impl";
-import { SelectSearches, SelectUsers }       from "@/types/table.types";
+import { SelectSearches, SelectUsers, UpdateUsers }       from "@/types/table.types";
 
 class UserService implements IUserService {
   private userRepository: UserRepository;
@@ -71,7 +71,7 @@ class UserService implements IUserService {
     };
   };
 
-  public async updateUser(id: number, user: any): Promise<any> {
+  public async updateUser(id: number, user: UpdateUsers): Promise<UpdateUsers> {
     try {
       // If no parameters are provided, return an error
       if (!id) throw ErrorException.badRequest("No arguments provided");
@@ -164,8 +164,18 @@ class UserService implements IUserService {
 
   public async removeRecentSearches(recent_id: any): Promise<string> {
     try {
+      // If no parameters are provided, return an error
+      if (!recent_id) throw ErrorException.badRequest("No arguments provided");
+
+      // Check if the user searched the other user
+      const data = await this.recentSearchRepository
+        .findUsersSearchByRecentId(recent_id);
+
+      // If the user is not found, return an error
+      if (!data) throw ErrorException.notFound("Recent search not found");
+      
       await this.recentSearchRepository.deleteRecentSearches(recent_id);
-      return "User deleted successfully";
+      return "Search user deleted successfully";
     } catch (error) {
       throw error;
     };
@@ -173,6 +183,13 @@ class UserService implements IUserService {
 
   public async getFollowStats(user_id: any): Promise<FollowStatsType> {
     try {
+      // If no arguments are provided, return an error
+      if (!user_id) throw ErrorException.badRequest("No arguments provided");
+
+      // Check if the user is already following the other user
+      const isExist = await this.userRepository.findUserById(user_id);
+      if (!isExist) throw ErrorException.notFound("User not found");
+
       return await this.followRepository.getFollowStats(user_id);
     } catch (error) {
       throw error;
@@ -181,6 +198,13 @@ class UserService implements IUserService {
 
   public async getFollowerFollowingLists(user_id: any, fetch: string, listsId: number[]): Promise<SelectUsers[]> {
     try {
+      // If no arguments are provided, return an error
+      if (!user_id) throw ErrorException.badRequest("No arguments provided");
+
+      // Check if the user is already following the other user
+      const isExist = await this.userRepository.findUserById(user_id);
+      if (!isExist) throw ErrorException.notFound("User not found");
+
       const listIdsToExclude = listsId?.length ? listsId : [0];
 
       switch(fetch) {

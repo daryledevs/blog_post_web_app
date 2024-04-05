@@ -11,7 +11,7 @@ interface IUserService {
   
   searchUserByFields(search: string): Promise<SelectUsers[]>;
 
-  updateUser(id: number, user: UpdateUsers): Promise<UpdateUsers | undefined>;
+  updateUser(id: number, user: UpdateUsers): Promise<UpdateUsers>;
 
   deleteUserById(id: number): Promise<string | undefined>;
 

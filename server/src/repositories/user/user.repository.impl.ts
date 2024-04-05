@@ -42,9 +42,9 @@ class UserRepository implements IUserRepository {
         .selectFrom("users")
         .where((eb) =>
           eb.or([
-            eb("username", "=", search + "%"),
-            eb("first_name", "=", search + "%"),
-            eb("last_name", "=", search + "%"),
+            eb("username", "like", search + "%"),
+            eb("first_name", "like", search + "%"),
+            eb("last_name", "like", search + "%"),
             eb(
               sql<string>`
                 concat(
@@ -52,7 +52,7 @@ class UserRepository implements IUserRepository {
                   ${eb.ref("last_name")}
                 )
               `,
-              "=",
+              "like",
               search + "%"
             ),
           ])
@@ -93,15 +93,13 @@ class UserRepository implements IUserRepository {
     }
   }
 
-  async updateUser(user_id: number, user: UpdateUsers): Promise<SelectUsers | undefined> {
+  async updateUser(user_id: number, user: UpdateUsers): Promise<UpdateUsers> {
     try {
-      await this.database
+      return await this.database
         .updateTable("users")
         .set(user)
         .where("user_id", "=", user_id)
-        .executeTakeFirstOrThrow();
-
-      return await this.findUserById(user_id);
+        .executeTakeFirstOrThrow() as UpdateUsers;
     } catch (error) {
       throw DatabaseException.fromError(error);
     }

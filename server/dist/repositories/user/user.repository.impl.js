@@ -40,15 +40,15 @@ class UserRepository {
             return await this.database
                 .selectFrom("users")
                 .where((eb) => eb.or([
-                eb("username", "=", search + "%"),
-                eb("first_name", "=", search + "%"),
-                eb("last_name", "=", search + "%"),
+                eb("username", "like", search + "%"),
+                eb("first_name", "like", search + "%"),
+                eb("last_name", "like", search + "%"),
                 eb((0, kysely_1.sql) `
                 concat(
                   ${eb.ref("first_name")}, "", 
                   ${eb.ref("last_name")}
                 )
-              `, "=", search + "%"),
+              `, "like", search + "%"),
             ]))
                 .selectAll()
                 .execute();
@@ -86,12 +86,11 @@ class UserRepository {
     }
     async updateUser(user_id, user) {
         try {
-            await this.database
+            return await this.database
                 .updateTable("users")
                 .set(user)
                 .where("user_id", "=", user_id)
                 .executeTakeFirstOrThrow();
-            return await this.findUserById(user_id);
         }
         catch (error) {
             throw database_exception_1.default.fromError(error);

@@ -11,7 +11,7 @@ interface IUserRepository {
 
   findUserByCredentials: (userCredential: string) =>  Promise<SelectUsers | undefined>;
   
-  updateUser: (user_id: number, user: UpdateUsers) => Promise<SelectUsers | undefined>;
+  updateUser: (user_id: number, user: UpdateUsers) => Promise<UpdateUsers>;
 
   deleteUser: (user_id: number) => Promise<void>;
 };

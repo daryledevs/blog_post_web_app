@@ -165,8 +165,17 @@ class UserService {
     ;
     async removeRecentSearches(recent_id) {
         try {
+            // If no parameters are provided, return an error
+            if (!recent_id)
+                throw error_exception_1.default.badRequest("No arguments provided");
+            // Check if the user searched the other user
+            const data = await this.recentSearchRepository
+                .findUsersSearchByRecentId(recent_id);
+            // If the user is not found, return an error
+            if (!data)
+                throw error_exception_1.default.notFound("Recent search not found");
             await this.recentSearchRepository.deleteRecentSearches(recent_id);
-            return "User deleted successfully";
+            return "Search user deleted successfully";
         }
         catch (error) {
             throw error;
@@ -176,6 +185,13 @@ class UserService {
     ;
     async getFollowStats(user_id) {
         try {
+            // If no arguments are provided, return an error
+            if (!user_id)
+                throw error_exception_1.default.badRequest("No arguments provided");
+            // Check if the user is already following the other user
+            const isExist = await this.userRepository.findUserById(user_id);
+            if (!isExist)
+                throw error_exception_1.default.notFound("User not found");
             return await this.followRepository.getFollowStats(user_id);
         }
         catch (error) {
@@ -186,6 +202,13 @@ class UserService {
     ;
     async getFollowerFollowingLists(user_id, fetch, listsId) {
         try {
+            // If no arguments are provided, return an error
+            if (!user_id)
+                throw error_exception_1.default.badRequest("No arguments provided");
+            // Check if the user is already following the other user
+            const isExist = await this.userRepository.findUserById(user_id);
+            if (!isExist)
+                throw error_exception_1.default.notFound("User not found");
             const listIdsToExclude = listsId?.length ? listsId : [0];
             switch (fetch) {
                 case "followers":
