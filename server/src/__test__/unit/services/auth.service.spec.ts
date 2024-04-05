@@ -11,7 +11,7 @@ import AuthService                    from "@/services/auth/auth.service.impl";
 import UserRepository                 from "@/repositories/user/user.repository.impl";
 import AuthRepository                 from "@/repositories/auth/auth.repository.impl";
 import ErrorException                 from "@/exceptions/error.exception";
-import { createUserList, createUser } from "@/__mock__/user/user.mock";
+import { createUserList, createUser } from "@/__mock__/data/user.mock";
 
 let users = createUserList(5);
 const newUser = createUser();

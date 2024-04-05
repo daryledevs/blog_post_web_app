@@ -2,25 +2,41 @@ import UserService                                           from "@/services/us
 import ErrorException                                        from "@/exceptions/error.exception";
 import UserRepository                                        from "@/repositories/user/user.repository.impl";
 import FollowRepository                                      from "@/repositories/follow/follow.repository.impl";
+import { createFollower }                                    from "@/__mock__/data/follow.mock";
+import { createRecentSearch }                                from "@/__mock__/data/search.mock";
 import RecentSearchRepository                                from "@/repositories/recent-search/recent-search.repository.impl";
-import { createUserList, createUser }                        from "@/__mock__/user/user.mock";
-import { createRecentSearch, createSearchList }              from "@/__mock__/recent-search/search.mock";
+import { createUser, createUserList }                        from "@/__mock__/data/user.mock";
+import { SelectFollowers, SelectSearches, SelectUsers }      from "@/types/table.types";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
-import { SelectSearches, SelectUsers } from "@/types/table.types";
 
+const processUsers = (changeArg: boolean, list: any[], callback: Function) => {
+  return list.flatMap((u, i) => {
+    let nextUser = list[i + 1];
+    let nextUserId = nextUser ? nextUser.user_id : u.user_id;
+
+    const args = changeArg ? 
+      [nextUserId, u.user_id] : 
+      [u.user_id, nextUserId];
+      
+    return callback(args[0], args[1]);
+  });
+};
+
+// Create a mock of the user service
 let users: SelectUsers[] = createUserList(10);
 const notFoundUser = createUser();
-const existingUser = users[0] || createUser();
+const existingUser = users[0]!;
 
-let recentSearches: SelectSearches[] = users.flatMap((u, i) => {
-  let nextUser = users[i + 1];
-  let nextUserId = nextUser ? nextUser.user_id : u.user_id;
-  return createSearchList(5, u.user_id, nextUserId);
-});
+// Create a mock of the recent searches
+let recentSearches: SelectSearches[] = processUsers(false, users, createRecentSearch);
 
 const notFoundSearch = createRecentSearch(notFoundUser.user_id, notFoundUser.user_id);
-const existingSearch = recentSearches[0];
-const newSearch = users[9] || createUser();
+const newSearch = users[9]!;
+const existingSearch = recentSearches[0]!;
+
+// Create a mock of the followers and following
+let followers: SelectFollowers[] = processUsers(false, users, createFollower);
+let following: SelectFollowers[] = processUsers(true, users, createFollower);
 
 vi.mock("@/repositories/user/user.repository.impl", async (importOriginal) => {
   const original = await importOriginal<typeof import("@/repositories/user/user.repository.impl")>();
@@ -83,7 +99,27 @@ vi.mock("@/repositories/follow/follow.repository.impl", async (importOriginal) =
   return {
     ...original,
     default: vi.fn().mockImplementation(() => ({
-
+      getFollowStats: vi
+        .fn()
+        .mockImplementation((user_id: number) => ({
+          followers: followers.filter((u) => u.follower_id === user_id).length,
+          following: following.filter((u) => u.followed_id === user_id).length,
+        })
+        ),
+      getFollowersLists: vi
+        .fn()
+        .mockImplementation((user_id: number, listsId: number[]) =>
+          followers.filter(
+            (u) => u.follower_id === user_id && !listsId.includes(u.followed_id)
+          )
+        ),
+      getFollowingLists: vi
+        .fn()
+        .mockImplementation((user_id: number, listsId: number[]) =>
+          following.filter(
+            (u) => u.followed_id === user_id && !listsId.includes(u.follower_id)
+          )
+        ),
     })),
   };
 });
@@ -122,6 +158,16 @@ vi.mock(
           .mockImplementation((user_id: number) =>
             recentSearches.filter((r) => r.user_id === user_id)
           ),
+        findUsersSearchByRecentId: vi
+          .fn()
+          .mockImplementation((recent_id: number) =>
+            recentSearches.find((r) => r.recent_id === recent_id)
+          ),
+        deleteRecentSearches: vi
+          .fn()
+          .mockImplementation((recent_id: number) =>
+            recentSearches.filter((r) => r.recent_id !== recent_id)
+          ),
       })),
     };
   }
@@ -133,9 +179,10 @@ describe('UserService', () => {
   let followRepository:       FollowRepository;
   let recentSearchRepository: RecentSearchRepository;
 
-  let noArgsMsg:         ErrorException = ErrorException.badRequest("No arguments provided");
-  let notFoundMsg:       ErrorException = ErrorException.badRequest("User not found");
-  let notFoundSearchMsg: ErrorException = ErrorException.notFound("Search user not found");
+  let noArgsMsgError:            ErrorException = ErrorException.badRequest("No arguments provided");
+  let userNotFoundMsgError:      ErrorException = ErrorException.badRequest("User not found");
+  let userSearchNotFoundError:   ErrorException = ErrorException.notFound("Search user not found");
+  let recentSearchNotFoundError: ErrorException = ErrorException.notFound("Recent search not found");
 
   beforeEach(() => {
     userRepository         = new UserRepository();
@@ -159,106 +206,99 @@ describe('UserService', () => {
 
   describe("Get user's data by id", () => {
     test("getUserById should return the correct result", async () => {
-      const methodMock = vi.spyOn(userRepository, "findUserById");
+      const findUserById = vi.spyOn(userRepository, "findUserById");
+
       const result = await userService.getUserById(existingUser.user_id);
       expect(result).toBe(existingUser);
 
-      methodMock.mockRejectedValue(existingUser);
-      expect(methodMock).toHaveBeenCalledWith(existingUser.user_id);
-      expect(methodMock).toHaveBeenCalledTimes(1);
+      expect(findUserById).toHaveBeenCalledWith(existingUser.user_id);
+      expect(findUserById).toHaveBeenCalledTimes(1);
     });
 
     test("getUserById should throw an error when no args are provided", async () => {
-      const methodMock = vi.spyOn(userRepository, "findUserById");
+      const findUserById = vi.spyOn(userRepository, "findUserById");
 
       await expect(
         userService.getUserById(undefined as any)
-      ).rejects.toThrow(noArgsMsg);
+      ).rejects.toThrow(noArgsMsgError);
 
-      methodMock.mockRejectedValue(noArgsMsg);
-      expect(methodMock).toHaveBeenCalledTimes(0);
+      expect(findUserById).toHaveBeenCalledTimes(0);
     });
 
     test("getUserById should throw an error when user is not found", async () => {
-      const methodMock = vi.spyOn(userRepository, "findUserById");
+      const findUserById = vi.spyOn(userRepository, "findUserById");
 
       await expect(
         userService.getUserById(notFoundUser.user_id)
-      ).rejects.toThrow(notFoundMsg);
+      ).rejects.toThrow(userNotFoundMsgError);
 
-      methodMock.mockRejectedValue(notFoundMsg);
-      expect(methodMock).toHaveBeenCalledWith(notFoundUser.user_id);
-      expect(methodMock).toHaveBeenCalledTimes(1);
+      expect(findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
+      expect(findUserById).toHaveBeenCalledTimes(1);
     });
   });
 
   describe("Get user's data by username", () => {
     test("getUserByUsername should return the correct result", async () => {
-      const methodMock = vi.spyOn(userRepository, "findUserByUsername");
+      const findUserByUsername = vi.spyOn(userRepository, "findUserByUsername");
       const result = await userService.getUserByUsername(existingUser.username);
+      
       expect(result).toBe(existingUser);
-
-      methodMock.mockRejectedValue(existingUser);
-      expect(methodMock).toHaveBeenCalledWith(existingUser.username);
-      expect(methodMock).toHaveBeenCalledTimes(1);
+      expect(findUserByUsername).toHaveBeenCalledWith(existingUser.username);
+      expect(findUserByUsername).toHaveBeenCalledTimes(1);
     });
 
     test("getUserByUsername should throw an error when no args are provided", async () => {
-      const methodMock = vi.spyOn(userRepository, "findUserByUsername");
+      const findUserByUsername = vi.spyOn(userRepository, "findUserByUsername");
 
       await expect(
         userService.getUserByUsername(undefined as any)
-      ).rejects.toThrow(noArgsMsg);
+      ).rejects.toThrow(noArgsMsgError);
 
-      methodMock.mockRejectedValue(noArgsMsg);
-      expect(methodMock).toHaveBeenCalledTimes(0);
+      expect(findUserByUsername).toHaveBeenCalledTimes(0);
     });
 
     test("getUserByUsername should throw an error when user is not found", async () => {
-      const methodMock = vi.spyOn(userRepository, "findUserByUsername");
+      const findUserByUsername = vi.spyOn(userRepository, "findUserByUsername");
 
       await expect(
         userService.getUserByUsername(notFoundUser.username)
-      ).rejects.toThrow(notFoundMsg);
+      ).rejects.toThrow(userNotFoundMsgError);
 
-      methodMock.mockRejectedValue(notFoundMsg);
-      expect(methodMock).toHaveBeenCalledWith(notFoundUser.username);
-      expect(methodMock).toHaveBeenCalledTimes(1);
+      findUserByUsername.mockRejectedValue(userNotFoundMsgError);
+      expect(findUserByUsername).toHaveBeenCalledWith(notFoundUser.username);
+      expect(findUserByUsername).toHaveBeenCalledTimes(1);
     });
   });
 
   describe("Get user data by email", async () => {
     test("getUserByEmail should return the correct result", async () => {
-      const methodMock = vi.spyOn(userRepository, "findUserByEmail");
+      const findUserByEmail = vi.spyOn(userRepository, "findUserByEmail");
       const result = await userService.getUserByEmail(existingUser.email);
-      expect(result).toBe(existingUser);
 
-      methodMock.mockRejectedValue(existingUser);
-      expect(methodMock).toHaveBeenCalledWith(existingUser.email);
-      expect(methodMock).toHaveBeenCalledTimes(1);
+      expect(result).toBe(existingUser);
+      expect(findUserByEmail).toHaveBeenCalledWith(existingUser.email);
+      expect(findUserByEmail).toHaveBeenCalledTimes(1);
     });
 
     test("getUserByEmail should throw an error when no args are provided", async () => {
-      const methodMock = vi.spyOn(userRepository, "findUserByEmail");
+      const findUserByEmail = vi.spyOn(userRepository, "findUserByEmail");
 
       await expect(
         userService.getUserByEmail(undefined as any)
-      ).rejects.toThrow(noArgsMsg);
+      ).rejects.toThrow(noArgsMsgError);
 
-      methodMock.mockRejectedValue(noArgsMsg);
-      expect(methodMock).toHaveBeenCalledTimes(0);
+      expect(findUserByEmail).toHaveBeenCalledTimes(0);
     });
 
     test("getUserByEmail should throw an error when user is not found", async () => {
-      const methodMock = vi.spyOn(userRepository, "findUserByEmail");
+      const findUserByEmail = vi.spyOn(userRepository, "findUserByEmail");
 
       await expect(
         userService.getUserByEmail(notFoundUser.email)
-      ).rejects.toThrow(notFoundMsg);
+      ).rejects.toThrow(userNotFoundMsgError);
 
-      methodMock.mockRejectedValue(notFoundMsg);
-      expect(methodMock).toHaveBeenCalledWith(notFoundUser.email);
-      expect(methodMock).toHaveBeenCalledTimes(1);
+      expect(findUserByEmail).toHaveBeenCalledWith(notFoundUser.email);
+      expect(findUserByEmail).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -266,15 +306,15 @@ describe('UserService', () => {
     test("updateUser should return the correct result", async () => {
       const findUserById = vi.spyOn(userRepository, "findUserById");
       const updateUser = vi.spyOn(userRepository, "updateUser");
-      
-      const result = await userService.updateUser(existingUser.user_id, existingUser);
+
+      const result = await userService
+        .updateUser(existingUser.user_id, existingUser);
+
       expect(result).toStrictEqual(existingUser);
 
-      findUserById.mockRejectedValue(notFoundMsg);
       expect(findUserById).toHaveBeenCalledWith(existingUser.user_id);
       expect(findUserById).toHaveBeenCalledTimes(1);
 
-      updateUser.mockRejectedValue(notFoundMsg);
       expect(updateUser).toHaveBeenCalledWith(existingUser.user_id, existingUser);
       expect(updateUser).toHaveBeenCalledTimes(1);
     });
@@ -285,12 +325,9 @@ describe('UserService', () => {
 
       await expect(
         userService.updateUser(undefined as any, existingUser)
-      ).rejects.toThrow(noArgsMsg);
+      ).rejects.toThrow(noArgsMsgError);
 
-      findUserById.mockRejectedValue(notFoundMsg);
       expect(findUserById).toHaveBeenCalledTimes(0);
-
-      updateUser.mockRejectedValue(notFoundMsg);
       expect(updateUser).toHaveBeenCalledTimes(0);
     });
 
@@ -300,13 +337,10 @@ describe('UserService', () => {
 
       await expect(
         userService.updateUser(notFoundUser.user_id, notFoundUser)
-      ).rejects.toThrow(notFoundMsg);
+      ).rejects.toThrow(userNotFoundMsgError);
 
-      findUserById.mockRejectedValue(notFoundMsg);
       expect(findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
       expect(findUserById).toHaveBeenCalledTimes(1);
-
-      updateUser.mockRejectedValue(notFoundMsg);
       expect(updateUser).toHaveBeenCalledTimes(0);
     });
   });
@@ -319,7 +353,6 @@ describe('UserService', () => {
       const result = await userService.deleteUserById(existingUser.user_id);
       expect(result).toBe("User deleted successfully");
 
-      findUserById.mockResolvedValue(existingUser);
       expect(findUserById).toHaveBeenCalledWith(existingUser.user_id);
       expect(findUserById).toHaveBeenCalledTimes(1);
 
@@ -333,12 +366,9 @@ describe('UserService', () => {
 
       await expect(
         userService.deleteUserById(undefined as any)
-      ).rejects.toThrow(noArgsMsg);
+      ).rejects.toThrow(noArgsMsgError);
 
-      findUserById.mockRejectedValue(noArgsMsg);
       expect(findUserById).toHaveBeenCalledTimes(0);
-
-      deleteUser.mockRejectedValue(noArgsMsg);
       expect(deleteUser).toHaveBeenCalledTimes(0);
     });
 
@@ -348,71 +378,74 @@ describe('UserService', () => {
 
       await expect(
         userService.deleteUserById(notFoundUser.user_id)
-      ).rejects.toThrow(notFoundMsg);
+      ).rejects.toThrow(userNotFoundMsgError);
 
-      findUserById.mockRejectedValue(notFoundMsg);
       expect(findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
       expect(findUserById).toHaveBeenCalledTimes(1);
 
-      deleteUser.mockRejectedValue(notFoundMsg);
       expect(deleteUser).toHaveBeenCalledTimes(0);
     });
   });
 
   describe("Find users by search", async () => {
     test("searchUserByFields should return the correct result with username", async () => {
-      const mockMethod = vi.spyOn(userRepository, "searchUsersByQuery");
-      mockMethod.mockResolvedValue(users);
-
+      const searchUsersByQuery = vi.spyOn(userRepository, "searchUsersByQuery");
+      
       const result = await userService.searchUserByFields(existingUser.username);
-      expect(result).toStrictEqual(users);
-
-      expect(mockMethod).toHaveBeenCalledWith(existingUser.username);
-      expect(mockMethod).toHaveBeenCalledTimes(1);
+      expect(result).toStrictEqual([existingUser]);
+      expect(Array.isArray(result)).toBe(true);
+      expect(result).toHaveLength(1);
+      
+      expect(searchUsersByQuery).toHaveBeenCalledWith(existingUser.username);
+      expect(searchUsersByQuery).toHaveBeenCalledTimes(1);
     });
 
     test("searchUserByFields should return the correct result with first name", async () => {
-      const mockMethod = vi.spyOn(userRepository, "searchUsersByQuery");
-      mockMethod.mockResolvedValue(users);
+      const searchUsersByQuery = vi.spyOn(userRepository, "searchUsersByQuery");
 
-      const result = await userService.searchUserByFields(existingUser.first_name as any);
-      expect(result).toStrictEqual(users);
+      const result = await userService.searchUserByFields(existingUser.first_name!);
+      expect(result).toStrictEqual([existingUser]);
+      expect(Array.isArray(result)).toBe(true);
+      expect(result).toHaveLength(1);
 
-      expect(mockMethod).toHaveBeenCalledWith(existingUser.first_name);
-      expect(mockMethod).toHaveBeenCalledTimes(1);
+      expect(searchUsersByQuery).toHaveBeenCalledWith(existingUser.first_name);
+      expect(searchUsersByQuery).toHaveBeenCalledTimes(1);
     });
 
     test("searchUserByFields should return the correct result with last name", async () => {
-      const mockMethod = vi.spyOn(userRepository, "searchUsersByQuery");
-      mockMethod.mockResolvedValue(users);
+      const searchUsersByQuery = vi.spyOn(userRepository, "searchUsersByQuery");
 
-      const result = await userService.searchUserByFields(existingUser.last_name as any);
-      expect(result).toStrictEqual(users);
+      const result = await userService.searchUserByFields(existingUser.last_name!);
+      expect(result).toStrictEqual([existingUser]);
+      expect(Array.isArray(result)).toBe(true);
+      expect(result).toHaveLength(1);
 
-      expect(mockMethod).toHaveBeenCalledWith(existingUser.last_name);
-      expect(mockMethod).toHaveBeenCalledTimes(1);
+      expect(searchUsersByQuery).toHaveBeenCalledWith(existingUser.last_name);
+      expect(searchUsersByQuery).toHaveBeenCalledTimes(1);
     });
 
-    test("searchUserByFields should return the correct result with last name", async () => {
-      const mockMethod = vi.spyOn(userRepository, "searchUsersByQuery");
-      mockMethod.mockResolvedValue(users);
+    test("searchUserByFields should return the correct result with first and last name", async () => {
+      const searchUsersByQuery = vi.spyOn(userRepository, "searchUsersByQuery");
+      const result = await userService
+        .searchUserByFields(`${existingUser.first_name} ${existingUser.last_name}`);
 
-      const result = await userService.searchUserByFields(`${existingUser.first_name} ${existingUser.last_name}`);
-      expect(result).toStrictEqual(users);
+      expect(result).toStrictEqual([existingUser]);
+      expect(Array.isArray(result)).toBe(true);
+      expect(result).toHaveLength(1);
 
-      expect(mockMethod).toHaveBeenCalledWith(`${existingUser.first_name} ${existingUser.last_name}`);
-      expect(mockMethod).toHaveBeenCalledTimes(1);
+      expect(searchUsersByQuery)
+        .toHaveBeenCalledWith(`${existingUser.first_name} ${existingUser.last_name}`);
+      expect(searchUsersByQuery).toHaveBeenCalledTimes(1);
     });
 
     test("searchUserByFields should throw an error when no args are provided", async () => {
-      const mockMethod = vi.spyOn(userRepository, "searchUsersByQuery");
-      mockMethod.mockRejectedValue(noArgsMsg);
+      const searchUsersByQuery = vi.spyOn(userRepository, "searchUsersByQuery");
 
       await expect(
         userService.searchUserByFields(undefined as any)
-      ).rejects.toThrow(noArgsMsg);
+      ).rejects.toThrow(noArgsMsgError);
 
-      expect(mockMethod).toHaveBeenCalledTimes(0);
+      expect(searchUsersByQuery).toHaveBeenCalledTimes(0);
     });
   });
 
@@ -420,13 +453,15 @@ describe('UserService', () => {
     test("getAllRecentSearches should return the correct result", async () => {
       const findUserById = vi.spyOn(userRepository, "findUserById");
       const getRecentSearches = vi.spyOn(recentSearchRepository, "getRecentSearches");
-
-      findUserById.mockResolvedValue(existingUser);
-      getRecentSearches.mockResolvedValue(recentSearches);
+      const expectedResult = recentSearches.filter(
+        (r) => r.user_id === existingUser.user_id
+      );
 
       const result = await userService.getAllRecentSearches(existingUser.user_id);
-      expect(result).toStrictEqual(recentSearches);
-
+      expect(result).toStrictEqual(expectedResult);
+      expect(Array.isArray(result)).toBe(true);
+      expect(result).toHaveLength(expectedResult.length);
+      
       expect(findUserById).toHaveBeenCalledWith(existingUser.user_id);
       expect(findUserById).toHaveBeenCalledTimes(1);
 
@@ -440,7 +475,7 @@ describe('UserService', () => {
 
       await expect(
         userService.getAllRecentSearches(undefined as any)
-      ).rejects.toThrow(noArgsMsg);
+      ).rejects.toThrow(noArgsMsgError);
 
       expect(findUserById).toHaveBeenCalledTimes(0);
       expect(getRecentSearches).toHaveBeenCalledTimes(0);
@@ -450,30 +485,25 @@ describe('UserService', () => {
       const findUserById = vi.spyOn(userRepository, "findUserById");
       const getRecentSearches = vi.spyOn(recentSearchRepository, "getRecentSearches");
 
-      findUserById.mockRejectedValue(notFoundMsg);
-      getRecentSearches.mockRejectedValue(notFoundMsg);
-
       await expect(
         userService.getAllRecentSearches(notFoundUser.user_id)
-      ).rejects.toThrow(notFoundMsg);
+      ).rejects.toThrow(userNotFoundMsgError);
 
       expect(findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
       expect(findUserById).toHaveBeenCalledTimes(1);
-
       expect(getRecentSearches).toHaveBeenCalledTimes(0);
     });
   });
 
-  describe("saveRecentSearches", () => {
+  describe("Save the recent searches", () => {
     test("saveRecentSearches should return the correct result", async () => {
       const findUserById = vi.spyOn(userRepository, "findUserById");
       const saveRecentSearches = vi.spyOn(recentSearchRepository, "saveRecentSearches");
       
       const result = await userService
         .saveRecentSearches(existingUser.user_id, newSearch.user_id);
+        
       expect(result).toBe("Search user saved successfully");
-      
-      findUserById.mockResolvedValue(existingUser);
       expect(findUserById).toHaveBeenCalledWith(existingUser.user_id);
       expect(findUserById).toHaveBeenCalledWith(newSearch.user_id);
       expect(findUserById).toHaveBeenCalledTimes(2);
@@ -487,14 +517,10 @@ describe('UserService', () => {
       const findUserById = vi.spyOn(userRepository, "findUserById");
       const saveRecentSearches = vi.spyOn(recentSearchRepository, "saveRecentSearches");
 
-      const result = await userService.saveRecentSearches(
-        existingSearch?.user_id,
-        existingSearch?.search_user_id
-      );
+      const result = await userService
+        .saveRecentSearches(existingSearch?.user_id, existingSearch?.search_user_id);
       
       expect(result).toBe("Search user already saved");
-
-      findUserById.mockResolvedValue(existingUser);
       expect(findUserById).toHaveBeenCalledWith(existingSearch?.user_id);
       expect(findUserById).toHaveBeenCalledWith(existingSearch?.search_user_id);
       expect(findUserById).toHaveBeenCalledTimes(2);
@@ -508,7 +534,7 @@ describe('UserService', () => {
 
       await expect(
         userService.saveRecentSearches(undefined as any, newSearch.user_id)
-      ).rejects.toThrow(noArgsMsg);
+      ).rejects.toThrow(noArgsMsgError);
 
       expect(findUserById).toHaveBeenCalledTimes(0);
       expect(saveRecentSearches).toHaveBeenCalledTimes(0);
@@ -523,7 +549,7 @@ describe('UserService', () => {
           notFoundSearch.user_id,
           existingSearch?.search_user_id
         )
-      ).rejects.toThrow(notFoundMsg);
+      ).rejects.toThrow(userNotFoundMsgError);
 
       expect(findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
       expect(findUserById).toHaveBeenCalledTimes(1);
@@ -540,7 +566,7 @@ describe('UserService', () => {
           existingSearch?.user_id,
           notFoundSearch.search_user_id
         )
-      ).rejects.toThrow(notFoundSearchMsg);
+      ).rejects.toThrow(userSearchNotFoundError);
 
       expect(findUserById).toHaveBeenCalledWith(existingUser.user_id);
       expect(findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
@@ -550,7 +576,86 @@ describe('UserService', () => {
     });
   });
 
-  // describe("removeRecentSearches", () => {
-    
-  // });
+  describe("Remove the recent searches", () => {
+    test("removeRecentSearches should return the correct result", async () => {
+      const findUsersSearchByRecentId = vi.spyOn(recentSearchRepository, "findUsersSearchByRecentId");
+      const deleteRecentSearches = vi.spyOn(recentSearchRepository, "deleteRecentSearches");
+
+      const result = await userService.removeRecentSearches(existingSearch.recent_id);
+      expect(result).toBe("Search user deleted successfully");
+
+      expect(findUsersSearchByRecentId).toHaveBeenCalledWith(existingSearch.recent_id);
+      expect(findUsersSearchByRecentId).toHaveBeenCalledTimes(1);
+
+      expect(deleteRecentSearches).toHaveBeenCalledWith(existingSearch.recent_id);
+      expect(deleteRecentSearches).toHaveBeenCalledTimes(1);
+    });
+
+    test("removeRecentSearches should throw an error when no args are provided", async () => {
+      const findUsersSearchByRecentId = vi.spyOn(recentSearchRepository, "findUsersSearchByRecentId");
+      const deleteRecentSearches = vi.spyOn(recentSearchRepository, "deleteRecentSearches");
+
+      await expect(
+        userService.removeRecentSearches(undefined as any)
+      ).rejects.toThrow(noArgsMsgError);
+
+      expect(findUsersSearchByRecentId).toHaveBeenCalledTimes(0);
+      expect(deleteRecentSearches).toHaveBeenCalledTimes(0);
+    });
+
+    test("removeRecentSearches should throw an error when search user is not found", async () => {
+      const findUsersSearchByRecentId = vi.spyOn(recentSearchRepository, "findUsersSearchByRecentId");
+      const deleteRecentSearches = vi.spyOn(recentSearchRepository, "deleteRecentSearches");
+
+      await expect(
+        userService.removeRecentSearches(notFoundSearch.recent_id)
+      ).rejects.toThrow(recentSearchNotFoundError);
+
+      expect(findUsersSearchByRecentId).toHaveBeenCalledWith(notFoundSearch.recent_id);
+      expect(findUsersSearchByRecentId).toHaveBeenCalledTimes(1);
+      expect(deleteRecentSearches).toHaveBeenCalledTimes(0);
+    });
+  });
+  
+  describe("Get the number of followers and following", () => {
+
+    test("getFollowStats should return the correct result", async () => {
+      const findUserById = vi.spyOn(userRepository, "findUserById");
+      const getFollowStats = vi.spyOn(followRepository, "getFollowStats");
+      
+      const result = await userService.getFollowStats(existingUser.user_id);
+      expect(result).toStrictEqual({ followers: 1, following: 1 });
+      
+      expect(findUserById).toHaveBeenCalledWith(existingUser.user_id);
+      expect(findUserById).toHaveBeenCalledTimes(1);
+      
+      expect(getFollowStats).toHaveBeenCalledWith(existingUser.user_id);
+      expect(getFollowStats).toHaveBeenCalledTimes(1);
+    });
+
+    test("getFollowStats should throw an error when no args are provided", async () => {
+      const findUserById = vi.spyOn(userRepository, "findUserById");
+      const getFollowStats = vi.spyOn(followRepository, "getFollowStats");
+
+      await expect(
+        userService.getFollowStats(undefined as any)
+      ).rejects.toThrow(noArgsMsgError);
+
+      expect(findUserById).toHaveBeenCalledTimes(0);
+      expect(getFollowStats).toHaveBeenCalledTimes(0);
+    });
+
+    test("getFollowStats should throw an error when user is not found", async () => {
+      const findUserById = vi.spyOn(userRepository, "findUserById");
+      const getFollowStats = vi.spyOn(followRepository, "getFollowStats");
+
+      await expect(
+        userService.getFollowStats(notFoundUser.user_id)
+      ).rejects.toThrow(userNotFoundMsgError);
+
+      expect(findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
+      expect(findUserById).toHaveBeenCalledTimes(1);
+      expect(getFollowStats).toHaveBeenCalledTimes(0);
+    });
+  });
 });

@@ -1,5 +1,5 @@
+import { faker }       from "@faker-js/faker";
 import { SelectUsers } from "@/types/table.types";
-import { faker } from "@faker-js/faker";
 
 const createUser = (): SelectUsers => ({
   user_id: faker.number.int({ min: 1, max: 1000 }),

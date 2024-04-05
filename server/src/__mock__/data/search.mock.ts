@@ -8,12 +8,4 @@ const createRecentSearch = (user_id: number, search_user_id: number): SelectSear
   create_time: new Date(faker.date.past().toISOString()),
 });
 
-const createSearchList = (
-  count: number,
-  user_id: number,
-  search_user_id: number
-): SelectSearches[] => {
-  return Array.from({ length: count }, () => createRecentSearch(user_id, search_user_id));
-};
-
-export { createRecentSearch, createSearchList };
+export { createRecentSearch };

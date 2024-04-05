@@ -7,21 +7,33 @@ const user_service_impl_1 = __importDefault(require("@/services/user/user.servic
 const error_exception_1 = __importDefault(require("@/exceptions/error.exception"));
 const user_repository_impl_1 = __importDefault(require("@/repositories/user/user.repository.impl"));
 const follow_repository_impl_1 = __importDefault(require("@/repositories/follow/follow.repository.impl"));
+const follow_mock_1 = require("@/__mock__/data/follow.mock");
+const search_mock_1 = require("@/__mock__/data/search.mock");
 const recent_search_repository_impl_1 = __importDefault(require("@/repositories/recent-search/recent-search.repository.impl"));
-const user_mock_1 = require("@/__mock__/user/user.mock");
-const search_mock_1 = require("@/__mock__/recent-search/search.mock");
+const user_mock_1 = require("@/__mock__/data/user.mock");
 const vitest_1 = require("vitest");
+const processUsers = (changeArg, list, callback) => {
+    return list.flatMap((u, i) => {
+        let nextUser = list[i + 1];
+        let nextUserId = nextUser ? nextUser.user_id : u.user_id;
+        const args = changeArg ?
+            [nextUserId, u.user_id] :
+            [u.user_id, nextUserId];
+        return callback(args[0], args[1]);
+    });
+};
+// Create a mock of the user service
 let users = (0, user_mock_1.createUserList)(10);
 const notFoundUser = (0, user_mock_1.createUser)();
-const existingUser = users[0] || (0, user_mock_1.createUser)();
-let recentSearches = users.flatMap((u, i) => {
-    let nextUser = users[i + 1];
-    let nextUserId = nextUser ? nextUser.user_id : u.user_id;
-    return (0, search_mock_1.createSearchList)(5, u.user_id, nextUserId);
-});
+const existingUser = users[0];
+// Create a mock of the recent searches
+let recentSearches = processUsers(false, users, search_mock_1.createRecentSearch);
 const notFoundSearch = (0, search_mock_1.createRecentSearch)(notFoundUser.user_id, notFoundUser.user_id);
+const newSearch = users[9];
 const existingSearch = recentSearches[0];
-const newSearch = users[9] || (0, user_mock_1.createUser)();
+// Create a mock of the followers and following
+let followers = processUsers(false, users, follow_mock_1.createFollower);
+let following = processUsers(true, users, follow_mock_1.createFollower);
 vitest_1.vi.mock("@/repositories/user/user.repository.impl", async (importOriginal) => {
     const original = await importOriginal();
     return {
@@ -67,7 +79,20 @@ vitest_1.vi.mock("@/repositories/follow/follow.repository.impl", async (importOr
     const original = await importOriginal();
     return {
         ...original,
-        default: vitest_1.vi.fn().mockImplementation(() => ({})),
+        default: vitest_1.vi.fn().mockImplementation(() => ({
+            getFollowStats: vitest_1.vi
+                .fn()
+                .mockImplementation((user_id) => ({
+                followers: followers.filter((u) => u.follower_id === user_id).length,
+                following: following.filter((u) => u.followed_id === user_id).length,
+            })),
+            getFollowersLists: vitest_1.vi
+                .fn()
+                .mockImplementation((user_id, listsId) => followers.filter((u) => u.follower_id === user_id && !listsId.includes(u.followed_id))),
+            getFollowingLists: vitest_1.vi
+                .fn()
+                .mockImplementation((user_id, listsId) => following.filter((u) => u.followed_id === user_id && !listsId.includes(u.follower_id))),
+        })),
     };
 });
 vitest_1.vi.mock("@/repositories/recent-search/recent-search.repository.impl", async (importOriginal) => {
@@ -89,6 +114,12 @@ vitest_1.vi.mock("@/repositories/recent-search/recent-search.repository.impl", a
             getRecentSearches: vitest_1.vi
                 .fn()
                 .mockImplementation((user_id) => recentSearches.filter((r) => r.user_id === user_id)),
+            findUsersSearchByRecentId: vitest_1.vi
+                .fn()
+                .mockImplementation((recent_id) => recentSearches.find((r) => r.recent_id === recent_id)),
+            deleteRecentSearches: vitest_1.vi
+                .fn()
+                .mockImplementation((recent_id) => recentSearches.filter((r) => r.recent_id !== recent_id)),
         })),
     };
 });
@@ -97,9 +128,10 @@ vitest_1.vi.mock("@/repositories/recent-search/recent-search.repository.impl", a
     let userRepository;
     let followRepository;
     let recentSearchRepository;
-    let noArgsMsg = error_exception_1.default.badRequest("No arguments provided");
-    let notFoundMsg = error_exception_1.default.badRequest("User not found");
-    let notFoundSearchMsg = error_exception_1.default.notFound("Search user not found");
+    let noArgsMsgError = error_exception_1.default.badRequest("No arguments provided");
+    let userNotFoundMsgError = error_exception_1.default.badRequest("User not found");
+    let userSearchNotFoundError = error_exception_1.default.notFound("Search user not found");
+    let recentSearchNotFoundError = error_exception_1.default.notFound("Recent search not found");
     (0, vitest_1.beforeEach)(() => {
         userRepository = new user_repository_impl_1.default();
         followRepository = new follow_repository_impl_1.default();
@@ -114,103 +146,90 @@ vitest_1.vi.mock("@/repositories/recent-search/recent-search.repository.impl", a
     });
     (0, vitest_1.describe)("Get user's data by id", () => {
         (0, vitest_1.test)("getUserById should return the correct result", async () => {
-            const methodMock = vitest_1.vi.spyOn(userRepository, "findUserById");
+            const findUserById = vitest_1.vi.spyOn(userRepository, "findUserById");
             const result = await userService.getUserById(existingUser.user_id);
             (0, vitest_1.expect)(result).toBe(existingUser);
-            methodMock.mockRejectedValue(existingUser);
-            (0, vitest_1.expect)(methodMock).toHaveBeenCalledWith(existingUser.user_id);
-            (0, vitest_1.expect)(methodMock).toHaveBeenCalledTimes(1);
+            (0, vitest_1.expect)(findUserById).toHaveBeenCalledWith(existingUser.user_id);
+            (0, vitest_1.expect)(findUserById).toHaveBeenCalledTimes(1);
         });
         (0, vitest_1.test)("getUserById should throw an error when no args are provided", async () => {
-            const methodMock = vitest_1.vi.spyOn(userRepository, "findUserById");
-            await (0, vitest_1.expect)(userService.getUserById(undefined)).rejects.toThrow(noArgsMsg);
-            methodMock.mockRejectedValue(noArgsMsg);
-            (0, vitest_1.expect)(methodMock).toHaveBeenCalledTimes(0);
+            const findUserById = vitest_1.vi.spyOn(userRepository, "findUserById");
+            await (0, vitest_1.expect)(userService.getUserById(undefined)).rejects.toThrow(noArgsMsgError);
+            (0, vitest_1.expect)(findUserById).toHaveBeenCalledTimes(0);
         });
         (0, vitest_1.test)("getUserById should throw an error when user is not found", async () => {
-            const methodMock = vitest_1.vi.spyOn(userRepository, "findUserById");
-            await (0, vitest_1.expect)(userService.getUserById(notFoundUser.user_id)).rejects.toThrow(notFoundMsg);
-            methodMock.mockRejectedValue(notFoundMsg);
-            (0, vitest_1.expect)(methodMock).toHaveBeenCalledWith(notFoundUser.user_id);
-            (0, vitest_1.expect)(methodMock).toHaveBeenCalledTimes(1);
+            const findUserById = vitest_1.vi.spyOn(userRepository, "findUserById");
+            await (0, vitest_1.expect)(userService.getUserById(notFoundUser.user_id)).rejects.toThrow(userNotFoundMsgError);
+            (0, vitest_1.expect)(findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
+            (0, vitest_1.expect)(findUserById).toHaveBeenCalledTimes(1);
         });
     });
     (0, vitest_1.describe)("Get user's data by username", () => {
         (0, vitest_1.test)("getUserByUsername should return the correct result", async () => {
-            const methodMock = vitest_1.vi.spyOn(userRepository, "findUserByUsername");
+            const findUserByUsername = vitest_1.vi.spyOn(userRepository, "findUserByUsername");
             const result = await userService.getUserByUsername(existingUser.username);
             (0, vitest_1.expect)(result).toBe(existingUser);
-            methodMock.mockRejectedValue(existingUser);
-            (0, vitest_1.expect)(methodMock).toHaveBeenCalledWith(existingUser.username);
-            (0, vitest_1.expect)(methodMock).toHaveBeenCalledTimes(1);
+            (0, vitest_1.expect)(findUserByUsername).toHaveBeenCalledWith(existingUser.username);
+            (0, vitest_1.expect)(findUserByUsername).toHaveBeenCalledTimes(1);
         });
         (0, vitest_1.test)("getUserByUsername should throw an error when no args are provided", async () => {
-            const methodMock = vitest_1.vi.spyOn(userRepository, "findUserByUsername");
-            await (0, vitest_1.expect)(userService.getUserByUsername(undefined)).rejects.toThrow(noArgsMsg);
-            methodMock.mockRejectedValue(noArgsMsg);
-            (0, vitest_1.expect)(methodMock).toHaveBeenCalledTimes(0);
+            const findUserByUsername = vitest_1.vi.spyOn(userRepository, "findUserByUsername");
+            await (0, vitest_1.expect)(userService.getUserByUsername(undefined)).rejects.toThrow(noArgsMsgError);
+            (0, vitest_1.expect)(findUserByUsername).toHaveBeenCalledTimes(0);
         });
         (0, vitest_1.test)("getUserByUsername should throw an error when user is not found", async () => {
-            const methodMock = vitest_1.vi.spyOn(userRepository, "findUserByUsername");
-            await (0, vitest_1.expect)(userService.getUserByUsername(notFoundUser.username)).rejects.toThrow(notFoundMsg);
-            methodMock.mockRejectedValue(notFoundMsg);
-            (0, vitest_1.expect)(methodMock).toHaveBeenCalledWith(notFoundUser.username);
-            (0, vitest_1.expect)(methodMock).toHaveBeenCalledTimes(1);
+            const findUserByUsername = vitest_1.vi.spyOn(userRepository, "findUserByUsername");
+            await (0, vitest_1.expect)(userService.getUserByUsername(notFoundUser.username)).rejects.toThrow(userNotFoundMsgError);
+            findUserByUsername.mockRejectedValue(userNotFoundMsgError);
+            (0, vitest_1.expect)(findUserByUsername).toHaveBeenCalledWith(notFoundUser.username);
+            (0, vitest_1.expect)(findUserByUsername).toHaveBeenCalledTimes(1);
         });
     });
     (0, vitest_1.describe)("Get user data by email", async () => {
         (0, vitest_1.test)("getUserByEmail should return the correct result", async () => {
-            const methodMock = vitest_1.vi.spyOn(userRepository, "findUserByEmail");
+            const findUserByEmail = vitest_1.vi.spyOn(userRepository, "findUserByEmail");
             const result = await userService.getUserByEmail(existingUser.email);
             (0, vitest_1.expect)(result).toBe(existingUser);
-            methodMock.mockRejectedValue(existingUser);
-            (0, vitest_1.expect)(methodMock).toHaveBeenCalledWith(existingUser.email);
-            (0, vitest_1.expect)(methodMock).toHaveBeenCalledTimes(1);
+            (0, vitest_1.expect)(findUserByEmail).toHaveBeenCalledWith(existingUser.email);
+            (0, vitest_1.expect)(findUserByEmail).toHaveBeenCalledTimes(1);
         });
         (0, vitest_1.test)("getUserByEmail should throw an error when no args are provided", async () => {
-            const methodMock = vitest_1.vi.spyOn(userRepository, "findUserByEmail");
-            await (0, vitest_1.expect)(userService.getUserByEmail(undefined)).rejects.toThrow(noArgsMsg);
-            methodMock.mockRejectedValue(noArgsMsg);
-            (0, vitest_1.expect)(methodMock).toHaveBeenCalledTimes(0);
+            const findUserByEmail = vitest_1.vi.spyOn(userRepository, "findUserByEmail");
+            await (0, vitest_1.expect)(userService.getUserByEmail(undefined)).rejects.toThrow(noArgsMsgError);
+            (0, vitest_1.expect)(findUserByEmail).toHaveBeenCalledTimes(0);
         });
         (0, vitest_1.test)("getUserByEmail should throw an error when user is not found", async () => {
-            const methodMock = vitest_1.vi.spyOn(userRepository, "findUserByEmail");
-            await (0, vitest_1.expect)(userService.getUserByEmail(notFoundUser.email)).rejects.toThrow(notFoundMsg);
-            methodMock.mockRejectedValue(notFoundMsg);
-            (0, vitest_1.expect)(methodMock).toHaveBeenCalledWith(notFoundUser.email);
-            (0, vitest_1.expect)(methodMock).toHaveBeenCalledTimes(1);
+            const findUserByEmail = vitest_1.vi.spyOn(userRepository, "findUserByEmail");
+            await (0, vitest_1.expect)(userService.getUserByEmail(notFoundUser.email)).rejects.toThrow(userNotFoundMsgError);
+            (0, vitest_1.expect)(findUserByEmail).toHaveBeenCalledWith(notFoundUser.email);
+            (0, vitest_1.expect)(findUserByEmail).toHaveBeenCalledTimes(1);
         });
     });
     (0, vitest_1.describe)("Update user's data", async () => {
         (0, vitest_1.test)("updateUser should return the correct result", async () => {
             const findUserById = vitest_1.vi.spyOn(userRepository, "findUserById");
             const updateUser = vitest_1.vi.spyOn(userRepository, "updateUser");
-            const result = await userService.updateUser(existingUser.user_id, existingUser);
+            const result = await userService
+                .updateUser(existingUser.user_id, existingUser);
             (0, vitest_1.expect)(result).toStrictEqual(existingUser);
-            findUserById.mockRejectedValue(notFoundMsg);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledWith(existingUser.user_id);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledTimes(1);
-            updateUser.mockRejectedValue(notFoundMsg);
             (0, vitest_1.expect)(updateUser).toHaveBeenCalledWith(existingUser.user_id, existingUser);
             (0, vitest_1.expect)(updateUser).toHaveBeenCalledTimes(1);
         });
         (0, vitest_1.test)("updateUser should throw an error when no args are provided", async () => {
             const findUserById = vitest_1.vi.spyOn(userRepository, "findUserById");
             const updateUser = vitest_1.vi.spyOn(userRepository, "updateUser");
-            await (0, vitest_1.expect)(userService.updateUser(undefined, existingUser)).rejects.toThrow(noArgsMsg);
-            findUserById.mockRejectedValue(notFoundMsg);
+            await (0, vitest_1.expect)(userService.updateUser(undefined, existingUser)).rejects.toThrow(noArgsMsgError);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledTimes(0);
-            updateUser.mockRejectedValue(notFoundMsg);
             (0, vitest_1.expect)(updateUser).toHaveBeenCalledTimes(0);
         });
         (0, vitest_1.test)("updateUser should throw an error when user is not found", async () => {
             const findUserById = vitest_1.vi.spyOn(userRepository, "findUserById");
             const updateUser = vitest_1.vi.spyOn(userRepository, "updateUser");
-            await (0, vitest_1.expect)(userService.updateUser(notFoundUser.user_id, notFoundUser)).rejects.toThrow(notFoundMsg);
-            findUserById.mockRejectedValue(notFoundMsg);
+            await (0, vitest_1.expect)(userService.updateUser(notFoundUser.user_id, notFoundUser)).rejects.toThrow(userNotFoundMsgError);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledTimes(1);
-            updateUser.mockRejectedValue(notFoundMsg);
             (0, vitest_1.expect)(updateUser).toHaveBeenCalledTimes(0);
         });
     });
@@ -220,7 +239,6 @@ vitest_1.vi.mock("@/repositories/recent-search/recent-search.repository.impl", a
             const deleteUser = vitest_1.vi.spyOn(userRepository, "deleteUser");
             const result = await userService.deleteUserById(existingUser.user_id);
             (0, vitest_1.expect)(result).toBe("User deleted successfully");
-            findUserById.mockResolvedValue(existingUser);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledWith(existingUser.user_id);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledTimes(1);
             (0, vitest_1.expect)(deleteUser).toHaveBeenCalledWith(existingUser.user_id);
@@ -229,71 +247,73 @@ vitest_1.vi.mock("@/repositories/recent-search/recent-search.repository.impl", a
         (0, vitest_1.test)("deleteUserById should throw an error when no args are provided", async () => {
             const findUserById = vitest_1.vi.spyOn(userRepository, "findUserById");
             const deleteUser = vitest_1.vi.spyOn(userRepository, "deleteUser");
-            await (0, vitest_1.expect)(userService.deleteUserById(undefined)).rejects.toThrow(noArgsMsg);
-            findUserById.mockRejectedValue(noArgsMsg);
+            await (0, vitest_1.expect)(userService.deleteUserById(undefined)).rejects.toThrow(noArgsMsgError);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledTimes(0);
-            deleteUser.mockRejectedValue(noArgsMsg);
             (0, vitest_1.expect)(deleteUser).toHaveBeenCalledTimes(0);
         });
         (0, vitest_1.test)("deleteUserById should throw an error when user is not found", async () => {
             const findUserById = vitest_1.vi.spyOn(userRepository, "findUserById");
             const deleteUser = vitest_1.vi.spyOn(userRepository, "deleteUser");
-            await (0, vitest_1.expect)(userService.deleteUserById(notFoundUser.user_id)).rejects.toThrow(notFoundMsg);
-            findUserById.mockRejectedValue(notFoundMsg);
+            await (0, vitest_1.expect)(userService.deleteUserById(notFoundUser.user_id)).rejects.toThrow(userNotFoundMsgError);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledTimes(1);
-            deleteUser.mockRejectedValue(notFoundMsg);
             (0, vitest_1.expect)(deleteUser).toHaveBeenCalledTimes(0);
         });
     });
     (0, vitest_1.describe)("Find users by search", async () => {
         (0, vitest_1.test)("searchUserByFields should return the correct result with username", async () => {
-            const mockMethod = vitest_1.vi.spyOn(userRepository, "searchUsersByQuery");
-            mockMethod.mockResolvedValue(users);
+            const searchUsersByQuery = vitest_1.vi.spyOn(userRepository, "searchUsersByQuery");
             const result = await userService.searchUserByFields(existingUser.username);
-            (0, vitest_1.expect)(result).toStrictEqual(users);
-            (0, vitest_1.expect)(mockMethod).toHaveBeenCalledWith(existingUser.username);
-            (0, vitest_1.expect)(mockMethod).toHaveBeenCalledTimes(1);
+            (0, vitest_1.expect)(result).toStrictEqual([existingUser]);
+            (0, vitest_1.expect)(Array.isArray(result)).toBe(true);
+            (0, vitest_1.expect)(result).toHaveLength(1);
+            (0, vitest_1.expect)(searchUsersByQuery).toHaveBeenCalledWith(existingUser.username);
+            (0, vitest_1.expect)(searchUsersByQuery).toHaveBeenCalledTimes(1);
         });
         (0, vitest_1.test)("searchUserByFields should return the correct result with first name", async () => {
-            const mockMethod = vitest_1.vi.spyOn(userRepository, "searchUsersByQuery");
-            mockMethod.mockResolvedValue(users);
+            const searchUsersByQuery = vitest_1.vi.spyOn(userRepository, "searchUsersByQuery");
             const result = await userService.searchUserByFields(existingUser.first_name);
-            (0, vitest_1.expect)(result).toStrictEqual(users);
-            (0, vitest_1.expect)(mockMethod).toHaveBeenCalledWith(existingUser.first_name);
-            (0, vitest_1.expect)(mockMethod).toHaveBeenCalledTimes(1);
+            (0, vitest_1.expect)(result).toStrictEqual([existingUser]);
+            (0, vitest_1.expect)(Array.isArray(result)).toBe(true);
+            (0, vitest_1.expect)(result).toHaveLength(1);
+            (0, vitest_1.expect)(searchUsersByQuery).toHaveBeenCalledWith(existingUser.first_name);
+            (0, vitest_1.expect)(searchUsersByQuery).toHaveBeenCalledTimes(1);
         });
         (0, vitest_1.test)("searchUserByFields should return the correct result with last name", async () => {
-            const mockMethod = vitest_1.vi.spyOn(userRepository, "searchUsersByQuery");
-            mockMethod.mockResolvedValue(users);
+            const searchUsersByQuery = vitest_1.vi.spyOn(userRepository, "searchUsersByQuery");
             const result = await userService.searchUserByFields(existingUser.last_name);
-            (0, vitest_1.expect)(result).toStrictEqual(users);
-            (0, vitest_1.expect)(mockMethod).toHaveBeenCalledWith(existingUser.last_name);
-            (0, vitest_1.expect)(mockMethod).toHaveBeenCalledTimes(1);
+            (0, vitest_1.expect)(result).toStrictEqual([existingUser]);
+            (0, vitest_1.expect)(Array.isArray(result)).toBe(true);
+            (0, vitest_1.expect)(result).toHaveLength(1);
+            (0, vitest_1.expect)(searchUsersByQuery).toHaveBeenCalledWith(existingUser.last_name);
+            (0, vitest_1.expect)(searchUsersByQuery).toHaveBeenCalledTimes(1);
         });
-        (0, vitest_1.test)("searchUserByFields should return the correct result with last name", async () => {
-            const mockMethod = vitest_1.vi.spyOn(userRepository, "searchUsersByQuery");
-            mockMethod.mockResolvedValue(users);
-            const result = await userService.searchUserByFields(`${existingUser.first_name} ${existingUser.last_name}`);
-            (0, vitest_1.expect)(result).toStrictEqual(users);
-            (0, vitest_1.expect)(mockMethod).toHaveBeenCalledWith(`${existingUser.first_name} ${existingUser.last_name}`);
-            (0, vitest_1.expect)(mockMethod).toHaveBeenCalledTimes(1);
+        (0, vitest_1.test)("searchUserByFields should return the correct result with first and last name", async () => {
+            const searchUsersByQuery = vitest_1.vi.spyOn(userRepository, "searchUsersByQuery");
+            const result = await userService
+                .searchUserByFields(`${existingUser.first_name} ${existingUser.last_name}`);
+            (0, vitest_1.expect)(result).toStrictEqual([existingUser]);
+            (0, vitest_1.expect)(Array.isArray(result)).toBe(true);
+            (0, vitest_1.expect)(result).toHaveLength(1);
+            (0, vitest_1.expect)(searchUsersByQuery)
+                .toHaveBeenCalledWith(`${existingUser.first_name} ${existingUser.last_name}`);
+            (0, vitest_1.expect)(searchUsersByQuery).toHaveBeenCalledTimes(1);
         });
         (0, vitest_1.test)("searchUserByFields should throw an error when no args are provided", async () => {
-            const mockMethod = vitest_1.vi.spyOn(userRepository, "searchUsersByQuery");
-            mockMethod.mockRejectedValue(noArgsMsg);
-            await (0, vitest_1.expect)(userService.searchUserByFields(undefined)).rejects.toThrow(noArgsMsg);
-            (0, vitest_1.expect)(mockMethod).toHaveBeenCalledTimes(0);
+            const searchUsersByQuery = vitest_1.vi.spyOn(userRepository, "searchUsersByQuery");
+            await (0, vitest_1.expect)(userService.searchUserByFields(undefined)).rejects.toThrow(noArgsMsgError);
+            (0, vitest_1.expect)(searchUsersByQuery).toHaveBeenCalledTimes(0);
         });
     });
     (0, vitest_1.describe)("Get all the recent searches", async () => {
         (0, vitest_1.test)("getAllRecentSearches should return the correct result", async () => {
             const findUserById = vitest_1.vi.spyOn(userRepository, "findUserById");
             const getRecentSearches = vitest_1.vi.spyOn(recentSearchRepository, "getRecentSearches");
-            findUserById.mockResolvedValue(existingUser);
-            getRecentSearches.mockResolvedValue(recentSearches);
+            const expectedResult = recentSearches.filter((r) => r.user_id === existingUser.user_id);
             const result = await userService.getAllRecentSearches(existingUser.user_id);
-            (0, vitest_1.expect)(result).toStrictEqual(recentSearches);
+            (0, vitest_1.expect)(result).toStrictEqual(expectedResult);
+            (0, vitest_1.expect)(Array.isArray(result)).toBe(true);
+            (0, vitest_1.expect)(result).toHaveLength(expectedResult.length);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledWith(existingUser.user_id);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledTimes(1);
             (0, vitest_1.expect)(getRecentSearches).toHaveBeenCalledWith(existingUser.user_id);
@@ -302,29 +322,26 @@ vitest_1.vi.mock("@/repositories/recent-search/recent-search.repository.impl", a
         (0, vitest_1.test)("getAllRecentSearches should throw an error when no args are provided", async () => {
             const findUserById = vitest_1.vi.spyOn(userRepository, "findUserById");
             const getRecentSearches = vitest_1.vi.spyOn(recentSearchRepository, "getRecentSearches");
-            await (0, vitest_1.expect)(userService.getAllRecentSearches(undefined)).rejects.toThrow(noArgsMsg);
+            await (0, vitest_1.expect)(userService.getAllRecentSearches(undefined)).rejects.toThrow(noArgsMsgError);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledTimes(0);
             (0, vitest_1.expect)(getRecentSearches).toHaveBeenCalledTimes(0);
         });
         (0, vitest_1.test)("getAllRecentSearches should throw an error when user is not found", async () => {
             const findUserById = vitest_1.vi.spyOn(userRepository, "findUserById");
             const getRecentSearches = vitest_1.vi.spyOn(recentSearchRepository, "getRecentSearches");
-            findUserById.mockRejectedValue(notFoundMsg);
-            getRecentSearches.mockRejectedValue(notFoundMsg);
-            await (0, vitest_1.expect)(userService.getAllRecentSearches(notFoundUser.user_id)).rejects.toThrow(notFoundMsg);
+            await (0, vitest_1.expect)(userService.getAllRecentSearches(notFoundUser.user_id)).rejects.toThrow(userNotFoundMsgError);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledTimes(1);
             (0, vitest_1.expect)(getRecentSearches).toHaveBeenCalledTimes(0);
         });
     });
-    (0, vitest_1.describe)("saveRecentSearches", () => {
+    (0, vitest_1.describe)("Save the recent searches", () => {
         (0, vitest_1.test)("saveRecentSearches should return the correct result", async () => {
             const findUserById = vitest_1.vi.spyOn(userRepository, "findUserById");
             const saveRecentSearches = vitest_1.vi.spyOn(recentSearchRepository, "saveRecentSearches");
             const result = await userService
                 .saveRecentSearches(existingUser.user_id, newSearch.user_id);
             (0, vitest_1.expect)(result).toBe("Search user saved successfully");
-            findUserById.mockResolvedValue(existingUser);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledWith(existingUser.user_id);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledWith(newSearch.user_id);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledTimes(2);
@@ -335,9 +352,9 @@ vitest_1.vi.mock("@/repositories/recent-search/recent-search.repository.impl", a
         (0, vitest_1.test)("saveRecentSearches should return the correct result when search user is already saved", async () => {
             const findUserById = vitest_1.vi.spyOn(userRepository, "findUserById");
             const saveRecentSearches = vitest_1.vi.spyOn(recentSearchRepository, "saveRecentSearches");
-            const result = await userService.saveRecentSearches(existingSearch?.user_id, existingSearch?.search_user_id);
+            const result = await userService
+                .saveRecentSearches(existingSearch?.user_id, existingSearch?.search_user_id);
             (0, vitest_1.expect)(result).toBe("Search user already saved");
-            findUserById.mockResolvedValue(existingUser);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledWith(existingSearch?.user_id);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledWith(existingSearch?.search_user_id);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledTimes(2);
@@ -346,14 +363,14 @@ vitest_1.vi.mock("@/repositories/recent-search/recent-search.repository.impl", a
         (0, vitest_1.test)("saveRecentSearches should throw an error when no args are provided", async () => {
             const findUserById = vitest_1.vi.spyOn(userRepository, "findUserById");
             const saveRecentSearches = vitest_1.vi.spyOn(recentSearchRepository, "saveRecentSearches");
-            await (0, vitest_1.expect)(userService.saveRecentSearches(undefined, newSearch.user_id)).rejects.toThrow(noArgsMsg);
+            await (0, vitest_1.expect)(userService.saveRecentSearches(undefined, newSearch.user_id)).rejects.toThrow(noArgsMsgError);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledTimes(0);
             (0, vitest_1.expect)(saveRecentSearches).toHaveBeenCalledTimes(0);
         });
         (0, vitest_1.test)("saveRecentSearches should throw an error when user is not found", async () => {
             const findUserById = vitest_1.vi.spyOn(userRepository, "findUserById");
             const saveRecentSearches = vitest_1.vi.spyOn(recentSearchRepository, "saveRecentSearches");
-            await (0, vitest_1.expect)(userService.saveRecentSearches(notFoundSearch.user_id, existingSearch?.search_user_id)).rejects.toThrow(notFoundMsg);
+            await (0, vitest_1.expect)(userService.saveRecentSearches(notFoundSearch.user_id, existingSearch?.search_user_id)).rejects.toThrow(userNotFoundMsgError);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledTimes(1);
             (0, vitest_1.expect)(saveRecentSearches).toHaveBeenCalledTimes(0);
@@ -361,13 +378,65 @@ vitest_1.vi.mock("@/repositories/recent-search/recent-search.repository.impl", a
         (0, vitest_1.test)("saveRecentSearches should throw an error when search user is not found", async () => {
             const findUserById = vitest_1.vi.spyOn(userRepository, "findUserById");
             const saveRecentSearches = vitest_1.vi.spyOn(recentSearchRepository, "saveRecentSearches");
-            await (0, vitest_1.expect)(userService.saveRecentSearches(existingSearch?.user_id, notFoundSearch.search_user_id)).rejects.toThrow(notFoundSearchMsg);
+            await (0, vitest_1.expect)(userService.saveRecentSearches(existingSearch?.user_id, notFoundSearch.search_user_id)).rejects.toThrow(userSearchNotFoundError);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledWith(existingUser.user_id);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
             (0, vitest_1.expect)(findUserById).toHaveBeenCalledTimes(2);
             (0, vitest_1.expect)(saveRecentSearches).toHaveBeenCalledTimes(0);
         });
     });
-    // describe("removeRecentSearches", () => {
-    // });
+    (0, vitest_1.describe)("Remove the recent searches", () => {
+        (0, vitest_1.test)("removeRecentSearches should return the correct result", async () => {
+            const findUsersSearchByRecentId = vitest_1.vi.spyOn(recentSearchRepository, "findUsersSearchByRecentId");
+            const deleteRecentSearches = vitest_1.vi.spyOn(recentSearchRepository, "deleteRecentSearches");
+            const result = await userService.removeRecentSearches(existingSearch.recent_id);
+            (0, vitest_1.expect)(result).toBe("Search user deleted successfully");
+            (0, vitest_1.expect)(findUsersSearchByRecentId).toHaveBeenCalledWith(existingSearch.recent_id);
+            (0, vitest_1.expect)(findUsersSearchByRecentId).toHaveBeenCalledTimes(1);
+            (0, vitest_1.expect)(deleteRecentSearches).toHaveBeenCalledWith(existingSearch.recent_id);
+            (0, vitest_1.expect)(deleteRecentSearches).toHaveBeenCalledTimes(1);
+        });
+        (0, vitest_1.test)("removeRecentSearches should throw an error when no args are provided", async () => {
+            const findUsersSearchByRecentId = vitest_1.vi.spyOn(recentSearchRepository, "findUsersSearchByRecentId");
+            const deleteRecentSearches = vitest_1.vi.spyOn(recentSearchRepository, "deleteRecentSearches");
+            await (0, vitest_1.expect)(userService.removeRecentSearches(undefined)).rejects.toThrow(noArgsMsgError);
+            (0, vitest_1.expect)(findUsersSearchByRecentId).toHaveBeenCalledTimes(0);
+            (0, vitest_1.expect)(deleteRecentSearches).toHaveBeenCalledTimes(0);
+        });
+        (0, vitest_1.test)("removeRecentSearches should throw an error when search user is not found", async () => {
+            const findUsersSearchByRecentId = vitest_1.vi.spyOn(recentSearchRepository, "findUsersSearchByRecentId");
+            const deleteRecentSearches = vitest_1.vi.spyOn(recentSearchRepository, "deleteRecentSearches");
+            await (0, vitest_1.expect)(userService.removeRecentSearches(notFoundSearch.recent_id)).rejects.toThrow(recentSearchNotFoundError);
+            (0, vitest_1.expect)(findUsersSearchByRecentId).toHaveBeenCalledWith(notFoundSearch.recent_id);
+            (0, vitest_1.expect)(findUsersSearchByRecentId).toHaveBeenCalledTimes(1);
+            (0, vitest_1.expect)(deleteRecentSearches).toHaveBeenCalledTimes(0);
+        });
+    });
+    (0, vitest_1.describe)("Get the number of followers and following", () => {
+        (0, vitest_1.test)("getFollowStats should return the correct result", async () => {
+            const findUserById = vitest_1.vi.spyOn(userRepository, "findUserById");
+            const getFollowStats = vitest_1.vi.spyOn(followRepository, "getFollowStats");
+            const result = await userService.getFollowStats(existingUser.user_id);
+            (0, vitest_1.expect)(result).toStrictEqual({ followers: 1, following: 1 });
+            (0, vitest_1.expect)(findUserById).toHaveBeenCalledWith(existingUser.user_id);
+            (0, vitest_1.expect)(findUserById).toHaveBeenCalledTimes(1);
+            (0, vitest_1.expect)(getFollowStats).toHaveBeenCalledWith(existingUser.user_id);
+            (0, vitest_1.expect)(getFollowStats).toHaveBeenCalledTimes(1);
+        });
+        (0, vitest_1.test)("getFollowStats should throw an error when no args are provided", async () => {
+            const findUserById = vitest_1.vi.spyOn(userRepository, "findUserById");
+            const getFollowStats = vitest_1.vi.spyOn(followRepository, "getFollowStats");
+            await (0, vitest_1.expect)(userService.getFollowStats(undefined)).rejects.toThrow(noArgsMsgError);
+            (0, vitest_1.expect)(findUserById).toHaveBeenCalledTimes(0);
+            (0, vitest_1.expect)(getFollowStats).toHaveBeenCalledTimes(0);
+        });
+        (0, vitest_1.test)("getFollowStats should throw an error when user is not found", async () => {
+            const findUserById = vitest_1.vi.spyOn(userRepository, "findUserById");
+            const getFollowStats = vitest_1.vi.spyOn(followRepository, "getFollowStats");
+            await (0, vitest_1.expect)(userService.getFollowStats(notFoundUser.user_id)).rejects.toThrow(userNotFoundMsgError);
+            (0, vitest_1.expect)(findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
+            (0, vitest_1.expect)(findUserById).toHaveBeenCalledTimes(1);
+            (0, vitest_1.expect)(getFollowStats).toHaveBeenCalledTimes(0);
+        });
+    });
 });
