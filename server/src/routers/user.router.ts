@@ -1,8 +1,10 @@
 import express                  from "express";
 import UsersService             from "@/services/user/user.service.impl";
+import FollowService            from "@/services/follow/follow.service.impl";
 import UserRepository           from "@/repositories/user/user.repository.impl";
 import UsersController          from "@/controllers/user.controller";
 import FollowRepository         from "@/repositories/follow/follow.repository.impl";
+import RecentSearchService      from "@/services/recent-search/recent-search.service.impl";
 import RecentSearchesRepository from "@/repositories/recent-search/recent-search.repository.impl";
 
 const router = express.Router();
@@ -10,9 +12,15 @@ const router = express.Router();
 const controller: UsersController = new UsersController(
   new UsersService(
     new UserRepository(),
+  ),
+  new FollowService(
+    new UserRepository(),
     new FollowRepository(),
+  ),
+  new RecentSearchService(
+    new UserRepository(),
     new RecentSearchesRepository(),
-  )
+  ),
 );
 
 router.get("/",                                       controller.getUserData);

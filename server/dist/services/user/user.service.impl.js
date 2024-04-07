@@ -6,12 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const error_exception_1 = __importDefault(require("@/exceptions/error.exception"));
 class UserService {
     userRepository;
-    followRepository;
-    recentSearchRepository;
-    constructor(userRepository, followRepository, recentSearchRepository) {
+    constructor(userRepository) {
         this.userRepository = userRepository;
-        this.followRepository = followRepository;
-        this.recentSearchRepository = recentSearchRepository;
     }
     ;
     async getUserById(id) {
@@ -112,145 +108,6 @@ class UserService {
                 throw error_exception_1.default.badRequest("No arguments provided");
             // search the user by search query
             return await this.userRepository.searchUsersByQuery(search);
-        }
-        catch (error) {
-            throw error;
-        }
-        ;
-    }
-    ;
-    async getAllRecentSearches(user_id) {
-        try {
-            // If no parameters are provided, return an error
-            if (!user_id)
-                throw error_exception_1.default.badRequest("No arguments provided");
-            // Check if the user is already following the other user
-            const isExist = await this.userRepository.findUserById(user_id);
-            // If the user is not found, return an error
-            if (!isExist)
-                throw error_exception_1.default.notFound("User not found");
-            // search the user by search query
-            return await this.recentSearchRepository.getRecentSearches(user_id);
-        }
-        catch (error) {
-            throw error;
-        }
-        ;
-    }
-    ;
-    async saveRecentSearches(user_id, search_user_id) {
-        try {
-            // If no parameters are provided, return an error
-            if (!user_id || !search_user_id)
-                throw error_exception_1.default.badRequest("No arguments provided");
-            // Check if the user is already following the other user
-            const user = await this.userRepository.findUserById(user_id);
-            if (!user)
-                throw error_exception_1.default.notFound("User not found");
-            // Check if the user is already following the other user
-            const searchUser = await this.userRepository.findUserById(search_user_id);
-            if (!searchUser)
-                throw error_exception_1.default.notFound("Search user not found");
-            const isExist = await this.recentSearchRepository
-                .findUsersSearchByUserId(user_id, search_user_id);
-            if (isExist)
-                return "Search user already saved";
-            await this.recentSearchRepository.saveRecentSearches(user_id, search_user_id);
-            return "Search user saved successfully";
-        }
-        catch (error) {
-            throw error;
-        }
-    }
-    ;
-    async removeRecentSearches(recent_id) {
-        try {
-            // If no parameters are provided, return an error
-            if (!recent_id)
-                throw error_exception_1.default.badRequest("No arguments provided");
-            // Check if the user searched the other user
-            const data = await this.recentSearchRepository
-                .findUsersSearchByRecentId(recent_id);
-            // If the user is not found, return an error
-            if (!data)
-                throw error_exception_1.default.notFound("Recent search not found");
-            await this.recentSearchRepository.deleteRecentSearches(recent_id);
-            return "Search user deleted successfully";
-        }
-        catch (error) {
-            throw error;
-        }
-        ;
-    }
-    ;
-    async getFollowStats(user_id) {
-        try {
-            // If no arguments are provided, return an error
-            if (!user_id)
-                throw error_exception_1.default.badRequest("No arguments provided");
-            // Check if the user is already following the other user
-            const isExist = await this.userRepository.findUserById(user_id);
-            if (!isExist)
-                throw error_exception_1.default.notFound("User not found");
-            return await this.followRepository.getFollowStats(user_id);
-        }
-        catch (error) {
-            throw error;
-        }
-        ;
-    }
-    ;
-    async getFollowerFollowingLists(user_id, fetch, listsId) {
-        try {
-            // If no arguments are provided, return an error
-            if (!user_id)
-                throw error_exception_1.default.badRequest("No arguments provided");
-            // Check if the user is already following the other user
-            const isExist = await this.userRepository.findUserById(user_id);
-            if (!isExist)
-                throw error_exception_1.default.notFound("User not found");
-            const listIdsToExclude = listsId?.length ? listsId : [0];
-            switch (fetch) {
-                case "followers":
-                    return this.followRepository.getFollowersLists(user_id, listIdsToExclude);
-                case "following":
-                    return this.followRepository.getFollowingLists(user_id, listIdsToExclude);
-                default:
-                    throw error_exception_1.default.badRequest("Invalid fetch parameter");
-            }
-            ;
-        }
-        catch (error) {
-            throw error;
-        }
-        ;
-    }
-    ;
-    async toggleFollow(user_id, followed_id) {
-        try {
-            if (!user_id || !followed_id)
-                throw error_exception_1.default.badRequest("No arguments provided");
-            const args = {
-                follower_id: user_id,
-                followed_id: followed_id,
-            };
-            const user = await this.userRepository.findUserById(user_id);
-            if (!user)
-                throw error_exception_1.default.notFound("User not found");
-            const otherUser = await this.userRepository.findUserById(followed_id);
-            if (!otherUser)
-                throw error_exception_1.default.notFound("The user to be followed doesn't exist");
-            // Check if the user is already following the other user
-            const isExist = await this.followRepository.isFollowUser(args);
-            // If it already exists, delete the data from the database
-            if (isExist) {
-                await this.followRepository.unfollowUser(args);
-                return "User unfollowed successfully";
-            }
-            ;
-            // if there is no data in the database, create one
-            await this.followRepository.followUser(args);
-            return "User followed successfully";
         }
         catch (error) {
             throw error;
