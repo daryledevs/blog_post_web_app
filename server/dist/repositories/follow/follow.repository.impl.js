@@ -88,8 +88,12 @@ class FollowRepository {
         }
     }
     async followUser(identifier) {
-        await this.database.insertInto("followers").values(identifier).execute();
+        await this.database
+            .insertInto("followers")
+            .values(identifier)
+            .execute();
     }
+    ;
     async unfollowUser(identifier) {
         try {
             await this.database

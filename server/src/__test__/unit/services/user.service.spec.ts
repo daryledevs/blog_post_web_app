@@ -26,6 +26,7 @@ const processUsers = (changeArg: boolean, list: any[], callback: Function) => {
 let users: SelectUsers[] = createUserList(10);
 const notFoundUser = createUser();
 const existingUser = users[0]!;
+const otherExistingUser = users[9]!;
 
 // Create a mock of the recent searches
 let recentSearches: SelectSearches[] = processUsers(false, users, createRecentSearch);
@@ -99,13 +100,10 @@ vi.mock("@/repositories/follow/follow.repository.impl", async (importOriginal) =
   return {
     ...original,
     default: vi.fn().mockImplementation(() => ({
-      getFollowStats: vi
-        .fn()
-        .mockImplementation((user_id: number) => ({
-          followers: followers.filter((u) => u.follower_id === user_id).length,
-          following: following.filter((u) => u.followed_id === user_id).length,
-        })
-        ),
+      getFollowStats: vi.fn().mockImplementation((user_id: number) => ({
+        followers: followers.filter((u) => u.follower_id === user_id).length,
+        following: following.filter((u) => u.followed_id === user_id).length,
+      })),
       getFollowersLists: vi
         .fn()
         .mockImplementation((user_id: number, listsId: number[]) =>
@@ -119,6 +117,29 @@ vi.mock("@/repositories/follow/follow.repository.impl", async (importOriginal) =
           following.filter(
             (u) => u.followed_id === user_id && !listsId.includes(u.follower_id)
           )
+        ),
+      isFollowUser: vi
+        .fn()
+        .mockImplementation((args: any) =>
+          followers.find(
+            (f) =>
+              f.follower_id === args.follower_id &&
+              f.followed_id === args.followed_id
+          )
+        ),
+      unfollowUser: vi
+        .fn()
+        .mockImplementation((args: any) =>
+          followers.filter(
+            (f) =>
+              f.follower_id !== args.follower_id &&
+              f.followed_id !== args.followed_id
+          )
+        ),
+      followUser: vi
+        .fn()
+        .mockImplementation((args: any) =>
+          followers.push({ ...createFollower(args.follower_id, args.followed_id) })
         ),
     })),
   };
@@ -183,6 +204,7 @@ describe('UserService', () => {
   let userNotFoundMsgError:      ErrorException = ErrorException.badRequest("User not found");
   let userSearchNotFoundError:   ErrorException = ErrorException.notFound("Search user not found");
   let recentSearchNotFoundError: ErrorException = ErrorException.notFound("Recent search not found");
+  let followFetchError:          ErrorException = ErrorException.notFound("Invalid fetch parameter");
 
   beforeEach(() => {
     userRepository         = new UserRepository();
@@ -618,7 +640,6 @@ describe('UserService', () => {
   });
   
   describe("Get the number of followers and following", () => {
-
     test("getFollowStats should return the correct result", async () => {
       const findUserById = vi.spyOn(userRepository, "findUserById");
       const getFollowStats = vi.spyOn(followRepository, "getFollowStats");
@@ -656,6 +677,225 @@ describe('UserService', () => {
       expect(findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
       expect(findUserById).toHaveBeenCalledTimes(1);
       expect(getFollowStats).toHaveBeenCalledTimes(0);
+    });
+  });
+
+  describe("Get the followers and following lists", () => {
+    test("getFollowerFollowingLists should return the correct result with followers", async () => {
+      const findUserById = vi.spyOn(userRepository, "findUserById");
+      const getFollowersLists = vi.spyOn(followRepository, "getFollowersLists");
+      const getFollowingLists = vi.spyOn(followRepository, "getFollowingLists");
+      const expectedResult = followers.filter((f) => f.follower_id === existingUser.user_id);
+      
+      const result = await userService.getFollowerFollowingLists(
+        existingUser.user_id,
+        "followers",
+        [0]
+      );
+
+      expect(result).toStrictEqual(expectedResult);
+      expect(Array.isArray(result)).toBeTruthy();
+      
+      expect(findUserById).toHaveBeenCalledWith(existingUser.user_id);
+      expect(findUserById).toHaveBeenCalledTimes(1);
+      
+      expect(getFollowersLists).toHaveBeenCalledWith(existingUser.user_id, [0]);
+      expect(getFollowersLists).toHaveBeenCalledTimes(1);
+      expect(getFollowingLists).toHaveBeenCalledTimes(0);
+    });
+
+    test("getFollowerFollowingLists should return the correct result with following", async () => {
+      const findUserById = vi.spyOn(userRepository, "findUserById");
+      const getFollowersLists = vi.spyOn(followRepository, "getFollowersLists");
+      const getFollowingLists = vi.spyOn(followRepository, "getFollowingLists");
+      const expectedResult = following.filter((f) => f.followed_id === existingUser.user_id);
+      
+      const result = await userService.getFollowerFollowingLists(
+        existingUser.user_id,
+        "following",
+        [0]
+      );
+
+      expect(result).toStrictEqual(expectedResult);
+      expect(Array.isArray(result)).toBeTruthy();
+      
+      expect(findUserById).toHaveBeenCalledWith(existingUser.user_id);
+      expect(findUserById).toHaveBeenCalledTimes(1);
+      
+      expect(getFollowingLists).toHaveBeenCalledWith(existingUser.user_id, [0]);
+      expect(getFollowingLists).toHaveBeenCalledTimes(1);
+      expect(getFollowersLists).toHaveBeenCalledTimes(0);
+    });
+
+    test("getFollowStats should throw an error when no args are provided", async () => {
+      const findUserById = vi.spyOn(userRepository, "findUserById");
+      const getFollowersLists = vi.spyOn(followRepository, "getFollowersLists");
+      const getFollowingLists = vi.spyOn(followRepository, "getFollowingLists");
+
+      await expect(
+        userService.getFollowerFollowingLists(undefined as any, "followers", [0])
+      ).rejects.toThrow(noArgsMsgError);
+
+      expect(findUserById).toHaveBeenCalledTimes(0);
+      expect(getFollowingLists).toHaveBeenCalledTimes(0);
+      expect(getFollowersLists).toHaveBeenCalledTimes(0);
+    });
+
+    test("getFollowStats should throw an error when user is not found", async () => {
+      const findUserById = vi.spyOn(userRepository, "findUserById");
+      const getFollowersLists = vi.spyOn(followRepository, "getFollowersLists");
+      const getFollowingLists = vi.spyOn(followRepository, "getFollowingLists");
+
+      await expect(
+        userService.getFollowerFollowingLists(notFoundUser.user_id, "following", [0])
+      ).rejects.toThrow(userNotFoundMsgError);
+
+      expect(findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
+      expect(findUserById).toHaveBeenCalledTimes(1);
+
+      expect(getFollowingLists).toHaveBeenCalledTimes(0);
+      expect(getFollowersLists).toHaveBeenCalledTimes(0);
+    });
+
+    test("getFollowStats should throw an error when invalid fetch parameter", async () => {
+      const findUserById = vi.spyOn(userRepository, "findUserById");
+      const getFollowersLists = vi.spyOn(followRepository, "getFollowersLists");
+      const getFollowingLists = vi.spyOn(followRepository, "getFollowingLists");
+
+      await expect(
+        userService.getFollowerFollowingLists(existingUser.user_id, "invalid", [0])
+      ).rejects.toThrow(followFetchError);
+
+      expect(findUserById).toHaveBeenCalledWith(existingUser.user_id);
+      expect(findUserById).toHaveBeenCalledTimes(1);
+
+      expect(getFollowingLists).toHaveBeenCalledTimes(0);
+      expect(getFollowersLists).toHaveBeenCalledTimes(0);
+    });
+  });
+
+  describe("User like and unlike the other user", () => {
+    const args = {
+      follower_id: existingUser.user_id,
+      followed_id: otherExistingUser.user_id,
+    };
+
+    const noArgs = {
+      follower_id: undefined as any,
+      followed_id: otherExistingUser.user_id
+    };
+
+    const notFoundUserArgs = {
+      follower_id: notFoundUser.user_id,
+      followed_id: otherExistingUser.user_id,
+    };
+
+    const notFoundOtherUserArgs = {
+      follower_id: existingUser.user_id,
+      followed_id: notFoundUser.user_id,
+    };
+
+    test("toggleFollow should return the correct result", async () => {
+      const findUserById = vi.spyOn(userRepository, "findUserById");
+      const isFollowUser = vi.spyOn(followRepository, "isFollowUser");
+      const followUser = vi.spyOn(followRepository, "followUser");
+      const unfollowUser = vi.spyOn(followRepository, "unfollowUser");
+
+      const result = await userService
+        .toggleFollow(args.follower_id, args.followed_id);
+      expect(result).toBe("User followed successfully");
+
+      expect(findUserById).toHaveBeenCalledWith(args.follower_id);
+      expect(findUserById).toHaveBeenCalledWith(args.followed_id);
+      expect(findUserById).toHaveBeenCalledTimes(2);
+
+      expect(isFollowUser).toHaveBeenCalledWith(args);
+      expect(followUser).toHaveBeenCalledWith(args);
+
+      expect(isFollowUser).toHaveBeenCalledTimes(1);
+      expect(followUser).toHaveBeenCalledTimes(1);
+      expect(unfollowUser).toHaveBeenCalledTimes(0);
+    });
+
+    test("toggleFollow should return the correct result", async () => {
+      const findUserById = vi.spyOn(userRepository, "findUserById");
+      const isFollowUser = vi.spyOn(followRepository, "isFollowUser");
+      const followUser = vi.spyOn(followRepository, "followUser");
+      const unfollowUser = vi.spyOn(followRepository, "unfollowUser");
+
+      const result = await userService
+        .toggleFollow(args.follower_id, args.followed_id);
+      expect(result).toBe("User unfollowed successfully");
+
+      expect(findUserById).toHaveBeenCalledWith(args.follower_id);
+      expect(findUserById).toHaveBeenCalledWith(args.followed_id);
+      expect(findUserById).toHaveBeenCalledTimes(2);
+
+      expect(isFollowUser).toHaveBeenCalledWith(args);
+      expect(unfollowUser).toHaveBeenCalledWith(args);
+
+      expect(isFollowUser).toHaveBeenCalledTimes(1);
+      expect(followUser).toHaveBeenCalledTimes(0);
+      expect(unfollowUser).toHaveBeenCalledTimes(1);
+    });
+
+    test("toggleFollow should throw an error when no args are provided", async () => {
+      const findUserById = vi.spyOn(userRepository, "findUserById");
+      const isFollowUser = vi.spyOn(followRepository, "isFollowUser");
+      const followUser = vi.spyOn(followRepository, "followUser");
+      const unfollowUser = vi.spyOn(followRepository, "unfollowUser");
+
+      await expect(
+        userService.toggleFollow(noArgs.follower_id, noArgs.followed_id)
+      ).rejects.toThrow(noArgsMsgError);
+
+      expect(findUserById).toHaveBeenCalledTimes(0);
+      expect(isFollowUser).toHaveBeenCalledTimes(0);
+      expect(followUser).toHaveBeenCalledTimes(0);
+      expect(unfollowUser).toHaveBeenCalledTimes(0);
+    });
+
+    test("toggleFollow should throw an error when user is not found", async () => {
+      const findUserById = vi.spyOn(userRepository, "findUserById");
+      const isFollowUser = vi.spyOn(followRepository, "isFollowUser");
+      const followUser = vi.spyOn(followRepository, "followUser");
+      const unfollowUser = vi.spyOn(followRepository, "unfollowUser");
+
+      await expect(
+        userService.toggleFollow(
+          notFoundUserArgs.follower_id,
+          notFoundUserArgs.followed_id
+        )
+      ).rejects.toThrow(userNotFoundMsgError)
+
+      expect(findUserById).toHaveBeenCalledWith(notFoundUserArgs.follower_id);
+      expect(findUserById).toHaveBeenCalledTimes(1);
+
+      expect(isFollowUser).toHaveBeenCalledTimes(0);
+      expect(followUser).toHaveBeenCalledTimes(0);
+      expect(unfollowUser).toHaveBeenCalledTimes(0);
+    });
+
+    test("toggleFollow should throw an error when the other is not found", async () => {
+      const findUserById = vi.spyOn(userRepository, "findUserById");
+      const isFollowUser = vi.spyOn(followRepository, "isFollowUser");
+      const followUser = vi.spyOn(followRepository, "followUser");
+      const unfollowUser = vi.spyOn(followRepository, "unfollowUser");
+
+      await expect(
+        userService.toggleFollow(
+          notFoundOtherUserArgs.follower_id,
+          notFoundOtherUserArgs.followed_id
+        )
+      ).rejects.toThrow("The user to be followed doesn't exist");
+
+      expect(findUserById).toHaveBeenCalledWith(notFoundOtherUserArgs.follower_id);
+      expect(findUserById).toHaveBeenCalledWith(notFoundOtherUserArgs.followed_id);
+      expect(findUserById).toHaveBeenCalledTimes(2);
+
+      expect(isFollowUser).toHaveBeenCalledTimes(0);
+      expect(followUser).toHaveBeenCalledTimes(0);
+      expect(unfollowUser).toHaveBeenCalledTimes(0);
     });
   });
 });

@@ -223,10 +223,18 @@ class UserService implements IUserService {
 
   public async toggleFollow(user_id: any, followed_id: any): Promise<string> {
     try {
+      if(!user_id || !followed_id) throw ErrorException.badRequest("No arguments provided");
+
       const args = {
-        follower_id: user_id as unknown as number,
-        followed_id: followed_id as unknown as number,
+        follower_id: user_id as any,
+        followed_id: followed_id as any,
       };
+
+      const user = await this.userRepository.findUserById(user_id);
+      if(!user) throw ErrorException.notFound("User not found");
+
+      const otherUser = await this.userRepository.findUserById(followed_id);
+      if(!otherUser) throw ErrorException.notFound("The user to be followed doesn't exist")
 
       // Check if the user is already following the other user
       const isExist = await this.followRepository.isFollowUser(args);
@@ -234,12 +242,12 @@ class UserService implements IUserService {
       // If it already exists, delete the data from the database
       if (isExist) {
         await this.followRepository.unfollowUser(args);
-        return "User followed successfully";
+        return "User unfollowed successfully";
       };
 
       // if there is no data in the database, create one
       await this.followRepository.followUser(args);
-      return "User unfollowed successfully";
+      return "User followed successfully";
     } catch (error) {
       throw error;
     };

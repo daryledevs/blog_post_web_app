@@ -103,10 +103,11 @@ class FollowRepository implements IFollowRepository {
   }
 
   async followUser(identifier: NewFollowers): Promise<void> {
-    await this.database.insertInto("followers").values(identifier).execute();
-
-    
-  }
+    await this.database
+      .insertInto("followers")
+      .values(identifier)
+      .execute();
+  };
 
   async unfollowUser(identifier: SelectFollowers): Promise<void> {
     try {
