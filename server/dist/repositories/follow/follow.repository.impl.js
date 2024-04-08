@@ -37,7 +37,7 @@ class FollowRepository {
     }
     async getFollowersLists(user_id, listsId) {
         try {
-            const result = await this.database
+            return await this.database
                 .selectFrom("followers")
                 .innerJoin("users", "followers.follower_id", "users.user_id")
                 .where((eb) => eb.and([
@@ -47,7 +47,6 @@ class FollowRepository {
                 .selectAll()
                 .limit(10)
                 .execute();
-            return result;
         }
         catch (error) {
             throw database_exception_1.default.fromError(error);
@@ -55,7 +54,7 @@ class FollowRepository {
     }
     async getFollowingLists(user_id, listsId) {
         try {
-            const result = await this.database
+            return await this.database
                 .selectFrom("followers")
                 .innerJoin("users", "followers.followed_id", "users.user_id")
                 .where((eb) => eb.and([
@@ -65,7 +64,6 @@ class FollowRepository {
                 .selectAll()
                 .limit(10)
                 .execute();
-            return result;
         }
         catch (error) {
             throw database_exception_1.default.fromError(error);

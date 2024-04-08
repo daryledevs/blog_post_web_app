@@ -11,7 +11,6 @@ class FollowService {
         this.userRepository = userRepository;
         this.followRepository = followRepository;
     }
-    ;
     async getFollowStats(user_id) {
         try {
             // If no arguments are provided, return an error
@@ -26,9 +25,7 @@ class FollowService {
         catch (error) {
             throw error;
         }
-        ;
     }
-    ;
     async getFollowerFollowingLists(user_id, fetch, listsId) {
         try {
             // If no arguments are provided, return an error
@@ -47,14 +44,11 @@ class FollowService {
                 default:
                     throw error_exception_1.default.badRequest("Invalid fetch parameter");
             }
-            ;
         }
         catch (error) {
             throw error;
         }
-        ;
     }
-    ;
     async toggleFollow(user_id, followed_id) {
         try {
             if (!user_id || !followed_id)
@@ -76,7 +70,6 @@ class FollowService {
                 await this.followRepository.unfollowUser(args);
                 return "User unfollowed successfully";
             }
-            ;
             // if there is no data in the database, create one
             await this.followRepository.followUser(args);
             return "User followed successfully";
@@ -84,9 +77,7 @@ class FollowService {
         catch (error) {
             throw error;
         }
-        ;
     }
-    ;
 }
 ;
 exports.default = FollowService;

@@ -8,9 +8,9 @@ export type FollowStatsType = {
 interface IFollowRepository {
   getFollowStats: (user_id: number) => Promise<FollowStatsType>;
 
-  getFollowersLists: (user_id: number, listsId: number[]) => Promise<any>;
+  getFollowersLists: (user_id: number, listsId: number[]) => Promise<SelectFollowers[]>;
 
-  getFollowingLists: (user_id: number, listsId: number[]) => Promise<any>;
+  getFollowingLists: (user_id: number, listsId: number[]) => Promise<SelectFollowers[]>;
 
   isFollowUser: (identifier: SelectFollowers) => Promise<boolean>;
 

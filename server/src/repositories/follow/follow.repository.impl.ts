@@ -41,9 +41,9 @@ class FollowRepository implements IFollowRepository {
     }
   }
 
-  async getFollowersLists(user_id: number, listsId: number[]): Promise<any> {
+  async getFollowersLists(user_id: number, listsId: number[]): Promise<SelectFollowers[]> {
     try {
-      const result = await this.database
+      return await this.database
         .selectFrom("followers")
         .innerJoin("users", "followers.follower_id", "users.user_id")
         .where((eb) =>
@@ -55,16 +55,14 @@ class FollowRepository implements IFollowRepository {
         .selectAll()
         .limit(10)
         .execute();
-
-      return result;
     } catch (error) {
       throw DatabaseException.fromError(error);
     }
   }
 
-  async getFollowingLists(user_id: number, listsId: number[]): Promise<any> {
+  async getFollowingLists(user_id: number, listsId: number[]): Promise<SelectFollowers[]> {
     try {
-      const result = await this.database
+      return await this.database
         .selectFrom("followers")
         .innerJoin("users", "followers.followed_id", "users.user_id")
         .where((eb) =>
@@ -76,8 +74,6 @@ class FollowRepository implements IFollowRepository {
         .selectAll()
         .limit(10)
         .execute();
-
-      return result;
     } catch (error) {
       throw DatabaseException.fromError(error);
     }
