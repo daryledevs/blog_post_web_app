@@ -31,3 +31,8 @@ jobs:
     - run: cd server && npm ci
     - run: cd server && npm run build --if-present
     - run: cd server && npm run test
+      env:
+        ACCESS_TKN_SECRET:    ${{ secrets.ACCESS_TKN_SECRET }}
+        REFRESH_TKN_SECRET:   ${{ secrets.REFRESH_TKN_SECRET }}
+        RESET_PWD_TKN_SECRET: ${{ secrets.RESET_PWD_TKN_SECRET }}
+        ENCRYPT_SECRET:       ${{ secrets.ENCRYPT_SECRET }}
