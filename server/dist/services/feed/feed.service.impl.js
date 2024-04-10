@@ -25,10 +25,10 @@ class FeedService {
     async getUserFeed(user_id, post_ids) {
         try {
             if (!user_id)
-                throw error_exception_1.default.badRequest("Missing required fields");
+                throw error_exception_1.default.badRequest("No arguments provided");
             const isUserExists = await this.userRepository.findUserById(user_id);
             if (!isUserExists)
-                throw error_exception_1.default.notFound("User doesn't exist");
+                throw error_exception_1.default.notFound("User not found");
             return await this.feedRepository.getUserFeed(user_id, post_ids);
         }
         catch (error) {
@@ -40,10 +40,10 @@ class FeedService {
     async getExploreFeed(user_id) {
         try {
             if (!user_id)
-                throw error_exception_1.default.badRequest("Missing required fields");
+                throw error_exception_1.default.badRequest("No arguments provided");
             const isUserExists = await this.userRepository.findUserById(user_id);
             if (!isUserExists)
-                throw error_exception_1.default.notFound("User doesn't exist");
+                throw error_exception_1.default.notFound("User not found");
             return await this.feedRepository.getExploreFeed(user_id);
         }
         catch (error) {

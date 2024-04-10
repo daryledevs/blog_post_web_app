@@ -23,9 +23,9 @@ class FeedService implements IFeedService {
 
   public async getUserFeed(user_id: number, post_ids: number[]): Promise<SelectPosts[]> {
     try {
-      if(!user_id) throw ErrorException.badRequest("Missing required fields");
+      if(!user_id) throw ErrorException.badRequest("No arguments provided");
       const isUserExists = await this.userRepository.findUserById(user_id);
-      if(!isUserExists) throw ErrorException.notFound("User doesn't exist");
+      if(!isUserExists) throw ErrorException.notFound("User not found");
       return await this.feedRepository.getUserFeed(user_id, post_ids);
     } catch (error) {
       throw error;
@@ -34,9 +34,9 @@ class FeedService implements IFeedService {
 
   public async getExploreFeed(user_id: number): Promise<SelectPosts[]> {
     try {
-      if(!user_id) throw ErrorException.badRequest("Missing required fields");
+      if(!user_id) throw ErrorException.badRequest("No arguments provided");
       const isUserExists = await this.userRepository.findUserById(user_id);
-      if(!isUserExists) throw ErrorException.notFound("User doesn't exist");
+      if(!isUserExists) throw ErrorException.notFound("User not found");
       return await this.feedRepository.getExploreFeed(user_id);
     } catch (error) {
       throw error;
