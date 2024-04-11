@@ -17,7 +17,7 @@ export default import("vitest/config").then(({ defineConfig, configDefaults, cov
       ...configDefaults,
       globals: true,
       environment: "node",
-      include: ["src/__test__/unit/**/*.{test,spec}.{ts,js}"],
+      include: ["src/__tests__/unit/**/*.{test,spec}.{ts,js}"],
       exclude: [
         ...configDefaults.exclude,
         "node_modules",

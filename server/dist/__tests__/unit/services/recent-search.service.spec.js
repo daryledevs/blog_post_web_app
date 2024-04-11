@@ -5,11 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const error_exception_1 = __importDefault(require("@/exceptions/error.exception"));
 const user_repository_impl_1 = __importDefault(require("@/repositories/user/user.repository.impl"));
-const generate_mock_data_1 = __importDefault(require("../util/generate-mock-data"));
+const generate_data_util_1 = __importDefault(require("../../utils/generate-data.util"));
 const recent_search_service_impl_1 = __importDefault(require("@/services/recent-search/recent-search.service.impl"));
 const recent_search_repository_impl_1 = __importDefault(require("@/repositories/recent-search/recent-search.repository.impl"));
-const search_mock_1 = require("@/__mock__/data/search.mock");
-const user_mock_1 = require("@/__mock__/data/user.mock");
 const vitest_1 = require("vitest");
 vitest_1.vi.mock("@/repositories/user/user.repository.impl");
 vitest_1.vi.mock("@/repositories/recent-search/recent-search.repository.impl");
@@ -22,14 +20,14 @@ vitest_1.vi.mock("@/repositories/recent-search/recent-search.repository.impl");
     const searchUserNotFoundError = error_exception_1.default.notFound("Search user not found");
     const recentSearchNotFoundError = error_exception_1.default.notFound("Recent search not found");
     // Create a mock of the user service
-    let users = (0, user_mock_1.createUserList)(10);
-    const notFoundUser = (0, user_mock_1.createUser)();
+    let users = generate_data_util_1.default.createUserList(10);
+    const notFoundUser = generate_data_util_1.default.createUser();
     const existingUser = users[0];
     // Create a mock of the recent searches
-    let recentSearches = (0, generate_mock_data_1.default)(false, users, search_mock_1.createRecentSearch);
+    let recentSearches = generate_data_util_1.default.generateMockData(false, users, generate_data_util_1.default.createRecentSearch);
     const newSearch = users[9];
     const existingSearch = recentSearches[0];
-    const notFoundSearch = (0, search_mock_1.createRecentSearch)(notFoundUser.user_id, notFoundUser.user_id);
+    const notFoundSearch = generate_data_util_1.default.createRecentSearch(notFoundUser.user_id, notFoundUser.user_id);
     (0, vitest_1.beforeEach)(() => {
         userRepository = new user_repository_impl_1.default();
         recentSearchRepository = new recent_search_repository_impl_1.default();

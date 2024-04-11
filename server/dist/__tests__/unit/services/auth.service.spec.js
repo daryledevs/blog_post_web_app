@@ -9,11 +9,11 @@ const auth_service_impl_1 = __importDefault(require("@/services/auth/auth.servic
 const user_repository_impl_1 = __importDefault(require("@/repositories/user/user.repository.impl"));
 const auth_repository_impl_1 = __importDefault(require("@/repositories/auth/auth.repository.impl"));
 const error_exception_1 = __importDefault(require("@/exceptions/error.exception"));
-const user_mock_1 = require("@/__mock__/data/user.mock");
-let users = (0, user_mock_1.createUserList)(5);
-const newUser = (0, user_mock_1.createUser)();
-const notFoundUser = (0, user_mock_1.createUser)();
-const existingUser = users[0] || (0, user_mock_1.createUser)();
+const generate_data_util_1 = __importDefault(require("../../utils/generate-data.util"));
+let users = generate_data_util_1.default.createUserList(5);
+const newUser = generate_data_util_1.default.createUser();
+const notFoundUser = generate_data_util_1.default.createUser();
+const existingUser = users[0];
 vitest_1.vi.mock("@/repositories/auth/auth.repository.impl", async (importOriginal) => {
     const original = await importOriginal();
     return {

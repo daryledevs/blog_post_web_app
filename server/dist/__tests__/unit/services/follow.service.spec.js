@@ -7,18 +7,8 @@ const error_exception_1 = __importDefault(require("@/exceptions/error.exception"
 const user_repository_impl_1 = __importDefault(require("@/repositories/user/user.repository.impl"));
 const follow_service_impl_1 = __importDefault(require("@/services/follow/follow.service.impl"));
 const follow_repository_impl_1 = __importDefault(require("@/repositories/follow/follow.repository.impl"));
-const generate_mock_data_1 = __importDefault(require("../util/generate-mock-data"));
-const follow_mock_1 = require("@/__mock__/data/follow.mock");
-const user_mock_1 = require("@/__mock__/data/user.mock");
+const generate_data_util_1 = __importDefault(require("../../utils/generate-data.util"));
 const vitest_1 = require("vitest");
-// Create a mock of the user service
-let users = (0, user_mock_1.createUserList)(10);
-const notFoundUser = (0, user_mock_1.createUser)();
-const existingUser = users[0];
-const otherExistingUser = users[9];
-// Create a mock of the followers and following
-let followers = (0, generate_mock_data_1.default)(false, users, follow_mock_1.createFollower);
-let following = (0, generate_mock_data_1.default)(true, users, follow_mock_1.createFollower);
 vitest_1.vi.mock("@/repositories/user/user.repository.impl");
 vitest_1.vi.mock("@/repositories/follow/follow.repository.impl");
 (0, vitest_1.describe)('FollowService', () => {
@@ -28,6 +18,14 @@ vitest_1.vi.mock("@/repositories/follow/follow.repository.impl");
     const noArgsMsgError = error_exception_1.default.badRequest("No arguments provided");
     const userNotFoundMsgError = error_exception_1.default.badRequest("User not found");
     const followFetchError = error_exception_1.default.notFound("Invalid fetch parameter");
+    // Create a mock of the user service
+    let users = generate_data_util_1.default.createUserList(10);
+    const notFoundUser = generate_data_util_1.default.createUser();
+    const existingUser = users[0];
+    const otherExistingUser = users[9];
+    // Create a mock of the followers and following
+    let followers = generate_data_util_1.default.generateMockData(false, users, generate_data_util_1.default.createFollower);
+    let following = generate_data_util_1.default.generateMockData(true, users, generate_data_util_1.default.createFollower);
     (0, vitest_1.beforeEach)(() => {
         userRepository = new user_repository_impl_1.default();
         followRepository = new follow_repository_impl_1.default();

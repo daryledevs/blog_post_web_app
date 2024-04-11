@@ -6,8 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const user_service_impl_1 = __importDefault(require("@/services/user/user.service.impl"));
 const error_exception_1 = __importDefault(require("@/exceptions/error.exception"));
 const user_repository_impl_1 = __importDefault(require("@/repositories/user/user.repository.impl"));
-const user_mock_1 = require("@/__mock__/data/user.mock");
 const vitest_1 = require("vitest");
+const generate_data_util_1 = __importDefault(require("../../utils/generate-data.util"));
 vitest_1.vi.mock("@/repositories/user/user.repository.impl");
 (0, vitest_1.describe)("UserService", () => {
     let userService;
@@ -15,8 +15,8 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
     const noArgsMsgError = error_exception_1.default.badRequest("No arguments provided");
     const userNotFoundMsgError = error_exception_1.default.badRequest("User not found");
     // Create a mock of the user service
-    let users = (0, user_mock_1.createUserList)(10);
-    const notFoundUser = (0, user_mock_1.createUser)();
+    let users = generate_data_util_1.default.createUserList(10);
+    const notFoundUser = generate_data_util_1.default.createUser();
     const existingUser = users[0];
     (0, vitest_1.beforeEach)(() => {
         userRepository = new user_repository_impl_1.default();

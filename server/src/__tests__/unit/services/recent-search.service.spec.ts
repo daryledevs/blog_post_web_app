@@ -1,10 +1,8 @@
 import ErrorException                                        from "@/exceptions/error.exception";
 import UserRepository                                        from "@/repositories/user/user.repository.impl";
-import generateMockData                                      from "../util/generate-mock-data";
+import GenerateMockData                                      from "../../utils/generate-data.util";
 import RecentSearchService                                   from "@/services/recent-search/recent-search.service.impl";
 import RecentSearchRepository                                from "@/repositories/recent-search/recent-search.repository.impl";
-import { createRecentSearch }                                from "@/__mock__/data/search.mock";
-import { createUser, createUserList }                        from "@/__mock__/data/user.mock";
 import { SelectSearches, SelectUsers }                       from "@/types/table.types";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 
@@ -30,21 +28,19 @@ describe("RecentSearchService", () => {
     ErrorException.notFound("Recent search not found");
 
   // Create a mock of the user service
-  let users: SelectUsers[] = createUserList(10);
-  const notFoundUser = createUser();
+  let users: SelectUsers[] = GenerateMockData.createUserList(10);
+  const notFoundUser = GenerateMockData.createUser();
   const existingUser = users[0]!;
 
   // Create a mock of the recent searches
-  let recentSearches: SelectSearches[] = generateMockData(
-    false,
-    users,
-    createRecentSearch
+  let recentSearches: SelectSearches[] = GenerateMockData.generateMockData(
+    false, users, GenerateMockData.createRecentSearch
   );
 
   const newSearch = users[9]!;
   const existingSearch = recentSearches[0]!;
 
-  const notFoundSearch = createRecentSearch(
+  const notFoundSearch = GenerateMockData.createRecentSearch(
     notFoundUser.user_id,
     notFoundUser.user_id
   );

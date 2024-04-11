@@ -2,8 +2,8 @@ import UserService                                           from "@/services/us
 import ErrorException                                        from "@/exceptions/error.exception";
 import UserRepository                                        from "@/repositories/user/user.repository.impl";
 import { SelectUsers }                                       from "@/types/table.types";
-import { createUser, createUserList }                        from "@/__mock__/data/user.mock";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
+import GenerateMockData from "../../utils/generate-data.util";
 
 vi.mock("@/repositories/user/user.repository.impl");
 
@@ -18,8 +18,8 @@ describe("UserService", () => {
     ErrorException.badRequest("User not found");
 
   // Create a mock of the user service
-  let users: SelectUsers[] = createUserList(10);
-  const notFoundUser = createUser();
+  let users: SelectUsers[] = GenerateMockData.createUserList(10);
+  const notFoundUser = GenerateMockData.createUser();
   const existingUser = users[0]!;
 
   beforeEach(() => {

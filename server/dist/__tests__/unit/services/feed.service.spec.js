@@ -7,8 +7,8 @@ const feed_service_impl_1 = __importDefault(require("@/services/feed/feed.servic
 const feed_repository_impl_1 = __importDefault(require("@/repositories/feed/feed.repository.impl"));
 const user_repository_impl_1 = __importDefault(require("@/repositories/user/user.repository.impl"));
 const error_exception_1 = __importDefault(require("@/exceptions/error.exception"));
-const user_mock_1 = require("@/__mock__/data/user.mock");
 const vitest_1 = require("vitest");
+const generate_data_util_1 = __importDefault(require("../../utils/generate-data.util"));
 vitest_1.vi.mock("@/repositories/feed/feed.repository.impl");
 vitest_1.vi.mock("@/repositories/user/user.repository.impl");
 (0, vitest_1.describe)("FeedService", () => {
@@ -17,9 +17,9 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
     let feedService;
     const noArgsMsgError = error_exception_1.default.badRequest("No arguments provided");
     const userNotFoundMsgError = error_exception_1.default.badRequest("User not found");
-    const users = (0, user_mock_1.createUserList)(10);
+    const users = generate_data_util_1.default.createUserList(10);
     const existingUser = users[0];
-    const nonExistingUser = (0, user_mock_1.createUser)();
+    const nonExistingUser = generate_data_util_1.default.createUser();
     (0, vitest_1.beforeEach)(() => {
         feedRepository = new feed_repository_impl_1.default();
         userRepository = new user_repository_impl_1.default();

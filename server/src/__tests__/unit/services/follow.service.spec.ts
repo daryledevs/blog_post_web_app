@@ -2,21 +2,9 @@ import ErrorException                                        from "@/exceptions/
 import UserRepository                                        from "@/repositories/user/user.repository.impl";
 import FollowService                                         from "@/services/follow/follow.service.impl";
 import FollowRepository                                      from "@/repositories/follow/follow.repository.impl";
-import generateMockData                                      from "../util/generate-mock-data";
-import { createFollower }                                    from "@/__mock__/data/follow.mock";
-import { createUser, createUserList }                        from "@/__mock__/data/user.mock";
+import GenerateMockData                                      from "../../utils/generate-data.util";
 import { SelectFollowers, SelectUsers }                      from "@/types/table.types";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
-
-// Create a mock of the user service
-let users: SelectUsers[] = createUserList(10);
-const notFoundUser = createUser();
-const existingUser = users[0]!;
-const otherExistingUser = users[9]!;
-
-// Create a mock of the followers and following
-let followers: SelectFollowers[] = generateMockData(false, users, createFollower);
-let following: SelectFollowers[] = generateMockData(true, users, createFollower);
 
 vi.mock("@/repositories/user/user.repository.impl");
 
@@ -35,6 +23,21 @@ describe('FollowService', () => {
 
   const followFetchError: ErrorException = 
     ErrorException.notFound("Invalid fetch parameter");
+
+  // Create a mock of the user service
+  let users: SelectUsers[] = GenerateMockData.createUserList(10);
+  const notFoundUser = GenerateMockData.createUser();
+  const existingUser = users[0]!;
+  const otherExistingUser = users[9]!;
+
+  // Create a mock of the followers and following
+  let followers: SelectFollowers[] = GenerateMockData.generateMockData(
+    false, users, GenerateMockData.createFollower
+  );
+
+  let following: SelectFollowers[] = GenerateMockData.generateMockData(
+    true, users, GenerateMockData.createFollower
+  );
 
   beforeEach(() => {
     userRepository   = new UserRepository();

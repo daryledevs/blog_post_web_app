@@ -1,11 +1,8 @@
-
-import createPost                                            from "@/__mock__/data/post.mock";
 import PostService                                           from "@/services/post/post.service.impl";
 import ErrorException                                        from "@/exceptions/error.exception";
 import UserRepository                                        from "@/repositories/user/user.repository.impl";
 import PostRepository                                        from "@/repositories/post/post.repository.impl";
-import generateMockData                                      from "../util/generate-mock-data";
-import { createUserList }                                    from "@/__mock__/data/user.mock";
+import GenerateMockData                                      from "../../utils/generate-data.util";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 
 vi.mock("@/repositories/feed/feed.repository.impl");
@@ -26,10 +23,13 @@ describe("FeedService", () => {
   const postNotFoundMsgError: ErrorException =
     ErrorException.badRequest("Post not found");
 
-  const users = createUserList(10);
-  const posts = generateMockData(false, users, createPost);
+  const users = GenerateMockData.createUserList(10);
+  const posts = GenerateMockData.generateMockData(
+    false, users, GenerateMockData.createPost
+  );
+
   const existingPost = posts[0]!;
-  const nonExistingPost = createPost(1000);
+  const nonExistingPost = GenerateMockData.createPost(1000);
 
   beforeEach(() => {
     postRepository = new PostRepository();

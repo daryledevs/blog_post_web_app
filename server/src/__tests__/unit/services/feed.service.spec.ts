@@ -3,8 +3,8 @@ import FeedService                                           from "@/services/fe
 import FeedRepository                                        from "@/repositories/feed/feed.repository.impl";
 import UserRepository                                        from "@/repositories/user/user.repository.impl";
 import ErrorException                                        from "@/exceptions/error.exception";
-import { createUser, createUserList }                        from "@/__mock__/data/user.mock";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
+import GenerateMockData from "../../utils/generate-data.util";
 
 vi.mock("@/repositories/feed/feed.repository.impl");
 
@@ -21,9 +21,9 @@ describe("FeedService", () =>  {
   const userNotFoundMsgError: ErrorException =
     ErrorException.badRequest("User not found");
 
-  const users = createUserList(10);
+  const users = GenerateMockData.createUserList(10);
   const existingUser = users[0]!;
-  const nonExistingUser = createUser();
+  const nonExistingUser = GenerateMockData.createUser();
 
   beforeEach(() => {
     feedRepository = new FeedRepository();

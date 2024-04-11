@@ -11,12 +11,12 @@ import AuthService                    from "@/services/auth/auth.service.impl";
 import UserRepository                 from "@/repositories/user/user.repository.impl";
 import AuthRepository                 from "@/repositories/auth/auth.repository.impl";
 import ErrorException                 from "@/exceptions/error.exception";
-import { createUserList, createUser } from "@/__mock__/data/user.mock";
+import GenerateMockData from "../../utils/generate-data.util";
 
-let users = createUserList(5);
-const newUser = createUser();
-const notFoundUser = createUser();
-const existingUser = users[0] || createUser();
+let users = GenerateMockData.createUserList(5);
+const newUser = GenerateMockData.createUser();
+const notFoundUser = GenerateMockData.createUser();
+const existingUser = users[0]!;
 
 vi.mock("@/repositories/auth/auth.repository.impl", async (importOriginal) => {
   const original = await importOriginal<typeof import("@/repositories/auth/auth.repository.impl")>();
