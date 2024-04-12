@@ -7,14 +7,13 @@ dotenv.config();
 export const pool = createPool({
   database: `${process.env.DATABASE}`,
   host: `${process.env.DATABASE_HOST}`,
-  port: process.env.DATABASE_PORT as unknown as number,
+  port: process.env.DATABASE_PORT as any,
   user: `${process.env.USER}`,
   password: process.env.PASSWORD,
   waitForConnections: true,
   multipleStatements: true,
   charset: "utf8mb4",
-  connectionLimit: `${process.env.DATABASE_CONNECTION_LIMIT}` as unknown as number,
-  queueLimit: 0,
+  connectionLimit: `${process.env.DATABASE_CONNECTION_LIMIT}` as any,
 });
 
 const dialect = new MysqlDialect({ pool });

@@ -22,23 +22,22 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.pool = void 0;
-const dotenv = __importStar(require("dotenv"));
-const mysql2_1 = require("mysql2");
+const db_database_1 = __importDefault(require("./db.database"));
+const kysely_migration_cli_1 = require("kysely-migration-cli");
+const path = __importStar(require("path"));
+const fs_1 = require("fs");
 const kysely_1 = require("kysely");
-dotenv.config();
-exports.pool = (0, mysql2_1.createPool)({
-    database: `${process.env.DATABASE}`,
-    host: `${process.env.DATABASE_HOST}`,
-    port: process.env.DATABASE_PORT,
-    user: `${process.env.USER}`,
-    password: process.env.PASSWORD,
-    waitForConnections: true,
-    multipleStatements: true,
-    charset: "utf8mb4",
-    connectionLimit: `${process.env.DATABASE_CONNECTION_LIMIT}`,
+const migrationFolder = path.join(process.cwd(), "src/database/migrations");
+const migrator = new kysely_1.Migrator({
+    db: db_database_1.default,
+    provider: new kysely_1.FileMigrationProvider({
+        fs: fs_1.promises,
+        path,
+        migrationFolder: migrationFolder,
+    }),
 });
-const dialect = new kysely_1.MysqlDialect({ pool: exports.pool });
-const db = new kysely_1.Kysely({ dialect });
-exports.default = db;
+(0, kysely_migration_cli_1.run)(db_database_1.default, migrator, migrationFolder);
