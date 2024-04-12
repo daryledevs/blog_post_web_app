@@ -7,7 +7,11 @@ import {
 import { faker } from "@faker-js/faker";
 
 class GenerateMockData {
-  static generateMockData = (changeArg: boolean, list: any[], callback: Function) => {
+  static generateMockData = (
+    changeArg: boolean,
+    list: any[],
+    callback: Function
+  ) => {
     return list.flatMap((u, i) => {
       let nextUser = list[i + 1];
       let nextUserId = nextUser ? nextUser.user_id : u.user_id;
@@ -44,13 +48,17 @@ class GenerateMockData {
   ): SelectFollowers => ({
     follower_id: follower_id,
     followed_id: followed_id,
+    created_at: new Date(faker.date.past().toISOString()),
   });
 
-  static createRecentSearch = (user_id: number, search_user_id: number): SelectSearches => ({
+  static createRecentSearch = (
+    user_id: number,
+    search_user_id: number
+  ): SelectSearches => ({
     recent_id: faker.number.int({ min: 1, max: 1000 }),
     user_id: user_id,
     search_user_id: search_user_id,
-    create_time: new Date(faker.date.past().toISOString()),
+    created_at: new Date(faker.date.past().toISOString()),
   });
 
   static createPost = (user_id: number): SelectPosts => ({
@@ -60,7 +68,7 @@ class GenerateMockData {
     user_id: user_id,
     caption: faker.lorem.text(),
     privacy_level: faker.string.fromCharacters(["public", "private"]),
-    post_date: new Date(faker.date.past().toISOString()),
+    created_at: new Date(faker.date.past().toISOString()),
   });
 };
 

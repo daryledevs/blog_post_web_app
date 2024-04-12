@@ -45,11 +45,11 @@ class PostRepository implements IPostRepository {
           "users.last_name",
           "posts.caption",
           "posts.privacy_level",
-          "posts.post_date",
+          "posts.created_at",
           eb.fn.count<number>("likes.post_id").as("count"),
         ])
         .where("posts.user_id", "=", user_id)
-        .orderBy("posts.post_date", "desc")
+        .orderBy("posts.created_at", "desc")
         .groupBy("posts.post_id")
         .execute();
     } catch (error) {

@@ -4,6 +4,14 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>
   : ColumnType<T, T | undefined, T>;
 
+export interface Comments {
+  comment: string;
+  comment_id: Generated<number>;
+  created_at: Generated<Date>;
+  post_id: number;
+  user_id: number;
+}
+
 export interface Conversations {
   conversation_id: Generated<number>;
   user_one_id: number;
@@ -11,11 +19,13 @@ export interface Conversations {
 }
 
 export interface Followers {
+  created_at: Generated<Date>;
   followed_id: number;
   follower_id: number;
 }
 
 export interface Likes {
+  created_at: Generated<Date>;
   post_id: number;
   user_id: number;
 }
@@ -24,42 +34,30 @@ export interface Messages {
   conversation_id: number;
   message_id: Generated<number>;
   sender_id: number;
-  text_message: string | null;
-  time_sent: Generated<Date | null>;
+  text_message: string;
+  time_sent: Generated<Date>;
 }
 
 export interface Posts {
   caption: string | null;
+  created_at: Generated<Date>;
   image_id: string;
   image_url: string | null;
-  post_date: Generated<Date | null>;
   post_id: Generated<number>;
   privacy_level: Generated<string | null>;
   user_id: number;
 }
 
 export interface RecentSearches {
-  /**
-   * Create Time
-   */
-  create_time: Generated<Date | null>;
-  /**
-   * Primary Key
-   */
+  created_at: Generated<Date>;
   recent_id: Generated<number>;
-  /**
-   * User ID
-   */
   search_user_id: number;
-  /**
-   * User ID
-   */
   user_id: number;
 }
 
 export interface ResetPasswordToken {
-  created_at: Generated<Date | null>;
-  encrypted: string | null;
+  created_at: Generated<Date>;
+  encrypted: string;
   token_id: Generated<number>;
   user_id: number;
 }
@@ -68,7 +66,7 @@ export interface Users {
   age: number | null;
   avatar_url: string | null;
   birthday: string | null;
-  created_at: Generated<Date | null>;
+  created_at: Generated<Date>;
   email: string;
   first_name: string | null;
   last_name: string | null;
@@ -79,6 +77,7 @@ export interface Users {
 }
 
 export interface DB {
+  comments: Comments;
   conversations: Conversations;
   followers: Followers;
   likes: Likes;

@@ -17,6 +17,28 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("created_at", "timestamp")
     .execute()
     .then(() => console.log("Users table created"));
+
+  
+  await db.schema
+    .createTable("followers")
+    .ifNotExists()
+    .addColumn("follower_id", "integer", (col) => col.notNull().unsigned())
+    .addColumn("followed_id", "integer", (col) => col.notNull().unsigned())
+    .addColumn("created_at", "timestamp")
+    .addForeignKeyConstraint(
+      "followed_user_id_fk",
+      ["follower_id"],
+      "users",
+      ["user_id"],
+    )
+    .addForeignKeyConstraint(
+      "follower_user_id_fk",
+      ["followed_id"],
+      "users",
+      ["user_id"],
+    )
+    .execute()
+    .then(() => console.log("Followers table created"));
   
   await db.schema
     .createTable("reset_password_token")
@@ -120,27 +142,6 @@ export async function up(db: Kysely<any>): Promise<void> {
     .then(() => console.log("Likes table created"));
 
   await db.schema
-    .createTable("followers")
-    .ifNotExists()
-    .addColumn("follower_id", "integer", (col) => col.notNull().unsigned())
-    .addColumn("followed_id", "integer", (col) => col.notNull().unsigned())
-    .addColumn("created_at", "timestamp")
-    .addForeignKeyConstraint(
-      "followed_user_id_fk",
-      ["follower_id"],
-      "users",
-      ["user_id"],
-    )
-    .addForeignKeyConstraint(
-      "follower_user_id_fk",
-      ["followed_id"],
-      "users",
-      ["user_id"],
-    )
-    .execute()
-    .then(() => console.log("Followers table created"));
-
-  await db.schema
     .createTable("conversations")
     .ifNotExists()
     .addColumn("conversation_id", "integer", (col) => col.notNull().autoIncrement().unsigned().primaryKey())
@@ -160,17 +161,41 @@ export async function up(db: Kysely<any>): Promise<void> {
     )
     .execute()
     .then(() => console.log("Conversations table created"));
+
+  await db.schema
+    .createTable("messages")
+    .ifNotExists()
+    .addColumn("message_id", "integer", (col) => col.notNull().autoIncrement().unsigned().primaryKey())
+    .addColumn("conversation_id", "integer", (col) => col.notNull().unsigned())
+    .addColumn("sender_id", "integer", (col) => col.notNull().unsigned())
+    .addColumn("text_message", "text", (col) => col.notNull())
+    .addColumn("time_sent", "timestamp")
+    .addForeignKeyConstraint(
+      "message_conversation_id_fk",
+      ["conversation_id"],
+      "conversations",
+      ["conversation_id"],
+    )
+    .addForeignKeyConstraint(
+      "message_sender_id_fk",
+      ["sender_id"],
+      "users",
+      ["user_id"],
+    )
+    .execute()
+    .then(() => console.log("Messages table created"));
 };
 
 export async function down(db: Kysely<any>): Promise<void> {
   await sql`SET FOREIGN_KEY_CHECKS = 0`.execute(db);
-  await db.schema.dropTable("users").execute().then(() => console.log("Users table dropped"));
-  await db.schema.dropTable("reset_password_token").execute().then(() => console.log("Reset Password Token table dropped"));
-  await db.schema.dropTable("recent_searches").execute().then(() => console.log("Recent Searches table dropped"));
-  await db.schema.dropTable("posts").execute().then(() => console.log("Posts table dropped"));
-  await db.schema.dropTable("comments").execute().then(() => console.log("Comments table dropped"));
-  await db.schema.dropTable("likes").execute().then(() => console.log("Likes table dropped"));
-  await db.schema.dropTable("followers").execute().then(() => console.log("Followers table dropped"));
-  await db.schema.dropTable("conversations").execute().then(() => console.log("Conversations table dropped"));
+  await db.schema.dropTable("users").ifExists().execute().then(() => console.log("Users table dropped"));
+  await db.schema.dropTable("reset_password_token").ifExists().execute().then(() => console.log("Reset Password Token table dropped"));
+  await db.schema.dropTable("recent_searches").ifExists().execute().then(() => console.log("Recent Searches table dropped"));
+  await db.schema.dropTable("posts").ifExists().execute().then(() => console.log("Posts table dropped"));
+  await db.schema.dropTable("comments").ifExists().execute().then(() => console.log("Comments table dropped"));
+  await db.schema.dropTable("likes").ifExists().execute().then(() => console.log("Likes table dropped"));
+  await db.schema.dropTable("followers").ifExists().execute().then(() => console.log("Followers table dropped"));
+  await db.schema.dropTable("conversations").ifExists().execute().then(() => console.log("Conversations table dropped"));
+  await db.schema.dropTable("messages").ifExists().execute().then(() => console.log("Messages table dropped"));
   await sql`SET FOREIGN_KEY_CHECKS = 1`.execute(db);
 };

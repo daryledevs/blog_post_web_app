@@ -15,7 +15,7 @@ class FeedRepository {
             const query = this.database
                 .selectFrom("posts")
                 .select((eb) => eb.fn.countAll().as("count"))
-                .where((eb) => eb("post_date", ">", (0, kysely_1.sql) `DATE_SUB(CURDATE(), INTERVAL 3 DAY)`));
+                .where((eb) => eb("created_at", ">", (0, kysely_1.sql) `DATE_SUB(CURDATE(), INTERVAL 3 DAY)`));
             const { count } = await this.database
                 .selectNoFrom((eb) => [eb.fn.coalesce(query, eb.lit(0)).as("count")])
                 .executeTakeFirstOrThrow();
@@ -43,7 +43,7 @@ class FeedRepository {
                 "users.avatar_url",
                 "posts.caption",
                 "posts.privacy_level",
-                "posts.post_date",
+                "posts.created_at",
                 eb
                     .selectFrom("likes")
                     .select((eb) => eb.fn.count("likes.post_id").as("count"))
@@ -52,7 +52,7 @@ class FeedRepository {
             ])
                 .where((eb) => eb.and([
                 eb("followers.follower_id", "=", user_id),
-                eb("posts.post_date", ">", (0, kysely_1.sql) `DATE_SUB(CURDATE(), INTERVAL 3 DAY)`),
+                eb("posts.created_at", ">", (0, kysely_1.sql) `DATE_SUB(CURDATE(), INTERVAL 3 DAY)`),
                 eb("posts.post_id", "not in", post_ids),
             ]))
                 .orderBy((0, kysely_1.sql) `"RAND()"`)
@@ -83,7 +83,7 @@ class FeedRepository {
             "users.avatar_url",
             "posts.caption",
             "posts.privacy_level",
-            "posts.post_date",
+            "posts.created_at",
             eb
                 .selectFrom("likes")
                 .select((eb) => eb.fn.count("likes.post_id").as("count"))
@@ -91,7 +91,7 @@ class FeedRepository {
                 .as("count"),
         ])
             .where((eb) => eb.and([
-            eb("posts.post_date", ">", (0, kysely_1.sql) `DATE_SUB(CURDATE(), INTERVAL 3 DAY)`),
+            eb("posts.created_at", ">", (0, kysely_1.sql) `DATE_SUB(CURDATE(), INTERVAL 3 DAY)`),
             eb("followers.follower_id", "is", eb.lit(null)),
             eb("users.user_id", "!=", user_id),
         ]))

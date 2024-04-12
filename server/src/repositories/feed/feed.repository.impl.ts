@@ -16,7 +16,7 @@ class FeedRepository implements IFeedRepository {
         .selectFrom("posts")
         .select((eb) => eb.fn.countAll<number>().as("count"))
         .where((eb) =>
-          eb("post_date", ">", sql<Date>`DATE_SUB(CURDATE(), INTERVAL 3 DAY)`)
+          eb("created_at", ">", sql<Date>`DATE_SUB(CURDATE(), INTERVAL 3 DAY)`)
         );
 
       const { count } = await this.database
@@ -46,7 +46,7 @@ class FeedRepository implements IFeedRepository {
           "users.avatar_url",
           "posts.caption",
           "posts.privacy_level",
-          "posts.post_date",
+          "posts.created_at",
           eb
             .selectFrom("likes")
             .select((eb) => eb.fn.count("likes.post_id").as("count"))
@@ -56,7 +56,7 @@ class FeedRepository implements IFeedRepository {
         .where((eb) =>
           eb.and([
             eb("followers.follower_id", "=", user_id),
-            eb("posts.post_date", ">", sql<Date>`DATE_SUB(CURDATE(), INTERVAL 3 DAY)`),
+            eb("posts.created_at", ">", sql<Date>`DATE_SUB(CURDATE(), INTERVAL 3 DAY)`),
             eb("posts.post_id", "not in", post_ids),
           ])
         )
@@ -91,7 +91,7 @@ class FeedRepository implements IFeedRepository {
         "users.avatar_url",
         "posts.caption",
         "posts.privacy_level",
-        "posts.post_date",
+        "posts.created_at",
         eb
           .selectFrom("likes")
           .select((eb) => eb.fn.count("likes.post_id").as("count"))
@@ -100,7 +100,7 @@ class FeedRepository implements IFeedRepository {
       ])
       .where((eb) =>
           eb.and([
-            eb("posts.post_date", ">", sql<Date>`DATE_SUB(CURDATE(), INTERVAL 3 DAY)`),
+            eb("posts.created_at", ">", sql<Date>`DATE_SUB(CURDATE(), INTERVAL 3 DAY)`),
             eb("followers.follower_id", "is", eb.lit(null)),
             eb("users.user_id", "!=", user_id),
           ])

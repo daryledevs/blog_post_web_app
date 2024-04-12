@@ -79,7 +79,7 @@ class FollowRepository implements IFollowRepository {
     }
   }
 
-  async isFollowUser(identifier: SelectFollowers): Promise<boolean> {
+  async isFollowUser(identifier: NewFollowers): Promise<boolean> {
     try {
       const result = await this.database
         .selectFrom("followers")
@@ -105,7 +105,7 @@ class FollowRepository implements IFollowRepository {
       .execute();
   };
 
-  async unfollowUser(identifier: SelectFollowers): Promise<void> {
+  async unfollowUser(identifier: NewFollowers): Promise<void> {
     try {
       await this.database
         .deleteFrom("followers")
