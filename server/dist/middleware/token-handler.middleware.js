@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
-const error_exception_1 = __importDefault(require("@/exceptions/error.exception"));
+const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
 const token_invalid_util_1 = __importDefault(require("@/utils/token-invalid.util"));
 const route_exception_util_1 = __importDefault(require("@/utils/route-exception.util"));
 const user_repository_impl_1 = __importDefault(require("@/repositories/user/user.repository.impl"));
@@ -22,18 +22,18 @@ const tokenHandler = async (req, res, next) => {
         const isTokenInvalid = (0, token_invalid_util_1.default)(accessToken, refreshToken);
         // if the token is not provided, return an error
         if (isTokenInvalid)
-            return next(error_exception_1.default.unauthorized("Token is not provided"));
+            return next(api_exception_1.default.HTTP401Error("Token is not provided"));
         // verify the refresh token and access token
         const { refreshError, refreshDecode } = await auth_token_util_1.default.verifyToken(refreshToken, refreshSecret, "refresh");
         const { accessError, accessDecode } = await auth_token_util_1.default.verifyToken(accessToken, accessSecret, "access");
         const isTokenError = [refreshError, accessError].some((status) => status === "JsonWebTokenError");
         // if the refresh token is not provided, return an error
         if (isTokenError)
-            return next(error_exception_1.default.unauthorized("Token is not valid"));
+            return next(api_exception_1.default.HTTP401Error("Token is not valid"));
         // if user is not found, return an error
         const result = await userRepository.findUserById(refreshDecode.user_id);
         if (!result)
-            return next(error_exception_1.default.notFound("User not found"));
+            return next(api_exception_1.default.HTTP404Error("User not found"));
         // if the refresh token is expired, generate a new refresh token and access token
         if (refreshError === "TokenExpiredError" || accessError === "TokenExpiredError") {
             // token options

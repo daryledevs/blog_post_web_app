@@ -18,7 +18,7 @@ class RecentSearchesRepository implements IRecentSearchRepository {
         .where("recent_id", "=", recent_id)
         .executeTakeFirst();
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     };
   };
 
@@ -35,7 +35,7 @@ class RecentSearchesRepository implements IRecentSearchRepository {
         )
         .executeTakeFirst();
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     };
   };
 
@@ -49,7 +49,7 @@ class RecentSearchesRepository implements IRecentSearchRepository {
         .selectAll()
         .execute();
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     };
   };
 
@@ -60,7 +60,7 @@ class RecentSearchesRepository implements IRecentSearchRepository {
         .values({ user_id, search_user_id })
         .execute();
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     };
   };
 
@@ -71,7 +71,7 @@ class RecentSearchesRepository implements IRecentSearchRepository {
         .where("recent_id", "=", recent_id)
         .execute();
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     };
   };
 };

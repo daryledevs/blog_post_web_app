@@ -23,7 +23,7 @@ class AuthRepository {
             return await this.userRepository.findUserById(Number(insertId));
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
     }
     async findResetTokenById(token_id) {
@@ -35,7 +35,7 @@ class AuthRepository {
                 .executeTakeFirst();
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
     }
     async saveResetToken(token) {
@@ -44,7 +44,7 @@ class AuthRepository {
             return "Reset token is saved successfully";
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
     }
     async deleteResetToken(token_id) {
@@ -56,7 +56,7 @@ class AuthRepository {
             return "Reset token is saved successfully";
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
     }
 }

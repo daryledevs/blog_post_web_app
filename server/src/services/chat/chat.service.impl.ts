@@ -1,65 +1,102 @@
 
 import IChatService                             from "./chat.service";
+import AsyncWrapper                             from "@/utils/async-wrapper.util";
 import UserRepository                           from "@/repositories/user/user.repository.impl";
 import ChatRepository                           from "@/repositories/chat/chat.repository.impl";
-import ErrorException                           from "@/exceptions/error.exception";
+import ApiErrorException                        from "@/exceptions/api.exception";
 import { SelectMessages }                       from "@/types/table.types";
 import { ChatHistoryByIdType, MessageDataType } from "@/repositories/chat/chat.repository";
 
 class ChatServices implements IChatService {
   private chatRepository: ChatRepository;
   private userRepository: UserRepository;
+  private wrap: AsyncWrapper = new AsyncWrapper();
 
-  constructor(chatRepository: ChatRepository, userRepository: UserRepository) { 
+  constructor(chatRepository: ChatRepository, userRepository: UserRepository) {
     this.chatRepository = chatRepository;
     this.userRepository = userRepository;
-  };
+  }
 
-  public async getChatHistory(userId: number, listId: number[]): Promise<ChatHistoryByIdType[]> {
-    if(!userId) throw ErrorException.badRequest("User id is required");
-    const isUserExist = await this.userRepository.findUserById(userId);
-    if(!isUserExist) throw ErrorException.notFound("User not found");
-    return await this.chatRepository
-      .getUserConversationHistoryByUserId(userId, listId);
-  };
+  public getChatHistory = this.wrap.asyncWrap(
+    async (
+      userId: number,
+      listId: number[]
+    ): Promise<ChatHistoryByIdType[]> => {
+      // If no user id is provided, return an error
+      if (!userId) throw ApiErrorException.HTTP400Error("User id is required");
 
-  public async getChatMessages(chatId: number, listId: number[]): Promise<SelectMessages[]> {
-    if(!chatId) throw ErrorException.badRequest("Chat id is required");
-    const data = await this.chatRepository
-      .findConversationByConversationId(chatId);
+      // If the user is not found, return an error
+      const isUserExist = await this.userRepository.findUserById(userId);
+      if (!isUserExist) throw ApiErrorException.HTTP404Error("User not found");
 
-    if(!data) throw ErrorException.notFound("Chat not found");
-    return await this.chatRepository
-      .getMessagesByConversationId(chatId, listId);
-  };
+      // Return the chat history
+      return await this.chatRepository.getUserConversationHistoryByUserId(
+        userId,
+        listId
+      );
+    }
+  );
 
-  public async newMessageAndConversation(conversation_id: number, messageData: MessageDataType): Promise<string> {
-    if(!conversation_id) throw ErrorException.badRequest("Conversation id is required");
-    let newConversationId: any = conversation_id;
+  public getChatMessages = this.wrap.asyncWrap(
+    async (chatId: number, listId: number[]): Promise<SelectMessages[]> => {
+      // If no chat id is provided, return an error
+      if (!chatId) throw ApiErrorException.HTTP400Error("Chat id is required");
 
-    const conversation = await this.chatRepository
-      .findConversationByConversationId(conversation_id);
+      // Check if the chat exists
+      const data = await this.chatRepository
+        .findConversationByConversationId(chatId);
 
-    if(!conversation) {
-      newConversationId = await this.chatRepository.saveNewConversation({
-        user_one_id: messageData.sender_id,
-        user_two_id: messageData.receiver_id,
-      });
-    };
+      // If the chat does not exist, return an error
+      if (!data) throw ApiErrorException.HTTP404Error("Chat not found");
 
-    return await this.chatRepository
-      .saveNewMessage(messageData);
-  };
+      // Return the chat messages
+      return await this.chatRepository
+        .getMessagesByConversationId(chatId, listId);
+    }
+  );
 
-  public async deleteConversation(conversation_id: number): Promise<string> {
-    if(!conversation_id) throw ErrorException.badRequest("Conversation id is required");
-    const conversation = await this.chatRepository
-      .findConversationByConversationId(conversation_id);
+  public newMessageAndConversation = this.wrap.asyncWrap(
+    async (
+      conversation_id: number,
+      messageData: MessageDataType
+    ): Promise<string> => {
+      // If no conversation id is provided, return an error
+      if (!conversation_id) throw ApiErrorException.HTTP400Error("Conversation id is required");
+      let newConversationId: any = conversation_id;
 
-    if(!conversation) throw ErrorException.notFound("Conversation not found");
-    return await this.chatRepository
-      .deleteConversation(conversation_id);
-  };
+      // Check if the conversation exists
+      const conversation = await this.chatRepository
+        .findConversationByConversationId(conversation_id);
+
+      // If the conversation does not exist, create a new conversation
+      if (!conversation) {
+        newConversationId = await this.chatRepository.saveNewConversation({
+          user_one_id: messageData.sender_id,
+          user_two_id: messageData.receiver_id,
+        });
+      }
+
+      // Save the new message
+      return await this.chatRepository.saveNewMessage(messageData);
+    }
+  );
+
+  public deleteConversation = this.wrap.asyncWrap(
+    async (conversation_id: number): Promise<string> => {
+      // If no conversation id is provided, return an error
+      if (!conversation_id) throw ApiErrorException.HTTP400Error("Conversation id is required");
+
+      // Check if the conversation exists
+      const conversation = await this.chatRepository
+        .findConversationByConversationId(conversation_id);
+
+      // If the conversation does not exist, return an error
+      if (!conversation) throw ApiErrorException.HTTP404Error("Conversation not found");
+
+      // Return the deleted conversation
+      return await this.chatRepository.deleteConversation(conversation_id);
+    }
+  );
 };
 
 export default ChatServices;

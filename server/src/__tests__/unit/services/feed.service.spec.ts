@@ -2,7 +2,7 @@
 import FeedService                                           from "@/services/feed/feed.service.impl";
 import FeedRepository                                        from "@/repositories/feed/feed.repository.impl";
 import UserRepository                                        from "@/repositories/user/user.repository.impl";
-import ErrorException                                        from "@/exceptions/error.exception";
+import ErrorException                                        from "@/exceptions/api.exception";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import GenerateMockData from "../../utils/generate-data.util";
 
@@ -16,10 +16,10 @@ describe("FeedService", () =>  {
   let feedService: FeedService;
 
   const noArgsMsgError: ErrorException = 
-    ErrorException.badRequest("No arguments provided");
+    ErrorException.HTTP400Error("No arguments provided");
 
   const userNotFoundMsgError: ErrorException =
-    ErrorException.badRequest("User not found");
+    ErrorException.HTTP400Error("User not found");
 
   const users = GenerateMockData.createUserList(10);
   const existingUser = users[0]!;

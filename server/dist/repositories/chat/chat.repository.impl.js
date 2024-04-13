@@ -38,7 +38,7 @@ class ChatsRepository {
                 .execute();
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
     }
     ;
@@ -51,7 +51,7 @@ class ChatsRepository {
                 .executeTakeFirst();
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
     }
     ;
@@ -73,7 +73,7 @@ class ChatsRepository {
                 .executeTakeFirst();
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
         ;
     }
@@ -91,7 +91,7 @@ class ChatsRepository {
                 .execute();
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
         ;
     }
@@ -105,7 +105,7 @@ class ChatsRepository {
             return insertId;
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
         ;
     }
@@ -119,7 +119,7 @@ class ChatsRepository {
             return "New message created";
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
         ;
     }
@@ -133,7 +133,7 @@ class ChatsRepository {
             return "Conversation deleted";
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
         ;
     }

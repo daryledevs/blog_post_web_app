@@ -5,189 +5,173 @@ import {
   UpdatePosts,
 }                           from "@/types/table.types";
 import { join }             from "path";
+import AsyncWrapper         from "@/utils/async-wrapper.util";
 import IPostService         from "./post.service";
-import ErrorException       from "@/exceptions/error.exception";
 import PostRepository       from "@/repositories/post/post.repository.impl";
 import UserRepository       from "@/repositories/user/user.repository.impl";
+import ApiErrorException    from "@/exceptions/api.exception";
 import uploadAndDeleteLocal from "@/config/cloudinary.config";
 
 class PostService implements IPostService {
   private postRepository: PostRepository;
   private userRepository: UserRepository;
+  private wrap: AsyncWrapper = new AsyncWrapper();
 
   constructor(postRepository: PostRepository, userRepository: UserRepository) {
     this.postRepository = postRepository;
     this.userRepository = userRepository;
-  };
+  }
 
-  public async findPostsByPostId(post_id: number): Promise<SelectPosts | undefined> {
-    try {
+  public findPostsByPostId = this.wrap.asyncWrap(
+    async (post_id: number): Promise<SelectPosts | undefined> => {
       // Check if the post_id is provided
-      if(!post_id) throw ErrorException.badRequest("No arguments provided");
+      if (!post_id) throw ApiErrorException.HTTP400Error("No arguments provided");
 
-      // Check if the post exists
+      // If the post is not found, return an error
       const data = await this.postRepository.findPostsByPostId(post_id);
-
-      // If the post doesn't exist, throw an error
-      if(!data) throw ErrorException.notFound("Post not found");
+      if (!data) throw ApiErrorException.HTTP404Error("Post not found");
 
       // Return the post
       return data;
-    } catch (error) {
-      throw error;
-    };
-  };
+    }
+  );
 
-  public async getUserPosts(user_id: number): Promise<SelectPosts[]> {
-    try {
+  public getUserPosts = this.wrap.asyncWrap(
+    async (user_id: number): Promise<SelectPosts[]> => {
       // Check if the user_id is provided
-      if(!user_id) throw ErrorException.badRequest("No arguments provided");
+      if (!user_id) throw ApiErrorException.HTTP400Error("No arguments provided");
 
-      // Check if the user exists
+      // If the user is not found, return an error
       const isUserExist = await this.userRepository.findUserById(user_id);
+      if (!isUserExist) throw ApiErrorException.HTTP404Error("User not found");
 
-      // If the user doesn't exist, throw an error
-      if(!isUserExist) throw ErrorException.notFound("User not found");
-      
       // Get the posts for the user
       return await this.postRepository.getUserPosts(user_id as any);
-    } catch (error) {
-      throw error;
-    };
-  };
+    }
+  );
 
-  public async getUserTotalPosts(user_id: number): Promise<string | number | bigint> {
-    try {
+  public getUserTotalPosts = this.wrap.asyncWrap(
+    async (user_id: number): Promise<string | number | bigint> => {
       // Check if the user_id is provided
-      if(!user_id) throw ErrorException.badRequest("No arguments provided");
+      if (!user_id) throw ApiErrorException.HTTP400Error("No arguments provided");
 
-      // Check if the user exists
+      // If the user is not found, return an error
       const isUserExist = await this.userRepository.findUserById(user_id);
-
-      // If the user doesn't exist, throw an error
-      if(!isUserExist) throw ErrorException.notFound("User not found");
+      if (!isUserExist) throw ApiErrorException.HTTP404Error("User not found");
 
       // Get the total posts for the user
       return await this.postRepository.getUserTotalPosts(user_id);
-    } catch (error) {
-      throw error;
-    };
-  };
+    }
+  );
 
-  public async newPost(file: Express.Multer.File | null | undefined, post: NewPosts): Promise<string> {
-    try {
+  public newPost = this.wrap.asyncWrap(
+    async (
+      file: Express.Multer.File | null | undefined,
+      post: NewPosts
+    ): Promise<string> => {
       // Check if the image is uploaded
-      if(!file) throw ErrorException.badRequest("No image uploaded");
-      if(!post.user_id) throw ErrorException.badRequest("No arguments provided");
+      if (!file) throw ApiErrorException.HTTP400Error("No image uploaded");
+      if (!post.user_id)
+        throw ApiErrorException.HTTP400Error("No arguments provided");
 
-      // Check if the user exists
+      // If the user is not found, return an error
       const isUserExist = await this.userRepository.findUserById(post.user_id);
-      if(!isUserExist) throw ErrorException.notFound("User not found");
+      if (!isUserExist) throw ApiErrorException.HTTP404Error("User not found");
 
       const path = join(file.destination, file.filename);
       const { image_id, image_url } = await uploadAndDeleteLocal(path);
 
       // Create a new post
-      return await this.postRepository.newPost({ ...post, image_id, image_url });
-    } catch (error) {
-      throw error;
-    };
-  };
+      return await this.postRepository.newPost({
+        ...post,
+        image_id,
+        image_url,
+      });
+    }
+  );
 
-  public async editPost(post_id: number, post: UpdatePosts): Promise<string | undefined> {
-    try {
-      // Check if the image_url is provided
-      if(post.image_url) throw ErrorException.badRequest("Image url is not allowed to be changed");
+  public editPost = this.wrap.asyncWrap(
+    async (post_id: number, post: UpdatePosts): Promise<string | undefined> => {
+      // Check if the arguments is provided
+      if (!post_id) throw ApiErrorException.HTTP400Error("No arguments provided");
+      if (post.image_url) throw ApiErrorException
+        .HTTP400Error("Image url is not allowed to be changed");
 
-      // Check if the post_id is provided
-      if(!post_id) throw ErrorException.badRequest("No arguments provided");
-
-      // Check if the post exists
+      // If the post is not found, return an error
       const data = await this.postRepository.findPostsByPostId(post_id);
-
-      // If the post doesn't exist, throw an error
-      if(!data) throw ErrorException.notFound("Post not found");
+      if (!data) throw ApiErrorException.HTTP404Error("Post not found");
 
       // Edit the post
       return this.postRepository.editPost(post_id, post);
-    } catch (error) {
-      throw error;
-    };
-  };
+    }
+  );
 
-  public async deletePost(post_id: number): Promise<string> {
-    try {
-      // Check if the post_id is provided
-      if(!post_id) throw ErrorException.badRequest("No arguments provided");
+  public deletePost = this.wrap.asyncWrap(
+    async (post_id: number): Promise<string> => {
+      // check if the arguments is provided
+      if (!post_id) throw ApiErrorException.HTTP400Error("No arguments provided");
 
-      // Check if the post exists
+      // If the post is not found, return an error
       const data = await this.postRepository.findPostsByPostId(post_id);
+      if (!data) throw ApiErrorException.HTTP404Error("Post not found");
 
-      // If the post doesn't exist, throw an error
-      if(!data) throw ErrorException.notFound("Post not found");
-      
       // Delete the post
       return await this.postRepository.deletePost(post_id);
-    } catch (error) {
-      throw error;
-    };
-  };
+    }
+  );
 
-  public async getLikesCountForPost(post_id: number): Promise<number> {
-    try {
+  public getLikesCountForPost = this.wrap.asyncWrap(
+    async (post_id: number): Promise<number> => {
+      // check if the arguments is provided
+      if (!post_id) throw ApiErrorException.HTTP400Error("No arguments provided");
+
       // Check if the post_id is provided
       const data = await this.postRepository.findPostsByPostId(post_id);
-
-      // If the post doesn't exist, throw an error
-      if(!data) throw ErrorException.notFound("Post not found");
+      if (!data) throw ApiErrorException.HTTP404Error("Post not found");
 
       // Get the total likes for the post
       return await this.postRepository.getLikesCountForPost(post_id);
-    } catch (error) {
-      throw error;
-    };
-  };
+    }
+  );
 
-  public async checkUserLikeStatusForPost(like: SelectLikes): Promise<SelectLikes | undefined> {
-    try {
-      // Check if the post_id and user_id is provided
-      if(like.post_id || like.user_id) {
-        throw ErrorException.badRequest("No arguments provided");
-      };
+  public checkUserLikeStatusForPost = this.wrap.asyncWrap(
+    async (like: SelectLikes): Promise<SelectLikes | undefined> => {
+      // check if the arguments is provided
+      if (like.post_id || like.user_id)
+        throw ApiErrorException.HTTP400Error("No arguments provided");
 
-      // Check if the user exists
+      // If the user is not found, return an error
       const isUserExist = await this.userRepository.findUserById(like.user_id);
-      if(!isUserExist) throw ErrorException.notFound("User not found");
+      if (!isUserExist) throw ApiErrorException.HTTP404Error("User not found");
 
-      // Check if the post exists
+      // If the post is not found, return an error
       const isPostExist = await this.postRepository.findPostsByPostId(like.post_id);
-      if(!isPostExist) throw ErrorException.notFound("Post not found");
-      
-      // Check if the post exists
-      return await this.postRepository.isUserLikePost(like);
-    } catch (error) {
-      throw error;
-    };
-  };
+      if (!isPostExist) throw ApiErrorException.HTTP404Error("Post not found");
 
-  public async toggleUserLikeForPost(like: SelectLikes): Promise<string> {
-    try {
-      if(like.post_id || like.user_id) throw ErrorException.badRequest("No arguments provided");
-      // check if the post exists
+      // If the post is not found, return an error
+      return await this.postRepository.isUserLikePost(like);
+    }
+  );
+
+  public toggleUserLikeForPost = this.wrap.asyncWrap(
+    async (like: SelectLikes): Promise<string> => {
+      // check if the arguments is provided
+      if (like.post_id || like.user_id)
+        throw ApiErrorException.HTTP400Error("No arguments provided");
+
+      // If the post is not found, return an error
       await this.postRepository.findPostsByPostId(like.post_id);
 
       // Check to see if the user already likes the post.
       const data = await this.postRepository.isUserLikePost(like);
 
       // If the user hasn't liked the post yet, then create or insert.
-      if(!data) return await this.postRepository.toggleUserLikeForPost(like);
+      if (!data) return await this.postRepository.toggleUserLikeForPost(like);
 
       // If the user has already liked the post, then delete or remove.
       return await this.postRepository.removeUserLikeForPost(like);
-    } catch (error) {
-      throw error;
-    };
-  };
+    }
+  );
 };
 
 export default PostService;

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const error_exception_1 = __importDefault(require("@/exceptions/error.exception"));
+const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
 const user_repository_impl_1 = __importDefault(require("@/repositories/user/user.repository.impl"));
 const follow_service_impl_1 = __importDefault(require("@/services/follow/follow.service.impl"));
 const follow_repository_impl_1 = __importDefault(require("@/repositories/follow/follow.repository.impl"));
@@ -15,9 +15,9 @@ vitest_1.vi.mock("@/repositories/follow/follow.repository.impl");
     let userRepository;
     let followRepository;
     let followService;
-    const noArgsMsgError = error_exception_1.default.badRequest("No arguments provided");
-    const userNotFoundMsgError = error_exception_1.default.badRequest("User not found");
-    const followFetchError = error_exception_1.default.notFound("Invalid fetch parameter");
+    const noArgsMsgError = api_exception_1.default.HTTP400Error("No arguments provided");
+    const userNotFoundMsgError = api_exception_1.default.HTTP400Error("User not found");
+    const followFetchError = api_exception_1.default.HTTP404Error("Invalid fetch parameter");
     // Create a mock of the user service
     let users = generate_data_util_1.default.createUserList(10);
     const notFoundUser = generate_data_util_1.default.createUser();

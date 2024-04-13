@@ -37,7 +37,7 @@ class FollowRepository implements IFollowRepository {
 
       return { followers, following };
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     }
   }
 
@@ -56,7 +56,7 @@ class FollowRepository implements IFollowRepository {
         .limit(10)
         .execute();
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     }
   }
 
@@ -75,7 +75,7 @@ class FollowRepository implements IFollowRepository {
         .limit(10)
         .execute();
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     }
   }
 
@@ -94,7 +94,7 @@ class FollowRepository implements IFollowRepository {
 
       return !!result;
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     }
   }
 
@@ -117,7 +117,7 @@ class FollowRepository implements IFollowRepository {
         )
         .execute();
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     }
   }
 };

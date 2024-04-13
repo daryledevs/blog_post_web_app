@@ -8,7 +8,7 @@ const faker_1 = require("@faker-js/faker");
 const auth_service_impl_1 = __importDefault(require("@/services/auth/auth.service.impl"));
 const user_repository_impl_1 = __importDefault(require("@/repositories/user/user.repository.impl"));
 const auth_repository_impl_1 = __importDefault(require("@/repositories/auth/auth.repository.impl"));
-const error_exception_1 = __importDefault(require("@/exceptions/error.exception"));
+const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
 const generate_data_util_1 = __importDefault(require("../../utils/generate-data.util"));
 let users = generate_data_util_1.default.createUserList(5);
 const newUser = generate_data_util_1.default.createUser();
@@ -80,21 +80,21 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl", async (importOrigin
         });
         (0, vitest_1.test)("Login with username from not existing user", async () => {
             const mockGetUserByUsername = vitest_1.vi.spyOn(authService, "login");
-            mockGetUserByUsername.mockRejectedValue(error_exception_1.default.notFound("User not found"));
+            mockGetUserByUsername.mockRejectedValue(api_exception_1.default.HTTP404Error("User not found"));
             await (0, vitest_1.expect)(authService.login(notFoundUser.username, notFoundUser.password)).rejects.toThrow("User not found");
             (0, vitest_1.expect)(mockGetUserByUsername).toHaveBeenCalledTimes(1);
             (0, vitest_1.expect)(mockGetUserByUsername).toHaveBeenCalledWith(notFoundUser.username, notFoundUser.password);
         });
         (0, vitest_1.test)("Login with email from not existing user", async () => {
             const mockGetUserByEmail = vitest_1.vi.spyOn(authService, "login");
-            mockGetUserByEmail.mockRejectedValue(error_exception_1.default.notFound("User not found"));
+            mockGetUserByEmail.mockRejectedValue(api_exception_1.default.HTTP404Error("User not found"));
             await (0, vitest_1.expect)(authService.login(notFoundUser.email, notFoundUser.password)).rejects.toThrow("User not found");
             (0, vitest_1.expect)(mockGetUserByEmail).toHaveBeenCalledTimes(1);
             (0, vitest_1.expect)(mockGetUserByEmail).toHaveBeenCalledWith(notFoundUser.email, notFoundUser.password);
         });
         (0, vitest_1.test)("Login with username from existing user", async () => {
             const mockGetUserByUsername = vitest_1.vi.spyOn(authService, "login");
-            mockGetUserByUsername.mockRejectedValue(error_exception_1.default.badRequest("Invalid password"));
+            mockGetUserByUsername.mockRejectedValue(api_exception_1.default.HTTP400Error("Invalid password"));
             const user = { ...existingUser, password: faker_1.faker.internet.password() };
             await (0, vitest_1.expect)(authService.login(user.username, user.password)).rejects.toThrow("Invalid password");
             (0, vitest_1.expect)(mockGetUserByUsername).toHaveBeenCalledTimes(1);
@@ -102,7 +102,7 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl", async (importOrigin
         });
         (0, vitest_1.test)("Login with email from existing user", async () => {
             const mockGetUserByEmail = vitest_1.vi.spyOn(authService, "login");
-            mockGetUserByEmail.mockRejectedValue(error_exception_1.default.badRequest("Invalid password"));
+            mockGetUserByEmail.mockRejectedValue(api_exception_1.default.HTTP400Error("Invalid password"));
             const user = { ...existingUser, password: faker_1.faker.internet.password() };
             await (0, vitest_1.expect)(authService.login(user.email, user.password)).rejects.toThrow("Invalid password");
             (0, vitest_1.expect)(mockGetUserByEmail).toHaveBeenCalledTimes(1);

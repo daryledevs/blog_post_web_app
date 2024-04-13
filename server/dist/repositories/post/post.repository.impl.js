@@ -4,9 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_database_1 = __importDefault(require("@/database/db.database"));
-const error_exception_1 = __importDefault(require("@/exceptions/error.exception"));
 const cloudinary_1 = __importDefault(require("cloudinary"));
 const database_exception_1 = __importDefault(require("@/exceptions/database.exception"));
+const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
 class PostRepository {
     database;
     constructor() { this.database = db_database_1.default; }
@@ -50,7 +50,7 @@ class PostRepository {
                 .execute();
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
         ;
     }
@@ -67,7 +67,7 @@ class PostRepository {
             return count;
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
         ;
     }
@@ -81,7 +81,7 @@ class PostRepository {
             return "Post has been posted";
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
         ;
     }
@@ -96,7 +96,7 @@ class PostRepository {
             return "Edit post successfully";
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
         ;
     }
@@ -110,7 +110,7 @@ class PostRepository {
                 .executeTakeFirst();
             const status = await cloudinary_1.default.v2.uploader.destroy(image_id);
             if (status.result !== "ok")
-                throw error_exception_1.default.badRequest("Delete image failed");
+                throw api_exception_1.default.HTTP400Error("Delete image failed");
             await this.database
                 .deleteFrom("posts")
                 .where("post_id", "=", post_id)
@@ -118,7 +118,7 @@ class PostRepository {
             return "Delete post successfully";
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
         ;
     }
@@ -135,7 +135,7 @@ class PostRepository {
             return count;
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
         ;
     }
@@ -152,7 +152,7 @@ class PostRepository {
                 .executeTakeFirst();
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
         ;
     }
@@ -166,7 +166,7 @@ class PostRepository {
             return "Like post successfully";
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
         ;
     }
@@ -183,7 +183,7 @@ class PostRepository {
             return "Removed like from a post";
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
         ;
     }

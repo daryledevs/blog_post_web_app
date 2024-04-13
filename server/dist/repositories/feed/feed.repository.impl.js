@@ -22,7 +22,7 @@ class FeedRepository {
             return count;
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
     }
     ;
@@ -60,7 +60,7 @@ class FeedRepository {
                 .execute();
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
     }
     ;

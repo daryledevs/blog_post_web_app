@@ -18,7 +18,7 @@ class RecentSearchesRepository {
                 .executeTakeFirst();
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
         ;
     }
@@ -35,7 +35,7 @@ class RecentSearchesRepository {
                 .executeTakeFirst();
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
         ;
     }
@@ -51,7 +51,7 @@ class RecentSearchesRepository {
                 .execute();
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
         ;
     }
@@ -64,7 +64,7 @@ class RecentSearchesRepository {
                 .execute();
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
         ;
     }
@@ -77,7 +77,7 @@ class RecentSearchesRepository {
                 .execute();
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
         ;
     }

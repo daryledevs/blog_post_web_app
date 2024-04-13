@@ -1,5 +1,5 @@
 import UserService                                           from "@/services/user/user.service.impl";
-import ErrorException                                        from "@/exceptions/error.exception";
+import ErrorException                                        from "@/exceptions/api.exception";
 import UserRepository                                        from "@/repositories/user/user.repository.impl";
 import { SelectUsers }                                       from "@/types/table.types";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
@@ -12,10 +12,10 @@ describe("UserService", () => {
   let userRepository: UserRepository;
 
   const noArgsMsgError: ErrorException = 
-    ErrorException.badRequest("No arguments provided");
+    ErrorException.HTTP400Error("No arguments provided");
 
   const userNotFoundMsgError: ErrorException =
-    ErrorException.badRequest("User not found");
+    ErrorException.HTTP400Error("User not found");
 
   // Create a mock of the user service
   let users: SelectUsers[] = GenerateMockData.createUserList(10);

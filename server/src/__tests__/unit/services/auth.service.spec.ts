@@ -10,7 +10,7 @@ import { faker }                      from "@faker-js/faker";
 import AuthService                    from "@/services/auth/auth.service.impl";
 import UserRepository                 from "@/repositories/user/user.repository.impl";
 import AuthRepository                 from "@/repositories/auth/auth.repository.impl";
-import ErrorException                 from "@/exceptions/error.exception";
+import ErrorException                 from "@/exceptions/api.exception";
 import GenerateMockData from "../../utils/generate-data.util";
 
 let users = GenerateMockData.createUserList(5);
@@ -111,7 +111,7 @@ describe("AuthService", () => {
 
     test("Login with username from not existing user", async () => {
       const mockGetUserByUsername = vi.spyOn(authService, "login");
-      mockGetUserByUsername.mockRejectedValue(ErrorException.notFound("User not found"));
+      mockGetUserByUsername.mockRejectedValue(ErrorException.HTTP404Error("User not found"));
 
       await expect(
         authService.login(notFoundUser.username, notFoundUser.password)
@@ -123,7 +123,7 @@ describe("AuthService", () => {
 
     test("Login with email from not existing user", async () => {
       const mockGetUserByEmail = vi.spyOn(authService, "login");
-      mockGetUserByEmail.mockRejectedValue(ErrorException.notFound("User not found"));
+      mockGetUserByEmail.mockRejectedValue(ErrorException.HTTP404Error("User not found"));
 
       await expect(
         authService.login(notFoundUser.email, notFoundUser.password)
@@ -135,7 +135,7 @@ describe("AuthService", () => {
 
     test("Login with username from existing user", async () => {
       const mockGetUserByUsername = vi.spyOn(authService, "login");
-      mockGetUserByUsername.mockRejectedValue(ErrorException.badRequest("Invalid password"));
+      mockGetUserByUsername.mockRejectedValue(ErrorException.HTTP400Error("Invalid password"));
       const user = { ...existingUser, password: faker.internet.password() };
       
       await expect(
@@ -148,7 +148,7 @@ describe("AuthService", () => {
 
     test("Login with email from existing user", async () => {
       const mockGetUserByEmail = vi.spyOn(authService, "login");
-      mockGetUserByEmail.mockRejectedValue(ErrorException.badRequest("Invalid password"));
+      mockGetUserByEmail.mockRejectedValue(ErrorException.HTTP400Error("Invalid password"));
       const user = { ...existingUser, password: faker.internet.password() };
       
       await expect(

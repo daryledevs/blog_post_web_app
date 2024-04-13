@@ -20,7 +20,7 @@ class UserRepository {
             return result;
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
     }
     async findUserByUsername(username) {
@@ -32,7 +32,7 @@ class UserRepository {
                 .executeTakeFirst();
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
     }
     async searchUsersByQuery(search) {
@@ -54,7 +54,7 @@ class UserRepository {
                 .execute();
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
     }
     async findUserByEmail(email) {
@@ -66,7 +66,7 @@ class UserRepository {
                 .executeTakeFirst();
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
     }
     async findUserByCredentials(userCredential) {
@@ -81,7 +81,7 @@ class UserRepository {
                 .executeTakeFirst();
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
     }
     async updateUser(user_id, user) {
@@ -93,7 +93,7 @@ class UserRepository {
                 .executeTakeFirstOrThrow();
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
     }
     async deleteUser(user_id) {
@@ -104,7 +104,7 @@ class UserRepository {
                 .execute();
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
     }
 }

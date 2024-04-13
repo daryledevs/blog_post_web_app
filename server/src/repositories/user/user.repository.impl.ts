@@ -20,7 +20,7 @@ class UserRepository implements IUserRepository {
 
       return result;
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     }
   }
 
@@ -32,7 +32,7 @@ class UserRepository implements IUserRepository {
         .selectAll()
         .executeTakeFirst();
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     }
   }
 
@@ -60,7 +60,7 @@ class UserRepository implements IUserRepository {
         .selectAll()
         .execute();
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     }
   }
 
@@ -72,7 +72,7 @@ class UserRepository implements IUserRepository {
         .selectAll()
         .executeTakeFirst();
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     }
   }
 
@@ -89,7 +89,7 @@ class UserRepository implements IUserRepository {
         )
         .executeTakeFirst();
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     }
   }
 
@@ -101,7 +101,7 @@ class UserRepository implements IUserRepository {
         .where("user_id", "=", user_id)
         .executeTakeFirstOrThrow() as UpdateUsers;
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     }
   }
 
@@ -112,7 +112,7 @@ class UserRepository implements IUserRepository {
         .where("user_id", "=", user_id)
         .execute();
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     }
   }
 };

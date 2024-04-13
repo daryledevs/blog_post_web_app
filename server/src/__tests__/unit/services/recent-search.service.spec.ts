@@ -1,4 +1,4 @@
-import ErrorException                                        from "@/exceptions/error.exception";
+import ErrorException                                        from "@/exceptions/api.exception";
 import UserRepository                                        from "@/repositories/user/user.repository.impl";
 import GenerateMockData                                      from "../../utils/generate-data.util";
 import RecentSearchService                                   from "@/services/recent-search/recent-search.service.impl";
@@ -16,16 +16,16 @@ describe("RecentSearchService", () => {
   let recentSearchService: RecentSearchService;
 
   const noArgsMsgError: ErrorException = 
-    ErrorException.badRequest("No arguments provided");
+    ErrorException.HTTP400Error("No arguments provided");
 
   const userNotFoundMsgError: ErrorException = 
-    ErrorException.badRequest("User not found");
+    ErrorException.HTTP400Error("User not found");
 
   const searchUserNotFoundError: ErrorException = 
-    ErrorException.notFound("Search user not found");
+    ErrorException.HTTP404Error("Search user not found");
 
   const recentSearchNotFoundError: ErrorException = 
-    ErrorException.notFound("Recent search not found");
+    ErrorException.HTTP404Error("Recent search not found");
 
   // Create a mock of the user service
   let users: SelectUsers[] = GenerateMockData.createUserList(10);

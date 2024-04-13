@@ -1,5 +1,5 @@
 import dotenv                              from "dotenv";
-import Exception                           from "@/exceptions/error.exception";
+import ApiException                           from "@/exceptions/api.exception";
 import isTokenValid                        from "@/utils/token-invalid.util";
 import routeException                      from "@/utils/route-exception.util";
 import UserRepository                      from "@/repositories/user/user.repository.impl";
@@ -19,7 +19,7 @@ const tokenHandler = async (req: Request, res: Response, next: NextFunction) => 
     const isTokenInvalid = isTokenValid(accessToken, refreshToken);
 
     // if the token is not provided, return an error
-    if (isTokenInvalid) return next(Exception.unauthorized("Token is not provided"));
+    if (isTokenInvalid) return next(ApiException.HTTP401Error("Token is not provided"));
     
     // verify the refresh token and access token
     const { refreshError, refreshDecode } = await AuthTokensUtil.verifyToken(
@@ -37,11 +37,11 @@ const tokenHandler = async (req: Request, res: Response, next: NextFunction) => 
     const isTokenError = [refreshError, accessError].some((status) => status === "JsonWebTokenError");
     
     // if the refresh token is not provided, return an error
-    if (isTokenError) return next(Exception.unauthorized("Token is not valid"));
+    if (isTokenError) return next(ApiException.HTTP401Error("Token is not valid"));
 
     // if user is not found, return an error
     const result: SelectUsers | undefined = await userRepository.findUserById(refreshDecode.user_id);
-    if (!result) return next(Exception.notFound("User not found"));
+    if (!result) return next(ApiException.HTTP404Error("User not found"));
 
     // if the refresh token is expired, generate a new refresh token and access token
     if (refreshError === "TokenExpiredError" || accessError === "TokenExpiredError") {

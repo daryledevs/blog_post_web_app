@@ -49,7 +49,7 @@ class ChatsRepository implements IChatRepository {
         .where("conversations.conversation_id", "not in", conversations)
         .execute();
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     }
   };
 
@@ -61,7 +61,7 @@ class ChatsRepository implements IChatRepository {
         .where("conversation_id", "=", conversation_id)
         .executeTakeFirst();
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     }
   };
 
@@ -84,7 +84,7 @@ class ChatsRepository implements IChatRepository {
         )
         .executeTakeFirst();
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     };
   };
 
@@ -100,7 +100,7 @@ class ChatsRepository implements IChatRepository {
         .limit(10)
         .execute();
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     };
   };
 
@@ -113,7 +113,7 @@ class ChatsRepository implements IChatRepository {
 
       return insertId;
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     };
   };
 
@@ -126,7 +126,7 @@ class ChatsRepository implements IChatRepository {
 
       return "New message created";
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     };
   };
 
@@ -139,7 +139,7 @@ class ChatsRepository implements IChatRepository {
 
       return "Conversation deleted";
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     };
   };
 };

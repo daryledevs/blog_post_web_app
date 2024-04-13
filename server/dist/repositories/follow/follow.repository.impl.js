@@ -32,7 +32,7 @@ class FollowRepository {
             return { followers, following };
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
     }
     async getFollowersLists(user_id, listsId) {
@@ -49,7 +49,7 @@ class FollowRepository {
                 .execute();
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
     }
     async getFollowingLists(user_id, listsId) {
@@ -66,7 +66,7 @@ class FollowRepository {
                 .execute();
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
     }
     async isFollowUser(identifier) {
@@ -82,7 +82,7 @@ class FollowRepository {
             return !!result;
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
     }
     async followUser(identifier) {
@@ -103,7 +103,7 @@ class FollowRepository {
                 .execute();
         }
         catch (error) {
-            throw database_exception_1.default.fromError(error);
+            throw database_exception_1.default.error(error);
         }
     }
 }

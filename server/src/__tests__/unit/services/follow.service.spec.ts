@@ -1,4 +1,4 @@
-import ErrorException                                        from "@/exceptions/error.exception";
+import ErrorException                                        from "@/exceptions/api.exception";
 import UserRepository                                        from "@/repositories/user/user.repository.impl";
 import FollowService                                         from "@/services/follow/follow.service.impl";
 import FollowRepository                                      from "@/repositories/follow/follow.repository.impl";
@@ -16,13 +16,13 @@ describe('FollowService', () => {
   let followService:    FollowService;
 
   const noArgsMsgError: ErrorException = 
-    ErrorException.badRequest("No arguments provided");
+    ErrorException.HTTP400Error("No arguments provided");
 
   const userNotFoundMsgError: ErrorException = 
-    ErrorException.badRequest("User not found");
+    ErrorException.HTTP400Error("User not found");
 
   const followFetchError: ErrorException = 
-    ErrorException.notFound("Invalid fetch parameter");
+    ErrorException.HTTP404Error("Invalid fetch parameter");
 
   // Create a mock of the user service
   let users: SelectUsers[] = GenerateMockData.createUserList(10);

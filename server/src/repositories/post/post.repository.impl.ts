@@ -7,10 +7,10 @@ import {
 import db                from "@/database/db.database";
 import { DB }            from "@/types/schema.types";
 import { Kysely }        from "kysely";
-import Exception         from "@/exceptions/error.exception";
 import cloudinary        from "cloudinary";
 import IPostRepository   from "./post.repository";
 import DatabaseException from "@/exceptions/database.exception";
+import ApiErrorException from "@/exceptions/api.exception";
 
 class PostRepository implements IPostRepository {
   private database: Kysely<DB>;
@@ -53,7 +53,7 @@ class PostRepository implements IPostRepository {
         .groupBy("posts.post_id")
         .execute();
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     };
   };
 
@@ -70,7 +70,7 @@ class PostRepository implements IPostRepository {
 
       return count;
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     };
   };
 
@@ -82,7 +82,7 @@ class PostRepository implements IPostRepository {
         .execute();
       return "Post has been posted";
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     };
   };
 
@@ -96,7 +96,7 @@ class PostRepository implements IPostRepository {
       
       return "Edit post successfully";
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     };
   };
 
@@ -109,7 +109,7 @@ class PostRepository implements IPostRepository {
         .executeTakeFirst() as { image_id: string };
 
       const status = await cloudinary.v2.uploader.destroy(image_id);
-      if(status.result !== "ok") throw Exception.badRequest("Delete image failed");
+      if(status.result !== "ok") throw ApiErrorException.HTTP400Error("Delete image failed");
 
       await this.database
         .deleteFrom("posts")
@@ -118,7 +118,7 @@ class PostRepository implements IPostRepository {
         
       return "Delete post successfully";
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     };
   };
 
@@ -135,7 +135,7 @@ class PostRepository implements IPostRepository {
 
       return count;
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     };
   };
 
@@ -150,7 +150,7 @@ class PostRepository implements IPostRepository {
         ]))
         .executeTakeFirst();
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     };
   };
 
@@ -163,7 +163,7 @@ class PostRepository implements IPostRepository {
 
     return "Like post successfully";
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     };
   };
 
@@ -179,7 +179,7 @@ class PostRepository implements IPostRepository {
 
       return "Removed like from a post";
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     };
   };
 };

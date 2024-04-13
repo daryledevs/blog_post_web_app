@@ -1,5 +1,5 @@
 import PostService                                           from "@/services/post/post.service.impl";
-import ErrorException                                        from "@/exceptions/error.exception";
+import ErrorException                                        from "@/exceptions/api.exception";
 import UserRepository                                        from "@/repositories/user/user.repository.impl";
 import PostRepository                                        from "@/repositories/post/post.repository.impl";
 import GenerateMockData                                      from "../../utils/generate-data.util";
@@ -15,13 +15,13 @@ describe("FeedService", () => {
   let postService: PostService;
 
   const noArgsMsgError: ErrorException = 
-    ErrorException.badRequest("No arguments provided");
+    ErrorException.HTTP400Error("No arguments provided");
 
   const userNotFoundMsgError: ErrorException = 
-    ErrorException.badRequest("User not found");
+    ErrorException.HTTP400Error("User not found");
 
   const postNotFoundMsgError: ErrorException =
-    ErrorException.badRequest("Post not found");
+    ErrorException.HTTP400Error("Post not found");
 
   const users = GenerateMockData.createUserList(10);
   const posts = GenerateMockData.generateMockData(

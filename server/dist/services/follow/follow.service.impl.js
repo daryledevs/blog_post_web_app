@@ -3,81 +3,73 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const error_exception_1 = __importDefault(require("@/exceptions/error.exception"));
+const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
+const async_wrapper_util_1 = __importDefault(require("@/utils/async-wrapper.util"));
 class FollowService {
     userRepository;
     followRepository;
+    wrap = new async_wrapper_util_1.default();
     constructor(userRepository, followRepository) {
         this.userRepository = userRepository;
         this.followRepository = followRepository;
     }
-    async getFollowStats(user_id) {
-        try {
-            // If no arguments are provided, return an error
-            if (!user_id)
-                throw error_exception_1.default.badRequest("No arguments provided");
-            // Check if the user is already following the other user
-            const isExist = await this.userRepository.findUserById(user_id);
-            if (!isExist)
-                throw error_exception_1.default.notFound("User not found");
-            return await this.followRepository.getFollowStats(user_id);
+    getFollowStats = this.wrap.asyncWrap(async (user_id) => {
+        // If no arguments are provided, return an error
+        if (!user_id)
+            throw api_exception_1.default.HTTP400Error("No arguments provided");
+        // If the user is not found, return an error
+        const isExist = await this.userRepository.findUserById(user_id);
+        if (!isExist)
+            throw api_exception_1.default.HTTP404Error("User not found");
+        return await this.followRepository.getFollowStats(user_id);
+    });
+    getFollowerFollowingLists = this.wrap.asyncWrap(async (user_id, fetch, listsId) => {
+        // If no arguments are provided, return an error
+        if (!user_id)
+            throw api_exception_1.default.HTTP400Error("No arguments provided");
+        // If the user is not found, return an error
+        const isExist = await this.userRepository.findUserById(user_id);
+        if (!isExist)
+            throw api_exception_1.default.HTTP404Error("User not found");
+        const listIdsToExclude = listsId?.length ? listsId : [0];
+        switch (fetch) {
+            case "followers":
+                return this.followRepository.getFollowersLists(user_id, listIdsToExclude);
+            case "following":
+                return this.followRepository.getFollowingLists(user_id, listIdsToExclude);
+            default:
+                throw api_exception_1.default.HTTP400Error("Invalid fetch parameter");
         }
-        catch (error) {
-            throw error;
+    });
+    toggleFollow = this.wrap.asyncWrap(async (user_id, followed_id) => {
+        // If no arguments are provided, return an error
+        if (!user_id || !followed_id)
+            throw api_exception_1.default
+                .HTTP400Error("No arguments provided");
+        const args = {
+            follower_id: user_id,
+            followed_id: followed_id,
+        };
+        // If the user is not found, return an error
+        const user = await this.userRepository.findUserById(user_id);
+        if (!user)
+            throw api_exception_1.default.HTTP404Error("User not found");
+        // If the user is not found, return an error
+        const otherUser = await this.userRepository.findUserById(followed_id);
+        if (!otherUser)
+            throw api_exception_1.default
+                .HTTP404Error("The user to be followed doesn't exist");
+        // Check if the user is already following the other user
+        const isExist = await this.followRepository.isFollowUser(args);
+        // If it already exists, delete the data from the database
+        if (isExist) {
+            await this.followRepository.unfollowUser(args);
+            return "User unfollowed successfully";
         }
-    }
-    async getFollowerFollowingLists(user_id, fetch, listsId) {
-        try {
-            // If no arguments are provided, return an error
-            if (!user_id)
-                throw error_exception_1.default.badRequest("No arguments provided");
-            // Check if the user is already following the other user
-            const isExist = await this.userRepository.findUserById(user_id);
-            if (!isExist)
-                throw error_exception_1.default.notFound("User not found");
-            const listIdsToExclude = listsId?.length ? listsId : [0];
-            switch (fetch) {
-                case "followers":
-                    return this.followRepository.getFollowersLists(user_id, listIdsToExclude);
-                case "following":
-                    return this.followRepository.getFollowingLists(user_id, listIdsToExclude);
-                default:
-                    throw error_exception_1.default.badRequest("Invalid fetch parameter");
-            }
-        }
-        catch (error) {
-            throw error;
-        }
-    }
-    async toggleFollow(user_id, followed_id) {
-        try {
-            if (!user_id || !followed_id)
-                throw error_exception_1.default.badRequest("No arguments provided");
-            const args = {
-                follower_id: user_id,
-                followed_id: followed_id,
-            };
-            const user = await this.userRepository.findUserById(user_id);
-            if (!user)
-                throw error_exception_1.default.notFound("User not found");
-            const otherUser = await this.userRepository.findUserById(followed_id);
-            if (!otherUser)
-                throw error_exception_1.default.notFound("The user to be followed doesn't exist");
-            // Check if the user is already following the other user
-            const isExist = await this.followRepository.isFollowUser(args);
-            // If it already exists, delete the data from the database
-            if (isExist) {
-                await this.followRepository.unfollowUser(args);
-                return "User unfollowed successfully";
-            }
-            // if there is no data in the database, create one
-            await this.followRepository.followUser(args);
-            return "User followed successfully";
-        }
-        catch (error) {
-            throw error;
-        }
-    }
+        // if there is no data in the database, create one
+        await this.followRepository.followUser(args);
+        return "User followed successfully";
+    });
 }
 ;
 exports.default = FollowService;

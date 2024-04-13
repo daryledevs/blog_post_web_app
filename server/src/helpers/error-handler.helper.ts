@@ -1,4 +1,4 @@
-import Exception                                  from "@/exceptions/error.exception";
+import Exception                                  from "@/exceptions/api.exception";
 import DatabaseException                          from "@/exceptions/database.exception";
 import { ErrorRequestHandler, Request, Response } from "express";
 
@@ -9,8 +9,8 @@ const errorHandler : ErrorRequestHandler = (err, req, res, next) => {
   }
 
   if(err instanceof Exception) {
-    const { status, message } = err;
-    return res.status(status).send({ message });
+    const { name, httpCode, message, isOperational } = err;
+    return res.status(httpCode).send({ name, isOperational, message });
   }
 
   res.status(500).send({ message: "Something went wrong", error: err.message });

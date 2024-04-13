@@ -1,47 +1,51 @@
-import IFeedService    from "./feed.service";
-import ErrorException  from "@/exceptions/error.exception";
-import FeedRepository  from "@/repositories/feed/feed.repository.impl";
-import UserRepository  from "@/repositories/user/user.repository.impl";
-import { SelectPosts } from "@/types/table.types";
+import AsyncWrapper      from "@/utils/async-wrapper.util";
+import IFeedService      from "./feed.service";
+import FeedRepository    from "@/repositories/feed/feed.repository.impl";
+import UserRepository    from "@/repositories/user/user.repository.impl";
+import { SelectPosts }   from "@/types/table.types";
+import ApiErrorException from "@/exceptions/api.exception";
 
 class FeedService implements IFeedService {
   private feedRepository: FeedRepository;
   private userRepository: UserRepository;
+  private wrap: AsyncWrapper = new AsyncWrapper();
 
   constructor(feedRepository: FeedRepository, userRepository: UserRepository) {
     this.feedRepository = feedRepository;
     this.userRepository = userRepository;
-  };
+  }
 
-  public async getTotalFeed(): Promise<number> {
-    try {
-      return await this.feedRepository.getTotalFeed();
-    } catch (error) {
-      throw error;
-    };
-  };
+  public getTotalFeed = this.wrap.asyncWrap(async (): Promise<number> => {
+    return await this.feedRepository.getTotalFeed();
+  });
 
-  public async getUserFeed(user_id: number, post_ids: number[]): Promise<SelectPosts[]> {
-    try {
-      if(!user_id) throw ErrorException.badRequest("No arguments provided");
+  public getUserFeed = this.wrap.asyncWrap(
+    async (user_id: number, post_ids: number[]): Promise<SelectPosts[]> => {
+      // If no arguments are provided, return an error
+      if (!user_id) throw ApiErrorException.HTTP400Error("No arguments provided");
+
+      // If the user is not found, return an error
       const isUserExists = await this.userRepository.findUserById(user_id);
-      if(!isUserExists) throw ErrorException.notFound("User not found");
+      if (!isUserExists) throw ApiErrorException.HTTP404Error("User not found");
+
+      // Return the user feed
       return await this.feedRepository.getUserFeed(user_id, post_ids);
-    } catch (error) {
-      throw error;
-    };
-  };
+    }
+  );
 
-  public async getExploreFeed(user_id: number): Promise<SelectPosts[]> {
-    try {
-      if(!user_id) throw ErrorException.badRequest("No arguments provided");
+  public getExploreFeed = this.wrap.asyncWrap(
+    async (user_id: number): Promise<SelectPosts[]> => {
+      // If no arguments are provided, return an error
+      if (!user_id) throw ApiErrorException.HTTP400Error("No arguments provided");
+
+      // If the user is not found, return an error
       const isUserExists = await this.userRepository.findUserById(user_id);
-      if(!isUserExists) throw ErrorException.notFound("User not found");
+      if (!isUserExists) throw ApiErrorException.HTTP404Error("User not found");
+
+      // Return the explore feed
       return await this.feedRepository.getExploreFeed(user_id);
-    } catch (error) {
-      throw error;
-    };
-  };
+    }
+  );
 };
 
 export default FeedService;

@@ -1,13 +1,15 @@
-import ErrorException      from "@/exceptions/error.exception";
+import AsyncWrapper        from "@/utils/async-wrapper.util";
 import UserRepository      from "@/repositories/user/user.repository.impl";
 import IFollowService      from "./follow.service";
 import FollowRepository    from "@/repositories/follow/follow.repository.impl";
+import ApiErrorException   from "@/exceptions/api.exception";
 import { SelectFollowers } from "@/types/table.types";
 import { FollowStatsType } from "@/repositories/follow/follow.repository";
 
 class FollowService implements IFollowService {
   private userRepository: UserRepository;
   private followRepository: FollowRepository;
+  private wrap: AsyncWrapper = new AsyncWrapper();
 
   constructor(
     userRepository: UserRepository,
@@ -17,33 +19,31 @@ class FollowService implements IFollowService {
     this.followRepository = followRepository;
   }
 
-  public async getFollowStats(user_id: any): Promise<FollowStatsType> {
-    try {
+  public getFollowStats = this.wrap.asyncWrap(
+    async (user_id: any): Promise<FollowStatsType> => {
       // If no arguments are provided, return an error
-      if (!user_id) throw ErrorException.badRequest("No arguments provided");
+      if (!user_id) throw ApiErrorException.HTTP400Error("No arguments provided");
 
-      // Check if the user is already following the other user
+      // If the user is not found, return an error
       const isExist = await this.userRepository.findUserById(user_id);
-      if (!isExist) throw ErrorException.notFound("User not found");
+      if (!isExist) throw ApiErrorException.HTTP404Error("User not found");
 
       return await this.followRepository.getFollowStats(user_id);
-    } catch (error) {
-      throw error;
     }
-  }
+  );
 
-  public async getFollowerFollowingLists(
-    user_id: any,
-    fetch: string,
-    listsId: number[]
-  ): Promise<SelectFollowers[]> {
-    try {
+  public getFollowerFollowingLists = this.wrap.asyncWrap(
+    async (
+      user_id: any,
+      fetch: string,
+      listsId: number[]
+    ): Promise<SelectFollowers[]> => {
       // If no arguments are provided, return an error
-      if (!user_id) throw ErrorException.badRequest("No arguments provided");
+      if (!user_id) throw ApiErrorException.HTTP400Error("No arguments provided");
 
-      // Check if the user is already following the other user
+      // If the user is not found, return an error
       const isExist = await this.userRepository.findUserById(user_id);
-      if (!isExist) throw ErrorException.notFound("User not found");
+      if (!isExist) throw ApiErrorException.HTTP404Error("User not found");
 
       const listIdsToExclude = listsId?.length ? listsId : [0];
 
@@ -59,27 +59,31 @@ class FollowService implements IFollowService {
             listIdsToExclude
           );
         default:
-          throw ErrorException.badRequest("Invalid fetch parameter");
+          throw ApiErrorException.HTTP400Error("Invalid fetch parameter");
       }
-    } catch (error) {
-      throw error;
     }
-  }
+  );
 
-  public async toggleFollow(user_id: any, followed_id: any): Promise<string> {
-    try {
-      if (!user_id || !followed_id) throw ErrorException.badRequest("No arguments provided");
+  public toggleFollow = this.wrap.asyncWrap(
+    async (user_id: any, followed_id: any): Promise<string> => {
+      // If no arguments are provided, return an error
+      if (!user_id || !followed_id) throw ApiErrorException
+        .HTTP400Error("No arguments provided");
 
       const args = {
         follower_id: user_id as any,
         followed_id: followed_id as any,
       };
 
+      // If the user is not found, return an error
       const user = await this.userRepository.findUserById(user_id);
-      if (!user) throw ErrorException.notFound("User not found");
+      if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
+      // If the user is not found, return an error
       const otherUser = await this.userRepository.findUserById(followed_id);
-      if (!otherUser) throw ErrorException.notFound("The user to be followed doesn't exist");
+      if (!otherUser) throw ApiErrorException
+        .HTTP404Error("The user to be followed doesn't exist");
+        
 
       // Check if the user is already following the other user
       const isExist = await this.followRepository.isFollowUser(args);
@@ -93,10 +97,8 @@ class FollowService implements IFollowService {
       // if there is no data in the database, create one
       await this.followRepository.followUser(args);
       return "User followed successfully";
-    } catch (error) {
-      throw error;
     }
-  }
+  );
 };
 
 export default FollowService;

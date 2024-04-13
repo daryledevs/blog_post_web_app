@@ -25,7 +25,7 @@ class FeedRepository implements IFeedRepository {
 
       return count;
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     }
   };
 
@@ -64,7 +64,7 @@ class FeedRepository implements IFeedRepository {
         .limit(3)
         .execute();
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     }
   };
 

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const error_exception_1 = __importDefault(require("@/exceptions/error.exception"));
+const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
 const user_repository_impl_1 = __importDefault(require("@/repositories/user/user.repository.impl"));
 const generate_data_util_1 = __importDefault(require("../../utils/generate-data.util"));
 const recent_search_service_impl_1 = __importDefault(require("@/services/recent-search/recent-search.service.impl"));
@@ -15,10 +15,10 @@ vitest_1.vi.mock("@/repositories/recent-search/recent-search.repository.impl");
     let userRepository;
     let recentSearchRepository;
     let recentSearchService;
-    const noArgsMsgError = error_exception_1.default.badRequest("No arguments provided");
-    const userNotFoundMsgError = error_exception_1.default.badRequest("User not found");
-    const searchUserNotFoundError = error_exception_1.default.notFound("Search user not found");
-    const recentSearchNotFoundError = error_exception_1.default.notFound("Recent search not found");
+    const noArgsMsgError = api_exception_1.default.HTTP400Error("No arguments provided");
+    const userNotFoundMsgError = api_exception_1.default.HTTP400Error("User not found");
+    const searchUserNotFoundError = api_exception_1.default.HTTP404Error("Search user not found");
+    const recentSearchNotFoundError = api_exception_1.default.HTTP404Error("Recent search not found");
     // Create a mock of the user service
     let users = generate_data_util_1.default.createUserList(10);
     const notFoundUser = generate_data_util_1.default.createUser();

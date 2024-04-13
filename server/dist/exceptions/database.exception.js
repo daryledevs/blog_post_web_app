@@ -15,7 +15,7 @@ class DatabaseException {
         this.query = sql;
         this.node = node;
     }
-    static fromError(error) {
+    static error(error) {
         return new DatabaseException(error.errno, error.code, error.sqlState, error.sqlMessage, error.sql, error.node);
     }
 }

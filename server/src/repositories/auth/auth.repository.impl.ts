@@ -29,7 +29,7 @@ class AuthRepository implements IAuthRepository {
 
       return await this.userRepository.findUserById(Number(insertId));
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     }
   }
 
@@ -41,7 +41,7 @@ class AuthRepository implements IAuthRepository {
         .where("token_id", "=", token_id)
         .executeTakeFirst();
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     }
   }
 
@@ -51,7 +51,7 @@ class AuthRepository implements IAuthRepository {
 
       return "Reset token is saved successfully";
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     }
   }
 
@@ -64,7 +64,7 @@ class AuthRepository implements IAuthRepository {
 
       return "Reset token is saved successfully";
     } catch (error) {
-      throw DatabaseException.fromError(error);
+      throw DatabaseException.error(error);
     }
   }
 };
