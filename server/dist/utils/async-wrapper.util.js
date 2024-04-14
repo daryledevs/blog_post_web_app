@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
+const database_exception_1 = __importDefault(require("@/exceptions/database.exception"));
 class AsyncWrapper {
     apiWrap = (cb) => {
         return (req, res, next) => cb(req, res, next).catch(next(api_exception_1.default.HTTP500Error("Something went wrong")));
@@ -18,7 +19,7 @@ class AsyncWrapper {
     repoWrap = (fn) => {
         return (...args) => {
             return fn.apply(this, args).catch((error) => {
-                throw error;
+                throw database_exception_1.default.error(error);
             });
         };
     };

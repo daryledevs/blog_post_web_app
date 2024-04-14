@@ -21,7 +21,7 @@ class AsyncWrapper {
   repoWrap = (fn: Function) => {
     return (...args: any) => {
       return fn.apply(this, args).catch((error: any) => {
-        throw error;
+        throw DatabaseException.error(error);
       });
     };
   };
