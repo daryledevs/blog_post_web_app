@@ -22,86 +22,54 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv = __importStar(require("dotenv"));
+const async_wrapper_util_1 = __importDefault(require("@/utils/async-wrapper.util"));
 dotenv.config();
 class AuthController {
     authService;
+    wrap = new async_wrapper_util_1.default();
     constructor(authService) {
         this.authService = authService;
     }
-    ;
-    register = async (req, res, next) => {
-        try {
-            const { cookieOptions, ...rest } = req.body;
-            const result = await this.authService.register(rest);
-            res.status(201).send({ message: result });
-        }
-        catch (error) {
-            next(error);
-        }
-        ;
-    };
-    login = async (req, res, next) => {
-        try {
-            const { userCredential, password } = req.body;
-            const result = await this.authService.login(userCredential, password);
-            res
-                .cookie("REFRESH_TOKEN", result.refreshToken, req.body.cookieOptions)
-                .status(200)
-                .send({ message: result.message, token: result.token });
-        }
-        catch (error) {
-            next(error);
-        }
-        ;
-    };
-    forgotPassword = async (req, res, next) => {
-        try {
-            const result = await this.authService.forgotPassword(req.body);
-            res.status(200).send({ message: result });
-        }
-        catch (error) {
-            next(error);
-        }
-        ;
-    };
-    resetPasswordForm = async (req, res, next) => {
-        try {
-            const result = await this.authService.resetPasswordForm(req.body);
-            res.status(201).render(result.render, result.data);
-        }
-        catch (error) {
-            next(error);
-        }
-        ;
-    };
-    resetPassword = async (req, res, next) => {
-        try {
-            const result = await this.authService.resetPassword(req.body);
-            res.status(200).send({ message: result });
-        }
-        catch (error) {
-            next(error);
-        }
-        ;
-    };
-    logout = async (req, res, next) => {
-        try {
-            res
-                .clearCookie("REFRESH_TOKEN", {
-                sameSite: "none",
-                secure: req.body.cookieOptions.secure,
-                httpOnly: true,
-            })
-                .status(200)
-                .send({ message: "Logout successfully" });
-        }
-        catch (error) {
-            next(error);
-        }
-        ;
-    };
+    register = this.wrap.apiWrap(async (req, res, next) => {
+        const { cookieOptions, ...rest } = req.body;
+        const result = await this.authService.register(rest);
+        res.status(201).send({ message: result });
+    });
+    login = this.wrap.apiWrap(async (req, res, next) => {
+        const { userCredential, password } = req.body;
+        const result = await this.authService.login(userCredential, password);
+        res
+            .cookie("REFRESH_TOKEN", result.refreshToken, req.body.cookieOptions)
+            .status(200)
+            .send({ message: result.message, token: result.token });
+    });
+    forgotPassword = this.wrap.apiWrap(async (req, res, next) => {
+        const result = await this.authService.forgotPassword(req.body);
+        res.status(200).send({ message: result });
+    });
+    resetPasswordForm = this.wrap.apiWrap(async (req, res, next) => {
+        const result = await this.authService.resetPasswordForm(req.body);
+        res.status(201).render(result.render, result.data);
+    });
+    resetPassword = this.wrap.apiWrap(async (req, res, next) => {
+        const result = await this.authService.resetPassword(req.body);
+        res.status(200).send({ message: result });
+    });
+    logout = this.wrap.apiWrap(async (req, res, next) => {
+        res
+            .clearCookie("REFRESH_TOKEN", {
+            sameSite: "none",
+            secure: req.body.cookieOptions.secure,
+            httpOnly: true,
+        })
+            .status(200)
+            .send({ message: "Logout successfully" });
+    });
 }
 ;
 exports.default = AuthController;

@@ -1,28 +1,28 @@
 import ChatsServices                       from "@/services/chat/chat.service.impl";
+import AsyncWrapper                        from "@/utils/async-wrapper.util";
 import { NextFunction, Request, Response } from "express";
 
 class ChatsController {
   private chatsService: ChatsServices;
+  private wrap: AsyncWrapper = new AsyncWrapper();
 
   constructor(chatsService: ChatsServices) {
     this.chatsService = chatsService;
-  };
+  }
 
-  public getChatHistory = async (req: Request, res: Response, next: NextFunction) => {
-    try {
+  public getChatHistory = this.wrap.apiWrap(
+    async (req: Request, res: Response, next: NextFunction) => {
       const user_id: any = req.query.user_id;
       const conversations = req.body || [0];
       const listId = conversations.length ? conversations : [0];
 
       const data = await this.chatsService.getChatHistory(user_id, listId);
       res.status(200).send(data);
-    } catch (error) {
-      next(error);
-    };
-  };
+    }
+  );
 
-  public getChatMessages = async (req: Request, res: Response, next: NextFunction) => {
-    try {
+  public getChatMessages = this.wrap.apiWrap(
+    async (req: Request, res: Response, next: NextFunction) => {
       let conversation_id: any = req.params.conversation_id;
       const messages = req.body.messages || [0];
       const listId = messages.length ? messages : [0];
@@ -33,13 +33,11 @@ class ChatsController {
       );
 
       res.status(200).send({ chats: data });
-    } catch (error) {
-      next(error);
-    };
-  };
+    }
+  );
 
-  public newMessageAndConversation = async (req: Request, res: Response, next: NextFunction) => {
-    try {
+  public newMessageAndConversation = this.wrap.apiWrap(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { conversation_id, messageData } = req.body;
 
       const message = await this.chatsService.newMessageAndConversation(
@@ -48,20 +46,19 @@ class ChatsController {
       );
 
       res.status(200).send({ message });
-    } catch (error) {
-      next(error);
-    };
-  };
+    }
+  );
 
-  public deleteConversation = async (req: Request, res: Response, next: NextFunction) => {
-    try {
+  public deleteConversation = this.wrap.apiWrap(
+    async (req: Request, res: Response, next: NextFunction) => {
       const { conversation_id } = req.body;
-      const message = await this.chatsService.deleteConversation(conversation_id);
+      
+      const message = await this.chatsService
+      .deleteConversation(conversation_id);
+
       res.status(200).send({ message });
-    } catch (error) {
-      next(error);
-    };
-  };
+    }
+  );
 };
 
 export default ChatsController;

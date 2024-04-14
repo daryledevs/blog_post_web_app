@@ -22,105 +22,62 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv = __importStar(require("dotenv"));
+const async_wrapper_util_1 = __importDefault(require("@/utils/async-wrapper.util"));
 dotenv.config();
 class PostsController {
     postsService;
+    wrap = new async_wrapper_util_1.default();
     constructor(postsService) {
         this.postsService = postsService;
     }
-    ;
-    getUserPost = async (req, res, next) => {
-        try {
-            const { user_id } = req.query;
-            const data = await this.postsService.getUserPosts(user_id);
-            res.status(200).send({ post: data });
-        }
-        catch (error) {
-            next(error);
-        }
-        ;
-    };
-    getUserTotalPosts = async (req, res, next) => {
-        try {
-            const { user_id } = req.query;
-            const data = await this.postsService.getUserTotalPosts(user_id);
-            res.status(200).send({ totalPost: data });
-        }
-        catch (error) {
-            next(error);
-        }
-        ;
-    };
-    newPost = async (req, res, next) => {
-        try {
-            const { cookieOptions, ...rest } = req.body;
-            const files = req.files?.img || null;
-            const data = await this.postsService.newPost(files[0], rest);
-            res.status(200).send({ message: data });
-        }
-        catch (error) {
-            next(error);
-        }
-        ;
-    };
-    editPost = async (req, res, next) => {
-        try {
-            const post_id = req.params;
-            const { user_id, roles, cookieOptions, ...rest } = req.body;
-            const data = await this.postsService.editPost(post_id, rest);
-            res.status(200).send({ message: data });
-        }
-        catch (error) {
-            next(error);
-        }
-        ;
-    };
-    deletePost = async (req, res, next) => {
-        try {
-            const post_id = req.params;
-            const data = await this.postsService.deletePost(post_id);
-            res.status(200).send({ message: data });
-        }
-        catch (error) {
-            next(error);
-        }
-        ;
-    };
-    getLikesCountForPost = async (req, res, next) => {
-        try {
-            const post_id = req.params;
-            const data = await this.postsService.getLikesCountForPost(post_id);
-            res.status(200).send({ count: data });
-        }
-        catch (error) {
-            next(error);
-        }
-        ;
-    };
-    checkUserLikeStatusForPost = async (req, res, next) => {
-        try {
-            const args = req.params;
-            const data = await this.postsService.checkUserLikeStatusForPost(args);
-            res.status(200).send({ status: data ? true : false });
-        }
-        catch (error) {
-            next(error);
-        }
-        ;
-    };
-    toggleUserLikeForPost = async (req, res, next) => {
-        try {
-            const args = req.params;
-            const data = await this.postsService.toggleUserLikeForPost(args);
-            return res.status(200).send({ message: data });
-        }
-        catch (error) {
-            next(error);
-        }
-        ;
-    };
+    getUserPost = this.wrap.apiWrap(async (req, res, next) => {
+        const { user_id } = req.query;
+        const data = await this.postsService.getUserPosts(user_id);
+        res.status(200).send({ post: data });
+    });
+    getUserTotalPosts = this.wrap.apiWrap(async (req, res, next) => {
+        const { user_id } = req.query;
+        const data = await this.postsService.getUserTotalPosts(user_id);
+        res.status(200).send({ totalPost: data });
+    });
+    newPost = this.wrap.apiWrap(async (req, res, next) => {
+        const { cookieOptions, ...rest } = req.body;
+        const files = req.files
+            ?.img || null;
+        const data = await this.postsService.newPost(files[0], rest);
+        res.status(200).send({ message: data });
+    });
+    editPost = this.wrap.apiWrap(async (req, res, next) => {
+        const post_id = req.params;
+        const { user_id, roles, cookieOptions, ...rest } = req.body;
+        const data = await this.postsService.editPost(post_id, rest);
+        res.status(200).send({ message: data });
+    });
+    deletePost = this.wrap.apiWrap(async (req, res, next) => {
+        const post_id = req.params;
+        const data = await this.postsService.deletePost(post_id);
+        res.status(200).send({ message: data });
+    });
+    getLikesCountForPost = this.wrap.apiWrap(async (req, res, next) => {
+        const post_id = req.params;
+        const data = await this.postsService.getLikesCountForPost(post_id);
+        res.status(200).send({ count: data });
+    });
+    checkUserLikeStatusForPost = this.wrap.apiWrap(async (req, res, next) => {
+        const args = req.params;
+        const data = await this.postsService.checkUserLikeStatusForPost(args);
+        res.status(200).send({ status: data ? true : false });
+    });
+    toggleUserLikeForPost = this.wrap.apiWrap(async (req, res, next) => {
+        const args = req.params;
+        const data = await this.postsService.toggleUserLikeForPost(args);
+        return res.status(200).send({ message: data });
+    });
 }
 ;
 exports.default = PostsController;
