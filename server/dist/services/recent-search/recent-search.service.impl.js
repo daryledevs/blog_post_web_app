@@ -40,7 +40,6 @@ class RecentSearchService {
             throw api_exception_1.default.HTTP404Error("Search user not found");
         const isExist = await this.recentSearchRepository
             .findUsersSearchByUserId(user_id, search_user_id);
-        console.log("TEST: ", isExist);
         if (isExist)
             return "Search user already saved";
         await this.recentSearchRepository.saveRecentSearches(user_id, search_user_id);

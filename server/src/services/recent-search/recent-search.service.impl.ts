@@ -49,8 +49,6 @@ class RecentSearchService implements IRecentSearchService {
       const isExist = await this.recentSearchRepository
         .findUsersSearchByUserId(user_id, search_user_id);
 
-      console.log("TEST: ", isExist)
-
       if (isExist) return "Search user already saved";
 
       await this.recentSearchRepository.saveRecentSearches( user_id, search_user_id);
