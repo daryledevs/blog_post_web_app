@@ -3,8 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
 const async_wrapper_util_1 = __importDefault(require("@/utils/async-wrapper.util"));
+const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
 class FollowService {
     userRepository;
     followRepository;
@@ -13,7 +13,7 @@ class FollowService {
         this.userRepository = userRepository;
         this.followRepository = followRepository;
     }
-    getFollowStats = this.wrap.asyncWrap(async (user_id) => {
+    getFollowStats = this.wrap.serviceWrap(async (user_id) => {
         // If no arguments are provided, return an error
         if (!user_id)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
@@ -23,7 +23,7 @@ class FollowService {
             throw api_exception_1.default.HTTP404Error("User not found");
         return await this.followRepository.getFollowStats(user_id);
     });
-    getFollowerFollowingLists = this.wrap.asyncWrap(async (user_id, fetch, listsId) => {
+    getFollowerFollowingLists = this.wrap.serviceWrap(async (user_id, fetch, listsId) => {
         // If no arguments are provided, return an error
         if (!user_id)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
@@ -41,7 +41,7 @@ class FollowService {
                 throw api_exception_1.default.HTTP400Error("Invalid fetch parameter");
         }
     });
-    toggleFollow = this.wrap.asyncWrap(async (user_id, followed_id) => {
+    toggleFollow = this.wrap.serviceWrap(async (user_id, followed_id) => {
         // If no arguments are provided, return an error
         if (!user_id || !followed_id)
             throw api_exception_1.default

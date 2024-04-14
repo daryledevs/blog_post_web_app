@@ -18,27 +18,32 @@ class AuthService {
         this.authRepository = authRepository;
         this.userRepository = userRepository;
     }
-    register = this.wrap.asyncWrap(async (data) => {
+    register = this.wrap.serviceWrap(async (data) => {
         const { email, username, password } = data;
         const hashPassword = bcrypt_1.default.hashSync(password, bcrypt_1.default.genSaltSync(10));
         // Check if the user has provided all the required fields
         if (!email || !username || !password)
-            throw api_exception_1.default.HTTP400Error("All fields are required");
+            throw api_exception_1.default
+                .HTTP400Error("All fields are required");
         // Check if the password is less than 6 characters
         if (password.length <= 5)
-            throw api_exception_1.default.HTTP400Error("Password must be at least 6 characters");
+            throw api_exception_1.default
+                .HTTP400Error("Password must be at least 6 characters");
         // Check to see if the user is already in the database.
         const userByEmail = await this.userRepository.findUserByEmail(email);
-        const userByUsername = await this.userRepository.findUserByUsername(username);
+        const userByUsername = await this.userRepository
+            .findUserByUsername(username);
         if (userByUsername)
-            throw api_exception_1.default.HTTP409Error("Username already exists");
+            throw api_exception_1.default
+                .HTTP409Error("Username already exists");
         if (userByEmail)
-            throw api_exception_1.default.HTTP409Error("Email already exists");
+            throw api_exception_1.default
+                .HTTP409Error("Email already exists");
         // Save the user to the database
         await this.authRepository.createUser({ ...data, password: hashPassword });
         return "Registration is successful";
     });
-    login = this.wrap.asyncWrap(async (userCredential, password) => {
+    login = this.wrap.serviceWrap(async (userCredential, password) => {
         // Check if the user exists in the database
         const user = await this.userRepository.findUserByCredentials(userCredential);
         // If the user does not exist, return an error
@@ -48,7 +53,8 @@ class AuthService {
         const isPasswordMatch = bcrypt_1.default.compareSync(password, user.password);
         // If the password is incorrect, return an error
         if (!isPasswordMatch)
-            throw api_exception_1.default.HTTP401Error("Invalid password");
+            throw api_exception_1.default
+                .HTTP401Error("Invalid password");
         // Generate tokens
         const ACCESS_TOKEN = auth_token_util_1.default.generateAccessToken(user);
         const REFRESH_TOKEN = auth_token_util_1.default.generateRefreshToken(user);
@@ -58,7 +64,7 @@ class AuthService {
             refreshToken: REFRESH_TOKEN,
         };
     });
-    forgotPassword = this.wrap.asyncWrap(async (data) => {
+    forgotPassword = this.wrap.serviceWrap(async (data) => {
         // If the user is not found, return an error
         const user = await this.userRepository.findUserByEmail(data.email);
         if (!user)
@@ -80,7 +86,7 @@ class AuthService {
         (0, send_email_util_1.default)(data.email, "Reset Password", encodedToken);
         return "Token sent to your email";
     });
-    resetPasswordForm = this.wrap.asyncWrap(async (tokenId) => {
+    resetPasswordForm = this.wrap.serviceWrap(async (tokenId) => {
         const decodedToken = decodeURIComponent(tokenId);
         // Check if the token (id) exists in the database.
         const data = await this.authRepository.findResetTokenById(decodedToken);
@@ -100,16 +106,18 @@ class AuthService {
             });
         });
     });
-    resetPassword = this.wrap.asyncWrap(async (data) => {
+    resetPassword = this.wrap.serviceWrap(async (data) => {
         const { tokenId, user_id, email, password, confirmPassword } = data;
         const isPasswordMismatch = password !== confirmPassword;
         const passwordLength = password.length <= 5;
         // Check if the password and confirm password match
         if (isPasswordMismatch)
-            throw api_exception_1.default.HTTP400Error("Password does not match");
+            throw api_exception_1.default
+                .HTTP400Error("Password does not match");
         // Check if the password is less than 6 characters
         if (passwordLength)
-            throw api_exception_1.default.HTTP400Error("Password must be at least 6 characters");
+            throw api_exception_1.default
+                .HTTP400Error("Password must be at least 6 characters");
         // Decrypt the token
         const decodedTokenId = decodeURIComponent(tokenId);
         const hashPassword = bcrypt_1.default.hashSync(password, bcrypt_1.default.genSaltSync(10));

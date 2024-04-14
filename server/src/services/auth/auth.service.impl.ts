@@ -20,7 +20,7 @@ class AuthService implements IAuthService {
     this.userRepository = userRepository;
   }
 
-  public register = this.wrap.asyncWrap(
+  public register = this.wrap.serviceWrap(
     async (data: NewUsers): Promise<string> => {
       const { email, username, password } = data;
       const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
@@ -50,7 +50,7 @@ class AuthService implements IAuthService {
     }
   );
 
-  public login = this.wrap.asyncWrap(
+  public login = this.wrap.serviceWrap(
     async (userCredential: string, password: string): Promise<LoginType> => {
       // Check if the user exists in the database
       const user: any = await this.userRepository.findUserByCredentials(
@@ -79,7 +79,7 @@ class AuthService implements IAuthService {
     }
   );
 
-  public forgotPassword = this.wrap.asyncWrap(
+  public forgotPassword = this.wrap.serviceWrap(
     async (data: any): Promise<string> => {
       // If the user is not found, return an error
       const user = await this.userRepository.findUserByEmail(data.email);
@@ -107,7 +107,7 @@ class AuthService implements IAuthService {
     }
   );
 
-  public resetPasswordForm = this.wrap.asyncWrap(
+  public resetPasswordForm = this.wrap.serviceWrap(
     async (tokenId: string): Promise<IResetPasswordForm> => {
       const decodedToken: any = decodeURIComponent(tokenId);
 
@@ -135,7 +135,7 @@ class AuthService implements IAuthService {
     }
   );
 
-  public resetPassword = this.wrap.asyncWrap(
+  public resetPassword = this.wrap.serviceWrap(
     async (data: any): Promise<string> => {
       const { tokenId, user_id, email, password, confirmPassword } = data;
       const isPasswordMismatch = password !== confirmPassword;

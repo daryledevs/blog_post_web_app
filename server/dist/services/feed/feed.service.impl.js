@@ -13,10 +13,10 @@ class FeedService {
         this.feedRepository = feedRepository;
         this.userRepository = userRepository;
     }
-    getTotalFeed = this.wrap.asyncWrap(async () => {
+    getTotalFeed = this.wrap.serviceWrap(async () => {
         return await this.feedRepository.getTotalFeed();
     });
-    getUserFeed = this.wrap.asyncWrap(async (user_id, post_ids) => {
+    getUserFeed = this.wrap.serviceWrap(async (user_id, post_ids) => {
         // If no arguments are provided, return an error
         if (!user_id)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
@@ -27,7 +27,7 @@ class FeedService {
         // Return the user feed
         return await this.feedRepository.getUserFeed(user_id, post_ids);
     });
-    getExploreFeed = this.wrap.asyncWrap(async (user_id) => {
+    getExploreFeed = this.wrap.serviceWrap(async (user_id) => {
         // If no arguments are provided, return an error
         if (!user_id)
             throw api_exception_1.default.HTTP400Error("No arguments provided");

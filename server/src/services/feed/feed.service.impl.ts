@@ -15,11 +15,11 @@ class FeedService implements IFeedService {
     this.userRepository = userRepository;
   }
 
-  public getTotalFeed = this.wrap.asyncWrap(async (): Promise<number> => {
+  public getTotalFeed = this.wrap.serviceWrap(async (): Promise<number> => {
     return await this.feedRepository.getTotalFeed();
   });
 
-  public getUserFeed = this.wrap.asyncWrap(
+  public getUserFeed = this.wrap.serviceWrap(
     async (user_id: number, post_ids: number[]): Promise<SelectPosts[]> => {
       // If no arguments are provided, return an error
       if (!user_id) throw ApiErrorException.HTTP400Error("No arguments provided");
@@ -33,7 +33,7 @@ class FeedService implements IFeedService {
     }
   );
 
-  public getExploreFeed = this.wrap.asyncWrap(
+  public getExploreFeed = this.wrap.serviceWrap(
     async (user_id: number): Promise<SelectPosts[]> => {
       // If no arguments are provided, return an error
       if (!user_id) throw ApiErrorException.HTTP400Error("No arguments provided");

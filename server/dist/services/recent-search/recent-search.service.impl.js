@@ -3,8 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
 const async_wrapper_util_1 = __importDefault(require("@/utils/async-wrapper.util"));
+const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
 class RecentSearchService {
     wrap = new async_wrapper_util_1.default();
     userRepository;
@@ -14,7 +14,7 @@ class RecentSearchService {
         this.recentSearchRepository = recentSearchRepository;
     }
     ;
-    getAllRecentSearches = this.wrap.asyncWrap(async (user_id) => {
+    getAllRecentSearches = this.wrap.serviceWrap(async (user_id) => {
         // If no parameters are provided, return an error
         if (!user_id)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
@@ -26,7 +26,7 @@ class RecentSearchService {
         // search the user by search query
         return await this.recentSearchRepository.getRecentSearches(user_id);
     });
-    async saveRecentSearches(user_id, search_user_id) {
+    saveRecentSearches = this.wrap.serviceWrap(async (user_id, search_user_id) => {
         // If no parameters are provided, return an error
         if (!user_id || !search_user_id)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
@@ -44,9 +44,8 @@ class RecentSearchService {
             return "Search user already saved";
         await this.recentSearchRepository.saveRecentSearches(user_id, search_user_id);
         return "Search user saved successfully";
-    }
-    ;
-    async removeRecentSearches(recent_id) {
+    });
+    removeRecentSearches = this.wrap.serviceWrap(async (recent_id) => {
         // If no parameters are provided, return an error
         if (!recent_id)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
@@ -58,8 +57,7 @@ class RecentSearchService {
             throw api_exception_1.default.HTTP404Error("Recent search not found");
         await this.recentSearchRepository.deleteRecentSearches(recent_id);
         return "Search user deleted successfully";
-    }
-    ;
+    });
 }
 ;
 exports.default = RecentSearchService;

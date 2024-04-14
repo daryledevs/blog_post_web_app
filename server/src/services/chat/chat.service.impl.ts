@@ -17,7 +17,7 @@ class ChatServices implements IChatService {
     this.userRepository = userRepository;
   }
 
-  public getChatHistory = this.wrap.asyncWrap(
+  public getChatHistory = this.wrap.serviceWrap(
     async (
       userId: number,
       listId: number[]
@@ -37,7 +37,7 @@ class ChatServices implements IChatService {
     }
   );
 
-  public getChatMessages = this.wrap.asyncWrap(
+  public getChatMessages = this.wrap.serviceWrap(
     async (chatId: number, listId: number[]): Promise<SelectMessages[]> => {
       // If no chat id is provided, return an error
       if (!chatId) throw ApiErrorException.HTTP400Error("Chat id is required");
@@ -55,7 +55,7 @@ class ChatServices implements IChatService {
     }
   );
 
-  public newMessageAndConversation = this.wrap.asyncWrap(
+  public newMessageAndConversation = this.wrap.serviceWrap(
     async (
       conversation_id: number,
       messageData: MessageDataType
@@ -81,7 +81,7 @@ class ChatServices implements IChatService {
     }
   );
 
-  public deleteConversation = this.wrap.asyncWrap(
+  public deleteConversation = this.wrap.serviceWrap(
     async (conversation_id: number): Promise<string> => {
       // If no conversation id is provided, return an error
       if (!conversation_id) throw ApiErrorException.HTTP400Error("Conversation id is required");

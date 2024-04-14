@@ -1,8 +1,8 @@
 import IUserService                 from "./user.service";
-import ApiErrorException               from "@/exceptions/api.exception";
+import AsyncWrapper                 from "@/utils/async-wrapper.util";
 import UserRepository               from "@/repositories/user/user.repository.impl";
+import ApiErrorException            from "@/exceptions/api.exception";
 import { SelectUsers, UpdateUsers } from "@/types/table.types";
-import AsyncWrapper from "@/utils/async-wrapper.util";
 
 class UserService implements IUserService {
   private wrap: AsyncWrapper = new AsyncWrapper();
@@ -12,7 +12,7 @@ class UserService implements IUserService {
     this.userRepository = userRepository;
   }
 
-  public getUserById = this.wrap.asyncWrap(
+  public getUserById = this.wrap.serviceWrap(
     async (id: number): Promise<SelectUsers | undefined> => {
       // If no parameters are provided, return an error
       if (!id) throw ApiErrorException.HTTP400Error("No arguments provided");
@@ -26,7 +26,7 @@ class UserService implements IUserService {
     }
   );
 
-  public getUserByUsername = this.wrap.asyncWrap(
+  public getUserByUsername = this.wrap.serviceWrap(
     async (username: string): Promise<SelectUsers | undefined> => {
       // If no parameters are provided, return an error
       if (!username)
@@ -42,7 +42,7 @@ class UserService implements IUserService {
     }
   );
 
-  public getUserByEmail = this.wrap.asyncWrap(
+  public getUserByEmail = this.wrap.serviceWrap(
     async (email: string): Promise<SelectUsers | undefined> => {
       // If no parameters are provided, return an error
       if (!email) throw ApiErrorException.HTTP400Error("No arguments provided");
@@ -57,7 +57,7 @@ class UserService implements IUserService {
     }
   );
 
-  public updateUser = this.wrap.asyncWrap(
+  public updateUser = this.wrap.serviceWrap(
     async (id: number, user: UpdateUsers): Promise<UpdateUsers> => {
       // If no parameters are provided, return an error
       if (!id) throw ApiErrorException.HTTP400Error("No arguments provided");
@@ -72,7 +72,7 @@ class UserService implements IUserService {
     }
   );
 
-  public deleteUserById = this.wrap.asyncWrap(
+  public deleteUserById = this.wrap.serviceWrap(
     async (id: number): Promise<string | undefined> => {
       // If no parameters are provided, return an error
       if (!id) throw ApiErrorException.HTTP400Error("No arguments provided");
@@ -88,7 +88,7 @@ class UserService implements IUserService {
     }
   );
 
-  public searchUserByFields = this.wrap.asyncWrap(
+  public searchUserByFields = this.wrap.serviceWrap(
     async (search: string): Promise<SelectUsers[]> => {
       // If no parameters are provided, return an error
       if (!search) throw ApiErrorException.HTTP400Error("No arguments provided");

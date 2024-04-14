@@ -13,7 +13,7 @@ class ChatServices {
         this.chatRepository = chatRepository;
         this.userRepository = userRepository;
     }
-    getChatHistory = this.wrap.asyncWrap(async (userId, listId) => {
+    getChatHistory = this.wrap.serviceWrap(async (userId, listId) => {
         // If no user id is provided, return an error
         if (!userId)
             throw api_exception_1.default.HTTP400Error("User id is required");
@@ -24,7 +24,7 @@ class ChatServices {
         // Return the chat history
         return await this.chatRepository.getUserConversationHistoryByUserId(userId, listId);
     });
-    getChatMessages = this.wrap.asyncWrap(async (chatId, listId) => {
+    getChatMessages = this.wrap.serviceWrap(async (chatId, listId) => {
         // If no chat id is provided, return an error
         if (!chatId)
             throw api_exception_1.default.HTTP400Error("Chat id is required");
@@ -38,7 +38,7 @@ class ChatServices {
         return await this.chatRepository
             .getMessagesByConversationId(chatId, listId);
     });
-    newMessageAndConversation = this.wrap.asyncWrap(async (conversation_id, messageData) => {
+    newMessageAndConversation = this.wrap.serviceWrap(async (conversation_id, messageData) => {
         // If no conversation id is provided, return an error
         if (!conversation_id)
             throw api_exception_1.default.HTTP400Error("Conversation id is required");
@@ -56,7 +56,7 @@ class ChatServices {
         // Save the new message
         return await this.chatRepository.saveNewMessage(messageData);
     });
-    deleteConversation = this.wrap.asyncWrap(async (conversation_id) => {
+    deleteConversation = this.wrap.serviceWrap(async (conversation_id) => {
         // If no conversation id is provided, return an error
         if (!conversation_id)
             throw api_exception_1.default.HTTP400Error("Conversation id is required");

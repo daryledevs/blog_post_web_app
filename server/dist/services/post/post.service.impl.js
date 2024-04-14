@@ -15,7 +15,7 @@ class PostService {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
     }
-    findPostsByPostId = this.wrap.asyncWrap(async (post_id) => {
+    findPostsByPostId = this.wrap.serviceWrap(async (post_id) => {
         // Check if the post_id is provided
         if (!post_id)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
@@ -26,7 +26,7 @@ class PostService {
         // Return the post
         return data;
     });
-    getUserPosts = this.wrap.asyncWrap(async (user_id) => {
+    getUserPosts = this.wrap.serviceWrap(async (user_id) => {
         // Check if the user_id is provided
         if (!user_id)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
@@ -37,7 +37,7 @@ class PostService {
         // Get the posts for the user
         return await this.postRepository.getUserPosts(user_id);
     });
-    getUserTotalPosts = this.wrap.asyncWrap(async (user_id) => {
+    getUserTotalPosts = this.wrap.serviceWrap(async (user_id) => {
         // Check if the user_id is provided
         if (!user_id)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
@@ -48,7 +48,7 @@ class PostService {
         // Get the total posts for the user
         return await this.postRepository.getUserTotalPosts(user_id);
     });
-    newPost = this.wrap.asyncWrap(async (file, post) => {
+    newPost = this.wrap.serviceWrap(async (file, post) => {
         // Check if the image is uploaded
         if (!file)
             throw api_exception_1.default.HTTP400Error("No image uploaded");
@@ -67,7 +67,7 @@ class PostService {
             image_url,
         });
     });
-    editPost = this.wrap.asyncWrap(async (post_id, post) => {
+    editPost = this.wrap.serviceWrap(async (post_id, post) => {
         // Check if the arguments is provided
         if (!post_id)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
@@ -81,7 +81,7 @@ class PostService {
         // Edit the post
         return this.postRepository.editPost(post_id, post);
     });
-    deletePost = this.wrap.asyncWrap(async (post_id) => {
+    deletePost = this.wrap.serviceWrap(async (post_id) => {
         // check if the arguments is provided
         if (!post_id)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
@@ -92,7 +92,7 @@ class PostService {
         // Delete the post
         return await this.postRepository.deletePost(post_id);
     });
-    getLikesCountForPost = this.wrap.asyncWrap(async (post_id) => {
+    getLikesCountForPost = this.wrap.serviceWrap(async (post_id) => {
         // check if the arguments is provided
         if (!post_id)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
@@ -103,7 +103,7 @@ class PostService {
         // Get the total likes for the post
         return await this.postRepository.getLikesCountForPost(post_id);
     });
-    checkUserLikeStatusForPost = this.wrap.asyncWrap(async (like) => {
+    checkUserLikeStatusForPost = this.wrap.serviceWrap(async (like) => {
         // check if the arguments is provided
         if (like.post_id || like.user_id)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
@@ -118,7 +118,7 @@ class PostService {
         // If the post is not found, return an error
         return await this.postRepository.isUserLikePost(like);
     });
-    toggleUserLikeForPost = this.wrap.asyncWrap(async (like) => {
+    toggleUserLikeForPost = this.wrap.serviceWrap(async (like) => {
         // check if the arguments is provided
         if (like.post_id || like.user_id)
             throw api_exception_1.default.HTTP400Error("No arguments provided");

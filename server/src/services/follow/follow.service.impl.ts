@@ -19,7 +19,7 @@ class FollowService implements IFollowService {
     this.followRepository = followRepository;
   }
 
-  public getFollowStats = this.wrap.asyncWrap(
+  public getFollowStats = this.wrap.serviceWrap(
     async (user_id: any): Promise<FollowStatsType> => {
       // If no arguments are provided, return an error
       if (!user_id) throw ApiErrorException.HTTP400Error("No arguments provided");
@@ -32,7 +32,7 @@ class FollowService implements IFollowService {
     }
   );
 
-  public getFollowerFollowingLists = this.wrap.asyncWrap(
+  public getFollowerFollowingLists = this.wrap.serviceWrap(
     async (
       user_id: any,
       fetch: string,
@@ -64,7 +64,7 @@ class FollowService implements IFollowService {
     }
   );
 
-  public toggleFollow = this.wrap.asyncWrap(
+  public toggleFollow = this.wrap.serviceWrap(
     async (user_id: any, followed_id: any): Promise<string> => {
       // If no arguments are provided, return an error
       if (!user_id || !followed_id) throw ApiErrorException

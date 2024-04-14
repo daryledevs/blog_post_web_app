@@ -18,7 +18,7 @@ class RecentSearchService implements IRecentSearchService {
     this.recentSearchRepository = recentSearchRepository;
   };
 
-  public getAllRecentSearches = this.wrap.asyncWrap(
+  public getAllRecentSearches = this.wrap.serviceWrap(
     async (user_id: any): Promise<SelectSearches[] | undefined> => {
     // If no parameters are provided, return an error
     if (!user_id) throw ApiErrorException.HTTP400Error("No arguments provided");
@@ -33,7 +33,7 @@ class RecentSearchService implements IRecentSearchService {
     return await this.recentSearchRepository.getRecentSearches(user_id);
   });
 
-  public saveRecentSearches = this.wrap.asyncWrap(
+  public saveRecentSearches = this.wrap.serviceWrap(
     async (user_id: any, search_user_id: any): Promise<string> => {
       // If no parameters are provided, return an error
       if (!user_id || !search_user_id) throw ApiErrorException.HTTP400Error("No arguments provided");
@@ -57,7 +57,7 @@ class RecentSearchService implements IRecentSearchService {
     }
   );
 
-  public removeRecentSearches = this.wrap.asyncWrap(
+  public removeRecentSearches = this.wrap.serviceWrap(
     async (recent_id: any): Promise<string> => {
       // If no parameters are provided, return an error
       if (!recent_id) throw ApiErrorException.HTTP400Error("No arguments provided");

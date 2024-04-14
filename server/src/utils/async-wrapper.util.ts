@@ -10,10 +10,17 @@ class AsyncWrapper {
       );
   };
 
-  asyncWrap = (fn: Function) => {
+  serviceWrap = (fn: Function) => {
     return (...args: any) => {
-      return fn.apply(null, args).catch((error: any) => {
-        if (!(error instanceof DatabaseException)) throw error;
+      return fn.apply(this, args).catch((error: any) => {
+        throw error;
+      });
+    };
+  };
+
+  repoWrap = (fn: Function) => {
+    return (...args: any) => {
+      return fn.apply(this, args).catch((error: any) => {
         throw DatabaseException.error(error);
       });
     };

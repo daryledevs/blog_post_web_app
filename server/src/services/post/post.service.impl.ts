@@ -22,7 +22,7 @@ class PostService implements IPostService {
     this.userRepository = userRepository;
   }
 
-  public findPostsByPostId = this.wrap.asyncWrap(
+  public findPostsByPostId = this.wrap.serviceWrap(
     async (post_id: number): Promise<SelectPosts | undefined> => {
       // Check if the post_id is provided
       if (!post_id) throw ApiErrorException.HTTP400Error("No arguments provided");
@@ -36,7 +36,7 @@ class PostService implements IPostService {
     }
   );
 
-  public getUserPosts = this.wrap.asyncWrap(
+  public getUserPosts = this.wrap.serviceWrap(
     async (user_id: number): Promise<SelectPosts[]> => {
       // Check if the user_id is provided
       if (!user_id) throw ApiErrorException.HTTP400Error("No arguments provided");
@@ -50,7 +50,7 @@ class PostService implements IPostService {
     }
   );
 
-  public getUserTotalPosts = this.wrap.asyncWrap(
+  public getUserTotalPosts = this.wrap.serviceWrap(
     async (user_id: number): Promise<string | number | bigint> => {
       // Check if the user_id is provided
       if (!user_id) throw ApiErrorException.HTTP400Error("No arguments provided");
@@ -64,7 +64,7 @@ class PostService implements IPostService {
     }
   );
 
-  public newPost = this.wrap.asyncWrap(
+  public newPost = this.wrap.serviceWrap(
     async (
       file: Express.Multer.File | null | undefined,
       post: NewPosts
@@ -90,7 +90,7 @@ class PostService implements IPostService {
     }
   );
 
-  public editPost = this.wrap.asyncWrap(
+  public editPost = this.wrap.serviceWrap(
     async (post_id: number, post: UpdatePosts): Promise<string | undefined> => {
       // Check if the arguments is provided
       if (!post_id) throw ApiErrorException.HTTP400Error("No arguments provided");
@@ -106,7 +106,7 @@ class PostService implements IPostService {
     }
   );
 
-  public deletePost = this.wrap.asyncWrap(
+  public deletePost = this.wrap.serviceWrap(
     async (post_id: number): Promise<string> => {
       // check if the arguments is provided
       if (!post_id) throw ApiErrorException.HTTP400Error("No arguments provided");
@@ -120,7 +120,7 @@ class PostService implements IPostService {
     }
   );
 
-  public getLikesCountForPost = this.wrap.asyncWrap(
+  public getLikesCountForPost = this.wrap.serviceWrap(
     async (post_id: number): Promise<number> => {
       // check if the arguments is provided
       if (!post_id) throw ApiErrorException.HTTP400Error("No arguments provided");
@@ -134,7 +134,7 @@ class PostService implements IPostService {
     }
   );
 
-  public checkUserLikeStatusForPost = this.wrap.asyncWrap(
+  public checkUserLikeStatusForPost = this.wrap.serviceWrap(
     async (like: SelectLikes): Promise<SelectLikes | undefined> => {
       // check if the arguments is provided
       if (like.post_id || like.user_id)
@@ -153,7 +153,7 @@ class PostService implements IPostService {
     }
   );
 
-  public toggleUserLikeForPost = this.wrap.asyncWrap(
+  public toggleUserLikeForPost = this.wrap.serviceWrap(
     async (like: SelectLikes): Promise<string> => {
       // check if the arguments is provided
       if (like.post_id || like.user_id)

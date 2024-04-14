@@ -9,11 +9,16 @@ class AsyncWrapper {
     apiWrap = (cb) => {
         return (req, res, next) => cb(req, res, next).catch(next(api_exception_1.default.HTTP500Error("Something went wrong")));
     };
-    asyncWrap = (fn) => {
+    serviceWrap = (fn) => {
         return (...args) => {
-            return fn.apply(null, args).catch((error) => {
-                if (!(error instanceof database_exception_1.default))
-                    throw error;
+            return fn.apply(this, args).catch((error) => {
+                throw error;
+            });
+        };
+    };
+    repoWrap = (fn) => {
+        return (...args) => {
+            return fn.apply(this, args).catch((error) => {
                 throw database_exception_1.default.error(error);
             });
         };

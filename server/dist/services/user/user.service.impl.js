@@ -3,14 +3,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const async_wrapper_util_1 = __importDefault(require("@/utils/async-wrapper.util"));
 const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
 class UserService {
+    wrap = new async_wrapper_util_1.default();
     userRepository;
     constructor(userRepository) {
         this.userRepository = userRepository;
     }
-    ;
-    async getUserById(id) {
+    getUserById = this.wrap.serviceWrap(async (id) => {
         // If no parameters are provided, return an error
         if (!id)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
@@ -20,9 +21,8 @@ class UserService {
         if (!data)
             throw api_exception_1.default.HTTP404Error("User not found");
         return data;
-    }
-    ;
-    async getUserByUsername(username) {
+    });
+    getUserByUsername = this.wrap.serviceWrap(async (username) => {
         // If no parameters are provided, return an error
         if (!username)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
@@ -32,9 +32,8 @@ class UserService {
         if (!data)
             throw api_exception_1.default.HTTP404Error("User not found");
         return data;
-    }
-    ;
-    async getUserByEmail(email) {
+    });
+    getUserByEmail = this.wrap.serviceWrap(async (email) => {
         // If no parameters are provided, return an error
         if (!email)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
@@ -44,9 +43,8 @@ class UserService {
         if (!data)
             throw api_exception_1.default.HTTP404Error("User not found");
         return data;
-    }
-    ;
-    async updateUser(id, user) {
+    });
+    updateUser = this.wrap.serviceWrap(async (id, user) => {
         // If no parameters are provided, return an error
         if (!id)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
@@ -56,9 +54,8 @@ class UserService {
         if (!data)
             throw api_exception_1.default.HTTP404Error("User not found");
         return await this.userRepository.updateUser(id, user);
-    }
-    ;
-    async deleteUserById(id) {
+    });
+    deleteUserById = this.wrap.serviceWrap(async (id) => {
         // If no parameters are provided, return an error
         if (!id)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
@@ -69,16 +66,13 @@ class UserService {
             throw api_exception_1.default.HTTP404Error("User not found");
         await this.userRepository.deleteUser(id);
         return "User deleted successfully";
-    }
-    ;
-    async searchUserByFields(search) {
+    });
+    searchUserByFields = this.wrap.serviceWrap(async (search) => {
         // If no parameters are provided, return an error
         if (!search)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
         // search the user by search query
         return await this.userRepository.searchUsersByQuery(search);
-    }
-    ;
+    });
 }
-;
 exports.default = UserService;
