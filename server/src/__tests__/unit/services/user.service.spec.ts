@@ -49,12 +49,13 @@ describe("UserService", () => {
     });
 
     test("should throw an error when no args are provided", async () => {
+      userRepository.findUserById = vi.fn();
+
       await expect(
         userService.getUserById(undefined as any)
       ).rejects.toThrow(noArgsMsgError);
 
-      expect(userRepository.findUserById)
-        .not.toHaveBeenCalled();
+      expect(userRepository.findUserById).not.toHaveBeenCalled();
     });
 
     test("should throw an error when user is not found", async () => {
@@ -85,6 +86,8 @@ describe("UserService", () => {
     });
 
     test("should throw an error when no args are provided", async () => {
+      userRepository.findUserByUsername = vi.fn();
+
       await expect(
         userService.getUserByUsername(undefined as any)
       ).rejects.toThrow(noArgsMsgError);
@@ -118,6 +121,8 @@ describe("UserService", () => {
     });
 
     test("should throw an error when no args are provided", async () => {
+      userRepository.findUserByEmail = vi.fn();
+
       await expect(
         userService.getUserByEmail(undefined as any)
       ).rejects.toThrow(noArgsMsgError);
@@ -155,6 +160,9 @@ describe("UserService", () => {
     });
 
     test("should throw an error when no args are provided", async () => {
+      userRepository.findUserById = vi.fn();
+      userRepository.updateUser = vi.fn();
+
       await expect(
         userService.updateUser(undefined as any, existingUser)
       ).rejects.toThrow(noArgsMsgError);
@@ -167,6 +175,8 @@ describe("UserService", () => {
       userRepository.findUserById = vi
         .fn()
         .mockResolvedValue(undefined);
+      
+      userRepository.updateUser = vi.fn();
 
       await expect(
         userService.updateUser(notFoundUser.user_id, notFoundUser)
@@ -198,6 +208,9 @@ describe("UserService", () => {
     });
 
     test("should throw an error when no args are provided", async () => {
+      userRepository.findUserById = vi.fn();
+      userRepository.deleteUser = vi.fn();
+
       await expect(
         userService.deleteUserById(undefined as any)
       ).rejects.toThrow(noArgsMsgError);
@@ -210,6 +223,8 @@ describe("UserService", () => {
       userRepository.findUserById = vi
         .fn()
         .mockResolvedValue(undefined);
+
+      userRepository.deleteUser = vi.fn();
 
       await expect(
         userService.deleteUserById(notFoundUser.user_id)
@@ -310,6 +325,8 @@ describe("UserService", () => {
     });
 
     test("should throw an error when no args are provided", async () => {
+      userRepository.searchUsersByQuery = vi.fn();
+
       await expect(
         userService.searchUserByFields(undefined as any)
       ).rejects.toThrow(noArgsMsgError);

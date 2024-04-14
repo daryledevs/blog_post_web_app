@@ -26,9 +26,9 @@ interface IChatRepository {
 
   saveNewConversation: (conversation: NewConversations) => Promise<bigint | undefined>;
 
-  saveNewMessage: (message: MessageDataType) => Promise<string>;
+  saveNewMessage: (message: MessageDataType) => Promise<void>;
 
-  deleteConversation: (conversation_id: number) => Promise<string>;
+  deleteConversation: (conversation_id: number) => Promise<void>;
 }
 
 export default IChatRepository;

@@ -38,17 +38,17 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
             postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(existingPost);
             const result = await postService.findPostsByPostId(existingPost.post_id);
             (0, vitest_1.expect)(result).toEqual(existingPost);
-            (0, vitest_1.expect)(postRepository.findPostsByPostId).toBeCalledWith(existingPost.post_id);
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(existingPost.post_id);
         });
         (0, vitest_1.test)("should throw an error if no post_id provided", async () => {
             postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(null);
             await (0, vitest_1.expect)(postService.findPostsByPostId(null)).rejects.toThrow(noArgsMsgError);
-            (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toBeCalled();
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toHaveBeenCalled();
         });
         (0, vitest_1.test)("should throw an error if post not found", async () => {
             postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(null);
             await (0, vitest_1.expect)(postService.findPostsByPostId(nonExistingPost.post_id)).rejects.toThrow(postNotFoundMsgError);
-            (0, vitest_1.expect)(postRepository.findPostsByPostId).toBeCalledWith(nonExistingPost.post_id);
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(nonExistingPost.post_id);
         });
     });
 });

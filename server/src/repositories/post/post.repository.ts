@@ -7,19 +7,19 @@ interface IPostRepository {
 
   getUserTotalPosts: (user_id: number) => Promise<string | number | bigint>;
 
-  newPost: (post: NewPosts) => Promise<string>;
+  newPost: (post: NewPosts) => Promise<void>;
 
-  editPost: (post_id: number, post: UpdatePosts) => Promise<string>;
+  editPost: (post_id: number, post: UpdatePosts) => Promise<void>;
 
-  deletePost: (post_id: number) => Promise<string>;
+  deletePost: (post_id: number) => Promise<void>;
 
   getLikesCountForPost: (post_id: number) => Promise<number>;
 
   isUserLikePost: (like: SelectLikes) => Promise<SelectLikes | undefined>;
 
-  toggleUserLikeForPost: (like: SelectLikes) => Promise<string>;
+  toggleUserLikeForPost: (like: SelectLikes) => Promise<void>;
 
-  removeUserLikeForPost: (like: SelectLikes) => Promise<string>;
+  removeUserLikeForPost: (like: SelectLikes) => Promise<void>;
 }
 
 export default IPostRepository;

@@ -39,9 +39,9 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
                 .toHaveBeenCalledWith(existingUser.user_id);
         });
         (0, vitest_1.test)("should throw an error when no args are provided", async () => {
+            userRepository.findUserById = vitest_1.vi.fn();
             await (0, vitest_1.expect)(userService.getUserById(undefined)).rejects.toThrow(noArgsMsgError);
-            (0, vitest_1.expect)(userRepository.findUserById)
-                .not.toHaveBeenCalled();
+            (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
         });
         (0, vitest_1.test)("should throw an error when user is not found", async () => {
             userRepository.findUserById = vitest_1.vi
@@ -63,6 +63,7 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
                 .toHaveBeenCalledWith(existingUser.username);
         });
         (0, vitest_1.test)("should throw an error when no args are provided", async () => {
+            userRepository.findUserByUsername = vitest_1.vi.fn();
             await (0, vitest_1.expect)(userService.getUserByUsername(undefined)).rejects.toThrow(noArgsMsgError);
             (0, vitest_1.expect)(userRepository.findUserByUsername).not.toHaveBeenCalled();
         });
@@ -84,6 +85,7 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
                 .toHaveBeenCalledWith(existingUser.email);
         });
         (0, vitest_1.test)("should throw an error when no args are provided", async () => {
+            userRepository.findUserByEmail = vitest_1.vi.fn();
             await (0, vitest_1.expect)(userService.getUserByEmail(undefined)).rejects.toThrow(noArgsMsgError);
             (0, vitest_1.expect)(userRepository.findUserByEmail).not.toHaveBeenCalled();
         });
@@ -106,6 +108,8 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
                 .toHaveBeenCalledWith(existingUser.user_id);
         });
         (0, vitest_1.test)("should throw an error when no args are provided", async () => {
+            userRepository.findUserById = vitest_1.vi.fn();
+            userRepository.updateUser = vitest_1.vi.fn();
             await (0, vitest_1.expect)(userService.updateUser(undefined, existingUser)).rejects.toThrow(noArgsMsgError);
             (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
             (0, vitest_1.expect)(userRepository.updateUser).not.toHaveBeenCalled();
@@ -114,6 +118,7 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
             userRepository.findUserById = vitest_1.vi
                 .fn()
                 .mockResolvedValue(undefined);
+            userRepository.updateUser = vitest_1.vi.fn();
             await (0, vitest_1.expect)(userService.updateUser(notFoundUser.user_id, notFoundUser)).rejects.toThrow(userNotFoundMsgError);
             (0, vitest_1.expect)(userRepository.findUserById)
                 .toHaveBeenCalledWith(notFoundUser.user_id);
@@ -134,6 +139,8 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
                 .toHaveBeenCalledWith(existingUser.user_id);
         });
         (0, vitest_1.test)("should throw an error when no args are provided", async () => {
+            userRepository.findUserById = vitest_1.vi.fn();
+            userRepository.deleteUser = vitest_1.vi.fn();
             await (0, vitest_1.expect)(userService.deleteUserById(undefined)).rejects.toThrow(noArgsMsgError);
             (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
             (0, vitest_1.expect)(userRepository.deleteUser).not.toHaveBeenCalled();
@@ -142,6 +149,7 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
             userRepository.findUserById = vitest_1.vi
                 .fn()
                 .mockResolvedValue(undefined);
+            userRepository.deleteUser = vitest_1.vi.fn();
             await (0, vitest_1.expect)(userService.deleteUserById(notFoundUser.user_id)).rejects.toThrow(userNotFoundMsgError);
             (0, vitest_1.expect)(userRepository.findUserById)
                 .toHaveBeenCalledWith(notFoundUser.user_id);
@@ -209,6 +217,7 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
                 .toHaveBeenCalledWith(notFoundUser.username);
         });
         (0, vitest_1.test)("should throw an error when no args are provided", async () => {
+            userRepository.searchUsersByQuery = vitest_1.vi.fn();
             await (0, vitest_1.expect)(userService.searchUserByFields(undefined)).rejects.toThrow(noArgsMsgError);
             (0, vitest_1.expect)(userRepository.searchUsersByQuery).not.toHaveBeenCalled();
         });

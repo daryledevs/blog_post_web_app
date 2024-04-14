@@ -1,43 +1,38 @@
 import db                           from "@/database/db.database";
 import { DB }                       from "@/types/schema.types";
+import AsyncWrapper                 from "@/utils/async-wrapper.util";
 import { Kysely, sql }              from "kysely";
 import IUserRepository              from "./user.repository";
-import DatabaseException            from "@/exceptions/database.exception";
 import { SelectUsers, UpdateUsers } from "@/types/table.types";
 
 class UserRepository implements IUserRepository {
   private database: Kysely<DB>;
+  private wrap: AsyncWrapper = new AsyncWrapper();
 
   constructor() { this.database = db; };
 
-  async findUserById(user_id: number): Promise<SelectUsers | undefined> {
-    try {
-      const result = await this.database
+  public findUserById = this.wrap.repoWrap(
+    async (user_id: number): Promise<SelectUsers | undefined> => {
+      return await this.database
         .selectFrom("users")
         .where("user_id", "=", user_id)
         .selectAll()
         .executeTakeFirst();
-
-      return result;
-    } catch (error) {
-      throw DatabaseException.error(error);
     }
-  }
+  );
 
-  async findUserByUsername(username: string): Promise<SelectUsers | undefined> {
-    try {
+  public findUserByUsername = this.wrap.repoWrap(
+    async (username: string): Promise<SelectUsers | undefined> => {
       return await this.database
         .selectFrom("users")
         .where("username", "like", username + "%")
         .selectAll()
         .executeTakeFirst();
-    } catch (error) {
-      throw DatabaseException.error(error);
     }
-  }
+  );
 
-  async searchUsersByQuery(search: string): Promise<SelectUsers[]> {
-    try {
+  public searchUsersByQuery = this.wrap.repoWrap(
+    async (search: string): Promise<SelectUsers[]> => {
       return await this.database
         .selectFrom("users")
         .where((eb) =>
@@ -59,25 +54,21 @@ class UserRepository implements IUserRepository {
         )
         .selectAll()
         .execute();
-    } catch (error) {
-      throw DatabaseException.error(error);
     }
-  }
+  );
 
-  async findUserByEmail(email: string): Promise<SelectUsers | undefined> {
-    try {
+  public findUserByEmail = this.wrap.repoWrap(
+    async (email: string): Promise<SelectUsers | undefined> => {
       return await this.database
         .selectFrom("users")
         .where("email", "=", email)
         .selectAll()
         .executeTakeFirst();
-    } catch (error) {
-      throw DatabaseException.error(error);
     }
-  }
+  );
 
-  async findUserByCredentials(userCredential: string): Promise<SelectUsers | undefined> {
-  try {
+  public findUserByCredentials = this.wrap.repoWrap(
+    async (userCredential: string): Promise<SelectUsers | undefined> => {
       return await this.database
         .selectFrom("users")
         .selectAll()
@@ -88,33 +79,27 @@ class UserRepository implements IUserRepository {
           ])
         )
         .executeTakeFirst();
-    } catch (error) {
-      throw DatabaseException.error(error);
     }
-  }
+  );
 
-  async updateUser(user_id: number, user: UpdateUsers): Promise<UpdateUsers> {
-    try {
-      return await this.database
+  public updateUser = this.wrap.repoWrap(
+    async (user_id: number, user: UpdateUsers): Promise<UpdateUsers> => {
+      return (await this.database
         .updateTable("users")
         .set(user)
         .where("user_id", "=", user_id)
-        .executeTakeFirstOrThrow() as UpdateUsers;
-    } catch (error) {
-      throw DatabaseException.error(error);
+        .executeTakeFirstOrThrow()) as UpdateUsers;
     }
-  }
+  );
 
-  async deleteUser(user_id: number): Promise<void> {
-    try {
+  public deleteUser = this.wrap.repoWrap(
+    async (user_id: number): Promise<void> => {
       await this.database
         .deleteFrom("users")
         .where("user_id", "=", user_id)
         .execute();
-    } catch (error) {
-      throw DatabaseException.error(error);
     }
-  }
+  );
 };
 
 export default UserRepository;

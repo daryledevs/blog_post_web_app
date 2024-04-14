@@ -45,12 +45,15 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
                 .toHaveBeenCalledWith(existingUser.user_id, [0]);
         });
         (0, vitest_1.test)("should throw an error if no arguments are provided", async () => {
+            userRepository.findUserById = vitest_1.vi.fn();
+            feedRepository.getUserFeed = vitest_1.vi.fn();
             await (0, vitest_1.expect)(feedService.getUserFeed(undefined, [])).rejects.toThrow(noArgsMsgError);
             (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
             (0, vitest_1.expect)(feedRepository.getUserFeed).not.toHaveBeenCalled();
         });
         (0, vitest_1.test)("should throw an error if the user is not found", async () => {
             userRepository.findUserById = vitest_1.vi.fn().mockResolvedValueOnce(null);
+            feedRepository.getUserFeed = vitest_1.vi.fn();
             await (0, vitest_1.expect)(feedService.getUserFeed(nonExistingUser.user_id, [])).rejects.toThrow(userNotFoundMsgError);
             (0, vitest_1.expect)(userRepository.findUserById)
                 .toHaveBeenCalledWith(nonExistingUser.user_id);
@@ -71,12 +74,15 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
                 .toHaveBeenCalledWith(existingUser.user_id);
         });
         (0, vitest_1.test)("should throw an error if no arguments are provided", async () => {
+            userRepository.findUserById = vitest_1.vi.fn();
+            feedRepository.getExploreFeed = vitest_1.vi.fn();
             await (0, vitest_1.expect)(feedService.getExploreFeed(undefined)).rejects.toThrow(noArgsMsgError);
             (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
             (0, vitest_1.expect)(feedRepository.getExploreFeed).not.toHaveBeenCalled();
         });
         (0, vitest_1.test)("should throw an error if the user is not found", async () => {
             userRepository.findUserById = vitest_1.vi.fn().mockResolvedValueOnce(null);
+            feedRepository.getExploreFeed = vitest_1.vi.fn();
             await (0, vitest_1.expect)(feedService.getExploreFeed(nonExistingUser.user_id)).rejects.toThrow(userNotFoundMsgError);
             (0, vitest_1.expect)(userRepository.findUserById)
                 .toHaveBeenCalledWith(nonExistingUser.user_id);

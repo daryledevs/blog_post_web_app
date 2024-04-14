@@ -92,6 +92,9 @@ describe("RecentSearchService", () => {
     });
 
     test("should throw an error when no args are provided", async () => {
+      userRepository.findUserById = vi.fn();
+      recentSearchRepository.getRecentSearches = vi.fn();
+
       await expect(
         recentSearchService.getAllRecentSearches(undefined as any)
       ).rejects.toThrow(noArgsMsgError);
@@ -107,6 +110,8 @@ describe("RecentSearchService", () => {
       userRepository.findUserById = vi
         .fn()
         .mockResolvedValue(undefined);
+
+      recentSearchRepository.getRecentSearches = vi.fn();
 
       await expect(
         recentSearchService.getAllRecentSearches(notFoundUser.user_id)
@@ -160,12 +165,14 @@ describe("RecentSearchService", () => {
         .fn()
         .mockResolvedValue(existingSearch);
 
+      recentSearchRepository.saveRecentSearches = vi.fn();
+
       const result = await recentSearchService.saveRecentSearches(
         existingSearch?.user_id,
         existingSearch?.search_user_id
       );
 
-      expect(result).toBe("Search user already saved");
+      expect(result).equal("Search user already saved");
 
       expect(userRepository.findUserById)
         .toHaveBeenCalledWith(existingSearch?.user_id);
@@ -185,6 +192,9 @@ describe("RecentSearchService", () => {
     });
 
     test("should throw an error when no args are provided", async () => {
+      userRepository.findUserById = vi.fn();
+      recentSearchRepository.saveRecentSearches = vi.fn();
+
       await expect(
         recentSearchService.saveRecentSearches(
           undefined as any,
@@ -200,6 +210,8 @@ describe("RecentSearchService", () => {
       userRepository.findUserById = vi
         .fn()
         .mockResolvedValue(undefined);
+
+      recentSearchRepository.saveRecentSearches = vi.fn();
 
       await expect(
         recentSearchService.saveRecentSearches(
@@ -220,6 +232,8 @@ describe("RecentSearchService", () => {
         .fn()
         .mockImplementationOnce(() => Promise.resolve(existingUser))
         .mockImplementationOnce(() => Promise.resolve(undefined));
+        
+      recentSearchRepository.saveRecentSearches = vi.fn();
 
       await expect(
         recentSearchService.saveRecentSearches(
@@ -259,6 +273,9 @@ describe("RecentSearchService", () => {
     });
 
     test("should throw an error when no args are provided", async () => {
+      recentSearchRepository.findUsersSearchByRecentId = vi.fn();
+      recentSearchRepository.deleteRecentSearches = vi.fn();
+
       await expect(
         recentSearchService.removeRecentSearches(undefined as any)
       ).rejects.toThrow(noArgsMsgError);
@@ -275,6 +292,8 @@ describe("RecentSearchService", () => {
         .fn()
         .mockResolvedValue(undefined);
         
+      recentSearchRepository.deleteRecentSearches = vi.fn();
+      
       await expect(
         recentSearchService.removeRecentSearches(notFoundSearch.user_id)
       ).rejects.toThrow(recentSearchNotFoundError);

@@ -53,7 +53,7 @@ describe("FeedService", () => {
       const result = await postService.findPostsByPostId(existingPost.post_id);
 
       expect(result).toEqual(existingPost);
-      expect(postRepository.findPostsByPostId).toBeCalledWith(existingPost.post_id);
+      expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(existingPost.post_id);
     });
 
     test("should throw an error if no post_id provided", async () => {
@@ -63,7 +63,7 @@ describe("FeedService", () => {
         postService.findPostsByPostId(null as any)
       ).rejects.toThrow(noArgsMsgError);
 
-      expect(postRepository.findPostsByPostId).not.toBeCalled();
+      expect(postRepository.findPostsByPostId).not.toHaveBeenCalled();
     });
 
     test("should throw an error if post not found", async () => {
@@ -73,7 +73,7 @@ describe("FeedService", () => {
         postService.findPostsByPostId(nonExistingPost.post_id)
       ).rejects.toThrow(postNotFoundMsgError);
 
-      expect(postRepository.findPostsByPostId).toBeCalledWith(nonExistingPost.post_id);
+      expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(nonExistingPost.post_id);
     });
   });
 });

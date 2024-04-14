@@ -1,17 +1,18 @@
 import db                                     from "@/database/db.database";
 import { DB }                                 from "@/types/schema.types";
 import { Kysely }                             from "kysely";
-import DatabaseException                      from "@/exceptions/database.exception";
+import AsyncWrapper                           from "@/utils/async-wrapper.util";
 import { NewFollowers, SelectFollowers }      from "@/types/table.types";
 import IFollowRepository, { FollowStatsType } from "./follow.repository";
 
 class FollowRepository implements IFollowRepository {
   private database: Kysely<DB>;
+  private wrap: AsyncWrapper = new AsyncWrapper();
 
   constructor() { this.database = db; };
 
-  async getFollowStats(user_id: number): Promise<FollowStatsType> {
-    try {
+  public getFollowStats = this.wrap.repoWrap(
+    async (user_id: number): Promise<FollowStatsType> => {
       const queryFollowers = this.database
         .selectFrom("followers")
         .innerJoin("users", "followers.followed_id", "users.user_id")
@@ -36,13 +37,11 @@ class FollowRepository implements IFollowRepository {
         .executeTakeFirstOrThrow();
 
       return { followers, following };
-    } catch (error) {
-      throw DatabaseException.error(error);
     }
-  }
+  );
 
-  async getFollowersLists(user_id: number, listsId: number[]): Promise<SelectFollowers[]> {
-    try {
+  public getFollowersLists = this.wrap.repoWrap(
+    async (user_id: number, listsId: number[]): Promise<SelectFollowers[]> => {
       return await this.database
         .selectFrom("followers")
         .innerJoin("users", "followers.follower_id", "users.user_id")
@@ -55,13 +54,11 @@ class FollowRepository implements IFollowRepository {
         .selectAll()
         .limit(10)
         .execute();
-    } catch (error) {
-      throw DatabaseException.error(error);
     }
-  }
+  );
 
-  async getFollowingLists(user_id: number, listsId: number[]): Promise<SelectFollowers[]> {
-    try {
+  public getFollowingLists = this.wrap.repoWrap(
+    async (user_id: number, listsId: number[]): Promise<SelectFollowers[]> => {
       return await this.database
         .selectFrom("followers")
         .innerJoin("users", "followers.followed_id", "users.user_id")
@@ -74,13 +71,11 @@ class FollowRepository implements IFollowRepository {
         .selectAll()
         .limit(10)
         .execute();
-    } catch (error) {
-      throw DatabaseException.error(error);
     }
-  }
+  );
 
-  async isFollowUser(identifier: NewFollowers): Promise<boolean> {
-    try {
+  public isFollowUser = this.wrap.repoWrap(
+    async (identifier: NewFollowers): Promise<boolean> => {
       const result = await this.database
         .selectFrom("followers")
         .selectAll()
@@ -93,20 +88,20 @@ class FollowRepository implements IFollowRepository {
         .executeTakeFirst();
 
       return !!result;
-    } catch (error) {
-      throw DatabaseException.error(error);
     }
-  }
+  );
 
-  async followUser(identifier: NewFollowers): Promise<void> {
-    await this.database
-      .insertInto("followers")
-      .values(identifier)
-      .execute();
-  };
+  public followUser = this.wrap.repoWrap(
+    async (identifier: NewFollowers): Promise<void> => {
+      await this.database
+        .insertInto("followers")
+        .values(identifier)
+        .execute();
+    }
+  );
 
-  async unfollowUser(identifier: NewFollowers): Promise<void> {
-    try {
+  public unfollowUser = this.wrap.repoWrap(
+    async (identifier: NewFollowers): Promise<void> => {
       await this.database
         .deleteFrom("followers")
         .where((eb) =>
@@ -116,10 +111,8 @@ class FollowRepository implements IFollowRepository {
           ])
         )
         .execute();
-    } catch (error) {
-      throw DatabaseException.error(error);
     }
-  }
+  );
 };
 
 export default FollowRepository;

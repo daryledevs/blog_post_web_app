@@ -1,29 +1,31 @@
 import db                      from "@/database/db.database";
 import { DB }                  from "@/types/schema.types";
 import { Kysely }              from "kysely";
-import DatabaseException       from "@/exceptions/database.exception";
+import AsyncWrapper            from "@/utils/async-wrapper.util";
 import { SelectSearches }      from "@/types/table.types";
 import IRecentSearchRepository from "./recent-search.repository";
 
 class RecentSearchesRepository implements IRecentSearchRepository {
   private database: Kysely<DB>;
+  private wrap: AsyncWrapper = new AsyncWrapper();
 
-  constructor() { this.database = db };
+  constructor() { this.database = db; };
 
-  async findUsersSearchByRecentId(recent_id: number): Promise<SelectSearches | undefined> {
-    try {
+  public findUsersSearchByRecentId = this.wrap.repoWrap(
+    async (recent_id: number): Promise<SelectSearches | undefined> => {
       return await this.database
         .selectFrom("recent_searches")
         .selectAll()
         .where("recent_id", "=", recent_id)
         .executeTakeFirst();
-    } catch (error) {
-      throw DatabaseException.error(error);
-    };
-  };
+    }
+  );
 
-  async findUsersSearchByUserId(user_id: number, search_user_id: number): Promise<SelectSearches | undefined> {
-    try {
+  public findUsersSearchByUserId = this.wrap.repoWrap(
+    async (
+      user_id: number,
+      search_user_id: number
+    ): Promise<SelectSearches | undefined> => {
       return await this.database
         .selectFrom("recent_searches")
         .selectAll()
@@ -34,13 +36,11 @@ class RecentSearchesRepository implements IRecentSearchRepository {
           ])
         )
         .executeTakeFirst();
-    } catch (error) {
-      throw DatabaseException.error(error);
-    };
-  };
+    }
+  );
 
-  async getRecentSearches(user_id: number): Promise<SelectSearches[] | undefined> {
-    try {
+  public getRecentSearches = this.wrap.repoWrap(
+    async (user_id: number): Promise<SelectSearches[] | undefined> => {
       return await this.database
         .selectFrom("recent_searches")
         .innerJoin("users", "users.user_id", "recent_searches.search_user_id")
@@ -48,32 +48,26 @@ class RecentSearchesRepository implements IRecentSearchRepository {
         .limit(10)
         .selectAll()
         .execute();
-    } catch (error) {
-      throw DatabaseException.error(error);
-    };
-  };
+    }
+  );
 
-  async saveRecentSearches(user_id: number, search_user_id: number): Promise<void> {
-    try {
+  public saveRecentSearches = this.wrap.repoWrap(
+    async (user_id: number, search_user_id: number): Promise<void> => {
       await this.database
         .insertInto("recent_searches")
         .values({ user_id, search_user_id })
         .execute();
-    } catch (error) {
-      throw DatabaseException.error(error);
-    };
-  };
+    }
+  );
 
-  async deleteRecentSearches(recent_id: number): Promise<void> {
-    try {
+  public deleteRecentSearches = this.wrap.repoWrap(
+    async (recent_id: number): Promise<void> => {
       await this.database
         .deleteFrom("recent_searches")
         .where("recent_id", "=", recent_id)
         .execute();
-    } catch (error) {
-      throw DatabaseException.error(error);
-    };
-  };
+    }
+  );
 };
 
 export default RecentSearchesRepository;

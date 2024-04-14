@@ -59,6 +59,8 @@ vitest_1.vi.mock("@/repositories/recent-search/recent-search.repository.impl");
                 .toHaveBeenCalledWith(existingUser.user_id);
         });
         (0, vitest_1.test)("should throw an error when no args are provided", async () => {
+            userRepository.findUserById = vitest_1.vi.fn();
+            recentSearchRepository.getRecentSearches = vitest_1.vi.fn();
             await (0, vitest_1.expect)(recentSearchService.getAllRecentSearches(undefined)).rejects.toThrow(noArgsMsgError);
             (0, vitest_1.expect)(userRepository.findUserById)
                 .not.toHaveBeenCalled();
@@ -69,6 +71,7 @@ vitest_1.vi.mock("@/repositories/recent-search/recent-search.repository.impl");
             userRepository.findUserById = vitest_1.vi
                 .fn()
                 .mockResolvedValue(undefined);
+            recentSearchRepository.getRecentSearches = vitest_1.vi.fn();
             await (0, vitest_1.expect)(recentSearchService.getAllRecentSearches(notFoundUser.user_id)).rejects.toThrow(userNotFoundMsgError);
             (0, vitest_1.expect)(userRepository.findUserById)
                 .toHaveBeenCalledWith(notFoundUser.user_id);
@@ -106,8 +109,9 @@ vitest_1.vi.mock("@/repositories/recent-search/recent-search.repository.impl");
             recentSearchRepository.findUsersSearchByUserId = vitest_1.vi
                 .fn()
                 .mockResolvedValue(existingSearch);
+            recentSearchRepository.saveRecentSearches = vitest_1.vi.fn();
             const result = await recentSearchService.saveRecentSearches(existingSearch?.user_id, existingSearch?.search_user_id);
-            (0, vitest_1.expect)(result).toBe("Search user already saved");
+            (0, vitest_1.expect)(result).equal("Search user already saved");
             (0, vitest_1.expect)(userRepository.findUserById)
                 .toHaveBeenCalledWith(existingSearch?.user_id);
             (0, vitest_1.expect)(userRepository.findUserById)
@@ -117,6 +121,8 @@ vitest_1.vi.mock("@/repositories/recent-search/recent-search.repository.impl");
                 .not.toHaveBeenCalled();
         });
         (0, vitest_1.test)("should throw an error when no args are provided", async () => {
+            userRepository.findUserById = vitest_1.vi.fn();
+            recentSearchRepository.saveRecentSearches = vitest_1.vi.fn();
             await (0, vitest_1.expect)(recentSearchService.saveRecentSearches(undefined, existingUser.user_id)).rejects.toThrow(noArgsMsgError);
             (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
             (0, vitest_1.expect)(recentSearchRepository.saveRecentSearches).not.toHaveBeenCalled();
@@ -125,6 +131,7 @@ vitest_1.vi.mock("@/repositories/recent-search/recent-search.repository.impl");
             userRepository.findUserById = vitest_1.vi
                 .fn()
                 .mockResolvedValue(undefined);
+            recentSearchRepository.saveRecentSearches = vitest_1.vi.fn();
             await (0, vitest_1.expect)(recentSearchService.saveRecentSearches(notFoundUser.user_id, existingUser.user_id)).rejects.toThrow(userNotFoundMsgError);
             (0, vitest_1.expect)(userRepository.findUserById)
                 .toHaveBeenCalledWith(notFoundUser.user_id);
@@ -136,6 +143,7 @@ vitest_1.vi.mock("@/repositories/recent-search/recent-search.repository.impl");
                 .fn()
                 .mockImplementationOnce(() => Promise.resolve(existingUser))
                 .mockImplementationOnce(() => Promise.resolve(undefined));
+            recentSearchRepository.saveRecentSearches = vitest_1.vi.fn();
             await (0, vitest_1.expect)(recentSearchService.saveRecentSearches(existingSearch?.user_id, notFoundSearch.search_user_id)).rejects.toThrow(searchUserNotFoundError);
             (0, vitest_1.expect)(userRepository.findUserById)
                 .toHaveBeenCalledWith(existingSearch?.user_id);
@@ -159,6 +167,8 @@ vitest_1.vi.mock("@/repositories/recent-search/recent-search.repository.impl");
                 .toHaveBeenCalledWith(existingSearch.recent_id);
         });
         (0, vitest_1.test)("should throw an error when no args are provided", async () => {
+            recentSearchRepository.findUsersSearchByRecentId = vitest_1.vi.fn();
+            recentSearchRepository.deleteRecentSearches = vitest_1.vi.fn();
             await (0, vitest_1.expect)(recentSearchService.removeRecentSearches(undefined)).rejects.toThrow(noArgsMsgError);
             (0, vitest_1.expect)(recentSearchRepository.findUsersSearchByRecentId)
                 .not.toHaveBeenCalled();
@@ -169,6 +179,7 @@ vitest_1.vi.mock("@/repositories/recent-search/recent-search.repository.impl");
             recentSearchRepository.findUsersSearchByRecentId = vitest_1.vi
                 .fn()
                 .mockResolvedValue(undefined);
+            recentSearchRepository.deleteRecentSearches = vitest_1.vi.fn();
             await (0, vitest_1.expect)(recentSearchService.removeRecentSearches(notFoundSearch.user_id)).rejects.toThrow(recentSearchNotFoundError);
             (0, vitest_1.expect)(recentSearchRepository.findUsersSearchByRecentId)
                 .toHaveBeenCalledWith(notFoundSearch.user_id);

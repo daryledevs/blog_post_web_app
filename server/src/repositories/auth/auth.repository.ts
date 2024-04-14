@@ -5,9 +5,9 @@ interface IAuthRepository {
 
   findResetTokenById: (token_id: number) => Promise<SelectResetPasswordToken | undefined>;
 
-  saveResetToken: (token: NewResetPasswordToken) => Promise<string>;
+  saveResetToken: (token: NewResetPasswordToken) => Promise<void>;
 
-  deleteResetToken: (token_id: number) => Promise<string>;
+  deleteResetToken: (token_id: number) => Promise<void>;
 };
 
 export default IAuthRepository;

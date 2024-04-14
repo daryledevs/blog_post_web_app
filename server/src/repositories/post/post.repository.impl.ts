@@ -8,29 +8,28 @@ import db                from "@/database/db.database";
 import { DB }            from "@/types/schema.types";
 import { Kysely }        from "kysely";
 import cloudinary        from "cloudinary";
+import AsyncWrapper      from "@/utils/async-wrapper.util";
 import IPostRepository   from "./post.repository";
-import DatabaseException from "@/exceptions/database.exception";
 import ApiErrorException from "@/exceptions/api.exception";
 
 class PostRepository implements IPostRepository {
   private database: Kysely<DB>;
+  private wrap: AsyncWrapper = new AsyncWrapper();
 
   constructor() { this.database = db; };
-  
-  async findPostsByPostId (post_id: number): Promise<SelectPosts | undefined>{
-    try {
+
+  public findPostsByPostId = this.wrap.repoWrap(
+    async (post_id: number): Promise<SelectPosts | undefined> => {
       return this.database
         .selectFrom("posts")
         .selectAll()
         .where("posts.post_id", "=", post_id)
         .executeTakeFirst();
-    } catch (error) {
-      throw error;
-    };
-  };
+    }
+  );
 
-  async getUserPosts(user_id: number): Promise<SelectPosts[]> {
-    try {
+  public getUserPosts = this.wrap.repoWrap(
+    async (user_id: number): Promise<SelectPosts[]> => {
       return await this.database
         .selectFrom("posts")
         .innerJoin("users", "posts.user_id", "users.user_id")
@@ -52,13 +51,11 @@ class PostRepository implements IPostRepository {
         .orderBy("posts.created_at", "desc")
         .groupBy("posts.post_id")
         .execute();
-    } catch (error) {
-      throw DatabaseException.error(error);
-    };
-  };
+    }
+  );
 
-  async getUserTotalPosts(user_id: number): Promise<string | number | bigint> {
-    try {
+  public getUserTotalPosts = this.wrap.repoWrap(
+    async (user_id: number): Promise<string | number | bigint> => {
       const query = this.database
         .selectFrom("posts")
         .select((eb) => eb.fn.count<number>("posts.post_id").as("count"))
@@ -69,61 +66,44 @@ class PostRepository implements IPostRepository {
         .executeTakeFirstOrThrow();
 
       return count;
-    } catch (error) {
-      throw DatabaseException.error(error);
-    };
-  };
+    }
+  );
 
-  async newPost(post: NewPosts): Promise<string> {
-    try {
-      await this.database
-        .insertInto("posts")
-        .values(post)
-        .execute();
-      return "Post has been posted";
-    } catch (error) {
-      throw DatabaseException.error(error);
-    };
-  };
+  public newPost = this.wrap.repoWrap(async (post: NewPosts): Promise<void> => {
+    await this.database.insertInto("posts").values(post).execute();
+  });
 
-  async editPost(post_id: number, post: UpdatePosts): Promise<string> {
-    try {
+  public editPost = this.wrap.repoWrap(
+    async (post_id: number, post: UpdatePosts): Promise<void> => {
       await this.database
         .updateTable("posts")
         .set(post)
         .where("post_id", "=", post_id)
         .executeTakeFirst();
-      
-      return "Edit post successfully";
-    } catch (error) {
-      throw DatabaseException.error(error);
-    };
-  };
+    }
+  );
 
-  async deletePost(post_id: number): Promise<string> {
-    try {
-      const { image_id } = await this.database
+  public deletePost = this.wrap.repoWrap(
+    async (post_id: number): Promise<void> => {
+      const { image_id } = (await this.database
         .selectFrom("posts")
         .select(["image_id"])
         .where("post_id", "=", post_id)
-        .executeTakeFirst() as { image_id: string };
+        .executeTakeFirst()) as { image_id: string };
 
       const status = await cloudinary.v2.uploader.destroy(image_id);
-      if(status.result !== "ok") throw ApiErrorException.HTTP400Error("Delete image failed");
+      if (status.result !== "ok")
+        throw ApiErrorException.HTTP400Error("Delete image failed");
 
       await this.database
         .deleteFrom("posts")
         .where("post_id", "=", post_id)
         .executeTakeFirst();
-        
-      return "Delete post successfully";
-    } catch (error) {
-      throw DatabaseException.error(error);
-    };
-  };
+    }
+  );
 
-  async getLikesCountForPost(post_id:number): Promise<number> {
-    try {
+  public getLikesCountForPost = this.wrap.repoWrap(
+    async (post_id: number): Promise<number> => {
       const query = this.database
         .selectFrom("likes")
         .select((eb) => eb.fn.count<number>("likes.post_id").as("count"))
@@ -134,54 +114,46 @@ class PostRepository implements IPostRepository {
         .executeTakeFirstOrThrow();
 
       return count;
-    } catch (error) {
-      throw DatabaseException.error(error);
-    };
-  };
+    }
+  );
 
-  async isUserLikePost(like: SelectLikes): Promise<SelectLikes | undefined> {
-    try {
+  public isUserLikePost = this.wrap.repoWrap(
+    async (like: SelectLikes): Promise<SelectLikes | undefined> => {
       return await this.database
         .selectFrom("likes")
         .selectAll()
-        .where((eb) => eb.and([
-          eb("likes.post_id", "=", like.post_id),
-          eb("likes.user_id", "=", like.user_id)
-        ]))
+        .where((eb) =>
+          eb.and([
+            eb("likes.post_id", "=", like.post_id),
+            eb("likes.user_id", "=", like.user_id),
+          ])
+        )
         .executeTakeFirst();
-    } catch (error) {
-      throw DatabaseException.error(error);
-    };
-  };
+    }
+  );
 
-  async toggleUserLikeForPost(like: SelectLikes): Promise<string> {
-    try {
+  public toggleUserLikeForPost = this.wrap.repoWrap(
+    async (like: SelectLikes): Promise<void> => {
       await this.database
-      .insertInto("likes")
-      .values(like)
-      .execute();
+        .insertInto("likes")
+        .values(like)
+        .execute();
+    }
+  );
 
-    return "Like post successfully";
-    } catch (error) {
-      throw DatabaseException.error(error);
-    };
-  };
-
-  async removeUserLikeForPost(like: SelectLikes): Promise<string> {
-    try {
+  public removeUserLikeForPost = this.wrap.repoWrap(
+    async (like: SelectLikes): Promise<void> => {
       await this.database
-      .deleteFrom("likes")
-      .where((eb) => eb.and([
-        eb("likes.post_id", "=", like.post_id),
-        eb("likes.user_id", "=", like.user_id)
-      ]))
-      .execute();
-
-      return "Removed like from a post";
-    } catch (error) {
-      throw DatabaseException.error(error);
-    };
-  };
+        .deleteFrom("likes")
+        .where((eb) =>
+          eb.and([
+            eb("likes.post_id", "=", like.post_id),
+            eb("likes.user_id", "=", like.user_id),
+          ])
+        )
+        .execute();
+    }
+  );
 };
 
 export default PostRepository;

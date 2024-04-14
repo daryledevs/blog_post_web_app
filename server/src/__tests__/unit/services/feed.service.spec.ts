@@ -62,6 +62,9 @@ describe("FeedService", () =>  {
     });
 
     test("should throw an error if no arguments are provided", async () => {
+      userRepository.findUserById = vi.fn();
+      feedRepository.getUserFeed = vi.fn();
+
       await expect(
         feedService.getUserFeed(undefined as any, [])
       ).rejects.toThrow(noArgsMsgError);
@@ -72,6 +75,7 @@ describe("FeedService", () =>  {
 
     test("should throw an error if the user is not found", async () => {
       userRepository.findUserById = vi.fn().mockResolvedValueOnce(null);
+      feedRepository.getUserFeed = vi.fn();
 
       await expect(
         feedService.getUserFeed(nonExistingUser.user_id, [])
@@ -103,6 +107,9 @@ describe("FeedService", () =>  {
     });
 
     test("should throw an error if no arguments are provided", async () => {
+      userRepository.findUserById = vi.fn();
+      feedRepository.getExploreFeed = vi.fn();
+      
       await expect(
         feedService.getExploreFeed(undefined as any)
       ).rejects.toThrow(noArgsMsgError);
@@ -113,6 +120,7 @@ describe("FeedService", () =>  {
 
     test("should throw an error if the user is not found", async () => {
       userRepository.findUserById = vi.fn().mockResolvedValueOnce(null);
+      feedRepository.getExploreFeed = vi.fn();
 
       await expect(
         feedService.getExploreFeed(nonExistingUser.user_id)
