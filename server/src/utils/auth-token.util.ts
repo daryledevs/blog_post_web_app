@@ -1,66 +1,77 @@
 import jwt         from "jsonwebtoken";
 import { nanoid }  from "nanoid";
 import * as dotenv from "dotenv";
+import ApiErrorException from "@/exceptions/api.exception";
+import { IResetPasswordForm } from "@/services/auth/auth.service";
 dotenv.config();
 
-const REFRESH_TOKEN_EXPIRATION = "7d";
-const ACCESS_TOKEN_EXPIRATION = "15m";
-const RESET_TOKEN_EXPIRATION = "1hr";
+export enum Expiration {
+  REFRESH_TOKEN_EXPIRATION = "7d",
+  ACCESS_TOKEN_EXPIRATION = "15m",
+  RESET_TOKEN_EXPIRATION = "1hr",
+};
 
-export interface IERefreshToken {
-  user_id: string;
-  username: string;
-}
+export enum TokenSecret {
+  REFRESH_SECRET = process.env.REFRESH_TKN_SECRET as any,
+  ACCESS_SECRET = process.env.ACCESS_TKN_SECRET as any,
+  RESET_SECRET = process.env.RESET_PWD_TKN_SECRET as any,
+};
 
-export interface IEAccessToken {
-  user_id: string;
-  roles: string;
-}
-
-export interface IEResetToken {
-  EMAIL: string;
-  user_id: string;
-}
+export interface IGenerateToken {
+  payload: any;
+  secret: TokenSecret;
+  expiration: Expiration;
+};
 
 class AuthTokensUtil {
-  static verifyToken = (token: any, secret: any, tokenName: string): Promise<any> => {
+  static referenceToken = async () => nanoid(10);
+  
+  static generateToken = (data: IGenerateToken): string => {
+    const { payload, secret, expiration } = data;
+    return jwt.sign(payload, secret as any, { expiresIn: expiration });
+  };
+
+  static verifyAuthToken = (
+    token: any,
+    secret: any,
+    tokenName: string
+  ): Promise<any> => {
     return new Promise((resolve, reject) => {
       const errorField = `${tokenName}Error`;
       const decodeField = `${tokenName}Decode`;
       try {
         const decodedToken = jwt.verify(token, secret);
         resolve({ [errorField]: null, [decodeField]: decodedToken });
-      } catch (error:any) {
+      } catch (error: any) {
         const decodedToken = jwt.decode(token);
-        return resolve({ [errorField]: error?.name, [decodeField]: decodedToken });
-      };
+        return resolve({
+          [errorField]: error?.name,
+          [decodeField]: decodedToken,
+        });
+      }
     });
   };
 
-  static generateRefreshToken = ({ user_id, username }: IERefreshToken): string => {
-    const REFRESH_SECRET = process.env.REFRESH_TKN_SECRET!;
-    const details = { user_id: user_id, username: username };
-    const expiration = { expiresIn: REFRESH_TOKEN_EXPIRATION };
-    return jwt.sign(details, REFRESH_SECRET, expiration);
-  };
-
-  static generateAccessToken = ({ user_id, roles }: IEAccessToken): string => {
-    const ACCESS_SECRET = process.env.ACCESS_TKN_SECRET!;
-    const details = { user_id: user_id, roles: roles };
-    const expiration = { expiresIn: ACCESS_TOKEN_EXPIRATION };
-    return jwt.sign(details, ACCESS_SECRET, expiration);
-  };
-
-  static generateResetToken = ({ EMAIL, user_id }: IEResetToken): string =>{
-    const RESET_SECRET = process.env.RESET_PWD_TKN_SECRET!;
-    const details = { email: EMAIL, user_id: user_id };
-    const expiration = { expiresIn: RESET_TOKEN_EXPIRATION };
-    return jwt.sign(details, RESET_SECRET, expiration);
-  };
-
-  static referenceToken = async () => {
-    const shortToken = nanoid(10);
-    return shortToken;
+  static verifyResetPasswordToken = (
+    decryptedToken: any,
+    tokenId: any
+  ): Promise<IResetPasswordForm> => {
+    return new Promise((resolve, reject) => {
+      jwt.verify(
+        decryptedToken,
+        process.env.RESET_PWD_TKN_SECRET!,
+        (error: any, decode: any) => {
+          // Explicitly type 'decode' as 'any'
+          if (error)
+            reject(ApiErrorException.HTTP400Error("Invalid or expired token"));
+          const { email, user_id } = decode as { email: any; user_id: any };
+          resolve({
+            render: "resetPassword",
+            data: { email, user_id, tokenId },
+          });
+        }
+      );
+    });
   };
 }
 

@@ -1,14 +1,36 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const send_email_util_1 = __importDefault(require("@/utils/send-email.util"));
 const crypto_util_1 = __importDefault(require("@/utils/crypto.util"));
 const async_wrapper_util_1 = __importDefault(require("@/utils/async-wrapper.util"));
-const auth_token_util_1 = __importDefault(require("@/utils/auth-token.util"));
+const auth_token_util_1 = __importStar(require("@/utils/auth-token.util"));
 const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
 class AuthService {
     authRepository;
@@ -55,9 +77,21 @@ class AuthService {
         if (!isPasswordMatch)
             throw api_exception_1.default
                 .HTTP401Error("Invalid password");
+        const args = {
+            accessToken: {
+                payload: { user_id: user.user_id, roles: user.roles },
+                secret: auth_token_util_1.TokenSecret.ACCESS_SECRET,
+                expiration: auth_token_util_1.Expiration.ACCESS_TOKEN_EXPIRATION,
+            },
+            refreshToken: {
+                payload: { user_id: user.user_id, username: user.username },
+                secret: auth_token_util_1.TokenSecret.REFRESH_SECRET,
+                expiration: auth_token_util_1.Expiration.REFRESH_TOKEN_EXPIRATION,
+            },
+        };
         // Generate tokens
-        const ACCESS_TOKEN = auth_token_util_1.default.generateAccessToken(user);
-        const REFRESH_TOKEN = auth_token_util_1.default.generateRefreshToken(user);
+        const ACCESS_TOKEN = auth_token_util_1.default.generateToken(args.accessToken);
+        const REFRESH_TOKEN = auth_token_util_1.default.generateToken(args.refreshToken);
         return {
             message: "Login successfully",
             token: ACCESS_TOKEN,
@@ -69,11 +103,16 @@ class AuthService {
         const user = await this.userRepository.findUserByEmail(data.email);
         if (!user)
             throw api_exception_1.default.HTTP404Error("User not found");
+        const args = {
+            payload: {
+                email: data.email,
+                user_id: user.user_id,
+            },
+            secret: auth_token_util_1.TokenSecret.RESET_SECRET,
+            expiration: auth_token_util_1.Expiration.RESET_TOKEN_EXPIRATION,
+        };
         // Generate tokens
-        const resetToken = auth_token_util_1.default.generateResetToken({
-            EMAIL: data.email,
-            user_id: user.user_id,
-        });
+        const resetToken = auth_token_util_1.default.generateToken(args);
         const shortToken = await auth_token_util_1.default.referenceToken();
         const encryptedToken = crypto_util_1.default.encryptData(resetToken);
         const encodedToken = encodeURIComponent(shortToken);
@@ -94,17 +133,7 @@ class AuthService {
             throw api_exception_1.default.HTTP400Error("Invalid or expired token");
         const decryptedToken = crypto_util_1.default.decryptData(data.encrypted);
         // then decrypt the code to check if it is still valid.
-        return new Promise((resolve, reject) => {
-            jsonwebtoken_1.default.verify(decryptedToken, process.env.RESET_PWD_TKN_SECRET, (error, decode) => {
-                if (error)
-                    reject(api_exception_1.default.HTTP400Error("Invalid or expired token"));
-                const { email, user_id } = decode;
-                resolve({
-                    render: "resetPassword",
-                    data: { email, user_id, tokenId },
-                });
-            });
-        });
+        return auth_token_util_1.default.verifyResetPasswordToken(decryptedToken, tokenId);
     });
     resetPassword = this.wrap.serviceWrap(async (data) => {
         const { tokenId, user_id, email, password, confirmPassword } = data;

@@ -6,7 +6,7 @@ import AsyncWrapper                                    from "@/utils/async-wrapp
 import { NewUsers }                                    from "@/types/table.types";
 import AuthRepository                                  from "@/repositories/auth/auth.repository.impl";
 import UserRepository                                  from "@/repositories/user/user.repository.impl";
-import AuthTokensUtil                                  from "@/utils/auth-token.util";
+import AuthTokensUtil, { Expiration, TokenSecret }                                  from "@/utils/auth-token.util";
 import ErrorException                                  from "@/exceptions/api.exception";
 import IAuthService, { IResetPasswordForm, LoginType } from "./auth.service";
 
@@ -67,9 +67,23 @@ class AuthService implements IAuthService {
       if (!isPasswordMatch) throw ErrorException
         .HTTP401Error("Invalid password");
 
+      const args = {
+        accessToken: {
+          payload: { user_id: user.user_id, roles: user.roles },
+          secret: TokenSecret.ACCESS_SECRET,
+          expiration: Expiration.ACCESS_TOKEN_EXPIRATION,
+        },
+
+        refreshToken: {
+          payload: { user_id: user.user_id, username: user.username },
+          secret: TokenSecret.REFRESH_SECRET,
+          expiration: Expiration.REFRESH_TOKEN_EXPIRATION,
+        },
+      };
+
       // Generate tokens
-      const ACCESS_TOKEN = AuthTokensUtil.generateAccessToken(user);
-      const REFRESH_TOKEN = AuthTokensUtil.generateRefreshToken(user);
+      const ACCESS_TOKEN = AuthTokensUtil.generateToken(args.accessToken);
+      const REFRESH_TOKEN = AuthTokensUtil.generateToken(args.refreshToken);
 
       return {
         message: "Login successfully",
@@ -85,11 +99,17 @@ class AuthService implements IAuthService {
       const user = await this.userRepository.findUserByEmail(data.email);
       if (!user) throw ErrorException.HTTP404Error("User not found");
 
+      const args = {
+        payload: {
+          email: data.email,
+          user_id: user.user_id as any,
+        },
+        secret: TokenSecret.RESET_SECRET,
+        expiration: Expiration.RESET_TOKEN_EXPIRATION,
+      };
+
       // Generate tokens
-      const resetToken = AuthTokensUtil.generateResetToken({
-        EMAIL: data.email,
-        user_id: user.user_id as any,
-      });
+      const resetToken = AuthTokensUtil.generateToken(args);
 
       const shortToken: any = await AuthTokensUtil.referenceToken();
       const encryptedToken = CryptoUtil.encryptData(resetToken);
@@ -117,21 +137,7 @@ class AuthService implements IAuthService {
       const decryptedToken = CryptoUtil.decryptData(data.encrypted as any);
 
       // then decrypt the code to check if it is still valid.
-      return new Promise((resolve, reject) => {
-        jwt.verify(
-          decryptedToken,
-          process.env.RESET_PWD_TKN_SECRET!,
-          (error, decode) => {
-            if (error)
-              reject(ErrorException.HTTP400Error("Invalid or expired token"));
-            const { email, user_id } = decode as { email: any; user_id: any };
-            resolve({
-              render: "resetPassword",
-              data: { email, user_id, tokenId },
-            });
-          }
-        );
-      });
+      return AuthTokensUtil.verifyResetPasswordToken(decryptedToken, tokenId);
     }
   );
 

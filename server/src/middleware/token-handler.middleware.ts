@@ -1,9 +1,12 @@
+import AuthTokensUtil, {
+  Expiration,
+  TokenSecret,
+}                                          from "@/utils/auth-token.util";
 import dotenv                              from "dotenv";
-import ApiException                           from "@/exceptions/api.exception";
+import ApiException                        from "@/exceptions/api.exception";
 import isTokenValid                        from "@/utils/token-invalid.util";
 import routeException                      from "@/utils/route-exception.util";
 import UserRepository                      from "@/repositories/user/user.repository.impl";
-import AuthTokensUtil                      from "@/utils/auth-token.util";
 import { SelectUsers }                     from "@/types/table.types";
 import { Request, Response, NextFunction } from "express";
 dotenv.config();
@@ -22,13 +25,13 @@ const tokenHandler = async (req: Request, res: Response, next: NextFunction) => 
     if (isTokenInvalid) return next(ApiException.HTTP401Error("Token is not provided"));
     
     // verify the refresh token and access token
-    const { refreshError, refreshDecode } = await AuthTokensUtil.verifyToken(
-      refreshToken,
-      refreshSecret,
-      "refresh"
-    );
+    const { refreshError, refreshDecode } = await AuthTokensUtil.verifyAuthToken(
+        refreshToken,
+        refreshSecret,
+        "refresh"
+      );
 
-    const { accessError, accessDecode } = await AuthTokensUtil.verifyToken(
+    const { accessError, accessDecode } = await AuthTokensUtil.verifyAuthToken(
       accessToken,
       accessSecret,
       "access"
@@ -46,21 +49,44 @@ const tokenHandler = async (req: Request, res: Response, next: NextFunction) => 
     // if the refresh token is expired, generate a new refresh token and access token
     if (refreshError === "TokenExpiredError" || accessError === "TokenExpiredError") {
       // token options
-      const ACCESS_OPTION = { user_id: accessDecode.user_id, roles: accessDecode.roles };
-      const REFRESH_OPTION = { user_id: refreshDecode.user_id, username: refreshDecode.username };
+      const payload = {
+        access: {
+          user_id: accessDecode.user_id,
+          roles: accessDecode.roles,
+        },
+        refresh: {
+          user_id: refreshDecode.user_id,
+          username: refreshDecode.username,
+        },
+      };
+
+      const args = {
+        accessToken: {
+          payload: payload.access,
+          secret: TokenSecret.ACCESS_SECRET,
+          expiration: Expiration.ACCESS_TOKEN_EXPIRATION,
+        },
+        refreshToken: {
+          payload: payload.refresh,
+          secret: TokenSecret.REFRESH_SECRET,
+          expiration: Expiration.REFRESH_TOKEN_EXPIRATION,
+        },
+      };
 
       // generate new tokens
-      const REFRESH_TKN = AuthTokensUtil.generateRefreshToken(REFRESH_OPTION);
-      const ACCESS_TOKEN = AuthTokensUtil.generateAccessToken(ACCESS_OPTION);
+      const REFRESH_TKN = AuthTokensUtil.generateToken(args.accessToken);
+      const ACCESS_TOKEN = AuthTokensUtil.generateToken(args.refreshToken);
       res.cookie("REFRESH_TOKEN", REFRESH_TKN, req.body.cookieOptions);
       return res.status(200).send({ accessToken: ACCESS_TOKEN });
     };
     
     // if the access token is not provided, generate a new access token
     if (!accessToken) {
-      const ACCESS_TOKEN = AuthTokensUtil.generateAccessToken({
-        user_id: result?.user_id as any,
-        roles: result?.roles as any,
+      const { user_id, roles } = result;
+      const ACCESS_TOKEN = AuthTokensUtil.generateToken({
+        payload: { user_id, roles, },
+        secret: TokenSecret.ACCESS_SECRET,
+        expiration: Expiration.ACCESS_TOKEN_EXPIRATION,
       });
       return res.status(200).send({ accessToken: ACCESS_TOKEN });
     };

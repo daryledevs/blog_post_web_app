@@ -26,15 +26,34 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.TokenSecret = exports.Expiration = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const nanoid_1 = require("nanoid");
 const dotenv = __importStar(require("dotenv"));
+const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
 dotenv.config();
-const REFRESH_TOKEN_EXPIRATION = "7d";
-const ACCESS_TOKEN_EXPIRATION = "15m";
-const RESET_TOKEN_EXPIRATION = "1hr";
+var Expiration;
+(function (Expiration) {
+    Expiration["REFRESH_TOKEN_EXPIRATION"] = "7d";
+    Expiration["ACCESS_TOKEN_EXPIRATION"] = "15m";
+    Expiration["RESET_TOKEN_EXPIRATION"] = "1hr";
+})(Expiration = exports.Expiration || (exports.Expiration = {}));
+;
+var TokenSecret;
+(function (TokenSecret) {
+    TokenSecret[TokenSecret["REFRESH_SECRET"] = process.env.REFRESH_TKN_SECRET] = "REFRESH_SECRET";
+    TokenSecret[TokenSecret["ACCESS_SECRET"] = process.env.ACCESS_TKN_SECRET] = "ACCESS_SECRET";
+    TokenSecret[TokenSecret["RESET_SECRET"] = process.env.RESET_PWD_TKN_SECRET] = "RESET_SECRET";
+})(TokenSecret = exports.TokenSecret || (exports.TokenSecret = {}));
+;
+;
 class AuthTokensUtil {
-    static verifyToken = (token, secret, tokenName) => {
+    static referenceToken = async () => (0, nanoid_1.nanoid)(10);
+    static generateToken = (data) => {
+        const { payload, secret, expiration } = data;
+        return jsonwebtoken_1.default.sign(payload, secret, { expiresIn: expiration });
+    };
+    static verifyAuthToken = (token, secret, tokenName) => {
         return new Promise((resolve, reject) => {
             const errorField = `${tokenName}Error`;
             const decodeField = `${tokenName}Decode`;
@@ -44,32 +63,26 @@ class AuthTokensUtil {
             }
             catch (error) {
                 const decodedToken = jsonwebtoken_1.default.decode(token);
-                return resolve({ [errorField]: error?.name, [decodeField]: decodedToken });
+                return resolve({
+                    [errorField]: error?.name,
+                    [decodeField]: decodedToken,
+                });
             }
-            ;
         });
     };
-    static generateRefreshToken = ({ user_id, username }) => {
-        const REFRESH_SECRET = process.env.REFRESH_TKN_SECRET;
-        const details = { user_id: user_id, username: username };
-        const expiration = { expiresIn: REFRESH_TOKEN_EXPIRATION };
-        return jsonwebtoken_1.default.sign(details, REFRESH_SECRET, expiration);
-    };
-    static generateAccessToken = ({ user_id, roles }) => {
-        const ACCESS_SECRET = process.env.ACCESS_TKN_SECRET;
-        const details = { user_id: user_id, roles: roles };
-        const expiration = { expiresIn: ACCESS_TOKEN_EXPIRATION };
-        return jsonwebtoken_1.default.sign(details, ACCESS_SECRET, expiration);
-    };
-    static generateResetToken = ({ EMAIL, user_id }) => {
-        const RESET_SECRET = process.env.RESET_PWD_TKN_SECRET;
-        const details = { email: EMAIL, user_id: user_id };
-        const expiration = { expiresIn: RESET_TOKEN_EXPIRATION };
-        return jsonwebtoken_1.default.sign(details, RESET_SECRET, expiration);
-    };
-    static referenceToken = async () => {
-        const shortToken = (0, nanoid_1.nanoid)(10);
-        return shortToken;
+    static verifyResetPasswordToken = (decryptedToken, tokenId) => {
+        return new Promise((resolve, reject) => {
+            jsonwebtoken_1.default.verify(decryptedToken, process.env.RESET_PWD_TKN_SECRET, (error, decode) => {
+                // Explicitly type 'decode' as 'any'
+                if (error)
+                    reject(api_exception_1.default.HTTP400Error("Invalid or expired token"));
+                const { email, user_id } = decode;
+                resolve({
+                    render: "resetPassword",
+                    data: { email, user_id, tokenId },
+                });
+            });
+        });
     };
 }
 exports.default = AuthTokensUtil;
