@@ -9,6 +9,7 @@ node_modules
 
 # testing
 /server/coverage
+/client/coverage
 
 # production
 build
