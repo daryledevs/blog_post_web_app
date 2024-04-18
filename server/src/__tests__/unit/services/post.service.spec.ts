@@ -24,10 +24,12 @@ describe("FeedService", () => {
     ErrorException.HTTP400Error("Post not found");
 
   const users = GenerateMockData.createUserList(10);
+  const existingUser = users[0]!;
+  const notFoundUser = GenerateMockData.createUser();
+
   const posts = GenerateMockData.generateMockData(
     false, users, GenerateMockData.createPost
   );
-
   const existingPost = posts[0]!;
   const nonExistingPost = GenerateMockData.createPost(1000);
 
@@ -56,7 +58,7 @@ describe("FeedService", () => {
       expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(existingPost.post_id);
     });
 
-    test("should throw an error if no post_id provided", async () => {
+    test("should throw an error if no args provided", async () => {
       postRepository.findPostsByPostId = vi.fn().mockResolvedValue(null);
 
       await expect(
@@ -74,6 +76,39 @@ describe("FeedService", () => {
       ).rejects.toThrow(postNotFoundMsgError);
 
       expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(nonExistingPost.post_id);
+    });
+  });
+
+  describe("getUserPosts", async () => {
+    test("should return the correct result", async () => {
+      userRepository.findUserById = vi.fn().mockResolvedValue(existingUser);
+      postRepository.getUserPosts = vi.fn().mockResolvedValue(posts);
+
+      const result = await postService.getUserPosts(existingUser.user_id);
+
+      expect(result).toEqual(posts);
+      expect(userRepository.findUserById).toHaveBeenCalledWith(existingUser.user_id);
+      expect(postRepository.getUserPosts).toHaveBeenCalledWith(existingUser.user_id);
+    });
+
+    test("should throw an error if no args provided", async () => {
+      userRepository.findUserById = vi.fn();
+
+      await expect(
+        postService.getUserPosts(null as any)
+      ).rejects.toThrow(noArgsMsgError);
+
+      expect(userRepository.findUserById).not.toHaveBeenCalled();
+    });
+
+    test("should throw an error if user not found", async () => {
+      userRepository.findUserById = vi.fn().mockResolvedValue(null);
+
+      await expect(
+        postService.getUserPosts(notFoundUser.user_id)
+      ).rejects.toThrow(userNotFoundMsgError);
+
+      expect(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
     });
   });
 });
