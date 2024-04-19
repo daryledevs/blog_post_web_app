@@ -73,4 +73,14 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
             (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
         });
     });
+    (0, vitest_1.describe)("getUserTotalPosts", async () => {
+        (0, vitest_1.test)("should return the correct result", async () => {
+            userRepository.findUserById = vitest_1.vi.fn().mockResolvedValue(existingUser);
+            postRepository.getUserTotalPosts = vitest_1.vi.fn().mockResolvedValue(posts.length);
+            const result = await postService.getUserTotalPosts(existingUser.user_id);
+            (0, vitest_1.expect)(result).toEqual(posts.length);
+            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(existingUser.user_id);
+            (0, vitest_1.expect)(postRepository.getUserTotalPosts).toHaveBeenCalledWith(existingUser.user_id);
+        });
+    });
 });

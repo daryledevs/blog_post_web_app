@@ -111,4 +111,17 @@ describe("FeedService", () => {
       expect(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
     });
   });
+
+  describe("getUserTotalPosts", async () => {
+    test("should return the correct result", async () => {
+      userRepository.findUserById = vi.fn().mockResolvedValue(existingUser);
+      postRepository.getUserTotalPosts = vi.fn().mockResolvedValue(posts.length);
+
+      const result = await postService.getUserTotalPosts(existingUser.user_id);
+
+      expect(result).toEqual(posts.length);
+      expect(userRepository.findUserById).toHaveBeenCalledWith(existingUser.user_id);
+      expect(postRepository.getUserTotalPosts).toHaveBeenCalledWith(existingUser.user_id);
+    });
+  });
 });
