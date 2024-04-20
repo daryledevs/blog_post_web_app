@@ -124,4 +124,28 @@ describe("FeedService", () => {
       expect(postRepository.getUserTotalPosts).toHaveBeenCalledWith(existingUser.user_id);
     });
   });
+
+  test("should throw an error if no args provided", async () => {
+    userRepository.findUserById = vi.fn();
+    postRepository.getUserTotalPosts = vi.fn();
+
+    await expect(
+      postService.getUserTotalPosts(undefined))
+    .rejects.toThrow(noArgsMsgError);
+
+    expect(userRepository.findUserById).not.toHaveBeenCalled();
+    expect(postRepository.getUserTotalPosts).not.toHaveBeenCalled();
+  });
+
+  test("should throw an error if user not found", async () => {
+    userRepository.findUserById = vi.fn().mockResolvedValue(undefined);
+    postRepository.getUserTotalPosts = vi.fn();
+
+    await expect(
+      postService.getUserTotalPosts(notFoundUser.user_id))
+    .rejects.toThrow(userNotFoundMsgError);
+
+    expect(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
+    expect(postRepository.getUserTotalPosts).not.toHaveBeenCalled();
+  });
 });

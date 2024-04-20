@@ -83,4 +83,20 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
             (0, vitest_1.expect)(postRepository.getUserTotalPosts).toHaveBeenCalledWith(existingUser.user_id);
         });
     });
+    (0, vitest_1.test)("should throw an error if no args provided", async () => {
+        userRepository.findUserById = vitest_1.vi.fn();
+        postRepository.getUserTotalPosts = vitest_1.vi.fn();
+        await (0, vitest_1.expect)(postService.getUserTotalPosts(undefined))
+            .rejects.toThrow(noArgsMsgError);
+        (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
+        (0, vitest_1.expect)(postRepository.getUserTotalPosts).not.toHaveBeenCalled();
+    });
+    (0, vitest_1.test)("should throw an error if user not found", async () => {
+        userRepository.findUserById = vitest_1.vi.fn().mockResolvedValue(undefined);
+        postRepository.getUserTotalPosts = vitest_1.vi.fn();
+        await (0, vitest_1.expect)(postService.getUserTotalPosts(notFoundUser.user_id))
+            .rejects.toThrow(userNotFoundMsgError);
+        (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
+        (0, vitest_1.expect)(postRepository.getUserTotalPosts).not.toHaveBeenCalled();
+    });
 });
