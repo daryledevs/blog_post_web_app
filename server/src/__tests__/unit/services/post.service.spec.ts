@@ -4,6 +4,7 @@ import UserRepository                                        from "@/repositorie
 import PostRepository                                        from "@/repositories/post/post.repository.impl";
 import GenerateMockData                                      from "../../utils/generate-data.util";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
+import { faker } from "@faker-js/faker";
 
 vi.mock("@/repositories/feed/feed.repository.impl");
 
@@ -147,5 +148,19 @@ describe("FeedService", () => {
 
     expect(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
     expect(postRepository.getUserTotalPosts).not.toHaveBeenCalled();
+  });
+
+  describe("editPost", () => {
+    test("should throw an error if no args provided", async () => {
+      postRepository.findPostsByPostId = vi.fn().mockResolvedValue(existingPost);
+      postRepository.editPost = vi.fn().mockResolvedValue(existingPost);
+
+      const { image_url, image_id, ...rest } = existingPost;
+      const result = await postService.editPost(existingPost.post_id, rest);
+
+      expect(result).toBe(existingPost)
+      expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(existingPost.post_id);
+      expect(postRepository.editPost).toHaveBeenCalledWith(existingPost.post_id, rest);
+    });
   });
 });

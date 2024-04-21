@@ -99,4 +99,15 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
         (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
         (0, vitest_1.expect)(postRepository.getUserTotalPosts).not.toHaveBeenCalled();
     });
+    (0, vitest_1.describe)("editPost", () => {
+        (0, vitest_1.test)("should throw an error if no args provided", async () => {
+            postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(existingPost);
+            postRepository.editPost = vitest_1.vi.fn().mockResolvedValue(existingPost);
+            const { image_url, image_id, ...rest } = existingPost;
+            const result = await postService.editPost(existingPost.post_id, rest);
+            (0, vitest_1.expect)(result).toBe(existingPost);
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(existingPost.post_id);
+            (0, vitest_1.expect)(postRepository.editPost).toHaveBeenCalledWith(existingPost.post_id, rest);
+        });
+    });
 });
