@@ -163,4 +163,16 @@ describe("FeedService", () => {
       expect(postRepository.editPost).toHaveBeenCalledWith(existingPost.post_id, rest);
     });
   });
+
+  test("should throw an error if no args provided", async () => {
+    postRepository.findPostsByPostId = vi.fn();
+    postRepository.editPost = vi.fn();
+
+    await expect(
+      postService.editPost(undefined, undefined))
+    .rejects.toThrow(noArgsMsgError);
+
+    expect(postRepository.findPostsByPostId).not.toHaveBeenCalled();
+    expect(postRepository.editPost).not.toHaveBeenCalled();
+  });
 });

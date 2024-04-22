@@ -110,4 +110,12 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
             (0, vitest_1.expect)(postRepository.editPost).toHaveBeenCalledWith(existingPost.post_id, rest);
         });
     });
+    (0, vitest_1.test)("should throw an error if no args provided", async () => {
+        postRepository.findPostsByPostId = vitest_1.vi.fn();
+        postRepository.editPost = vitest_1.vi.fn();
+        await (0, vitest_1.expect)(postService.editPost(undefined, undefined))
+            .rejects.toThrow(noArgsMsgError);
+        (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toHaveBeenCalled();
+        (0, vitest_1.expect)(postRepository.editPost).not.toHaveBeenCalled();
+    });
 });
