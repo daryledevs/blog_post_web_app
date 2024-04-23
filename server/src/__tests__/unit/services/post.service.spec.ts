@@ -4,7 +4,6 @@ import UserRepository                                        from "@/repositorie
 import PostRepository                                        from "@/repositories/post/post.repository.impl";
 import GenerateMockData                                      from "../../utils/generate-data.util";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
-import { faker } from "@faker-js/faker";
 
 vi.mock("@/repositories/feed/feed.repository.impl");
 
@@ -124,30 +123,30 @@ describe("FeedService", () => {
       expect(userRepository.findUserById).toHaveBeenCalledWith(existingUser.user_id);
       expect(postRepository.getUserTotalPosts).toHaveBeenCalledWith(existingUser.user_id);
     });
-  });
 
-  test("should throw an error if no args provided", async () => {
-    userRepository.findUserById = vi.fn();
-    postRepository.getUserTotalPosts = vi.fn();
+    test("should throw an error if no args provided", async () => {
+      userRepository.findUserById = vi.fn();
+      postRepository.getUserTotalPosts = vi.fn();
 
-    await expect(
-      postService.getUserTotalPosts(undefined))
-    .rejects.toThrow(noArgsMsgError);
+      await expect(
+        postService.getUserTotalPosts(undefined))
+      .rejects.toThrow(noArgsMsgError);
 
-    expect(userRepository.findUserById).not.toHaveBeenCalled();
-    expect(postRepository.getUserTotalPosts).not.toHaveBeenCalled();
-  });
+      expect(userRepository.findUserById).not.toHaveBeenCalled();
+      expect(postRepository.getUserTotalPosts).not.toHaveBeenCalled();
+    });
 
-  test("should throw an error if user not found", async () => {
-    userRepository.findUserById = vi.fn().mockResolvedValue(undefined);
-    postRepository.getUserTotalPosts = vi.fn();
+    test("should throw an error if user not found", async () => {
+      userRepository.findUserById = vi.fn().mockResolvedValue(undefined);
+      postRepository.getUserTotalPosts = vi.fn();
 
-    await expect(
-      postService.getUserTotalPosts(notFoundUser.user_id))
-    .rejects.toThrow(userNotFoundMsgError);
+      await expect(
+        postService.getUserTotalPosts(notFoundUser.user_id))
+      .rejects.toThrow(userNotFoundMsgError);
 
-    expect(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
-    expect(postRepository.getUserTotalPosts).not.toHaveBeenCalled();
+      expect(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
+      expect(postRepository.getUserTotalPosts).not.toHaveBeenCalled();
+    });
   });
 
   describe("editPost", () => {
@@ -162,17 +161,31 @@ describe("FeedService", () => {
       expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(existingPost.post_id);
       expect(postRepository.editPost).toHaveBeenCalledWith(existingPost.post_id, rest);
     });
-  });
 
-  test("should throw an error if no args provided", async () => {
-    postRepository.findPostsByPostId = vi.fn();
-    postRepository.editPost = vi.fn();
+    test("should throw an error if no args provided", async () => {
+      postRepository.findPostsByPostId = vi.fn();
+      postRepository.editPost = vi.fn();
 
-    await expect(
-      postService.editPost(undefined, undefined))
-    .rejects.toThrow(noArgsMsgError);
+      await expect(
+        postService.editPost(undefined, undefined))
+      .rejects.toThrow(noArgsMsgError);
 
-    expect(postRepository.findPostsByPostId).not.toHaveBeenCalled();
-    expect(postRepository.editPost).not.toHaveBeenCalled();
+      expect(postRepository.findPostsByPostId).not.toHaveBeenCalled();
+      expect(postRepository.editPost).not.toHaveBeenCalled();
+    });
+
+    test("should throw an error if post not found", async () => {
+      postRepository.findPostsByPostId = vi.fn().mockResolvedValue(undefined);
+      postRepository.editPost = vi.fn();
+
+      const { image_url, image_id, ...rest } = nonExistingPost;
+
+      await expect(
+        postService.editPost(rest.post_id, rest)
+      ).rejects.toThrow(postNotFoundMsgError);
+
+      expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(rest.post_id);
+      expect(postRepository.editPost).not.toHaveBeenCalled();
+    });
   });
 });
