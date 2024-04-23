@@ -32,11 +32,11 @@ class PostsController {
     async (req: Request, res: Response, next: NextFunction) => {
       const { cookieOptions, ...rest } = req.body;
 
-      const files =
+      const files: Express.Multer.File[] =
         ((req.files as { [fieldname: string]: Express.Multer.File[] })
           ?.img as Express.Multer.File[]) || null;
 
-      const data = await this.postsService.newPost(files[0], rest);
+      const data = await this.postsService.newPost(files?.[0], rest);
       res.status(200).send({ message: data });
     }
   );

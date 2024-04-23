@@ -6,14 +6,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const path_1 = require("path");
 const async_wrapper_util_1 = __importDefault(require("@/utils/async-wrapper.util"));
 const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
-const cloudinary_config_1 = __importDefault(require("@/config/cloudinary.config"));
 class PostService {
     postRepository;
     userRepository;
+    cloudinary;
     wrap = new async_wrapper_util_1.default();
-    constructor(postRepository, userRepository) {
+    constructor(postRepository, userRepository, cloudinary) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
+        this.cloudinary = cloudinary;
     }
     findPostsByPostId = this.wrap.serviceWrap(async (post_id) => {
         // Check if the post_id is provided
@@ -59,13 +60,14 @@ class PostService {
         if (!isUserExist)
             throw api_exception_1.default.HTTP404Error("User not found");
         const path = (0, path_1.join)(file.destination, file.filename);
-        const { image_id, image_url } = await (0, cloudinary_config_1.default)(path);
+        const { image_id, image_url } = await this.cloudinary.uploadAndDeleteLocal(path);
         // Create a new post
-        return await this.postRepository.newPost({
+        await this.postRepository.newPost({
             ...post,
             image_id,
             image_url,
         });
+        return "Post created successfully";
     });
     editPost = this.wrap.serviceWrap(async (post_id, post) => {
         // Check if the arguments is provided

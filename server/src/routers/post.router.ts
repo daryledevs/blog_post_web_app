@@ -1,9 +1,10 @@
-import express         from "express";
-import uploadImage     from "@/middleware/multer.middleware";
-import PostsService    from "@/services/post/post.service.impl";
-import UserRepository  from "@/repositories/user/user.repository.impl";
-import PostsController from "@/controllers/post.controller";
-import PostsRepository from "@/repositories/post/post.repository.impl";
+import express           from "express";
+import uploadImage       from "@/middleware/multer.middleware";
+import PostsService      from "@/services/post/post.service.impl";
+import UserRepository    from "@/repositories/user/user.repository.impl";
+import PostsController   from "@/controllers/post.controller";
+import PostsRepository   from "@/repositories/post/post.repository.impl";
+import CloudinaryService from "@/utils/cloudinary-service.util";
 
 const router = express.Router();
 
@@ -11,6 +12,7 @@ const controller: PostsController = new PostsController(
   new PostsService(
     new PostsRepository(),
     new UserRepository(),
+    new CloudinaryService()
   )
 );
 

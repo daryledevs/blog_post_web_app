@@ -10,16 +10,18 @@ import IPostService         from "./post.service";
 import PostRepository       from "@/repositories/post/post.repository.impl";
 import UserRepository       from "@/repositories/user/user.repository.impl";
 import ApiErrorException    from "@/exceptions/api.exception";
-import uploadAndDeleteLocal from "@/config/cloudinary.config";
+import CloudinaryService from "@/utils/cloudinary-service.util";
 
 class PostService implements IPostService {
   private postRepository: PostRepository;
   private userRepository: UserRepository;
+  private cloudinary: CloudinaryService;
   private wrap: AsyncWrapper = new AsyncWrapper();
 
-  constructor(postRepository: PostRepository, userRepository: UserRepository) {
+  constructor(postRepository: PostRepository, userRepository: UserRepository, cloudinary: CloudinaryService) {
     this.postRepository = postRepository;
     this.userRepository = userRepository;
+    this.cloudinary     = cloudinary;
   }
 
   public findPostsByPostId = this.wrap.serviceWrap(
@@ -71,22 +73,23 @@ class PostService implements IPostService {
     ): Promise<string> => {
       // Check if the image is uploaded
       if (!file) throw ApiErrorException.HTTP400Error("No image uploaded");
-      if (!post.user_id)
-        throw ApiErrorException.HTTP400Error("No arguments provided");
+      if (!post.user_id) throw ApiErrorException.HTTP400Error("No arguments provided");
 
       // If the user is not found, return an error
       const isUserExist = await this.userRepository.findUserById(post.user_id);
       if (!isUserExist) throw ApiErrorException.HTTP404Error("User not found");
 
       const path = join(file.destination, file.filename);
-      const { image_id, image_url } = await uploadAndDeleteLocal(path);
+      const { image_id, image_url } = await this.cloudinary.uploadAndDeleteLocal(path);
 
       // Create a new post
-      return await this.postRepository.newPost({
+      await this.postRepository.newPost({
         ...post,
         image_id,
         image_url,
       });
+
+      return "Post created successfully";
     }
   );
 

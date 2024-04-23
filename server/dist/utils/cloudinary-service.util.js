@@ -22,13 +22,26 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-const dotenv = __importStar(require("dotenv"));
-dotenv.config();
-const cloudConfig = {
-    cloud_name: process.env.STORAGE_NAME,
-    api_key: process.env.STORAGE_API_KEY,
-    api_secret: process.env.STORAGE_API_SECRET,
-    secure: true,
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.default = cloudConfig;
+Object.defineProperty(exports, "__esModule", { value: true });
+const cloudinary_config_1 = __importDefault(require("@/config/cloudinary.config"));
+const cloudinary_1 = __importDefault(require("cloudinary"));
+const fs = __importStar(require("fs"));
+cloudinary_1.default.v2.config(cloudinary_config_1.default);
+class CloudinaryService {
+    uploadAndDeleteLocal = async (path) => {
+        const result = await cloudinary_1.default.v2.uploader.upload(path, {
+            UNIQUE_FILENAME: true,
+            folder: process.env.STORAGE_FOLDER,
+        });
+        fs.unlink(path, (err) => {
+            if (err)
+                throw err;
+            console.log("Delete File successfully.");
+        });
+        return { image_id: result.public_id, image_url: result.url };
+    };
+}
+exports.default = CloudinaryService;

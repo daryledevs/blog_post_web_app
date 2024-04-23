@@ -49,7 +49,7 @@ class PostsController {
         const { cookieOptions, ...rest } = req.body;
         const files = req.files
             ?.img || null;
-        const data = await this.postsService.newPost(files[0], rest);
+        const data = await this.postsService.newPost(files?.[0], rest);
         res.status(200).send({ message: data });
     });
     editPost = this.wrap.apiWrap(async (req, res, next) => {
