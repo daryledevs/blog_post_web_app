@@ -9,10 +9,13 @@ const errorHandler = (err, req, res, next) => {
     if (err instanceof database_exception_1.default) {
         return res.status(500).send(err);
     }
+    ;
     if (err instanceof api_exception_1.default) {
-        const { name, httpCode, message, isOperational } = err;
-        return res.status(httpCode).send({ name, isOperational, message });
+        const { name, httpCode, message, isOperational, error } = err;
+        return res
+            .status(httpCode)
+            .send({ name, isOperational, message, stack: error?.stack });
     }
-    res.status(500).send({ message: "Something went wrong", error: err.message });
+    ;
 };
 exports.default = errorHandler;

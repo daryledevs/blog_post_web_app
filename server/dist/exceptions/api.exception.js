@@ -29,12 +29,14 @@ class ApiErrorException extends base_error_exception_1.default {
     message;
     httpCode;
     isOperational;
-    constructor(name, httpCode, description, isOperational) {
+    error;
+    constructor(name, httpCode, description, isOperational, error) {
         super(name, httpCode, description, isOperational);
         this.status = httpCode;
         this.message = description;
         this.httpCode = httpCode;
         this.isOperational = isOperational;
+        this.error = error;
     }
     ;
     static HTTP401Error = (message) => {
@@ -52,8 +54,8 @@ class ApiErrorException extends base_error_exception_1.default {
     static HTTP409Error = (message) => {
         return new ApiErrorException("CONFLICT", base_error_exception_1.HttpStatusCode.CONFLICT, message, true);
     };
-    static HTTP500Error = (message) => {
-        return new ApiErrorException("INTERNAL SERVER ERROR", base_error_exception_1.HttpStatusCode.INTERNAL_SERVER, message, false);
+    static HTTP500Error = (message, error) => {
+        return new ApiErrorException("INTERNAL SERVER ERROR", base_error_exception_1.HttpStatusCode.INTERNAL_SERVER, message, false, error);
     };
 }
 ;

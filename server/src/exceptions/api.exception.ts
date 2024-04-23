@@ -1,22 +1,25 @@
 import BaseError, { HttpStatusCode } from "./base-error.exception";
 
 class ApiErrorException extends BaseError {
-  public status: number;
-  public message: string;
-  public httpCode: HttpStatusCode;
+  public status:        number;
+  public message:       string;
+  public httpCode:      HttpStatusCode;
   public isOperational: boolean;
+  public error?:        Error | undefined;
 
   constructor(
-    name: string,
-    httpCode: HttpStatusCode,
-    description: string,
-    isOperational: boolean
+    name:          string,
+    httpCode:      HttpStatusCode,
+    description:   string,
+    isOperational: boolean,
+    error?:        Error | undefined
   ) {
     super(name, httpCode, description, isOperational);
-    this.status = httpCode;
-    this.message = description;
-    this.httpCode = httpCode;
+    this.status =        httpCode;
+    this.message =       description;
+    this.httpCode =      httpCode;
     this.isOperational = isOperational;
+    this.error =         error;
   };
 
   public static HTTP401Error = (message: string): ApiErrorException => {
@@ -64,12 +67,13 @@ class ApiErrorException extends BaseError {
     );
   };
 
-  public static HTTP500Error = (message: string): ApiErrorException => {
+  public static HTTP500Error = (message: string, error: Error): ApiErrorException => {
     return new ApiErrorException(
       "INTERNAL SERVER ERROR",
       HttpStatusCode.INTERNAL_SERVER,
       message,
-      false
+      false,
+      error
     );
   };
 };

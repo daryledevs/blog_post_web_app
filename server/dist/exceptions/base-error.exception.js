@@ -15,15 +15,16 @@ class BaseError extends Error {
     name;
     httpCode;
     isOperational;
-    constructor(name, httpCode, description, isOperational) {
+    error;
+    constructor(name, httpCode, description, isOperational, error) {
         super(description);
         Object.setPrototypeOf(this, new.target.prototype);
         this.name = name;
         this.httpCode = httpCode;
         this.isOperational = isOperational;
+        this.error = error;
         Error.captureStackTrace(this);
     }
-    ;
 }
 ;
 exports.default = BaseError;

@@ -7,7 +7,12 @@ const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
 const database_exception_1 = __importDefault(require("@/exceptions/database.exception"));
 class AsyncWrapper {
     apiWrap = (cb) => {
-        return (req, res, next) => cb(req, res, next).catch(next(api_exception_1.default.HTTP500Error("Something went wrong")));
+        return (req, res, next) => cb(req, res, next).catch((error) => {
+            if (error instanceof database_exception_1.default ||
+                error instanceof api_exception_1.default)
+                return next(error);
+            next(api_exception_1.default.HTTP500Error("An unexpected error occurred", error));
+        });
     };
     serviceWrap = (fn) => {
         return (...args) => {
