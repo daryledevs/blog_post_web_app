@@ -9,9 +9,14 @@ const user_repository_impl_1 = __importDefault(require("@/repositories/user/user
 const post_repository_impl_1 = __importDefault(require("@/repositories/post/post.repository.impl"));
 const generate_data_util_1 = __importDefault(require("../../utils/generate-data.util"));
 const vitest_1 = require("vitest");
+const faker_1 = require("@faker-js/faker");
+const path_1 = require("path");
+const cloudinary_service_util_1 = __importDefault(require("@/utils/cloudinary-service.util"));
 vitest_1.vi.mock("@/repositories/feed/feed.repository.impl");
 vitest_1.vi.mock("@/repositories/user/user.repository.impl");
+vitest_1.vi.mock("@/utils/cloudinary-service.util");
 (0, vitest_1.describe)("FeedService", () => {
+    let cloudinary;
     let postRepository;
     let userRepository;
     let postService;
@@ -25,9 +30,10 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
     const existingPost = posts[0];
     const nonExistingPost = generate_data_util_1.default.createPost(1000);
     (0, vitest_1.beforeEach)(() => {
+        cloudinary = new cloudinary_service_util_1.default();
         postRepository = new post_repository_impl_1.default();
         userRepository = new user_repository_impl_1.default();
-        postService = new post_service_impl_1.default(postRepository, userRepository);
+        postService = new post_service_impl_1.default(postRepository, userRepository, cloudinary);
     });
     (0, vitest_1.afterEach)(() => {
         vitest_1.vi.clearAllMocks();
@@ -97,6 +103,38 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
                 .rejects.toThrow(userNotFoundMsgError);
             (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
             (0, vitest_1.expect)(postRepository.getUserTotalPosts).not.toHaveBeenCalled();
+        });
+    });
+    (0, vitest_1.describe)("newPost", async () => {
+        (0, vitest_1.test)("should return the correct result", async () => {
+            const { image_url, image_id, ...rest } = existingPost;
+            const buffer = Buffer.alloc(1024 * 1024 * 10, ".");
+            const file = {
+                buffer,
+                mimetype: "image/jpeg",
+                originalname: faker_1.faker.system.fileName(),
+                size: buffer.length,
+                filename: faker_1.faker.system.fileName(),
+                destination: faker_1.faker.system.directoryPath()
+            };
+            userRepository.findUserById = vitest_1.vi
+                .fn()
+                .mockResolvedValue(existingUser);
+            postRepository.newPost = vitest_1.vi
+                .fn()
+                .mockResolvedValue(existingPost);
+            cloudinary.uploadAndDeleteLocal = vitest_1.vi
+                .fn()
+                .mockResolvedValue({ image_url, image_id });
+            const result = await postService.newPost(file, rest);
+            (0, vitest_1.expect)(result).toBe("Post created successfully");
+            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(existingPost.user_id);
+            (0, vitest_1.expect)(cloudinary.uploadAndDeleteLocal).toHaveBeenCalledWith((0, path_1.join)(file.destination, file.filename));
+            (0, vitest_1.expect)(postRepository.newPost).toHaveBeenCalledWith({
+                ...rest,
+                image_url,
+                image_id,
+            });
         });
     });
     (0, vitest_1.describe)("editPost", () => {
