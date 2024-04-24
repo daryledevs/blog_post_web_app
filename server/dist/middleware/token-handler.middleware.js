@@ -83,10 +83,12 @@ const tokenHandler = async (req, res, next) => {
                 },
             };
             // generate new tokens
-            const REFRESH_TKN = auth_token_util_1.default.generateToken(args.accessToken);
-            const ACCESS_TOKEN = auth_token_util_1.default.generateToken(args.refreshToken);
-            res.cookie("REFRESH_TOKEN", REFRESH_TKN, req.body.cookieOptions);
-            return res.status(200).send({ accessToken: ACCESS_TOKEN });
+            const REFRESH_TKN = auth_token_util_1.default.generateToken(args.refreshToken);
+            const ACCESS_TOKEN = auth_token_util_1.default.generateToken(args.accessToken);
+            return res
+                .cookie("REFRESH_TOKEN", REFRESH_TKN, req.body.cookieOptions)
+                .status(200)
+                .send({ accessToken: ACCESS_TOKEN });
         }
         ;
         // if the access token is not provided, generate a new access token
