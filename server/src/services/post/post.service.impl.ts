@@ -10,7 +10,7 @@ import IPostService         from "./post.service";
 import PostRepository       from "@/repositories/post/post.repository.impl";
 import UserRepository       from "@/repositories/user/user.repository.impl";
 import ApiErrorException    from "@/exceptions/api.exception";
-import CloudinaryService from "@/utils/cloudinary-service.util";
+import CloudinaryService    from "@/utils/cloudinary-service.util";
 
 class PostService implements IPostService {
   private postRepository: PostRepository;
@@ -73,7 +73,7 @@ class PostService implements IPostService {
     ): Promise<string> => {
       // Check if the image is uploaded
       if (!file) throw ApiErrorException.HTTP400Error("No image uploaded");
-      if (!post.user_id) throw ApiErrorException.HTTP400Error("No arguments provided");
+      if (!post?.user_id) throw ApiErrorException.HTTP400Error("No arguments provided");
 
       // If the user is not found, return an error
       const isUserExist = await this.userRepository.findUserById(post.user_id);

@@ -53,7 +53,7 @@ class PostService {
         // Check if the image is uploaded
         if (!file)
             throw api_exception_1.default.HTTP400Error("No image uploaded");
-        if (!post.user_id)
+        if (!post?.user_id)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
         // If the user is not found, return an error
         const isUserExist = await this.userRepository.findUserById(post.user_id);

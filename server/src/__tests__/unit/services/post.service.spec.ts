@@ -1,12 +1,12 @@
+import { join }                                              from "path";
+import { faker }                                             from "@faker-js/faker";
 import PostService                                           from "@/services/post/post.service.impl";
 import ErrorException                                        from "@/exceptions/api.exception";
 import UserRepository                                        from "@/repositories/user/user.repository.impl";
 import PostRepository                                        from "@/repositories/post/post.repository.impl";
 import GenerateMockData                                      from "../../utils/generate-data.util";
+import CloudinaryService                                     from "@/utils/cloudinary-service.util";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
-import { faker } from "@faker-js/faker";
-import { join } from "path";
-import CloudinaryService from "@/utils/cloudinary-service.util";
 
 vi.mock("@/repositories/feed/feed.repository.impl");
 
@@ -200,6 +200,70 @@ describe("FeedService", () => {
         image_url,
         image_id,
       });
+    });
+    
+    test("should throw an error if no args provided", async () => {
+      const { image_url, image_id, ...rest } = existingPost;
+      const buffer = Buffer.alloc(1024 * 1024 * 10, ".");
+      const file = {
+        buffer,
+        mimetype: "image/jpeg",
+        originalname: faker.system.fileName(),
+        size: buffer.length,
+        filename: faker.system.fileName(),
+        destination: faker.system.directoryPath(),
+      };
+
+      userRepository.findUserById = vi.fn();
+      postRepository.newPost = vi.fn();
+      cloudinary.uploadAndDeleteLocal = vi.fn();
+
+      await expect(
+        postService.newPost(file, undefined))
+      .rejects.toThrow(noArgsMsgError);
+
+      expect(userRepository.findUserById).not.toHaveBeenCalled();
+      expect(postRepository.newPost).not.toHaveBeenCalled();
+      expect(cloudinary.uploadAndDeleteLocal).not.toHaveBeenCalled();
+    });
+
+    test("should throw an error if no image uploaded", async () => {
+      userRepository.findUserById = vi.fn();
+      postRepository.newPost = vi.fn();
+      cloudinary.uploadAndDeleteLocal = vi.fn();
+
+      await expect(
+        postService.newPost(undefined, undefined))
+      .rejects.toThrow("No image uploaded");
+
+      expect(userRepository.findUserById).not.toHaveBeenCalled();
+      expect(postRepository.newPost).not.toHaveBeenCalled();
+      expect(cloudinary.uploadAndDeleteLocal).not.toHaveBeenCalled();
+    });
+
+    test("should throw an error if user not found", async () => {
+      const { image_url, image_id, ...rest } = existingPost;
+      const buffer = Buffer.alloc(1024 * 1024 * 10, ".");
+      const file = {
+        buffer,
+        mimetype: "image/jpeg",
+        originalname: faker.system.fileName(),
+        size: buffer.length,
+        filename: faker.system.fileName(),
+        destination: faker.system.directoryPath(),
+      };
+
+      userRepository.findUserById = vi.fn().mockResolvedValue(undefined);
+      postRepository.newPost = vi.fn();
+      cloudinary.uploadAndDeleteLocal = vi.fn();
+
+      await expect(
+        postService.newPost(file, rest))
+      .rejects.toThrow(userNotFoundMsgError);
+
+      expect(userRepository.findUserById).toHaveBeenCalledWith(existingPost.user_id);
+      expect(postRepository.newPost).not.toHaveBeenCalled();
+      expect(cloudinary.uploadAndDeleteLocal).not.toHaveBeenCalled();
     });
   });
 

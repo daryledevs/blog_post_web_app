@@ -3,15 +3,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const path_1 = require("path");
+const faker_1 = require("@faker-js/faker");
 const post_service_impl_1 = __importDefault(require("@/services/post/post.service.impl"));
 const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
 const user_repository_impl_1 = __importDefault(require("@/repositories/user/user.repository.impl"));
 const post_repository_impl_1 = __importDefault(require("@/repositories/post/post.repository.impl"));
 const generate_data_util_1 = __importDefault(require("../../utils/generate-data.util"));
-const vitest_1 = require("vitest");
-const faker_1 = require("@faker-js/faker");
-const path_1 = require("path");
 const cloudinary_service_util_1 = __importDefault(require("@/utils/cloudinary-service.util"));
+const vitest_1 = require("vitest");
 vitest_1.vi.mock("@/repositories/feed/feed.repository.impl");
 vitest_1.vi.mock("@/repositories/user/user.repository.impl");
 vitest_1.vi.mock("@/utils/cloudinary-service.util");
@@ -135,6 +135,56 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
                 image_url,
                 image_id,
             });
+        });
+        (0, vitest_1.test)("should throw an error if no args provided", async () => {
+            const { image_url, image_id, ...rest } = existingPost;
+            const buffer = Buffer.alloc(1024 * 1024 * 10, ".");
+            const file = {
+                buffer,
+                mimetype: "image/jpeg",
+                originalname: faker_1.faker.system.fileName(),
+                size: buffer.length,
+                filename: faker_1.faker.system.fileName(),
+                destination: faker_1.faker.system.directoryPath(),
+            };
+            userRepository.findUserById = vitest_1.vi.fn();
+            postRepository.newPost = vitest_1.vi.fn();
+            cloudinary.uploadAndDeleteLocal = vitest_1.vi.fn();
+            await (0, vitest_1.expect)(postService.newPost(file, undefined))
+                .rejects.toThrow(noArgsMsgError);
+            (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(postRepository.newPost).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(cloudinary.uploadAndDeleteLocal).not.toHaveBeenCalled();
+        });
+        (0, vitest_1.test)("should throw an error if no image uploaded", async () => {
+            userRepository.findUserById = vitest_1.vi.fn();
+            postRepository.newPost = vitest_1.vi.fn();
+            cloudinary.uploadAndDeleteLocal = vitest_1.vi.fn();
+            await (0, vitest_1.expect)(postService.newPost(undefined, undefined))
+                .rejects.toThrow("No image uploaded");
+            (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(postRepository.newPost).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(cloudinary.uploadAndDeleteLocal).not.toHaveBeenCalled();
+        });
+        (0, vitest_1.test)("should throw an error if user not found", async () => {
+            const { image_url, image_id, ...rest } = existingPost;
+            const buffer = Buffer.alloc(1024 * 1024 * 10, ".");
+            const file = {
+                buffer,
+                mimetype: "image/jpeg",
+                originalname: faker_1.faker.system.fileName(),
+                size: buffer.length,
+                filename: faker_1.faker.system.fileName(),
+                destination: faker_1.faker.system.directoryPath(),
+            };
+            userRepository.findUserById = vitest_1.vi.fn().mockResolvedValue(undefined);
+            postRepository.newPost = vitest_1.vi.fn();
+            cloudinary.uploadAndDeleteLocal = vitest_1.vi.fn();
+            await (0, vitest_1.expect)(postService.newPost(file, rest))
+                .rejects.toThrow(userNotFoundMsgError);
+            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(existingPost.user_id);
+            (0, vitest_1.expect)(postRepository.newPost).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(cloudinary.uploadAndDeleteLocal).not.toHaveBeenCalled();
         });
     });
     (0, vitest_1.describe)("editPost", () => {
