@@ -306,4 +306,17 @@ describe("FeedService", () => {
       expect(postRepository.editPost).not.toHaveBeenCalled();
     });
   });
+
+  describe("deletePost", async () => {
+    test("should return the correct result", async () => {
+      postRepository.findPostsByPostId = vi.fn().mockResolvedValue(existingPost);
+      postRepository.deletePost = vi.fn().mockResolvedValue("Post deleted successfully");
+
+      const result = await postService.deletePost(existingPost.post_id);
+
+      expect(result).toBe("Post deleted successfully");
+      expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(existingPost.post_id);
+      expect(postRepository.deletePost).toHaveBeenCalledWith(existingPost.post_id);
+    });
+  });
 });

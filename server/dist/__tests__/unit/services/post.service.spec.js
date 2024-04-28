@@ -214,4 +214,14 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
             (0, vitest_1.expect)(postRepository.editPost).not.toHaveBeenCalled();
         });
     });
+    (0, vitest_1.describe)("deletePost", async () => {
+        (0, vitest_1.test)("should return the correct result", async () => {
+            postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(existingPost);
+            postRepository.deletePost = vitest_1.vi.fn().mockResolvedValue("Post deleted successfully");
+            const result = await postService.deletePost(existingPost.post_id);
+            (0, vitest_1.expect)(result).toBe("Post deleted successfully");
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(existingPost.post_id);
+            (0, vitest_1.expect)(postRepository.deletePost).toHaveBeenCalledWith(existingPost.post_id);
+        });
+    });
 });
