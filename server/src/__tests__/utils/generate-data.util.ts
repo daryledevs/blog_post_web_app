@@ -10,7 +10,7 @@ class GenerateMockData {
   static generateMockData = (
     changeArg: boolean,
     list: any[],
-    callback: Function
+    callback: Function,
   ) => {
     return list.flatMap((u, i) => {
       let nextUser = list[i + 1];
@@ -74,6 +74,24 @@ class GenerateMockData {
   static createLike = (post_id: number, user_id: number): any => ({
     post_id: post_id,
     user_id: user_id,
+    created_at: new Date(faker.date.past().toISOString()),
+  });
+
+  static createConversation = (
+    user_one_id: number,
+    user_two_id: number
+  ): any => ({
+    conversation_id: faker.number.int({ min: 1, max: 1000 }),
+    user_one_id: user_one_id,
+    user_two_id: user_two_id,
+    created_at: new Date(faker.date.past().toISOString()),
+  });
+
+  static createMessage = (conversation_id: number, user_id: number): any => ({
+    message_id: faker.number.int({ min: 1, max: 1000 }),
+    conversation_id: conversation_id,
+    user_id: user_id,
+    message: faker.lorem.text(),
     created_at: new Date(faker.date.past().toISOString()),
   });
 };

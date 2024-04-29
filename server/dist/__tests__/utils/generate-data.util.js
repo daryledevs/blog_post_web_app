@@ -53,6 +53,19 @@ class GenerateMockData {
         user_id: user_id,
         created_at: new Date(faker_1.faker.date.past().toISOString()),
     });
+    static createConversation = (user_one_id, user_two_id) => ({
+        conversation_id: faker_1.faker.number.int({ min: 1, max: 1000 }),
+        user_one_id: user_one_id,
+        user_two_id: user_two_id,
+        created_at: new Date(faker_1.faker.date.past().toISOString()),
+    });
+    static createMessage = (conversation_id, user_id) => ({
+        message_id: faker_1.faker.number.int({ min: 1, max: 1000 }),
+        conversation_id: conversation_id,
+        user_id: user_id,
+        message: faker_1.faker.lorem.text(),
+        created_at: new Date(faker_1.faker.date.past().toISOString()),
+    });
 }
 ;
 exports.default = GenerateMockData;
