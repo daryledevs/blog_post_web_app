@@ -311,4 +311,76 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
             (0, vitest_1.expect)(postRepository.isUserLikePost).not.toHaveBeenCalled();
         });
     });
+    (0, vitest_1.describe)("toggleUserLikeForPost (toggle the user's like for the post)", async () => {
+        (0, vitest_1.test)("should return the 'like added successfully' message", async () => {
+            const like = generate_data_util_1.default.createLike(existingPost.post_id, existingPost.user_id);
+            userRepository.findUserById = vitest_1.vi
+                .fn()
+                .mockResolvedValue(existingUser);
+            postRepository.findPostsByPostId = vitest_1.vi
+                .fn()
+                .mockResolvedValue(existingPost);
+            postRepository.isUserLikePost = vitest_1.vi
+                .fn()
+                .mockResolvedValue(undefined);
+            postRepository.toggleUserLikeForPost = vitest_1.vi.fn();
+            postRepository.removeUserLikeForPost = vitest_1.vi.fn();
+            const result = await postService.toggleUserLikeForPost(like);
+            (0, vitest_1.expect)(result).toBe("Like added successfully");
+            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(like.user_id);
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(like.post_id);
+            (0, vitest_1.expect)(postRepository.isUserLikePost).toHaveBeenCalledWith(like);
+            (0, vitest_1.expect)(postRepository.removeUserLikeForPost).not.toHaveBeenCalled();
+        });
+        (0, vitest_1.test)("should return the 'like removed successfully' message", async () => {
+            const like = generate_data_util_1.default.createLike(existingPost.post_id, existingPost.user_id);
+            userRepository.findUserById = vitest_1.vi
+                .fn()
+                .mockResolvedValue(existingUser);
+            postRepository.findPostsByPostId = vitest_1.vi
+                .fn()
+                .mockResolvedValue(existingPost);
+            postRepository.isUserLikePost = vitest_1.vi
+                .fn()
+                .mockResolvedValue(like);
+            postRepository.toggleUserLikeForPost = vitest_1.vi.fn();
+            postRepository.removeUserLikeForPost = vitest_1.vi.fn();
+            const result = await postService.toggleUserLikeForPost(like);
+            (0, vitest_1.expect)(result).toBe("Like removed successfully");
+            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(like.user_id);
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(like.post_id);
+            (0, vitest_1.expect)(postRepository.isUserLikePost).toHaveBeenCalledWith(like);
+            (0, vitest_1.expect)(postRepository.removeUserLikeForPost).toHaveBeenCalledWith(like);
+            (0, vitest_1.expect)(postRepository.toggleUserLikeForPost).not.toHaveBeenCalled();
+        });
+        (0, vitest_1.test)("should throw an error if no args provided", async () => {
+            userRepository.findUserById = vitest_1.vi.fn();
+            postRepository.findPostsByPostId = vitest_1.vi.fn();
+            postRepository.isUserLikePost = vitest_1.vi.fn();
+            postRepository.toggleUserLikeForPost = vitest_1.vi.fn();
+            postRepository.removeUserLikeForPost = vitest_1.vi.fn();
+            await (0, vitest_1.expect)(postService.toggleUserLikeForPost(undefined))
+                .rejects.toThrow(noArgsMsgError);
+            (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(postRepository.isUserLikePost).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(postRepository.toggleUserLikeForPost).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(postRepository.removeUserLikeForPost).not.toHaveBeenCalled();
+        });
+        (0, vitest_1.test)("should throw an error if user not found", async () => {
+            const like = generate_data_util_1.default.createLike(existingPost.post_id, existingPost.user_id);
+            userRepository.findUserById = vitest_1.vi.fn().mockResolvedValue(undefined);
+            postRepository.findPostsByPostId = vitest_1.vi.fn();
+            postRepository.isUserLikePost = vitest_1.vi.fn();
+            postRepository.toggleUserLikeForPost = vitest_1.vi.fn();
+            postRepository.removeUserLikeForPost = vitest_1.vi.fn();
+            await (0, vitest_1.expect)(postService.toggleUserLikeForPost(like))
+                .rejects.toThrow(userNotFoundMsgError);
+            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(like.user_id);
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(postRepository.isUserLikePost).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(postRepository.toggleUserLikeForPost).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(postRepository.removeUserLikeForPost).not.toHaveBeenCalled();
+        });
+    });
 });

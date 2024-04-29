@@ -452,4 +452,110 @@ describe("FeedService", () => {
       expect(postRepository.isUserLikePost).not.toHaveBeenCalled();
     });
   });
+
+  describe("toggleUserLikeForPost (toggle the user's like for the post)", async () => {
+    test("should return the 'like added successfully' message", async () => {
+      const like = GenerateMockData.createLike(
+        existingPost.post_id,
+        existingPost.user_id
+      );
+
+      userRepository.findUserById = vi
+        .fn()
+        .mockResolvedValue(existingUser);
+
+      postRepository.findPostsByPostId = vi
+        .fn()
+        .mockResolvedValue(existingPost);
+
+      postRepository.isUserLikePost = vi
+        .fn()
+        .mockResolvedValue(undefined);
+
+      postRepository.toggleUserLikeForPost = vi.fn();
+
+      postRepository.removeUserLikeForPost = vi.fn();
+
+      const result = await postService.toggleUserLikeForPost(like);
+
+      expect(result).toBe("Like added successfully");
+      expect(userRepository.findUserById).toHaveBeenCalledWith(like.user_id);
+      expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(like.post_id);
+      expect(postRepository.isUserLikePost).toHaveBeenCalledWith(like);
+      expect(postRepository.removeUserLikeForPost).not.toHaveBeenCalled();
+    });
+
+    test("should return the 'like removed successfully' message", async () => {
+      const like = GenerateMockData.createLike(
+        existingPost.post_id,
+        existingPost.user_id
+      );
+
+      userRepository.findUserById = vi
+        .fn()
+        .mockResolvedValue(existingUser);
+
+      postRepository.findPostsByPostId = vi
+        .fn()
+        .mockResolvedValue(existingPost);
+
+      postRepository.isUserLikePost = vi
+        .fn()
+        .mockResolvedValue(like);
+
+      postRepository.toggleUserLikeForPost = vi.fn();
+
+      postRepository.removeUserLikeForPost = vi.fn();
+
+      const result = await postService.toggleUserLikeForPost(like);
+
+      expect(result).toBe("Like removed successfully");
+      expect(userRepository.findUserById).toHaveBeenCalledWith(like.user_id);
+      expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(like.post_id);
+      expect(postRepository.isUserLikePost).toHaveBeenCalledWith(like);
+      expect(postRepository.removeUserLikeForPost).toHaveBeenCalledWith(like);
+      expect(postRepository.toggleUserLikeForPost).not.toHaveBeenCalled();
+    });
+
+    test("should throw an error if no args provided", async () => {
+      userRepository.findUserById = vi.fn();
+      postRepository.findPostsByPostId = vi.fn();
+      postRepository.isUserLikePost = vi.fn();
+      postRepository.toggleUserLikeForPost = vi.fn();
+      postRepository.removeUserLikeForPost = vi.fn();
+
+      await expect(
+        postService.toggleUserLikeForPost(undefined))
+      .rejects.toThrow(noArgsMsgError);
+
+      expect(userRepository.findUserById).not.toHaveBeenCalled();
+      expect(postRepository.findPostsByPostId).not.toHaveBeenCalled();
+      expect(postRepository.isUserLikePost).not.toHaveBeenCalled();
+      expect(postRepository.toggleUserLikeForPost).not.toHaveBeenCalled();
+      expect(postRepository.removeUserLikeForPost).not.toHaveBeenCalled();
+    });
+
+    test("should throw an error if user not found", async () => {
+      const like = GenerateMockData.createLike(
+        existingPost.post_id,
+        existingPost.user_id
+      );
+
+      userRepository.findUserById = vi.fn().mockResolvedValue(undefined);
+      postRepository.findPostsByPostId = vi.fn();
+      postRepository.isUserLikePost = vi.fn();
+      postRepository.toggleUserLikeForPost = vi.fn();
+      postRepository.removeUserLikeForPost = vi.fn();
+
+      await expect(
+        postService.toggleUserLikeForPost(like))
+      .rejects.toThrow(userNotFoundMsgError);
+
+      expect(userRepository.findUserById).toHaveBeenCalledWith(like.user_id);
+      expect(postRepository.findPostsByPostId).not.toHaveBeenCalled();
+      expect(postRepository.isUserLikePost).not.toHaveBeenCalled();
+      expect(postRepository.toggleUserLikeForPost).not.toHaveBeenCalled();
+      expect(postRepository.removeUserLikeForPost).not.toHaveBeenCalled();
+    });
+  });
 });
