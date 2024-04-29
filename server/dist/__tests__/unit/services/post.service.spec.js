@@ -223,5 +223,21 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
             (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(existingPost.post_id);
             (0, vitest_1.expect)(postRepository.deletePost).toHaveBeenCalledWith(existingPost.post_id);
         });
+        (0, vitest_1.test)("should throw an error if no args provided", async () => {
+            postRepository.findPostsByPostId = vitest_1.vi.fn();
+            postRepository.deletePost = vitest_1.vi.fn();
+            await (0, vitest_1.expect)(postService.deletePost(undefined))
+                .rejects.toThrow(noArgsMsgError);
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(postRepository.deletePost).not.toHaveBeenCalled();
+        });
+        (0, vitest_1.test)("should throw an error if post not found", async () => {
+            postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(undefined);
+            postRepository.deletePost = vitest_1.vi.fn();
+            await (0, vitest_1.expect)(postService.deletePost(nonExistingPost.post_id))
+                .rejects.toThrow(postNotFoundMsgError);
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(nonExistingPost.post_id);
+            (0, vitest_1.expect)(postRepository.deletePost).not.toHaveBeenCalled();
+        });
     });
 });

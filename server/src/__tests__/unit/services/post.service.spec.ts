@@ -318,5 +318,29 @@ describe("FeedService", () => {
       expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(existingPost.post_id);
       expect(postRepository.deletePost).toHaveBeenCalledWith(existingPost.post_id);
     });
+
+    test("should throw an error if no args provided", async () => {
+      postRepository.findPostsByPostId = vi.fn();
+      postRepository.deletePost = vi.fn();
+
+      await expect(
+        postService.deletePost(undefined))
+      .rejects.toThrow(noArgsMsgError);
+
+      expect(postRepository.findPostsByPostId).not.toHaveBeenCalled();
+      expect(postRepository.deletePost).not.toHaveBeenCalled();
+    });
+
+    test("should throw an error if post not found", async () => {
+      postRepository.findPostsByPostId = vi.fn().mockResolvedValue(undefined);
+      postRepository.deletePost = vi.fn();
+
+      await expect(
+        postService.deletePost(nonExistingPost.post_id))
+      .rejects.toThrow(postNotFoundMsgError);
+
+      expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(nonExistingPost.post_id);
+      expect(postRepository.deletePost).not.toHaveBeenCalled();
+    });
   });
 });
