@@ -16,6 +16,7 @@ class PostService {
         this.userRepository = userRepository;
         this.cloudinary = cloudinary;
     }
+    ;
     findPostsByPostId = this.wrap.serviceWrap(async (post_id) => {
         // Check if the post_id is provided
         if (!post_id)
@@ -73,9 +74,9 @@ class PostService {
         // Check if the arguments is provided
         if (!post_id)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
-        if (post.image_url)
-            throw api_exception_1.default
-                .HTTP400Error("Image url is not allowed to be changed");
+        if (post.image_url) {
+            throw api_exception_1.default.HTTP400Error("Image url is not allowed to be changed");
+        }
         // If the post is not found, return an error
         const data = await this.postRepository.findPostsByPostId(post_id);
         if (!data)
@@ -107,8 +108,9 @@ class PostService {
     });
     checkUserLikeStatusForPost = this.wrap.serviceWrap(async (like) => {
         // check if the arguments is provided
-        if (like.post_id || like.user_id)
+        if (!like?.post_id || !like?.user_id) {
             throw api_exception_1.default.HTTP400Error("No arguments provided");
+        }
         // If the user is not found, return an error
         const isUserExist = await this.userRepository.findUserById(like.user_id);
         if (!isUserExist)
@@ -122,8 +124,9 @@ class PostService {
     });
     toggleUserLikeForPost = this.wrap.serviceWrap(async (like) => {
         // check if the arguments is provided
-        if (like.post_id || like.user_id)
+        if (!like.post_id || !like.user_id) {
             throw api_exception_1.default.HTTP400Error("No arguments provided");
+        }
         // If the post is not found, return an error
         await this.postRepository.findPostsByPostId(like.post_id);
         // Check to see if the user already likes the post.

@@ -18,16 +18,21 @@ class PostService implements IPostService {
   private cloudinary: CloudinaryService;
   private wrap: AsyncWrapper = new AsyncWrapper();
 
-  constructor(postRepository: PostRepository, userRepository: UserRepository, cloudinary: CloudinaryService) {
+  constructor(
+    postRepository: PostRepository,
+    userRepository: UserRepository,
+    cloudinary: CloudinaryService
+  ) {
     this.postRepository = postRepository;
     this.userRepository = userRepository;
-    this.cloudinary     = cloudinary;
-  }
+    this.cloudinary = cloudinary;
+  };
 
   public findPostsByPostId = this.wrap.serviceWrap(
     async (post_id: number): Promise<SelectPosts | undefined> => {
       // Check if the post_id is provided
       if (!post_id) throw ApiErrorException.HTTP400Error("No arguments provided");
+        
 
       // If the post is not found, return an error
       const data = await this.postRepository.findPostsByPostId(post_id);
@@ -42,7 +47,7 @@ class PostService implements IPostService {
     async (user_id: number): Promise<SelectPosts[]> => {
       // Check if the user_id is provided
       if (!user_id) throw ApiErrorException.HTTP400Error("No arguments provided");
-
+      
       // If the user is not found, return an error
       const isUserExist = await this.userRepository.findUserById(user_id);
       if (!isUserExist) throw ApiErrorException.HTTP404Error("User not found");
@@ -56,7 +61,7 @@ class PostService implements IPostService {
     async (user_id: number): Promise<string | number | bigint> => {
       // Check if the user_id is provided
       if (!user_id) throw ApiErrorException.HTTP400Error("No arguments provided");
-
+      
       // If the user is not found, return an error
       const isUserExist = await this.userRepository.findUserById(user_id);
       if (!isUserExist) throw ApiErrorException.HTTP404Error("User not found");
@@ -80,7 +85,8 @@ class PostService implements IPostService {
       if (!isUserExist) throw ApiErrorException.HTTP404Error("User not found");
 
       const path = join(file.destination, file.filename);
-      const { image_id, image_url } = await this.cloudinary.uploadAndDeleteLocal(path);
+      const { image_id, image_url } =
+        await this.cloudinary.uploadAndDeleteLocal(path);
 
       // Create a new post
       await this.postRepository.newPost({
@@ -97,8 +103,11 @@ class PostService implements IPostService {
     async (post_id: number, post: UpdatePosts): Promise<string | undefined> => {
       // Check if the arguments is provided
       if (!post_id) throw ApiErrorException.HTTP400Error("No arguments provided");
-      if (post.image_url) throw ApiErrorException
-        .HTTP400Error("Image url is not allowed to be changed");
+      if (post.image_url) {
+        throw ApiErrorException.HTTP400Error(
+          "Image url is not allowed to be changed"
+        );
+      }
 
       // If the post is not found, return an error
       const data = await this.postRepository.findPostsByPostId(post_id);
@@ -140,15 +149,18 @@ class PostService implements IPostService {
   public checkUserLikeStatusForPost = this.wrap.serviceWrap(
     async (like: SelectLikes): Promise<SelectLikes | undefined> => {
       // check if the arguments is provided
-      if (like.post_id || like.user_id)
+      if (!like?.post_id || !like?.user_id) {
         throw ApiErrorException.HTTP400Error("No arguments provided");
+      }
 
       // If the user is not found, return an error
       const isUserExist = await this.userRepository.findUserById(like.user_id);
       if (!isUserExist) throw ApiErrorException.HTTP404Error("User not found");
 
       // If the post is not found, return an error
-      const isPostExist = await this.postRepository.findPostsByPostId(like.post_id);
+      const isPostExist = await this.postRepository.findPostsByPostId(
+        like.post_id
+      );
       if (!isPostExist) throw ApiErrorException.HTTP404Error("Post not found");
 
       // If the post is not found, return an error
@@ -159,8 +171,9 @@ class PostService implements IPostService {
   public toggleUserLikeForPost = this.wrap.serviceWrap(
     async (like: SelectLikes): Promise<string> => {
       // check if the arguments is provided
-      if (like.post_id || like.user_id)
+      if (!like.post_id || !like.user_id) {
         throw ApiErrorException.HTTP400Error("No arguments provided");
+      }
 
       // If the post is not found, return an error
       await this.postRepository.findPostsByPostId(like.post_id);
