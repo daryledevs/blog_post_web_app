@@ -23,7 +23,7 @@ class ChatServices implements IChatService {
       listId: number[]
     ): Promise<ChatHistoryByIdType[]> => {
       // If no user id is provided, return an error
-      if (!userId) throw ApiErrorException.HTTP400Error("User id is required");
+      if (!userId) throw ApiErrorException.HTTP400Error("No arguments provided");
 
       // If the user is not found, return an error
       const isUserExist = await this.userRepository.findUserById(userId);
@@ -40,7 +40,7 @@ class ChatServices implements IChatService {
   public getChatMessages = this.wrap.serviceWrap(
     async (chatId: number, listId: number[]): Promise<SelectMessages[]> => {
       // If no chat id is provided, return an error
-      if (!chatId) throw ApiErrorException.HTTP400Error("Chat id is required");
+      if (!chatId) throw ApiErrorException.HTTP400Error("No arguments provided");
 
       // Check if the chat exists
       const data = await this.chatRepository
@@ -61,7 +61,7 @@ class ChatServices implements IChatService {
       messageData: MessageDataType
     ): Promise<string> => {
       // If no conversation id is provided, return an error
-      if (!conversation_id) throw ApiErrorException.HTTP400Error("Conversation id is required");
+      if (!conversation_id) throw ApiErrorException.HTTP400Error("No arguments provided");
       let newConversationId: any = conversation_id;
 
       // Check if the conversation exists
@@ -84,7 +84,7 @@ class ChatServices implements IChatService {
   public deleteConversation = this.wrap.serviceWrap(
     async (conversation_id: number): Promise<string> => {
       // If no conversation id is provided, return an error
-      if (!conversation_id) throw ApiErrorException.HTTP400Error("Conversation id is required");
+      if (!conversation_id) throw ApiErrorException.HTTP400Error("No arguments provided");
 
       // Check if the conversation exists
       const conversation = await this.chatRepository

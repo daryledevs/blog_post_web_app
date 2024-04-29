@@ -16,7 +16,7 @@ class ChatServices {
     getChatHistory = this.wrap.serviceWrap(async (userId, listId) => {
         // If no user id is provided, return an error
         if (!userId)
-            throw api_exception_1.default.HTTP400Error("User id is required");
+            throw api_exception_1.default.HTTP400Error("No arguments provided");
         // If the user is not found, return an error
         const isUserExist = await this.userRepository.findUserById(userId);
         if (!isUserExist)
@@ -27,7 +27,7 @@ class ChatServices {
     getChatMessages = this.wrap.serviceWrap(async (chatId, listId) => {
         // If no chat id is provided, return an error
         if (!chatId)
-            throw api_exception_1.default.HTTP400Error("Chat id is required");
+            throw api_exception_1.default.HTTP400Error("No arguments provided");
         // Check if the chat exists
         const data = await this.chatRepository
             .findConversationByConversationId(chatId);
@@ -41,7 +41,7 @@ class ChatServices {
     newMessageAndConversation = this.wrap.serviceWrap(async (conversation_id, messageData) => {
         // If no conversation id is provided, return an error
         if (!conversation_id)
-            throw api_exception_1.default.HTTP400Error("Conversation id is required");
+            throw api_exception_1.default.HTTP400Error("No arguments provided");
         let newConversationId = conversation_id;
         // Check if the conversation exists
         const conversation = await this.chatRepository
@@ -59,7 +59,7 @@ class ChatServices {
     deleteConversation = this.wrap.serviceWrap(async (conversation_id) => {
         // If no conversation id is provided, return an error
         if (!conversation_id)
-            throw api_exception_1.default.HTTP400Error("Conversation id is required");
+            throw api_exception_1.default.HTTP400Error("No arguments provided");
         // Check if the conversation exists
         const conversation = await this.chatRepository
             .findConversationByConversationId(conversation_id);
