@@ -70,6 +70,12 @@ class GenerateMockData {
     privacy_level: faker.string.fromCharacters(["public", "private"]),
     created_at: new Date(faker.date.past().toISOString()),
   });
+
+  static createLike = (post_id: number, user_id: number): any => ({
+    post_id: post_id,
+    user_id: user_id,
+    created_at: new Date(faker.date.past().toISOString()),
+  });
 };
 
 export default GenerateMockData;
