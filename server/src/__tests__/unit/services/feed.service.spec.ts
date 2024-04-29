@@ -2,7 +2,7 @@
 import FeedService                                           from "@/services/feed/feed.service.impl";
 import FeedRepository                                        from "@/repositories/feed/feed.repository.impl";
 import UserRepository                                        from "@/repositories/user/user.repository.impl";
-import ErrorException                                        from "@/exceptions/api.exception";
+import ApiErrorException                                     from "@/exceptions/api.exception";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import GenerateMockData from "../../utils/generate-data.util";
 
@@ -15,11 +15,10 @@ describe("FeedService", () =>  {
   let userRepository: UserRepository;
   let feedService: FeedService;
 
-  const noArgsMsgError: ErrorException = 
-    ErrorException.HTTP400Error("No arguments provided");
-
-  const userNotFoundMsgError: ErrorException =
-    ErrorException.HTTP400Error("User not found");
+  const error = {
+    noArgsMsg: ApiErrorException.HTTP400Error("No arguments provided"),
+    userNotFoundMsg: ApiErrorException.HTTP400Error("User not found"),
+  };
 
   const users = GenerateMockData.createUserList(10);
   const existingUser = users[0]!;
@@ -67,7 +66,7 @@ describe("FeedService", () =>  {
 
       await expect(
         feedService.getUserFeed(undefined as any, [])
-      ).rejects.toThrow(noArgsMsgError);
+      ).rejects.toThrow(error.noArgsMsg);
 
       expect(userRepository.findUserById).not.toHaveBeenCalled();
       expect(feedRepository.getUserFeed).not.toHaveBeenCalled();
@@ -79,7 +78,7 @@ describe("FeedService", () =>  {
 
       await expect(
         feedService.getUserFeed(nonExistingUser.user_id, [])
-      ).rejects.toThrow(userNotFoundMsgError);
+      ).rejects.toThrow(error.userNotFoundMsg);
 
       expect(userRepository.findUserById)
         .toHaveBeenCalledWith(nonExistingUser.user_id);
@@ -112,7 +111,7 @@ describe("FeedService", () =>  {
       
       await expect(
         feedService.getExploreFeed(undefined as any)
-      ).rejects.toThrow(noArgsMsgError);
+      ).rejects.toThrow(error.noArgsMsg);
 
       expect(userRepository.findUserById).not.toHaveBeenCalled();
       expect(feedRepository.getExploreFeed).not.toHaveBeenCalled();
@@ -124,7 +123,7 @@ describe("FeedService", () =>  {
 
       await expect(
         feedService.getExploreFeed(nonExistingUser.user_id)
-      ).rejects.toThrow(userNotFoundMsgError);
+      ).rejects.toThrow(error.userNotFoundMsg);
 
       expect(userRepository.findUserById)
         .toHaveBeenCalledWith(nonExistingUser.user_id);

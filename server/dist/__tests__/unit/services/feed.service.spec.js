@@ -15,8 +15,10 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
     let feedRepository;
     let userRepository;
     let feedService;
-    const noArgsMsgError = api_exception_1.default.HTTP400Error("No arguments provided");
-    const userNotFoundMsgError = api_exception_1.default.HTTP400Error("User not found");
+    const error = {
+        noArgsMsg: api_exception_1.default.HTTP400Error("No arguments provided"),
+        userNotFoundMsg: api_exception_1.default.HTTP400Error("User not found"),
+    };
     const users = generate_data_util_1.default.createUserList(10);
     const existingUser = users[0];
     const nonExistingUser = generate_data_util_1.default.createUser();
@@ -47,14 +49,14 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
         (0, vitest_1.test)("should throw an error if no arguments are provided", async () => {
             userRepository.findUserById = vitest_1.vi.fn();
             feedRepository.getUserFeed = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(feedService.getUserFeed(undefined, [])).rejects.toThrow(noArgsMsgError);
+            await (0, vitest_1.expect)(feedService.getUserFeed(undefined, [])).rejects.toThrow(error.noArgsMsg);
             (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
             (0, vitest_1.expect)(feedRepository.getUserFeed).not.toHaveBeenCalled();
         });
         (0, vitest_1.test)("should throw an error if the user is not found", async () => {
             userRepository.findUserById = vitest_1.vi.fn().mockResolvedValueOnce(null);
             feedRepository.getUserFeed = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(feedService.getUserFeed(nonExistingUser.user_id, [])).rejects.toThrow(userNotFoundMsgError);
+            await (0, vitest_1.expect)(feedService.getUserFeed(nonExistingUser.user_id, [])).rejects.toThrow(error.userNotFoundMsg);
             (0, vitest_1.expect)(userRepository.findUserById)
                 .toHaveBeenCalledWith(nonExistingUser.user_id);
             (0, vitest_1.expect)(feedRepository.getUserFeed).not.toHaveBeenCalled();
@@ -76,14 +78,14 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
         (0, vitest_1.test)("should throw an error if no arguments are provided", async () => {
             userRepository.findUserById = vitest_1.vi.fn();
             feedRepository.getExploreFeed = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(feedService.getExploreFeed(undefined)).rejects.toThrow(noArgsMsgError);
+            await (0, vitest_1.expect)(feedService.getExploreFeed(undefined)).rejects.toThrow(error.noArgsMsg);
             (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
             (0, vitest_1.expect)(feedRepository.getExploreFeed).not.toHaveBeenCalled();
         });
         (0, vitest_1.test)("should throw an error if the user is not found", async () => {
             userRepository.findUserById = vitest_1.vi.fn().mockResolvedValueOnce(null);
             feedRepository.getExploreFeed = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(feedService.getExploreFeed(nonExistingUser.user_id)).rejects.toThrow(userNotFoundMsgError);
+            await (0, vitest_1.expect)(feedService.getExploreFeed(nonExistingUser.user_id)).rejects.toThrow(error.userNotFoundMsg);
             (0, vitest_1.expect)(userRepository.findUserById)
                 .toHaveBeenCalledWith(nonExistingUser.user_id);
             (0, vitest_1.expect)(feedRepository.getExploreFeed).not.toHaveBeenCalled();

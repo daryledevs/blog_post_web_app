@@ -3,11 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
 const user_repository_impl_1 = __importDefault(require("@/repositories/user/user.repository.impl"));
 const follow_service_impl_1 = __importDefault(require("@/services/follow/follow.service.impl"));
 const follow_repository_impl_1 = __importDefault(require("@/repositories/follow/follow.repository.impl"));
 const generate_data_util_1 = __importDefault(require("../../utils/generate-data.util"));
+const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
 const vitest_1 = require("vitest");
 vitest_1.vi.mock("@/repositories/user/user.repository.impl");
 vitest_1.vi.mock("@/repositories/follow/follow.repository.impl");
@@ -15,9 +15,11 @@ vitest_1.vi.mock("@/repositories/follow/follow.repository.impl");
     let userRepository;
     let followRepository;
     let followService;
-    const noArgsMsgError = api_exception_1.default.HTTP400Error("No arguments provided");
-    const userNotFoundMsgError = api_exception_1.default.HTTP400Error("User not found");
-    const followFetchError = api_exception_1.default.HTTP404Error("Invalid fetch parameter");
+    const error = {
+        noArgsMsg: api_exception_1.default.HTTP400Error("No arguments provided"),
+        userNotFoundMsg: api_exception_1.default.HTTP400Error("User not found"),
+        followFetch: api_exception_1.default.HTTP404Error("Invalid fetch parameter"),
+    };
     // Create a mock of the user service
     let users = generate_data_util_1.default.createUserList(10);
     const notFoundUser = generate_data_util_1.default.createUser();
@@ -53,7 +55,7 @@ vitest_1.vi.mock("@/repositories/follow/follow.repository.impl");
         (0, vitest_1.test)("should throw an error when no args are provided", async () => {
             userRepository.findUserById = vitest_1.vi.fn();
             followRepository.getFollowStats = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(followService.getFollowStats(undefined)).rejects.toThrow(noArgsMsgError);
+            await (0, vitest_1.expect)(followService.getFollowStats(undefined)).rejects.toThrow(error.noArgsMsg);
             (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
             (0, vitest_1.expect)(followRepository.getFollowStats).not.toHaveBeenCalled();
         });
@@ -62,7 +64,7 @@ vitest_1.vi.mock("@/repositories/follow/follow.repository.impl");
                 .fn()
                 .mockResolvedValue(null);
             followRepository.getFollowStats = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(followService.getFollowStats(notFoundUser.user_id)).rejects.toThrow(userNotFoundMsgError);
+            await (0, vitest_1.expect)(followService.getFollowStats(notFoundUser.user_id)).rejects.toThrow(error.userNotFoundMsg);
             (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
             (0, vitest_1.expect)(followRepository.getFollowStats).not.toHaveBeenCalled();
         });
@@ -113,7 +115,7 @@ vitest_1.vi.mock("@/repositories/follow/follow.repository.impl");
             userRepository.findUserById = vitest_1.vi.fn();
             followRepository.getFollowersLists = vitest_1.vi.fn();
             followRepository.getFollowingLists = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(followService.getFollowerFollowingLists(undefined, "followers", [0])).rejects.toThrow(noArgsMsgError);
+            await (0, vitest_1.expect)(followService.getFollowerFollowingLists(undefined, "followers", [0])).rejects.toThrow(error.noArgsMsg);
             (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
             (0, vitest_1.expect)(followRepository.getFollowersLists).not.toHaveBeenCalled();
             (0, vitest_1.expect)(followRepository.getFollowingLists).not.toHaveBeenCalled();
@@ -124,7 +126,7 @@ vitest_1.vi.mock("@/repositories/follow/follow.repository.impl");
                 .mockResolvedValue(null);
             followRepository.getFollowersLists = vitest_1.vi.fn();
             followRepository.getFollowingLists = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(followService.getFollowerFollowingLists(notFoundUser.user_id, "following", [0])).rejects.toThrow(userNotFoundMsgError);
+            await (0, vitest_1.expect)(followService.getFollowerFollowingLists(notFoundUser.user_id, "following", [0])).rejects.toThrow(error.userNotFoundMsg);
             (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
             (0, vitest_1.expect)(followRepository.getFollowersLists).not.toHaveBeenCalled();
             (0, vitest_1.expect)(followRepository.getFollowingLists).not.toHaveBeenCalled();
@@ -135,7 +137,7 @@ vitest_1.vi.mock("@/repositories/follow/follow.repository.impl");
                 .mockResolvedValue(existingUser);
             followRepository.getFollowersLists = vitest_1.vi.fn();
             followRepository.getFollowingLists = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(followService.getFollowerFollowingLists(existingUser.user_id, "invalid", [0])).rejects.toThrow(followFetchError);
+            await (0, vitest_1.expect)(followService.getFollowerFollowingLists(existingUser.user_id, "invalid", [0])).rejects.toThrow(error.followFetch);
             (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(existingUser.user_id);
             (0, vitest_1.expect)(followRepository.getFollowersLists).not.toHaveBeenCalled();
             (0, vitest_1.expect)(followRepository.getFollowingLists).not.toHaveBeenCalled();
@@ -199,7 +201,7 @@ vitest_1.vi.mock("@/repositories/follow/follow.repository.impl");
             followRepository.isFollowUser = vitest_1.vi.fn();
             followRepository.followUser = vitest_1.vi.fn();
             followRepository.unfollowUser = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(followService.toggleFollow(noArgs.follower_id, noArgs.followed_id)).rejects.toThrow(noArgsMsgError);
+            await (0, vitest_1.expect)(followService.toggleFollow(noArgs.follower_id, noArgs.followed_id)).rejects.toThrow(error.noArgsMsg);
             (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
             (0, vitest_1.expect)(followRepository.isFollowUser).not.toHaveBeenCalled();
             (0, vitest_1.expect)(followRepository.followUser).not.toHaveBeenCalled();
@@ -216,7 +218,7 @@ vitest_1.vi.mock("@/repositories/follow/follow.repository.impl");
             followRepository.isFollowUser = vitest_1.vi.fn();
             followRepository.followUser = vitest_1.vi.fn();
             followRepository.unfollowUser = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(followService.toggleFollow(notFoundUserArgs.follower_id, notFoundUserArgs.followed_id)).rejects.toThrow(userNotFoundMsgError);
+            await (0, vitest_1.expect)(followService.toggleFollow(notFoundUserArgs.follower_id, notFoundUserArgs.followed_id)).rejects.toThrow(error.userNotFoundMsg);
             (0, vitest_1.expect)(userRepository.findUserById)
                 .toHaveBeenCalledWith(notFoundUserArgs.follower_id);
             (0, vitest_1.expect)(followRepository.isFollowUser).not.toHaveBeenCalled();

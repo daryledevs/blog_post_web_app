@@ -1,9 +1,9 @@
 import UserService                                           from "@/services/user/user.service.impl";
-import ErrorException                                        from "@/exceptions/api.exception";
 import UserRepository                                        from "@/repositories/user/user.repository.impl";
 import { SelectUsers }                                       from "@/types/table.types";
+import GenerateMockData                                      from "../../utils/generate-data.util";
+import ApiErrorException                                     from "@/exceptions/api.exception";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
-import GenerateMockData from "../../utils/generate-data.util";
 
 vi.mock("@/repositories/user/user.repository.impl");
 
@@ -11,11 +11,10 @@ describe("UserService", () => {
   let userService: UserService;
   let userRepository: UserRepository;
 
-  const noArgsMsgError: ErrorException = 
-    ErrorException.HTTP400Error("No arguments provided");
-
-  const userNotFoundMsgError: ErrorException =
-    ErrorException.HTTP400Error("User not found");
+  const error = {
+    noArgsMsg: ApiErrorException.HTTP400Error("No arguments provided"),
+    userNotFoundMsg: ApiErrorException.HTTP400Error("User not found"),
+  };
 
   // Create a mock of the user service
   let users: SelectUsers[] = GenerateMockData.createUserList(10);
@@ -53,7 +52,7 @@ describe("UserService", () => {
 
       await expect(
         userService.getUserById(undefined as any)
-      ).rejects.toThrow(noArgsMsgError);
+      ).rejects.toThrow(error.noArgsMsg);
 
       expect(userRepository.findUserById).not.toHaveBeenCalled();
     });
@@ -65,7 +64,7 @@ describe("UserService", () => {
 
       await expect(
         userService.getUserById(notFoundUser.user_id)
-      ).rejects.toThrow(userNotFoundMsgError);
+      ).rejects.toThrow(error.userNotFoundMsg);
 
       expect(userRepository.findUserById)
         .toHaveBeenCalledWith(notFoundUser.user_id);
@@ -90,7 +89,7 @@ describe("UserService", () => {
 
       await expect(
         userService.getUserByUsername(undefined as any)
-      ).rejects.toThrow(noArgsMsgError);
+      ).rejects.toThrow(error.noArgsMsg);
 
       expect(userRepository.findUserByUsername).not.toHaveBeenCalled();
     });
@@ -102,7 +101,7 @@ describe("UserService", () => {
 
       await expect(
         userService.getUserByUsername(notFoundUser.username)
-      ).rejects.toThrow(userNotFoundMsgError);
+      ).rejects.toThrow(error.userNotFoundMsg);
 
       expect(userRepository.findUserByUsername)
         .toHaveBeenCalledWith(notFoundUser.username);
@@ -125,7 +124,7 @@ describe("UserService", () => {
 
       await expect(
         userService.getUserByEmail(undefined as any)
-      ).rejects.toThrow(noArgsMsgError);
+      ).rejects.toThrow(error.noArgsMsg);
 
       expect(userRepository.findUserByEmail).not.toHaveBeenCalled();
     });
@@ -137,7 +136,7 @@ describe("UserService", () => {
 
       await expect(
         userService.getUserByEmail(notFoundUser.email)
-      ).rejects.toThrow(userNotFoundMsgError);
+      ).rejects.toThrow(error.userNotFoundMsg);
 
       expect(userRepository.findUserByEmail)
         .toHaveBeenCalledWith(notFoundUser.email);
@@ -165,7 +164,7 @@ describe("UserService", () => {
 
       await expect(
         userService.updateUser(undefined as any, existingUser)
-      ).rejects.toThrow(noArgsMsgError);
+      ).rejects.toThrow(error.noArgsMsg);
 
       expect(userRepository.findUserById).not.toHaveBeenCalled();
       expect(userRepository.updateUser).not.toHaveBeenCalled();
@@ -180,7 +179,7 @@ describe("UserService", () => {
 
       await expect(
         userService.updateUser(notFoundUser.user_id, notFoundUser)
-      ).rejects.toThrow(userNotFoundMsgError);
+      ).rejects.toThrow(error.userNotFoundMsg);
 
       expect(userRepository.findUserById)
         .toHaveBeenCalledWith(notFoundUser.user_id);
@@ -213,7 +212,7 @@ describe("UserService", () => {
 
       await expect(
         userService.deleteUserById(undefined as any)
-      ).rejects.toThrow(noArgsMsgError);
+      ).rejects.toThrow(error.noArgsMsg);
 
       expect(userRepository.findUserById).not.toHaveBeenCalled();
       expect(userRepository.deleteUser).not.toHaveBeenCalled();
@@ -228,7 +227,7 @@ describe("UserService", () => {
 
       await expect(
         userService.deleteUserById(notFoundUser.user_id)
-      ).rejects.toThrow(userNotFoundMsgError);
+      ).rejects.toThrow(error.userNotFoundMsg);
 
       expect(userRepository.findUserById)
         .toHaveBeenCalledWith(notFoundUser.user_id);
@@ -329,7 +328,7 @@ describe("UserService", () => {
 
       await expect(
         userService.searchUserByFields(undefined as any)
-      ).rejects.toThrow(noArgsMsgError);
+      ).rejects.toThrow(error.noArgsMsg);
 
       expect(userRepository.searchUsersByQuery).not.toHaveBeenCalled();
     });

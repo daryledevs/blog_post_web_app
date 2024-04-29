@@ -1,6 +1,6 @@
-import ErrorException                                        from "@/exceptions/api.exception";
 import UserRepository                                        from "@/repositories/user/user.repository.impl";
 import GenerateMockData                                      from "../../utils/generate-data.util";
+import ApiErrorException                                     from "@/exceptions/api.exception";
 import RecentSearchService                                   from "@/services/recent-search/recent-search.service.impl";
 import RecentSearchRepository                                from "@/repositories/recent-search/recent-search.repository.impl";
 import { SelectSearches, SelectUsers }                       from "@/types/table.types";
@@ -15,17 +15,14 @@ describe("RecentSearchService", () => {
   let recentSearchRepository: RecentSearchRepository;
   let recentSearchService: RecentSearchService;
 
-  const noArgsMsgError: ErrorException = 
-    ErrorException.HTTP400Error("No arguments provided");
-
-  const userNotFoundMsgError: ErrorException = 
-    ErrorException.HTTP400Error("User not found");
-
-  const searchUserNotFoundError: ErrorException = 
-    ErrorException.HTTP404Error("Search user not found");
-
-  const recentSearchNotFoundError: ErrorException = 
-    ErrorException.HTTP404Error("Recent search not found");
+  const error = {
+    noArgsMsg: ApiErrorException.HTTP400Error("No arguments provided"),
+    userNotFoundMsg: ApiErrorException.HTTP400Error("User not found"),
+    searchUserNotFound: ApiErrorException.HTTP404Error("Search user not found"),
+    recentSearchNotFound: ApiErrorException.HTTP404Error(
+      "Recent search not found"
+    ),
+  };
 
   // Create a mock of the user service
   let users: SelectUsers[] = GenerateMockData.createUserList(10);
@@ -97,7 +94,7 @@ describe("RecentSearchService", () => {
 
       await expect(
         recentSearchService.getAllRecentSearches(undefined as any)
-      ).rejects.toThrow(noArgsMsgError);
+      ).rejects.toThrow(error.noArgsMsg);
 
       expect(userRepository.findUserById)
         .not.toHaveBeenCalled();
@@ -115,7 +112,7 @@ describe("RecentSearchService", () => {
 
       await expect(
         recentSearchService.getAllRecentSearches(notFoundUser.user_id)
-      ).rejects.toThrow(userNotFoundMsgError);
+      ).rejects.toThrow(error.userNotFoundMsg);
 
       expect(userRepository.findUserById)
         .toHaveBeenCalledWith(notFoundUser.user_id);
@@ -200,7 +197,7 @@ describe("RecentSearchService", () => {
           undefined as any,
           existingUser.user_id
         )
-      ).rejects.toThrow(noArgsMsgError);
+      ).rejects.toThrow(error.noArgsMsg);
 
       expect(userRepository.findUserById).not.toHaveBeenCalled();
       expect(recentSearchRepository.saveRecentSearches).not.toHaveBeenCalled();
@@ -218,7 +215,7 @@ describe("RecentSearchService", () => {
           notFoundUser.user_id,
           existingUser.user_id
         )
-      ).rejects.toThrow(userNotFoundMsgError);
+      ).rejects.toThrow(error.userNotFoundMsg);
 
       expect(userRepository.findUserById)
         .toHaveBeenCalledWith(notFoundUser.user_id);
@@ -240,7 +237,7 @@ describe("RecentSearchService", () => {
           existingSearch?.user_id,
           notFoundSearch.search_user_id
         )
-      ).rejects.toThrow(searchUserNotFoundError);
+      ).rejects.toThrow(error.searchUserNotFound);
 
       expect(userRepository.findUserById)
         .toHaveBeenCalledWith(existingSearch?.user_id);
@@ -278,7 +275,7 @@ describe("RecentSearchService", () => {
 
       await expect(
         recentSearchService.removeRecentSearches(undefined as any)
-      ).rejects.toThrow(noArgsMsgError);
+      ).rejects.toThrow(error.noArgsMsg);
 
       expect(recentSearchRepository.findUsersSearchByRecentId)
         .not.toHaveBeenCalled();
@@ -296,7 +293,7 @@ describe("RecentSearchService", () => {
       
       await expect(
         recentSearchService.removeRecentSearches(notFoundSearch.user_id)
-      ).rejects.toThrow(recentSearchNotFoundError);
+      ).rejects.toThrow(error.recentSearchNotFound);
 
       expect(recentSearchRepository.findUsersSearchByRecentId)
         .toHaveBeenCalledWith(notFoundSearch.user_id);

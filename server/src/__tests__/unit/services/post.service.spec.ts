@@ -1,10 +1,10 @@
 import { join }                                              from "path";
 import { faker }                                             from "@faker-js/faker";
 import PostService                                           from "@/services/post/post.service.impl";
-import ErrorException                                        from "@/exceptions/api.exception";
 import UserRepository                                        from "@/repositories/user/user.repository.impl";
 import PostRepository                                        from "@/repositories/post/post.repository.impl";
 import GenerateMockData                                      from "../../utils/generate-data.util";
+import ApiErrorException                                     from "@/exceptions/api.exception";
 import CloudinaryService                                     from "@/utils/cloudinary-service.util";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 
@@ -20,14 +20,11 @@ describe("FeedService", () => {
   let userRepository: UserRepository;
   let postService: PostService;
 
-  const noArgsMsgError: ErrorException = 
-    ErrorException.HTTP400Error("No arguments provided");
-
-  const userNotFoundMsgError: ErrorException = 
-    ErrorException.HTTP400Error("User not found");
-
-  const postNotFoundMsgError: ErrorException =
-    ErrorException.HTTP400Error("Post not found");
+  const error = {
+    noArgsMsg: ApiErrorException.HTTP400Error("No arguments provided"),
+    userNotFoundMsg: ApiErrorException.HTTP400Error("User not found"),
+    postNotFoundMsg: ApiErrorException.HTTP400Error("Post not found"),
+  };
 
   const users = GenerateMockData.createUserList(10);
   const existingUser = users[0]!;
@@ -74,7 +71,7 @@ describe("FeedService", () => {
 
       await expect(
         postService.findPostsByPostId(null as any)
-      ).rejects.toThrow(noArgsMsgError);
+      ).rejects.toThrow(error.noArgsMsg);
 
       expect(postRepository.findPostsByPostId).not.toHaveBeenCalled();
     });
@@ -84,7 +81,7 @@ describe("FeedService", () => {
 
       await expect(
         postService.findPostsByPostId(nonExistingPost.post_id)
-      ).rejects.toThrow(postNotFoundMsgError);
+      ).rejects.toThrow(error.postNotFoundMsg);
 
       expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(nonExistingPost.post_id);
     });
@@ -107,7 +104,7 @@ describe("FeedService", () => {
 
       await expect(
         postService.getUserPosts(null as any)
-      ).rejects.toThrow(noArgsMsgError);
+      ).rejects.toThrow(error.noArgsMsg);
 
       expect(userRepository.findUserById).not.toHaveBeenCalled();
     });
@@ -117,7 +114,7 @@ describe("FeedService", () => {
 
       await expect(
         postService.getUserPosts(notFoundUser.user_id)
-      ).rejects.toThrow(userNotFoundMsgError);
+      ).rejects.toThrow(error.userNotFoundMsg);
 
       expect(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
     });
@@ -141,7 +138,7 @@ describe("FeedService", () => {
 
       await expect(
         postService.getUserTotalPosts(undefined))
-      .rejects.toThrow(noArgsMsgError);
+      .rejects.toThrow(error.noArgsMsg);
 
       expect(userRepository.findUserById).not.toHaveBeenCalled();
       expect(postRepository.getUserTotalPosts).not.toHaveBeenCalled();
@@ -153,7 +150,7 @@ describe("FeedService", () => {
 
       await expect(
         postService.getUserTotalPosts(notFoundUser.user_id))
-      .rejects.toThrow(userNotFoundMsgError);
+      .rejects.toThrow(error.userNotFoundMsg);
 
       expect(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
       expect(postRepository.getUserTotalPosts).not.toHaveBeenCalled();
@@ -220,7 +217,7 @@ describe("FeedService", () => {
 
       await expect(
         postService.newPost(file, undefined))
-      .rejects.toThrow(noArgsMsgError);
+      .rejects.toThrow(error.noArgsMsg);
 
       expect(userRepository.findUserById).not.toHaveBeenCalled();
       expect(postRepository.newPost).not.toHaveBeenCalled();
@@ -259,7 +256,7 @@ describe("FeedService", () => {
 
       await expect(
         postService.newPost(file, rest))
-      .rejects.toThrow(userNotFoundMsgError);
+      .rejects.toThrow(error.userNotFoundMsg);
 
       expect(userRepository.findUserById).toHaveBeenCalledWith(existingPost.user_id);
       expect(postRepository.newPost).not.toHaveBeenCalled();
@@ -286,7 +283,7 @@ describe("FeedService", () => {
 
       await expect(
         postService.editPost(undefined, undefined))
-      .rejects.toThrow(noArgsMsgError);
+      .rejects.toThrow(error.noArgsMsg);
 
       expect(postRepository.findPostsByPostId).not.toHaveBeenCalled();
       expect(postRepository.editPost).not.toHaveBeenCalled();
@@ -300,7 +297,7 @@ describe("FeedService", () => {
 
       await expect(
         postService.editPost(rest.post_id, rest)
-      ).rejects.toThrow(postNotFoundMsgError);
+      ).rejects.toThrow(error.postNotFoundMsg);
 
       expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(rest.post_id);
       expect(postRepository.editPost).not.toHaveBeenCalled();
@@ -325,7 +322,7 @@ describe("FeedService", () => {
 
       await expect(
         postService.deletePost(undefined))
-      .rejects.toThrow(noArgsMsgError);
+      .rejects.toThrow(error.noArgsMsg);
 
       expect(postRepository.findPostsByPostId).not.toHaveBeenCalled();
       expect(postRepository.deletePost).not.toHaveBeenCalled();
@@ -337,7 +334,7 @@ describe("FeedService", () => {
 
       await expect(
         postService.deletePost(nonExistingPost.post_id))
-      .rejects.toThrow(postNotFoundMsgError);
+      .rejects.toThrow(error.postNotFoundMsg);
 
       expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(nonExistingPost.post_id);
       expect(postRepository.deletePost).not.toHaveBeenCalled();
@@ -362,7 +359,7 @@ describe("FeedService", () => {
 
       await expect(
         postService.getLikesCountForPost(undefined))
-      .rejects.toThrow(noArgsMsgError);
+      .rejects.toThrow(error.noArgsMsg);
 
       expect(postRepository.findPostsByPostId).not.toHaveBeenCalled();
       expect(postRepository.getLikesCountForPost).not.toHaveBeenCalled();
@@ -374,7 +371,7 @@ describe("FeedService", () => {
 
       await expect(
         postService.getLikesCountForPost(nonExistingPost.post_id))
-      .rejects.toThrow(postNotFoundMsgError);
+      .rejects.toThrow(error.postNotFoundMsg);
 
       expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(nonExistingPost.post_id);
       expect(postRepository.getLikesCountForPost).not.toHaveBeenCalled();
@@ -407,7 +404,7 @@ describe("FeedService", () => {
 
       await expect(
         postService.checkUserLikeStatusForPost(undefined))
-      .rejects.toThrow(noArgsMsgError);
+      .rejects.toThrow(error.noArgsMsg);
 
       expect(userRepository.findUserById).not.toHaveBeenCalled();
       expect(postRepository.findPostsByPostId).not.toHaveBeenCalled();
@@ -426,7 +423,7 @@ describe("FeedService", () => {
 
       await expect(
         postService.checkUserLikeStatusForPost(like))
-      .rejects.toThrow(userNotFoundMsgError);
+      .rejects.toThrow(error.userNotFoundMsg);
 
       expect(userRepository.findUserById).toHaveBeenCalledWith(like.user_id);
       expect(postRepository.findPostsByPostId).not.toHaveBeenCalled();
@@ -445,7 +442,7 @@ describe("FeedService", () => {
 
       await expect(
         postService.checkUserLikeStatusForPost(like))
-      .rejects.toThrow(postNotFoundMsgError);
+      .rejects.toThrow(error.postNotFoundMsg);
 
       expect(userRepository.findUserById).toHaveBeenCalledWith(like.user_id);
       expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(like.post_id);
@@ -526,7 +523,7 @@ describe("FeedService", () => {
 
       await expect(
         postService.toggleUserLikeForPost(undefined))
-      .rejects.toThrow(noArgsMsgError);
+      .rejects.toThrow(error.noArgsMsg);
 
       expect(userRepository.findUserById).not.toHaveBeenCalled();
       expect(postRepository.findPostsByPostId).not.toHaveBeenCalled();
@@ -549,7 +546,7 @@ describe("FeedService", () => {
 
       await expect(
         postService.toggleUserLikeForPost(like))
-      .rejects.toThrow(userNotFoundMsgError);
+      .rejects.toThrow(error.userNotFoundMsg);
 
       expect(userRepository.findUserById).toHaveBeenCalledWith(like.user_id);
       expect(postRepository.findPostsByPostId).not.toHaveBeenCalled();

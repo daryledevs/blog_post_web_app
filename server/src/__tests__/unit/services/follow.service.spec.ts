@@ -1,8 +1,8 @@
-import ErrorException                                        from "@/exceptions/api.exception";
 import UserRepository                                        from "@/repositories/user/user.repository.impl";
 import FollowService                                         from "@/services/follow/follow.service.impl";
 import FollowRepository                                      from "@/repositories/follow/follow.repository.impl";
 import GenerateMockData                                      from "../../utils/generate-data.util";
+import ApiErrorException                                     from "@/exceptions/api.exception";
 import { SelectFollowers, SelectUsers }                      from "@/types/table.types";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 
@@ -15,14 +15,11 @@ describe('FollowService', () => {
   let followRepository: FollowRepository;
   let followService:    FollowService;
 
-  const noArgsMsgError: ErrorException = 
-    ErrorException.HTTP400Error("No arguments provided");
-
-  const userNotFoundMsgError: ErrorException = 
-    ErrorException.HTTP400Error("User not found");
-
-  const followFetchError: ErrorException = 
-    ErrorException.HTTP404Error("Invalid fetch parameter");
+  const error = {
+    noArgsMsg: ApiErrorException.HTTP400Error("No arguments provided"),
+    userNotFoundMsg: ApiErrorException.HTTP400Error("User not found"),
+    followFetch: ApiErrorException.HTTP404Error("Invalid fetch parameter"),
+  };
 
   // Create a mock of the user service
   let users: SelectUsers[] = GenerateMockData.createUserList(10);
@@ -76,7 +73,7 @@ describe('FollowService', () => {
 
       await expect(
         followService.getFollowStats(undefined as any)
-      ).rejects.toThrow(noArgsMsgError);
+      ).rejects.toThrow(error.noArgsMsg);
 
       expect(userRepository.findUserById).not.toHaveBeenCalled();
       expect(followRepository.getFollowStats).not.toHaveBeenCalled();
@@ -91,7 +88,7 @@ describe('FollowService', () => {
 
       await expect(
         followService.getFollowStats(notFoundUser.user_id)
-      ).rejects.toThrow(userNotFoundMsgError);
+      ).rejects.toThrow(error.userNotFoundMsg);
 
       expect(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
       expect(followRepository.getFollowStats).not.toHaveBeenCalled();
@@ -173,7 +170,7 @@ describe('FollowService', () => {
       
       await expect(
         followService.getFollowerFollowingLists(undefined as any, "followers", [0])
-      ).rejects.toThrow(noArgsMsgError);
+      ).rejects.toThrow(error.noArgsMsg);
 
       expect(userRepository.findUserById).not.toHaveBeenCalled();
       expect(followRepository.getFollowersLists).not.toHaveBeenCalled();
@@ -190,7 +187,7 @@ describe('FollowService', () => {
 
       await expect(
         followService.getFollowerFollowingLists(notFoundUser.user_id, "following", [0])
-      ).rejects.toThrow(userNotFoundMsgError);
+      ).rejects.toThrow(error.userNotFoundMsg);
 
       expect(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
       expect(followRepository.getFollowersLists).not.toHaveBeenCalled();
@@ -207,7 +204,7 @@ describe('FollowService', () => {
         
       await expect(
         followService.getFollowerFollowingLists(existingUser.user_id, "invalid", [0])
-      ).rejects.toThrow(followFetchError);
+      ).rejects.toThrow(error.followFetch);
 
       expect(userRepository.findUserById).toHaveBeenCalledWith(existingUser.user_id);
       expect(followRepository.getFollowersLists).not.toHaveBeenCalled();
@@ -291,7 +288,7 @@ describe('FollowService', () => {
       
       await expect(
         followService.toggleFollow(noArgs.follower_id, noArgs.followed_id)
-      ).rejects.toThrow(noArgsMsgError);
+      ).rejects.toThrow(error.noArgsMsg);
 
       expect(userRepository.findUserById).not.toHaveBeenCalled();
       expect(followRepository.isFollowUser).not.toHaveBeenCalled();
@@ -318,7 +315,7 @@ describe('FollowService', () => {
           notFoundUserArgs.follower_id,
           notFoundUserArgs.followed_id
         )
-      ).rejects.toThrow(userNotFoundMsgError)
+      ).rejects.toThrow(error.userNotFoundMsg)
 
       expect(userRepository.findUserById)
         .toHaveBeenCalledWith(notFoundUserArgs.follower_id);

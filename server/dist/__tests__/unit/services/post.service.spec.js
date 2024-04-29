@@ -6,10 +6,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const path_1 = require("path");
 const faker_1 = require("@faker-js/faker");
 const post_service_impl_1 = __importDefault(require("@/services/post/post.service.impl"));
-const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
 const user_repository_impl_1 = __importDefault(require("@/repositories/user/user.repository.impl"));
 const post_repository_impl_1 = __importDefault(require("@/repositories/post/post.repository.impl"));
 const generate_data_util_1 = __importDefault(require("../../utils/generate-data.util"));
+const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
 const cloudinary_service_util_1 = __importDefault(require("@/utils/cloudinary-service.util"));
 const vitest_1 = require("vitest");
 vitest_1.vi.mock("@/repositories/feed/feed.repository.impl");
@@ -20,9 +20,11 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
     let postRepository;
     let userRepository;
     let postService;
-    const noArgsMsgError = api_exception_1.default.HTTP400Error("No arguments provided");
-    const userNotFoundMsgError = api_exception_1.default.HTTP400Error("User not found");
-    const postNotFoundMsgError = api_exception_1.default.HTTP400Error("Post not found");
+    const error = {
+        noArgsMsg: api_exception_1.default.HTTP400Error("No arguments provided"),
+        userNotFoundMsg: api_exception_1.default.HTTP400Error("User not found"),
+        postNotFoundMsg: api_exception_1.default.HTTP400Error("Post not found"),
+    };
     const users = generate_data_util_1.default.createUserList(10);
     const existingUser = users[0];
     const notFoundUser = generate_data_util_1.default.createUser();
@@ -50,12 +52,12 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
         });
         (0, vitest_1.test)("should throw an error if no args provided", async () => {
             postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(null);
-            await (0, vitest_1.expect)(postService.findPostsByPostId(null)).rejects.toThrow(noArgsMsgError);
+            await (0, vitest_1.expect)(postService.findPostsByPostId(null)).rejects.toThrow(error.noArgsMsg);
             (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toHaveBeenCalled();
         });
         (0, vitest_1.test)("should throw an error if post not found", async () => {
             postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(null);
-            await (0, vitest_1.expect)(postService.findPostsByPostId(nonExistingPost.post_id)).rejects.toThrow(postNotFoundMsgError);
+            await (0, vitest_1.expect)(postService.findPostsByPostId(nonExistingPost.post_id)).rejects.toThrow(error.postNotFoundMsg);
             (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(nonExistingPost.post_id);
         });
     });
@@ -70,12 +72,12 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
         });
         (0, vitest_1.test)("should throw an error if no args provided", async () => {
             userRepository.findUserById = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(postService.getUserPosts(null)).rejects.toThrow(noArgsMsgError);
+            await (0, vitest_1.expect)(postService.getUserPosts(null)).rejects.toThrow(error.noArgsMsg);
             (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
         });
         (0, vitest_1.test)("should throw an error if user not found", async () => {
             userRepository.findUserById = vitest_1.vi.fn().mockResolvedValue(null);
-            await (0, vitest_1.expect)(postService.getUserPosts(notFoundUser.user_id)).rejects.toThrow(userNotFoundMsgError);
+            await (0, vitest_1.expect)(postService.getUserPosts(notFoundUser.user_id)).rejects.toThrow(error.userNotFoundMsg);
             (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
         });
     });
@@ -92,7 +94,7 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
             userRepository.findUserById = vitest_1.vi.fn();
             postRepository.getUserTotalPosts = vitest_1.vi.fn();
             await (0, vitest_1.expect)(postService.getUserTotalPosts(undefined))
-                .rejects.toThrow(noArgsMsgError);
+                .rejects.toThrow(error.noArgsMsg);
             (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
             (0, vitest_1.expect)(postRepository.getUserTotalPosts).not.toHaveBeenCalled();
         });
@@ -100,7 +102,7 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
             userRepository.findUserById = vitest_1.vi.fn().mockResolvedValue(undefined);
             postRepository.getUserTotalPosts = vitest_1.vi.fn();
             await (0, vitest_1.expect)(postService.getUserTotalPosts(notFoundUser.user_id))
-                .rejects.toThrow(userNotFoundMsgError);
+                .rejects.toThrow(error.userNotFoundMsg);
             (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
             (0, vitest_1.expect)(postRepository.getUserTotalPosts).not.toHaveBeenCalled();
         });
@@ -151,7 +153,7 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
             postRepository.newPost = vitest_1.vi.fn();
             cloudinary.uploadAndDeleteLocal = vitest_1.vi.fn();
             await (0, vitest_1.expect)(postService.newPost(file, undefined))
-                .rejects.toThrow(noArgsMsgError);
+                .rejects.toThrow(error.noArgsMsg);
             (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
             (0, vitest_1.expect)(postRepository.newPost).not.toHaveBeenCalled();
             (0, vitest_1.expect)(cloudinary.uploadAndDeleteLocal).not.toHaveBeenCalled();
@@ -181,7 +183,7 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
             postRepository.newPost = vitest_1.vi.fn();
             cloudinary.uploadAndDeleteLocal = vitest_1.vi.fn();
             await (0, vitest_1.expect)(postService.newPost(file, rest))
-                .rejects.toThrow(userNotFoundMsgError);
+                .rejects.toThrow(error.userNotFoundMsg);
             (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(existingPost.user_id);
             (0, vitest_1.expect)(postRepository.newPost).not.toHaveBeenCalled();
             (0, vitest_1.expect)(cloudinary.uploadAndDeleteLocal).not.toHaveBeenCalled();
@@ -201,7 +203,7 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
             postRepository.findPostsByPostId = vitest_1.vi.fn();
             postRepository.editPost = vitest_1.vi.fn();
             await (0, vitest_1.expect)(postService.editPost(undefined, undefined))
-                .rejects.toThrow(noArgsMsgError);
+                .rejects.toThrow(error.noArgsMsg);
             (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toHaveBeenCalled();
             (0, vitest_1.expect)(postRepository.editPost).not.toHaveBeenCalled();
         });
@@ -209,7 +211,7 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
             postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(undefined);
             postRepository.editPost = vitest_1.vi.fn();
             const { image_url, image_id, ...rest } = nonExistingPost;
-            await (0, vitest_1.expect)(postService.editPost(rest.post_id, rest)).rejects.toThrow(postNotFoundMsgError);
+            await (0, vitest_1.expect)(postService.editPost(rest.post_id, rest)).rejects.toThrow(error.postNotFoundMsg);
             (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(rest.post_id);
             (0, vitest_1.expect)(postRepository.editPost).not.toHaveBeenCalled();
         });
@@ -227,7 +229,7 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
             postRepository.findPostsByPostId = vitest_1.vi.fn();
             postRepository.deletePost = vitest_1.vi.fn();
             await (0, vitest_1.expect)(postService.deletePost(undefined))
-                .rejects.toThrow(noArgsMsgError);
+                .rejects.toThrow(error.noArgsMsg);
             (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toHaveBeenCalled();
             (0, vitest_1.expect)(postRepository.deletePost).not.toHaveBeenCalled();
         });
@@ -235,7 +237,7 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
             postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(undefined);
             postRepository.deletePost = vitest_1.vi.fn();
             await (0, vitest_1.expect)(postService.deletePost(nonExistingPost.post_id))
-                .rejects.toThrow(postNotFoundMsgError);
+                .rejects.toThrow(error.postNotFoundMsg);
             (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(nonExistingPost.post_id);
             (0, vitest_1.expect)(postRepository.deletePost).not.toHaveBeenCalled();
         });
@@ -253,7 +255,7 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
             postRepository.findPostsByPostId = vitest_1.vi.fn();
             postRepository.getLikesCountForPost = vitest_1.vi.fn();
             await (0, vitest_1.expect)(postService.getLikesCountForPost(undefined))
-                .rejects.toThrow(noArgsMsgError);
+                .rejects.toThrow(error.noArgsMsg);
             (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toHaveBeenCalled();
             (0, vitest_1.expect)(postRepository.getLikesCountForPost).not.toHaveBeenCalled();
         });
@@ -261,7 +263,7 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
             postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(undefined);
             postRepository.getLikesCountForPost = vitest_1.vi.fn();
             await (0, vitest_1.expect)(postService.getLikesCountForPost(nonExistingPost.post_id))
-                .rejects.toThrow(postNotFoundMsgError);
+                .rejects.toThrow(error.postNotFoundMsg);
             (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(nonExistingPost.post_id);
             (0, vitest_1.expect)(postRepository.getLikesCountForPost).not.toHaveBeenCalled();
         });
@@ -283,7 +285,7 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
             postRepository.findPostsByPostId = vitest_1.vi.fn();
             postRepository.isUserLikePost = vitest_1.vi.fn();
             await (0, vitest_1.expect)(postService.checkUserLikeStatusForPost(undefined))
-                .rejects.toThrow(noArgsMsgError);
+                .rejects.toThrow(error.noArgsMsg);
             (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
             (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toHaveBeenCalled();
             (0, vitest_1.expect)(postRepository.isUserLikePost).not.toHaveBeenCalled();
@@ -294,7 +296,7 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
             postRepository.findPostsByPostId = vitest_1.vi.fn();
             postRepository.isUserLikePost = vitest_1.vi.fn();
             await (0, vitest_1.expect)(postService.checkUserLikeStatusForPost(like))
-                .rejects.toThrow(userNotFoundMsgError);
+                .rejects.toThrow(error.userNotFoundMsg);
             (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(like.user_id);
             (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toHaveBeenCalled();
             (0, vitest_1.expect)(postRepository.isUserLikePost).not.toHaveBeenCalled();
@@ -305,7 +307,7 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
             postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(undefined);
             postRepository.isUserLikePost = vitest_1.vi.fn();
             await (0, vitest_1.expect)(postService.checkUserLikeStatusForPost(like))
-                .rejects.toThrow(postNotFoundMsgError);
+                .rejects.toThrow(error.postNotFoundMsg);
             (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(like.user_id);
             (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(like.post_id);
             (0, vitest_1.expect)(postRepository.isUserLikePost).not.toHaveBeenCalled();
@@ -360,7 +362,7 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
             postRepository.toggleUserLikeForPost = vitest_1.vi.fn();
             postRepository.removeUserLikeForPost = vitest_1.vi.fn();
             await (0, vitest_1.expect)(postService.toggleUserLikeForPost(undefined))
-                .rejects.toThrow(noArgsMsgError);
+                .rejects.toThrow(error.noArgsMsg);
             (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
             (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toHaveBeenCalled();
             (0, vitest_1.expect)(postRepository.isUserLikePost).not.toHaveBeenCalled();
@@ -375,7 +377,7 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
             postRepository.toggleUserLikeForPost = vitest_1.vi.fn();
             postRepository.removeUserLikeForPost = vitest_1.vi.fn();
             await (0, vitest_1.expect)(postService.toggleUserLikeForPost(like))
-                .rejects.toThrow(userNotFoundMsgError);
+                .rejects.toThrow(error.userNotFoundMsg);
             (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(like.user_id);
             (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toHaveBeenCalled();
             (0, vitest_1.expect)(postRepository.isUserLikePost).not.toHaveBeenCalled();
