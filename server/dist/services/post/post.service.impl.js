@@ -124,18 +124,28 @@ class PostService {
     });
     toggleUserLikeForPost = this.wrap.serviceWrap(async (like) => {
         // check if the arguments is provided
-        if (!like.post_id || !like.user_id) {
+        if (!like?.post_id || !like?.user_id) {
             throw api_exception_1.default.HTTP400Error("No arguments provided");
         }
+        ;
+        // If the user is not found, return an error
+        const user = await this.userRepository.findUserById(like.user_id);
+        if (!user)
+            throw api_exception_1.default.HTTP404Error("User not found");
         // If the post is not found, return an error
-        await this.postRepository.findPostsByPostId(like.post_id);
+        const post = await this.postRepository.findPostsByPostId(like.post_id);
+        if (!post)
+            throw api_exception_1.default.HTTP404Error("Post not found");
         // Check to see if the user already likes the post.
         const data = await this.postRepository.isUserLikePost(like);
         // If the user hasn't liked the post yet, then create or insert.
-        if (!data)
-            return await this.postRepository.toggleUserLikeForPost(like);
+        if (!data) {
+            await this.postRepository.toggleUserLikeForPost(like);
+            return "Like added successfully";
+        }
         // If the user has already liked the post, then delete or remove.
-        return await this.postRepository.removeUserLikeForPost(like);
+        await this.postRepository.removeUserLikeForPost(like);
+        return "Like removed successfully";
     });
 }
 ;
