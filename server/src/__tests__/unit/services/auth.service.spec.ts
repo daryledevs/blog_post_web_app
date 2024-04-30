@@ -6,66 +6,51 @@ import {
   beforeEach,
   afterEach,
 } from "vitest";
-import { faker }                      from "@faker-js/faker";
-import AuthService                    from "@/services/auth/auth.service.impl";
-import UserRepository                 from "@/repositories/user/user.repository.impl";
-import AuthRepository                 from "@/repositories/auth/auth.repository.impl";
-import ErrorException                 from "@/exceptions/api.exception";
-import GenerateMockData from "../../utils/generate-data.util";
+import bcrypt            from "bcrypt";
+import { faker }         from "@faker-js/faker";
+import AuthService       from "@/services/auth/auth.service.impl";
+import UserRepository    from "@/repositories/user/user.repository.impl";
+import AuthRepository    from "@/repositories/auth/auth.repository.impl";
+import GenerateMockData  from "../../utils/generate-data.util";
+import ApiErrorException from "@/exceptions/api.exception";
 
-let users = GenerateMockData.createUserList(5);
-const newUser = GenerateMockData.createUser();
-const notFoundUser = GenerateMockData.createUser();
-const existingUser = users[0]!;
+vi.mock("@/repositories/auth/auth.repository.impl");
 
-vi.mock("@/repositories/auth/auth.repository.impl", async (importOriginal) => {
-  const original = await importOriginal<typeof import("@/repositories/auth/auth.repository.impl")>();
-  return {
-    ...original,
-    default: vi.fn().mockImplementation(() => ({
-      createUser: vi.fn().mockImplementation((user) => users.push(user)),
-    })),
-  };
-});
-
-vi.mock("@/repositories/user/user.repository.impl", async (importOriginal) => {
-  const original = await importOriginal<typeof import("@/repositories/user/user.repository.impl")>();
-  return {
-    ...original,
-    default: vi.fn().mockImplementation(() => ({
-      findUserById: vi.fn().mockImplementation((id: number) => {
-        return users.find((u) => u.user_id === id);
-      }),
-      findUserByUsername: vi.fn().mockImplementation((username: string) =>
-        users.find((u) => u.username === username)
-      ),
-      findUserByEmail: vi.fn().mockImplementation((email: string) =>
-        users.find((u) => u.email === email)
-      ),
-      searchUsersByQuery: vi.fn().mockImplementation((query: string) =>
-        users.filter((u) =>
-          u.username.includes(query) ||
-          u.email.includes(query) ||
-          (u?.first_name && u.first_name.includes(query)) ||
-          (u?.last_name && u.last_name.includes(query))
-        )
-      ),
-      findUserByCredentials: vi.fn().mockImplementation((userCredential: string) =>
-        users.find(
-          (u) => u.username === userCredential || u.email === userCredential
-        )
-      ),
-    })),
-  };
-});
+vi.mock("@/repositories/user/user.repository.impl");
 
 describe("AuthService", () => {
+  // Mocking the repositories
+  let userRepository: UserRepository;
+  let authRepository: AuthRepository;
   let authService: AuthService;
 
+  // Mocking the data
+  let users = GenerateMockData.createUserList(5);
+  const newUser = GenerateMockData.createUser();
+  const notFoundUser = GenerateMockData.createUser();
+  const existingUser = users[0]!;
+
+  // Error messages
+  const error = {
+    noArgsMsg: ApiErrorException.HTTP400Error("No arguments provided"),
+    userNotFoundMsg: ApiErrorException.HTTP400Error("User not found"),
+    invalidEmailMsg: ApiErrorException.HTTP400Error("Email already exists"),
+    invalidPasswordMsg: ApiErrorException.HTTP400Error("Invalid password"),
+    invalidUsernameMsg: ApiErrorException.HTTP400Error(
+      "Username already exists"
+    ),
+    invalidPasswordLengthMsg: ApiErrorException.HTTP400Error(
+      "Password must be at least 6 characters"
+    ),
+  };
+
   beforeEach(() => {
+    userRepository = new UserRepository();
+    authRepository = new AuthRepository();
+
     authService = new AuthService(
-      new AuthRepository(),
-      new UserRepository()
+      authRepository,
+      userRepository
     );
   })
 
@@ -73,90 +58,169 @@ describe("AuthService", () => {
     vi.clearAllMocks();
   });
   
-  describe("Register", async () => {
+  describe("Register (Create a new user)", async () => {
     test("Register should be successful", async () => {
+      userRepository.findUserByEmail = vi.fn().mockResolvedValue(null);
+      userRepository.findUserByUsername = vi.fn().mockResolvedValue(null);
+      authRepository.createUser = vi.fn();
+      
       const result = await authService.register(newUser);
       expect(result).toBe("Registration is successful");
+
+      expect(userRepository.findUserByEmail).toHaveBeenCalledWith(
+        newUser.email
+      );
+
+      expect(userRepository.findUserByUsername).toHaveBeenCalledWith(
+        newUser.username
+      );
+
+      expect(authRepository.createUser).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ...newUser,
+          password: expect.any(String),
+        })
+      );
     });
 
-    test("Register with empty fields", async () => {
+    test("should throw an error when no args are provided", async () => {
       const user = { ...newUser, username: "", email: "", password: "" };
-      await expect(authService.register(user)).rejects.toThrow("All fields are required");
+
+      userRepository.findUserByEmail = vi.fn();
+      userRepository.findUserByUsername = vi.fn();
+      authRepository.createUser = vi.fn();
+
+      await expect(
+        authService.register(user)
+      ).rejects.toThrow(error.noArgsMsg);
+
+      expect(userRepository.findUserByEmail).not.toHaveBeenCalled();
+      expect(userRepository.findUserByUsername).not.toHaveBeenCalled();
+      expect(authRepository.createUser).not.toHaveBeenCalled();
     });
 
-    test("Register with password less than 6 characters", async () => {
+    test("should throw an error when password less than 6 characters", async () => {
       const user = { ...newUser, password: "12345" };
-      await expect(authService.register(user)).rejects.toThrow("Password must be at least 6 characters");
+
+      userRepository.findUserByEmail = vi.fn();
+      userRepository.findUserByUsername = vi.fn();
+      authRepository.createUser = vi.fn();
+
+      await expect(
+        authService.register(user)
+      ).rejects.toThrow(error.invalidPasswordLengthMsg);
+
+      expect(userRepository.findUserByEmail).not.toHaveBeenCalled();
+      expect(userRepository.findUserByUsername).not.toHaveBeenCalled();
+      expect(authRepository.createUser).not.toHaveBeenCalled();
     });
 
-    test("Register with existing username", async () => {
+    test("should throw an error using an existing username", async () => {
       const user = { ...existingUser, email: faker.internet.email() };
-      await expect(authService.register(user)).rejects.toThrow("Username already exists");
+
+      userRepository.findUserByEmail = vi.fn().mockResolvedValue(null);
+      userRepository.findUserByUsername = vi.fn().mockResolvedValue(existingUser);
+      authRepository.createUser = vi.fn();
+
+      await expect(
+        authService.register(user)
+      ).rejects.toThrow(error.invalidUsernameMsg);
+
+      expect(userRepository.findUserByEmail).toHaveBeenCalledWith(user.email);
+      expect(userRepository.findUserByUsername).toHaveBeenCalledWith(user.username);
+      expect(authRepository.createUser).not.toHaveBeenCalled();
     });
 
     test("Register with existing email", async () => {
+      userRepository.findUserByEmail = vi.fn().mockResolvedValue(existingUser);
+      userRepository.findUserByUsername = vi.fn();
+      authRepository.createUser = vi.fn();
+
       const user = { ...existingUser, username: faker.internet.userName() };
-      await expect(authService.register(user)).rejects.toThrow("Email already exists");
+      await expect(
+        authService.register(user)
+      ).rejects.toThrow(error.invalidEmailMsg);
+
+      expect(userRepository.findUserByEmail).toHaveBeenCalledWith(user.email);
+      expect(userRepository.findUserByUsername).not.toHaveBeenCalled();
+      expect(authRepository.createUser).not.toHaveBeenCalled();
     });
   });
 
   
   describe("Login", async () => {
     test("Login should be successful", async () => {
-      const result = await authService.login(newUser.username, newUser.password);
+      const hashedPassword = bcrypt.hashSync(existingUser.password, bcrypt.genSaltSync(10))
+      const user = { ...existingUser, password: hashedPassword };
+
+      userRepository.findUserByCredentials = vi.fn().mockResolvedValue(user);
+
+      const result = await authService.login(
+        existingUser.username,
+        existingUser.password
+      );
+      
       expect(result.message).toBe("Login successfully");
       expect(result.token).toBeDefined();
       expect(result.refreshToken).toBeDefined();
     });
 
-    test("Login with username from not existing user", async () => {
-      const mockGetUserByUsername = vi.spyOn(authService, "login");
-      mockGetUserByUsername.mockRejectedValue(ErrorException.HTTP404Error("User not found"));
+    test("should throw an error when username is not existing", async () => {
+      userRepository.findUserByCredentials = vi
+        .fn()
+        .mockResolvedValue(null);
 
       await expect(
         authService.login(notFoundUser.username, notFoundUser.password)
-      ).rejects.toThrow("User not found");
+      ).rejects.toThrow(error.userNotFoundMsg);
 
-      expect(mockGetUserByUsername).toHaveBeenCalledTimes(1);
-      expect(mockGetUserByUsername).toHaveBeenCalledWith(notFoundUser.username, notFoundUser.password);
+      expect(userRepository.findUserByCredentials).toHaveBeenCalledWith(
+        notFoundUser.username
+      );
     });
 
-    test("Login with email from not existing user", async () => {
-      const mockGetUserByEmail = vi.spyOn(authService, "login");
-      mockGetUserByEmail.mockRejectedValue(ErrorException.HTTP404Error("User not found"));
+    test("should throw an error when email is not existing", async () => {
+      userRepository.findUserByCredentials = vi
+        .fn()
+        .mockResolvedValue(null);
 
       await expect(
         authService.login(notFoundUser.email, notFoundUser.password)
       ).rejects.toThrow("User not found");
 
-      expect(mockGetUserByEmail).toHaveBeenCalledTimes(1);
-      expect(mockGetUserByEmail).toHaveBeenCalledWith(notFoundUser.email, notFoundUser.password);
+      expect(userRepository.findUserByCredentials).toHaveBeenCalledWith(
+        notFoundUser.email
+      );
     });
 
-    test("Login with username from existing user", async () => {
-      const mockGetUserByUsername = vi.spyOn(authService, "login");
-      mockGetUserByUsername.mockRejectedValue(ErrorException.HTTP400Error("Invalid password"));
+    test("should throw an error when logging in with username and password is invalid", async () => {
       const user = { ...existingUser, password: faker.internet.password() };
+
+      userRepository.findUserByCredentials = vi
+        .fn()
+        .mockResolvedValue(user); 
       
       await expect(
         authService.login(user.username, user.password)
-      ).rejects.toThrow("Invalid password");
+      ).rejects.toThrow(error.invalidPasswordMsg);
 
-      expect(mockGetUserByUsername).toHaveBeenCalledTimes(1);
-      expect(mockGetUserByUsername).toHaveBeenCalledWith(user.username, user.password);
+      expect(userRepository.findUserByCredentials).toHaveBeenCalledWith(
+        user.username
+      );
     });
 
-    test("Login with email from existing user", async () => {
-      const mockGetUserByEmail = vi.spyOn(authService, "login");
-      mockGetUserByEmail.mockRejectedValue(ErrorException.HTTP400Error("Invalid password"));
+    test("should throw an error when logging in with email and password is invalid", async () => {
       const user = { ...existingUser, password: faker.internet.password() };
-      
+
+      userRepository.findUserByCredentials = vi.fn().mockResolvedValue(user); 
+
       await expect(
         authService.login(user.email, user.password)
-      ).rejects.toThrow("Invalid password");
-      
-      expect(mockGetUserByEmail).toHaveBeenCalledTimes(1);
-      expect(mockGetUserByEmail).toHaveBeenCalledWith(user.email, user.password);
+      ).rejects.toThrow(error.invalidPasswordMsg);
+
+      expect(userRepository.findUserByCredentials).toHaveBeenCalledWith(
+        user.email
+      );
     });
   });
 });
