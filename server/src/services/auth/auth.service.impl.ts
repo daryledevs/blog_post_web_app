@@ -6,8 +6,8 @@ import AsyncWrapper                                    from "@/utils/async-wrapp
 import { NewUsers }                                    from "@/types/table.types";
 import AuthRepository                                  from "@/repositories/auth/auth.repository.impl";
 import UserRepository                                  from "@/repositories/user/user.repository.impl";
-import AuthTokensUtil, { Expiration, TokenSecret }                                  from "@/utils/auth-token.util";
-import ErrorException                                  from "@/exceptions/api.exception";
+import ApiErrorException                               from "@/exceptions/api.exception";
+import AuthTokensUtil, { Expiration, TokenSecret }     from "@/utils/auth-token.util";
 import IAuthService, { IResetPasswordForm, LoginType } from "./auth.service";
 
 class AuthService implements IAuthService {
@@ -26,24 +26,24 @@ class AuthService implements IAuthService {
       const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 
       // Check if the user has provided all the required fields
-      if (!email || !username || !password) throw ErrorException
-        .HTTP400Error("All fields are required");
+      if (!email || !username || !password) {
+        throw ApiErrorException.HTTP400Error("No arguments provided");
+      }
 
       // Check if the password is less than 6 characters
-      if (password.length <= 5) throw ErrorException
-        .HTTP400Error("Password must be at least 6 characters");
+      if (password.length <= 5) {
+        throw ApiErrorException.HTTP400Error(
+          "Password must be at least 6 characters"
+        );
+      }
 
       // Check to see if the user is already in the database.
       const userByEmail = await this.userRepository.findUserByEmail(email);
-      const userByUsername = await this.userRepository
-        .findUserByUsername(username);
+      if (userByEmail) throw ApiErrorException.HTTP409Error("Email already exists");
 
-      if (userByUsername) throw ErrorException
-        .HTTP409Error("Username already exists");
+      const userByUsername = await this.userRepository.findUserByUsername(username);
+      if (userByUsername) throw ApiErrorException.HTTP409Error("Username already exists");
         
-      if (userByEmail) throw ErrorException
-        .HTTP409Error("Email already exists");
-
       // Save the user to the database
       await this.authRepository.createUser({ ...data, password: hashPassword });
       return "Registration is successful";
@@ -58,14 +58,13 @@ class AuthService implements IAuthService {
       );
 
       // If the user does not exist, return an error
-      if (!user) throw ErrorException.HTTP404Error("User not found");
-
+      if (!user) throw ApiErrorException.HTTP404Error("User not found");
       // Check if the password is correct
       const isPasswordMatch = bcrypt.compareSync(password, user.password);
-
+      
+      console.log(password, user.password, isPasswordMatch)
       // If the password is incorrect, return an error
-      if (!isPasswordMatch) throw ErrorException
-        .HTTP401Error("Invalid password");
+      if (!isPasswordMatch) throw ApiErrorException.HTTP401Error("Invalid password");
 
       const args = {
         accessToken: {
@@ -97,7 +96,7 @@ class AuthService implements IAuthService {
     async (data: any): Promise<string> => {
       // If the user is not found, return an error
       const user = await this.userRepository.findUserByEmail(data.email);
-      if (!user) throw ErrorException.HTTP404Error("User not found");
+      if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
       const args = {
         payload: {
@@ -133,7 +132,7 @@ class AuthService implements IAuthService {
 
       // Check if the token (id) exists in the database.
       const data = await this.authRepository.findResetTokenById(decodedToken);
-      if (!data) throw ErrorException.HTTP400Error("Invalid or expired token");
+      if (!data) throw ApiErrorException.HTTP400Error("Invalid or expired token");
       const decryptedToken = CryptoUtil.decryptData(data.encrypted as any);
 
       // then decrypt the code to check if it is still valid.
@@ -148,11 +147,11 @@ class AuthService implements IAuthService {
       const passwordLength = password.length <= 5;
 
       // Check if the password and confirm password match
-      if (isPasswordMismatch) throw ErrorException
+      if (isPasswordMismatch) throw ApiErrorException
         .HTTP400Error("Password does not match");
 
       // Check if the password is less than 6 characters
-      if (passwordLength) throw ErrorException
+      if (passwordLength) throw ApiErrorException
         .HTTP400Error("Password must be at least 6 characters");
 
       // Decrypt the token
@@ -161,7 +160,7 @@ class AuthService implements IAuthService {
 
       // If the user is not found, return an error
       const user = await this.userRepository.findUserById(user_id);
-      if (!user) throw ErrorException.HTTP404Error("User not found");
+      if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
       // Update the user's password and delete the reset password token from the database.
       await this.userRepository.updateUser(user_id, { password: hashPassword });

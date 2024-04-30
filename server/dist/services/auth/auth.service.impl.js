@@ -30,8 +30,8 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const send_email_util_1 = __importDefault(require("@/utils/send-email.util"));
 const crypto_util_1 = __importDefault(require("@/utils/crypto.util"));
 const async_wrapper_util_1 = __importDefault(require("@/utils/async-wrapper.util"));
-const auth_token_util_1 = __importStar(require("@/utils/auth-token.util"));
 const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
+const auth_token_util_1 = __importStar(require("@/utils/auth-token.util"));
 class AuthService {
     authRepository;
     userRepository;
@@ -44,23 +44,20 @@ class AuthService {
         const { email, username, password } = data;
         const hashPassword = bcrypt_1.default.hashSync(password, bcrypt_1.default.genSaltSync(10));
         // Check if the user has provided all the required fields
-        if (!email || !username || !password)
-            throw api_exception_1.default
-                .HTTP400Error("All fields are required");
+        if (!email || !username || !password) {
+            throw api_exception_1.default.HTTP400Error("No arguments provided");
+        }
         // Check if the password is less than 6 characters
-        if (password.length <= 5)
-            throw api_exception_1.default
-                .HTTP400Error("Password must be at least 6 characters");
+        if (password.length <= 5) {
+            throw api_exception_1.default.HTTP400Error("Password must be at least 6 characters");
+        }
         // Check to see if the user is already in the database.
         const userByEmail = await this.userRepository.findUserByEmail(email);
-        const userByUsername = await this.userRepository
-            .findUserByUsername(username);
-        if (userByUsername)
-            throw api_exception_1.default
-                .HTTP409Error("Username already exists");
         if (userByEmail)
-            throw api_exception_1.default
-                .HTTP409Error("Email already exists");
+            throw api_exception_1.default.HTTP409Error("Email already exists");
+        const userByUsername = await this.userRepository.findUserByUsername(username);
+        if (userByUsername)
+            throw api_exception_1.default.HTTP409Error("Username already exists");
         // Save the user to the database
         await this.authRepository.createUser({ ...data, password: hashPassword });
         return "Registration is successful";
@@ -73,10 +70,10 @@ class AuthService {
             throw api_exception_1.default.HTTP404Error("User not found");
         // Check if the password is correct
         const isPasswordMatch = bcrypt_1.default.compareSync(password, user.password);
+        console.log(password, user.password, isPasswordMatch);
         // If the password is incorrect, return an error
         if (!isPasswordMatch)
-            throw api_exception_1.default
-                .HTTP401Error("Invalid password");
+            throw api_exception_1.default.HTTP401Error("Invalid password");
         const args = {
             accessToken: {
                 payload: { user_id: user.user_id, roles: user.roles },
