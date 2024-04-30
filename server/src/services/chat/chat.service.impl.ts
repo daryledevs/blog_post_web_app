@@ -94,7 +94,8 @@ class ChatServices implements IChatService {
       if (!conversation) throw ApiErrorException.HTTP404Error("Conversation not found");
 
       // Return the deleted conversation
-      return await this.chatRepository.deleteConversation(conversation_id);
+      await this.chatRepository.deleteConversation(conversation_id);
+      return "Conversation deleted successfully";
     }
   );
 };
