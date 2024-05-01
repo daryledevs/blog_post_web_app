@@ -35,7 +35,9 @@ function Recipients({
           type="text"
           value={search}
           placeholder="Search..."
-          onChange={(event) => setSearch(event.target.value)}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+            setSearch(event.target.value)
+          }
         />
       </div>
     </label>

@@ -1,11 +1,14 @@
-import { useState } from "react";
+import {
+  selectMessage,
+  setNewMessageTrigger,
+  setOpenConversation,
+} from "../../redux/slices/messageSlice";
+import { useState }                       from "react";
+import Button                             from "shared/components/elements/Button";
+import Recipients                         from "../components/new-message-modal/recipients/Recipients";
+import NewMessageLists                    from "../components/new-message-modal/NewMessageLists";
+import NewMessageHeader                   from "../components/new-message-modal/NewMessageHeader";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
-import { selectMessage, setNewMessageTrigger, setOpenConversation } from "../../redux/slices/messageSlice";
-
-import Button from "shared/components/elements/Button";
-import Recipients from "../components/new-message-modal/recipients/Recipients";
-import NewMessageLists from "shared/components/new-message-modal/NewMessageLists";
-import NewMessageHeader from "shared/components/new-message-modal/NewMessageHeader";
 
 function NewMessage() {
   const messages = useAppSelector(selectMessage);

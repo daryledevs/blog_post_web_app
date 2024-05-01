@@ -7,15 +7,17 @@ type SearchBarHeaderProps = {
 
 function SearchBarHeader({ setSearch }: SearchBarHeaderProps) {
   return (
-    <div className='search-header__container'>
+    <div className="search-header__container">
       <h3>Search</h3>
-      <Input 
-        type='text'
-        placeholder='Search'
-        onChange={(e) => setSearch(e.target.value)}
+      <Input
+        type="text"
+        placeholder="Search"
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setSearch(e.target.value)
+        }
       />
     </div>
-  )
+  );
 }
 
 export default SearchBarHeader
