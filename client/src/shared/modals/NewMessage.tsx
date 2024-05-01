@@ -5,7 +5,7 @@ import {
 }                                         from "../../redux/slices/messageSlice";
 import { useState }                       from "react";
 import Button                             from "../components/element/Button";
-import Recipients                         from "../components/new-message-modal/recipients/Recipients";
+import Recipients                         from "../components/new-message-modal/recipient/Recipients";
 import NewMessageLists                    from "../components/new-message-modal/NewMessageLists";
 import NewMessageHeader                   from "../components/new-message-modal/NewMessageHeader";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
