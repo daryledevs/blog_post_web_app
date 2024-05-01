@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState }     from "react";
 import { Outlet, useLocation } from "react-router-dom";
-import CreatePost from "../shared/modals/CreatePost";
-import Sidebar from "../shared/components/Sidebar";
-import SearchBar from "shared/components/SearchBar";
+import CreatePost              from "../shared/modals/CreatePost";
+import Sidebar                 from "../components/sidebar/Sidebar";
+import SearchBar               from "../components/search/SearchBar";
 
 export type ClickedLink = {
   previous: string;
@@ -11,7 +11,11 @@ export type ClickedLink = {
 
 function Index() {
   const { hash, pathname, search } = useLocation();
-  const [clickedLink, setClickedLink] = useState<ClickedLink>({ previous: "", current: pathname });
+  
+  const [clickedLink, setClickedLink] = useState<ClickedLink>({
+    previous: "",
+    current: pathname,
+  });
 
   return (
     <div className="index__container">

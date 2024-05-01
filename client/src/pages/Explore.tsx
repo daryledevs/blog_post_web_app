@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
-import GridPost from "../components/ProfileGallery";
-import { useGetExploreFeedQuery } from "../redux/api/feedApi";
-import { useGetUserDataQuery } from "../redux/api/userApi";
+import GridPost                       from "../components/profile/ProfileGallery";
+import { useGetUserDataQuery }        from "../redux/api/userApi";
+import { useGetExploreFeedQuery }     from "../redux/api/feedApi";
 
 type FeedApiData = {
-  feed: any[]; 
+  feed: any[];
 };
 
 type HoverData = {
-  post_id: string | null; 
+  post_id: string | null;
 };
 
 function Explore() {
@@ -21,7 +21,7 @@ function Explore() {
     isError: isUserApiError,
     error: userApiError,
     isSuccess: isUserApiSuccess,
-  } = useGetUserDataQuery({ person: ""});
+  } = useGetUserDataQuery({ person: "" });
 
   const {
     data: exploreApiData,
@@ -29,8 +29,7 @@ function Explore() {
     isError: isExploreApiError,
     error: exploreApiError,
     isSuccess: isExploreApiSuccess,
-  } = useGetExploreFeedQuery(
-    userApiData?.user?.user_id, {
+  } = useGetExploreFeedQuery(userApiData?.user?.user_id, {
     skip: !isUserApiSuccess,
   });
 
@@ -39,20 +38,30 @@ function Explore() {
     setFeedApi({ feed: exploreApiData?.data?.feed || [] });
   }, [exploreApiData, isExploreApiLoading, isUserApiLoading]);
 
-  
   if (isUserApiError || isExploreApiError) {
-    console.log("USER ERROR: ", userApiError, " EXPLORE ERROR: ", exploreApiError);
+    console.log(
+      "USER ERROR: ",
+      userApiError,
+      " EXPLORE ERROR: ",
+      exploreApiError
+    );
   }
-  
+
   if (isExploreApiLoading || isUserApiLoading) return <></>;
-  
+
   return (
     <div className="explore__container">
       <div className="explore__parent">
         {feedApi.feed && feedApi.feed.length ? (
-          <GridPost posts={{ post: feedApi.feed }} hover={hover} setHover={setHover} />
+          <GridPost
+            posts={{ post: feedApi.feed }}
+            hover={hover}
+            setHover={setHover}
+          />
         ) : (
-          <p style={{ textAlign: "center", marginTop: "5vh" }}>No Post To Show</p>
+          <p style={{ textAlign: "center", marginTop: "5vh" }}>
+            No Post To Show
+          </p>
         )}
       </div>
     </div>

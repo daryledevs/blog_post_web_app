@@ -1,9 +1,9 @@
+import { SubmitHandler }    from "react-hook-form";
+import Instagram            from "../assets/images/instagram-logo.svg?react";
+import LoginForm            from "components/login/LoginForm";
+import LoginErrorMessage    from "components/login/LoginErrorMessage";
+import LoginSignUpPrompt    from "components/login/LoginSignUpPrompt";
 import { useLoginMutation } from "../redux/api/authApi";
-import { SubmitHandler } from "react-hook-form";
-import LoginForm from "components/LoginForm";
-import LoginErrorMessage from "components/LoginErrorMessage";
-import Instagram from "../assets/images/instagram-logo.svg?react";
-import LoginSignUpPrompt from "components/LoginSignUpPrompt";
 
 type Inputs = {
   userCredential: string;
@@ -11,7 +11,9 @@ type Inputs = {
 };
 
 function Login() {
-  const [login, { isError, error }] = useLoginMutation({ fixedCacheKey: "login-api" });
+  const [login, { isError, error }] = useLoginMutation({
+    fixedCacheKey: "login-api",
+  });
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     const userCredential = data.userCredential;

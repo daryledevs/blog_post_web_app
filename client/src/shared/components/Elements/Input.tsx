@@ -1,5 +1,4 @@
-import React, { forwardRef, InputHTMLAttributes } from 'react';
-
+import React, { forwardRef, InputHTMLAttributes } from "react";
 
 type InputType = "text" | "email";
 type Ref = HTMLInputElement;
@@ -33,8 +32,8 @@ const Input = forwardRef<Ref, InputProps>((props, ref) => {
 
 // set default props
 Input.defaultProps = {
-  className: '',
+  className: "",
   styles: {},
 };
 
-export default Input
+export default Input;

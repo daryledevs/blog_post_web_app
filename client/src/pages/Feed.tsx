@@ -1,10 +1,12 @@
 import React, { useState, forwardRef } from "react";
-import useFetchLastScroll from "../hooks/useFetchLastScroll";
-import useFetchFeedOnScroll from "../hooks/useFetchFeedOnScroll";
-import FeedLoading from "../shared/components/FeedLoading";
-import FeedListPost from "../components/FeedListPost";
-import { IEPost } from "../interfaces/interface";
-import { useGetUserFeedMutation } from "redux/api/feedApi";
+import useFetchLastScroll              from "../hooks/useFetchLastScroll";
+import useFetchFeedOnScroll            from "../hooks/useFetchFeedOnScroll";
+
+import FeedLoading                     from "../components/feed/FeedLoading";
+import FeedListPost                    from "../components/feed/FeedListPost";
+
+import { IEPost }                      from "../interfaces/interface";
+import { useGetUserFeedMutation }      from "redux/api/feedApi";
 
 type FeedProps = {
   feeds: { feed: IEPost[] };
@@ -14,8 +16,12 @@ type FeedProps = {
 
 const Feed = forwardRef((props: FeedProps, ref ) => {
     const { feeds, userTotalFeedApi, setAddFeedTrigger } = props;
+    
     const [hasShownLoading, setHasShownLoading] = useState<boolean>(false);
-    const [fetchUserFeed, userFeedApi] = useGetUserFeedMutation({ fixedCacheKey: "feed-api" });
+
+    const [fetchUserFeed, userFeedApi] = useGetUserFeedMutation({
+      fixedCacheKey: "feed-api",
+    });
 
     useFetchLastScroll({
       feedRef: ref as React.RefObject<HTMLDivElement>,
