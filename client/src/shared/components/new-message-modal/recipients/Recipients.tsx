@@ -1,4 +1,4 @@
-import Input                from "../../elements/Input";
+import Input                from "../../element/Input";
 import RecipientsPersonList from "./RecipientsPersonList";
 
 interface IERecipients {
