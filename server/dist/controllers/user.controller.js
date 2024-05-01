@@ -24,7 +24,7 @@ class UsersController {
         else {
             user = await this.userService.getUserById(user_id);
         }
-        res.status(200).send(user);
+        res.status(200).send({ user });
     });
     searchUsersByQuery = this.wrap.apiWrap(async (req, res, next) => {
         const search = req.query.search;

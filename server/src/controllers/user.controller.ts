@@ -33,7 +33,7 @@ class UsersController {
         user = await this.userService.getUserById(user_id);
       }
 
-      res.status(200).send(user);
+      res.status(200).send({ user });
     }
   );
 
