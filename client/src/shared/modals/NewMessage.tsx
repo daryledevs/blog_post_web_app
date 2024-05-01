@@ -2,9 +2,9 @@ import {
   selectMessage,
   setNewMessageTrigger,
   setOpenConversation,
-} from "../../redux/slices/messageSlice";
+}                                         from "../../redux/slices/messageSlice";
 import { useState }                       from "react";
-import Button                             from "shared/components/elements/Button";
+import Button                             from "../components/element/Button";
 import Recipients                         from "../components/new-message-modal/recipients/Recipients";
 import NewMessageLists                    from "../components/new-message-modal/NewMessageLists";
 import NewMessageHeader                   from "../components/new-message-modal/NewMessageHeader";

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import SearchBarUserList from "./SearchBarUserList";
+import SearchBarUserList    from "./SearchBarUserList";
 
 import {
   useDeleteRecentSearchUserMutation,

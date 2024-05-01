@@ -1,5 +1,5 @@
 import React from 'react'
-import Input from '../../shared/components/elements/Input'
+import Input from '../../shared/components/element/Input'
 
 type SearchBarHeaderProps = {
   setSearch: React.Dispatch<React.SetStateAction<string>>;
