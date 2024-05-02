@@ -1,7 +1,8 @@
 import { IEPost } from "../../interfaces/interface";
 import baseApi from "./baseApi";
 
-interface IEUserFeed {
+export interface IEUserFeed {
+  user_id: number;
   post_ids: number[];
 }
 
@@ -11,10 +12,10 @@ const feedApi = baseApi.injectEndpoints({
       { feed: Array<IEPost> },
       { post_ids: Array<number> }
     >({
-      query: ({ post_ids }: IEUserFeed) => ({
+      query: ({ user_id, post_ids }: IEUserFeed) => ({
         url: "/feeds/",
         method: "POST",
-        body: { post_ids },
+        body: { user_id, post_ids },
       }),
     }),
     getTotalFeed: build.query<any, any>({
@@ -29,7 +30,6 @@ const feedApi = baseApi.injectEndpoints({
         method: "GET",
       }),
     }),
-    
   }),
 });
 

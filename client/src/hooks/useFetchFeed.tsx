@@ -1,15 +1,18 @@
 import { useEffect, useState } from 'react'
 import { IEPost } from '../interfaces/interface';
+import { IEUserFeed } from 'redux/api/feedApi';
 
 type useFetchFeedProps = {
+  user_id: number;
   addFeedTrigger: string;
   userFeedApi: any;
   setFeeds: React.Dispatch<React.SetStateAction<{ feed: IEPost[] }>>;
-  fetchUserFeed: ({ post_ids }: { post_ids: number[] }) => void;
+  fetchUserFeed: ({ user_id, post_ids }: IEUserFeed) => void;
   setAddFeedTrigger: React.Dispatch<React.SetStateAction<string>>;
 };
 
 function useFetchFeed({
+  user_id,
   userFeedApi,
   addFeedTrigger,
   setFeeds, 
@@ -19,8 +22,8 @@ function useFetchFeed({
   const [isPageRefresh, setIsPageRefresh] = useState<boolean>(true);
 
   useEffect(() => {
-    if (isPageRefresh && userFeedApi.status === "uninitialized") {
-      fetchUserFeed({ post_ids: [] });
+    if (user_id && isPageRefresh && userFeedApi.status === "uninitialized") {
+      fetchUserFeed({ user_id: user_id, post_ids: [] });
       sessionStorage.setItem("lastTime", new Date().toString());
       setIsPageRefresh(false);
       return;

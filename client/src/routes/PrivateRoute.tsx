@@ -22,18 +22,22 @@ type PrivateRouteProps = {
 function PrivateRoute() {
   const Redirect = () => <Navigate to="/" replace />;
   const PUBLIC_PATH: any[] = ["/login", "/register", "/reset"];
-
-  const socketService = new SocketService("ws://localhost:8900");
-  const userDataApi = useGetUserDataQuery({ person: "" });
-  const [feeds, setFeeds] = useState<any>({ feed: [] });
+  const socketService = new SocketService("ws://localhost:3000");
+  
   const feedRef = useRef<HTMLDivElement | null>(null);
+  const userDataApi = useGetUserDataQuery({ person: "" });
+  const user = userDataApi.data?.user;
+  const [feeds, setFeeds] = useState<any>({ feed: [] });
   const [addFeedTrigger, setAddFeedTrigger] = useState<string>("not triggered yet");
 
   // SERVICES
   const userTotalFeedApi = useGetTotalFeedQuery({});
-  const [fetchUserFeed, userFeedApi] = useGetUserFeedMutation({ fixedCacheKey: "feed-api", });
+  const [fetchUserFeed, userFeedApi] = useGetUserFeedMutation({
+    fixedCacheKey: "feed-api",
+  });
 
   useFetchFeed({
+    user_id: user?.user_id,
     addFeedTrigger,
     userFeedApi,
     fetchUserFeed,
@@ -42,14 +46,14 @@ function PrivateRoute() {
   });
 
   useEffect(() => {
-    if (userDataApi.data) {
-      socketService.addUserId(userDataApi.data.user.user_id);
+    if (user) {
+      socketService.addUserId(user.user_id);
       socketService.onConnection();
     }
     return () => {
       socketService.onDisconnect();
     };
-  }, [userDataApi.data])
+  }, [user]);
 
   return (
     <Routes>
