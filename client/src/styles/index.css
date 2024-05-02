@@ -264,6 +264,9 @@
 .text-input__container input:valid + label {
   animation: move-top 0.3s forwards;
 }
+.text-input__container input:-webkit-autofill ~ label {
+  background-color: red;
+}
 
 .profile__container, .explore__container {
   flex: 1;
@@ -1084,6 +1087,4 @@
 }
 .switch-account__container .switch-account__parent .switch-account__footer :hover {
   color: rgb(4, 71, 116);
-}
-
-/*# sourceMappingURL=index.css.map */
+}/*# sourceMappingURL=index.css.map */

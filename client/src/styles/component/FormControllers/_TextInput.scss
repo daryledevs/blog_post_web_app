@@ -71,4 +71,8 @@
   input:valid + label {
     animation: move-top 0.3s forwards;
   }
+
+  input:-webkit-autofill ~ label {
+    animation: move-top 0.3s forwards;
+  }
 }
