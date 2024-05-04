@@ -31,7 +31,7 @@ function PrivateRoute() {
     defaultPath: "/", routePath: PUBLIC_PATH 
   });
   
-  const socketService = new SocketService("ws://localhost:3000");
+  const socketService = new SocketService("ws://localhost:5000");
   const feedRef = useRef<HTMLDivElement | null>(null);
   const userDataApi = useGetUserDataQuery({ person: "" });
   const user = userDataApi.data?.user;
