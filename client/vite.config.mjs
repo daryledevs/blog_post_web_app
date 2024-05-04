@@ -27,4 +27,12 @@ export default defineConfig({
       },
     },
   },
+  resolve: {
+    alias: [
+      {
+        find: "@",
+        replacement: path.join(process.cwd(), "src"),
+      },
+    ],
+  },
 });
