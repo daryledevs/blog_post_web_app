@@ -1,20 +1,5 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const socket_io_1 = require("socket.io");
-const index_1 = __importDefault(require("./index"));
-const socketIO = new socket_io_1.Server(index_1.default, {
-    cors: {
-        origin: [
-            `${process.env.SERVER_URL_ONE}`,
-            `${process.env.SERVER_URL_TWO}`,
-            `${process.env.SERVER_URL_THREE}`,
-        ],
-    },
-    path: `${process.env.API}/socket`,
-});
 let users = [];
 const addUser = (userId, socketId) => {
     !users.some((user) => user.userId === userId) &&
@@ -26,8 +11,9 @@ const removeUser = (socketId) => {
 const getUser = (userId) => {
     return users.find((user) => user.userId === userId);
 };
-function socketController() {
+function socketController(socketIO) {
     socketIO.on("connect", (socket) => {
+        console.log("a user connected");
         socket.on("add-user", (userId) => {
             addUser(userId, socket.id);
             socket.emit("get-users", users);
