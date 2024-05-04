@@ -1,5 +1,5 @@
-import avatar          from '../../assets/icons/avatar.png'
-import { IEUserState } from '../../interfaces/interface';
+import avatar          from "@/assets/icons/avatar.png"
+import { IEUserState } from "@/interfaces/interface";
 
 type ProfileHeaderProps = {
   user: IEUserState;

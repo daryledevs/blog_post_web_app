@@ -1,6 +1,6 @@
-import usersPicture            from "../../assets/icons/avatar.png";
-import { useAppDispatch }      from "../../hooks/reduxHooks";
-import { setOpenConversation } from "../../redux/slices/messageSlice";
+import usersPicture            from "@/assets/icons/avatar.png";
+import { useAppDispatch }      from "@/hooks/reduxHooks";
+import { setOpenConversation } from "@/redux/slices/messageSlice";
 
 type ChatHistoryRecipientProps = {
   chat: any;

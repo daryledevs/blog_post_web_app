@@ -1,5 +1,5 @@
-import { IEPost } from "../../interfaces/interface";
-import baseApi from "./baseApi";
+import baseApi    from "./baseApi";
+import { IEPost } from "@/interfaces/interface";
 
 export interface IEUserFeed {
   user_id: number;

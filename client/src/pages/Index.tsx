@@ -1,8 +1,9 @@
 import React, { useState }     from "react";
 import { Outlet, useLocation } from "react-router-dom";
-import CreatePost              from "../shared/modals/CreatePost";
-import Sidebar                 from "../components/sidebar/Sidebar";
-import SearchBar               from "../components/search-bar/SearchBar";
+
+import CreatePost              from "@/shared/modals/CreatePost";
+import Sidebar                 from "@/components/sidebar/Sidebar";
+import SearchBar               from "@/components/search-bar/SearchBar";
 
 export type ClickedLink = {
   previous: string;

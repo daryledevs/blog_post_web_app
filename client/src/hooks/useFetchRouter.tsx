@@ -1,8 +1,10 @@
-import { useEffect } from 'react'
-import PublicRoute from "../routes/PublicRoute";
-import PrivateRoute from "../routes/PrivateRoute";
-import { useLoginMutation } from '../redux/api/authApi';
-import { useGetUserDataQuery } from '../redux/api/userApi';
+import { useEffect } from "react";
+
+import PublicRoute from "@/routes/PublicRoute";
+import PrivateRoute from "@/routes/PrivateRoute";
+
+import { useLoginMutation } from "@/redux/api/authApi";
+import { useGetUserDataQuery } from "@/redux/api/userApi";
 
 type useFetchRouterProps = {
   setRoute: any;
@@ -39,4 +41,4 @@ function useFetchRouter({ setRoute }: useFetchRouterProps) {
   }, [loginApiData, userDataApi]);
 }
 
-export default useFetchRouter
+export default useFetchRouter;

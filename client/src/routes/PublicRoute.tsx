@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import { PRIVATE_PATH }  from "shared/constants/routes";
+import { PRIVATE_PATH }  from "@/shared/constants/routes";
 import RedirectRoute     from "./RedirectRoute";
 import Login             from '../pages/Login';
 

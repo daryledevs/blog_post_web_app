@@ -1,10 +1,10 @@
 import {
   setNewMessageTrigger,
   setSwitchAccountTrigger,
-}                         from "../../redux/slices/messageSlice";
-import downArrow          from "../../assets/icons/down-arrow.png";
-import newMessage         from "../../assets/icons/editing.png";
-import { useAppDispatch } from "../../hooks/reduxHooks";
+}                         from "@/redux/slices/messageSlice";
+import downArrow          from "@/assets/icons/down-arrow.png";
+import newMessage         from "@/assets/icons/editing.png";
+import { useAppDispatch } from "@/hooks/reduxHooks";
 
 type ChatHeaderProps = {
   user: any;

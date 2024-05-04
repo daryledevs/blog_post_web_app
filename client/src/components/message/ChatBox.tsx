@@ -2,15 +2,15 @@ import { useEffect, useState, useRef } from "react";
 import ChatBoxSubmission               from "./ChatBoxSubmission";
 import ChatBoxMessageList              from "./ChatBoxMessageList";
 
-import { useGetUserDataQuery }         from "../../redux/api/userApi";
-import { selectMessage }               from "../../redux/slices/messageSlice";
+import { useGetUserDataQuery }         from "@/redux/api/userApi";
+import { selectMessage }               from "@/redux/slices/messageSlice";
 
-import { useAppSelector }              from "../../hooks/reduxHooks";
-import useFetchMessage                 from "../../hooks/useFetchMessage";
-import useAdjustInputHeight            from "../../hooks/useAdjustInputHeight";
-import useSendMessageHandler           from "../../hooks/useSendMessage";
+import { useAppSelector }              from "@/hooks/reduxHooks";
+import useFetchMessage                 from "@/hooks/useFetchMessage";
+import useAdjustInputHeight            from "@/hooks/useAdjustInputHeight";
+import useSendMessageHandler           from "@/hooks/useSendMessage";
 
-import SocketService                   from "../../services/SocketServices";
+import SocketService                   from "@/services/SocketServices";
 
 interface IEChatProps {
   socketService: SocketService;
@@ -32,7 +32,6 @@ function ChatBox({ socketService }: IEChatProps) {
   useAdjustInputHeight({ inputRef, newMessage, clearMessage });
   
   const { comingMessage, setComingMessage, isLoading } = useFetchMessage({
-    userDataApi: userDataApi.data?.user,
     socketService,
     openConversation,
   });

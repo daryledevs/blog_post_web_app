@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import svg_loading   from "../../assets/icons/svg/loading.svg";
+import svg_loading   from "@/assets/icons/svg/loading.svg";
 
 type FeedLoadingProps = {
   isLoading: boolean;
@@ -14,6 +14,7 @@ function FeedLoading({
   className,
   setHasShownLoading,
 }: FeedLoadingProps) {
+  
   useEffect(() => {
     if (setHasShownLoading) setHasShownLoading(true);
   }, [isLoading, setHasShownLoading]);

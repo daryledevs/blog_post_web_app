@@ -1,7 +1,7 @@
 
-import { ClickedLink } from "pages/Index";
-import Links from "../../shared/constants/nav_links";
-import SidebarTabCard from "./SidebarTabCard";
+import Links           from "@/shared/constants/nav_links";
+import SidebarTabCard  from "./SidebarTabCard";
+import { ClickedLink } from "@/pages/Index";
 
 type SidebarTabListsProps = {
   avatar: string;

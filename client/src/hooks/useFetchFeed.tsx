@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
-import { IEPost } from '../interfaces/interface';
-import { IEUserFeed } from 'redux/api/feedApi';
+import { useEffect, useState } from "react";
+import { IEPost } from "../interfaces/interface";
+import { IEUserFeed } from "@/redux/api/feedApi";
 
 type useFetchFeedProps = {
   user_id: number;
@@ -15,9 +15,9 @@ function useFetchFeed({
   user_id,
   userFeedApi,
   addFeedTrigger,
-  setFeeds, 
+  setFeeds,
   fetchUserFeed,
-  setAddFeedTrigger
+  setAddFeedTrigger,
 }: useFetchFeedProps) {
   const [isPageRefresh, setIsPageRefresh] = useState<boolean>(true);
 
@@ -28,11 +28,13 @@ function useFetchFeed({
       setIsPageRefresh(false);
       return;
     }
-    
-    if(!userFeedApi.data) return;
-    setFeeds((prev: any) => ({ feed: [...prev?.feed, ...userFeedApi?.data?.feed] }));
+
+    if (!userFeedApi.data) return;
+    setFeeds((prev: any) => ({
+      feed: [...prev?.feed, ...userFeedApi?.data?.feed],
+    }));
     setAddFeedTrigger("not triggered yet");
   }, [addFeedTrigger, userFeedApi]);
 }
 
-export default useFetchFeed
+export default useFetchFeed;

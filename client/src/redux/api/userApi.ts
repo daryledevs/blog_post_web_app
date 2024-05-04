@@ -1,5 +1,5 @@
-import baseApi from "./baseApi";
-import { IEUserState } from "../../interfaces/interface";
+import baseApi         from "./baseApi";
+import { IEUserState } from "@/interfaces/interface";
 
 const userApi = baseApi.injectEndpoints({
   endpoints: (build) => ({

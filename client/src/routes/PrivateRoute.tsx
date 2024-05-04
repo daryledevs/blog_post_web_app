@@ -1,22 +1,22 @@
 import {
   useGetTotalFeedQuery,
   useGetUserFeedMutation,
-}                                             from "redux/api/feedApi";
+}                                             from "@/redux/api/feedApi";
 import { Route, Routes }                      from "react-router-dom";
 import React, { useEffect, useRef, useState } from "react";
 
-import Feed                                   from "../pages/Feed";
-import Index                                  from "../pages/Index";
-import Message                                from "../pages/Message";
-import Explore                                from "../pages/Explore";
-import Profile                                from "../pages/Profile";
-import FollowModal                            from "shared/modals/FollowModal";
+import Feed                                   from "@/pages/Feed";
+import Index                                  from "@/pages/Index";
+import Message                                from "@/pages/Message";
+import Explore                                from "@/pages/Explore";
+import Profile                                from "@/pages/Profile";
+import FollowModal                            from "@/shared/modals/FollowModal";
 import RedirectRoute                          from "./RedirectRoute";
-import { PUBLIC_PATH }                        from "../shared/constants/routes";
+import { PUBLIC_PATH }                        from "@/shared/constants/routes";
 
-import useFetchFeed                           from "hooks/useFetchFeed";
-import SocketService                          from "../services/SocketServices";
-import { useGetUserDataQuery }                from "redux/api/userApi";
+import useFetchFeed                           from "@/hooks/useFetchFeed";
+import SocketService                          from "@/services/SocketServices";
+import { useGetUserDataQuery }                from "@/redux/api/userApi";
 
 type PrivateRouteProps = {
   socketService: SocketService;

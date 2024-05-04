@@ -7,7 +7,7 @@ import {
   useGetUserDataQuery,
   useSaveRecentSearchUserMutation,
   useSearchUsersQuery,
-} from "redux/api/userApi";
+} from "@/redux/api/userApi";
 
 type SearchBarBodyProps = {
   search: string;

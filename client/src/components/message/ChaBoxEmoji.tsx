@@ -1,4 +1,4 @@
-import emojiIcon                              from "../../assets/icons/emoji-icon.png";
+import emojiIcon                              from "@/assets/icons/emoji-icon.png";
 import EmojiPicker, { Theme, EmojiClickData } from "emoji-picker-react";
 
 function ChatBoxEmoji({

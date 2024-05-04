@@ -1,9 +1,9 @@
 import { SubmitHandler }    from "react-hook-form";
-import Instagram            from "../assets/images/instagram-logo.svg?react";
-import LoginForm            from "components/login/LoginForm";
-import LoginErrorMessage    from "components/login/LoginErrorMessage";
-import LoginSignUpPrompt    from "components/login/LoginSignUpPrompt";
-import { useLoginMutation } from "../redux/api/authApi";
+import Instagram            from "@/assets/images/instagram-logo.svg?react";
+import LoginForm            from "@/components/login/LoginForm";
+import LoginErrorMessage    from "@/components/login/LoginErrorMessage";
+import LoginSignUpPrompt    from "@/components/login/LoginSignUpPrompt";
+import { useLoginMutation } from "@/redux/api/authApi";
 
 type Inputs = {
   userCredential: string;

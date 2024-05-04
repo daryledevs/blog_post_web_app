@@ -1,15 +1,28 @@
-import { useEffect } from 'react';
-import { useGetUserTotalPostsQuery } from 'redux/api/postApi';
-import { useFollowUserMutation, useGetFollowStatsQuery } from 'redux/api/userApi';
+import {
+  useFollowUserMutation,
+  useGetFollowStatsQuery,
+}                                    from "@/redux/api/userApi";
+import { useEffect }                 from "react";
+import { useGetUserTotalPostsQuery } from "@/redux/api/postApi";
 
-function useUserDetailsStats({ user_id }:any) {
-  const [, followsListsApi] = useFollowUserMutation({ fixedCacheKey: "follows-api" });
-  const totalPostsApi = useGetUserTotalPostsQuery({ user_id }, { skip: !user_id });
-  const followStatsDataApi = useGetFollowStatsQuery({ user_id }, { skip: !user_id });
+function useUserDetailsStats({ user_id }: any) {
+  const [, followsListsApi] = useFollowUserMutation({
+    fixedCacheKey: "follows-api",
+  });
+
+  const totalPostsApi = useGetUserTotalPostsQuery(
+    { user_id },
+    { skip: !user_id }
+  );
+  
+  const followStatsDataApi = useGetFollowStatsQuery(
+    { user_id },
+    { skip: !user_id }
+  );
 
   useEffect(() => {
     followStatsDataApi.refetch();
-  }, [followsListsApi.data]); 
+  }, [followsListsApi.data]);
 
   return {
     totalPosts: totalPostsApi.data?.totalPost,
@@ -20,4 +33,4 @@ function useUserDetailsStats({ user_id }:any) {
   };
 }
 
-export default useUserDetailsStats
+export default useUserDetailsStats;

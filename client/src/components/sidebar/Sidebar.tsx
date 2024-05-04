@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import { useGetUserDataQuery } from "../../redux/api/userApi";
-import SidebarBurger from "./SidebarBurger";
-import SidebarLogo from "./SidebarLogo";
-import SidebarTabLists from "./SidebarTabLists";
-import { ClickedLink } from "pages/Index";
+import React, { useState }     from "react";
+import SidebarBurger           from "./SidebarBurger";
+import SidebarLogo             from "./SidebarLogo";
+import SidebarTabLists         from "./SidebarTabLists";
+import { ClickedLink }         from "@/pages/Index";
+import { useGetUserDataQuery } from "@/redux/api/userApi";
 
 interface IProps {
   clickedLink: ClickedLink;

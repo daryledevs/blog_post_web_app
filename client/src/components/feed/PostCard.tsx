@@ -1,11 +1,11 @@
-import avatar                  from "../../assets/icons/avatar.png";
-import bookmark                from "../../assets/icons/bookmark.png";
-import emojiIcon               from "../../assets/icons/emoji-icon.png";
-import shareIcon               from "../../assets/icons/share.png";
-import settingIcon             from "../../assets/icons/setting-icon.png";
-import commentIcon             from "../../assets/icons/comment.png";
-import heartIcon_uncheck       from "../../assets/icons/heart_uncheck.png";
-import { useGetUserDataQuery } from "redux/api/userApi";
+import avatar                  from "@/assets/icons/avatar.png";
+import bookmark                from "@/assets/icons/bookmark.png";
+import emojiIcon               from "@/assets/icons/emoji-icon.png";
+import shareIcon               from "@/assets/icons/share.png";
+import settingIcon             from "@/assets/icons/setting-icon.png";
+import commentIcon             from "@/assets/icons/comment.png";
+import heartIcon_uncheck       from "@/assets/icons/heart_uncheck.png";
+import { useGetUserDataQuery } from "@/redux/api/userApi";
 
 interface IEPostCard{
   postData:any;

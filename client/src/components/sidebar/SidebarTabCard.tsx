@@ -1,8 +1,8 @@
-import React from 'react'
-import { useNavigate } from 'react-router';
+import React             from 'react'
+import { useNavigate }   from 'react-router';
 import SidebarRenderIcon from './SidebarRenderIcon';
-import SidebarIconName from './SidebarIconName';
-import { ClickedLink } from 'pages/Index';
+import SidebarIconName   from './SidebarIconName';
+import { ClickedLink }   from '@/pages/Index';
 
 interface SidebarProps {
   item: any;

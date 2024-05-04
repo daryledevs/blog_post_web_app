@@ -1,6 +1,6 @@
 import { useNavigate }           from "react-router-dom";
-import { IEUserState }           from "../../interfaces/interface";
-import useUserDetailsStats       from "hooks/useUserDetailsStats";
+import { IEUserState }           from "@/interfaces/interface";
+import useUserDetailsStats       from "@/hooks/useUserDetailsStats";
 import ProfileHeaderDetailsStats from "./ProfileHeaderDetailsStats";
 
 type ProfileHeaderDetailsProps = {

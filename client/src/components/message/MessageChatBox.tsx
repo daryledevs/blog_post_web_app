@@ -1,7 +1,7 @@
 import ChatBox            from "./ChatBox";
-import SocketService      from '../../services/SocketServices';
-import { selectMessage }  from "../../redux/slices/messageSlice";
-import { useAppSelector } from "../../hooks/reduxHooks";
+import SocketService      from "@/services/SocketServices";
+import { selectMessage }  from "@/redux/slices/messageSlice";
+import { useAppSelector } from "@/hooks/reduxHooks";
 
 type MessageChatBoxProps = {
   socketService: SocketService;

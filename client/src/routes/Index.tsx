@@ -1,5 +1,5 @@
 import React, {  useState } from "react";
-import useFetchRouter from "../hooks/useFetchRouter";
+import useFetchRouter from "@/hooks/useFetchRouter";
 
 function RouteIndex() {
   const DummyComponent = () => <React.Fragment />;

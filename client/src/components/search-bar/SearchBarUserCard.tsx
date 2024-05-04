@@ -1,5 +1,5 @@
-import avatar              from "../../assets/icons/avatar.png";
-import CloseIcon           from "../../assets/icons/svg/close-icon-black.svg?react";
+import avatar              from "@/assets/icons/avatar.png";
+import CloseIcon           from "@/assets/icons/svg/close-icon-black.svg?react";
 import { useNavigate }     from "react-router-dom";
 import { MutationTrigger } from "@reduxjs/toolkit/dist/query/react/buildHooks";
 

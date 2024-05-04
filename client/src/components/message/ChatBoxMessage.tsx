@@ -1,4 +1,4 @@
-import usersPicture from "../../assets/icons/avatar.png";
+import usersPicture from "@/assets/icons/avatar.png";
 
 function ChatBoxMessage({ value, data }: any) {
   return (

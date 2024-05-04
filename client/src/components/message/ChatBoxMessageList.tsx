@@ -1,6 +1,6 @@
-import ChatBoxMessage     from './ChatBoxMessage';
-import { selectMessage }  from 'redux/slices/messageSlice';
-import { useAppSelector } from 'hooks/reduxHooks';
+import ChatBoxMessage     from "./ChatBoxMessage";
+import { selectMessage }  from "@/redux/slices/messageSlice";
+import { useAppSelector } from "@/hooks/reduxHooks";
 
 function ChatBoxMessageList({ userDataApi, messageRef, comingMessage }: any) {
   const messages = useAppSelector(selectMessage);

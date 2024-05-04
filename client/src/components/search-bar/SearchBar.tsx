@@ -1,6 +1,6 @@
 import { useState }    from 'react';
 import SearchBarBody   from './SearchBarBody';
-import { ClickedLink } from 'pages/Index';
+import { ClickedLink } from '@/pages/Index';
 import SearchBarHeader from './SearchBarHeader';
 
 type SearchBarProps = {

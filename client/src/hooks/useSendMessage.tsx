@@ -1,6 +1,6 @@
-import { useCallback } from 'react';
-import { MessageType } from '../interfaces/types';
-import { useSendNewMessagesMutation } from "../redux/api/chatApi";
+import { useCallback }                from 'react';
+import { MessageType }                from '@/interfaces/types';
+import { useSendNewMessagesMutation } from "@/redux/api/chatApi";
 
 type useSendMessageHandlerProps = {
   userDataApi: any;

@@ -1,12 +1,12 @@
 import React, { useState, forwardRef } from "react";
-import useFetchLastScroll              from "../hooks/useFetchLastScroll";
-import useFetchFeedOnScroll            from "../hooks/useFetchFeedOnScroll";
+import useFetchLastScroll              from "@/hooks/useFetchLastScroll";
+import useFetchFeedOnScroll            from "@/hooks/useFetchFeedOnScroll";
 
-import FeedLoading                     from "../components/feed/FeedLoading";
-import FeedListPost                    from "../components/feed/FeedListPost";
+import FeedLoading                     from "@/components/feed/FeedLoading";
+import FeedListPost                    from "@/components/feed/FeedListPost";
 
-import { IEPost }                      from "../interfaces/interface";
-import { useGetUserFeedMutation }      from "redux/api/feedApi";
+import { IEPost }                      from "@/interfaces/interface";
+import { useGetUserFeedMutation }      from "@/redux/api/feedApi";
 
 type FeedProps = {
   feeds: { feed: IEPost[] };

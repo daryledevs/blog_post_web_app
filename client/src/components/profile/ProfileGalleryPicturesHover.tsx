@@ -1,6 +1,6 @@
 import React                      from "react";
-import heart                      from "../../assets/icons/heart-filled-white.png";
-import comment                    from "../../assets/icons/comment-filled.png";
+import heart                      from "@/assets/icons/heart-filled-white.png";
+import comment                    from "@/assets/icons/comment-filled.png";
 import ProfileGalleryPicturesCard from "./ProfileGalleryPicturesHoverCard";
 
 const images = [
