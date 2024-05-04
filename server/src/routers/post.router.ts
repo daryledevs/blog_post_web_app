@@ -4,7 +4,7 @@ import PostsService      from "@/services/post/post.service.impl";
 import UserRepository    from "@/repositories/user/user.repository.impl";
 import PostsController   from "@/controllers/post.controller";
 import PostsRepository   from "@/repositories/post/post.repository.impl";
-import CloudinaryService from "@/utils/cloudinary-service.util";
+import CloudinaryService from "@/libraries/cloudinary/cloudinary-service.lib";
 
 const router = express.Router();
 

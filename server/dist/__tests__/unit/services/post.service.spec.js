@@ -10,7 +10,7 @@ const user_repository_impl_1 = __importDefault(require("@/repositories/user/user
 const post_repository_impl_1 = __importDefault(require("@/repositories/post/post.repository.impl"));
 const generate_data_util_1 = __importDefault(require("../../utils/generate-data.util"));
 const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
-const cloudinary_service_util_1 = __importDefault(require("@/utils/cloudinary-service.util"));
+const cloudinary_service_lib_1 = __importDefault(require("@/libraries/cloudinary/cloudinary-service.lib"));
 const vitest_1 = require("vitest");
 vitest_1.vi.mock("@/repositories/feed/feed.repository.impl");
 vitest_1.vi.mock("@/repositories/user/user.repository.impl");
@@ -32,7 +32,7 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
     const existingPost = posts[0];
     const nonExistingPost = generate_data_util_1.default.createPost(1000);
     (0, vitest_1.beforeEach)(() => {
-        cloudinary = new cloudinary_service_util_1.default();
+        cloudinary = new cloudinary_service_lib_1.default();
         postRepository = new post_repository_impl_1.default();
         userRepository = new user_repository_impl_1.default();
         postService = new post_service_impl_1.default(postRepository, userRepository, cloudinary);

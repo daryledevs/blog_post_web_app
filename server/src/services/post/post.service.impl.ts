@@ -10,7 +10,7 @@ import IPostService         from "./post.service";
 import PostRepository       from "@/repositories/post/post.repository.impl";
 import UserRepository       from "@/repositories/user/user.repository.impl";
 import ApiErrorException    from "@/exceptions/api.exception";
-import CloudinaryService    from "@/utils/cloudinary-service.util";
+import CloudinaryService    from "@/libraries/cloudinary/cloudinary-service.lib";
 
 class PostService implements IPostService {
   private postRepository: PostRepository;

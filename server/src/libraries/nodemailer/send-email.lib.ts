@@ -1,5 +1,5 @@
 import mailTransport from "@/config/nodemailer.config";
-import * as dotenv from "dotenv";
+import * as dotenv   from "dotenv";
 dotenv.config();
 
 function sendEmail(to: any, subject: any, token: any) {

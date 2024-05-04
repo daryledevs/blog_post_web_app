@@ -1,7 +1,7 @@
 import jwt                                             from "jsonwebtoken";
 import bcrypt                                          from "bcrypt";
-import sendEmail                                       from "@/utils/send-email.util";
-import CryptoUtil                                      from "@/utils/crypto.util";
+import sendEmail                                       from "@/libraries/nodemailer/send-email.lib";
+import CryptoUtil                                      from "@/libraries/crypto/crypto.lib";
 import AsyncWrapper                                    from "@/utils/async-wrapper.util";
 import { NewUsers }                                    from "@/types/table.types";
 import AuthRepository                                  from "@/repositories/auth/auth.repository.impl";

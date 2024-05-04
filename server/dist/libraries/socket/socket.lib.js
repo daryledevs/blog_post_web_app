@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-class SocketController {
+class SocketService {
     users = [];
     connection(io) {
         return new Promise((resolve, reject) => {
@@ -44,4 +44,4 @@ class SocketController {
     }
 }
 ;
-exports.default = SocketController;
+exports.default = SocketService;

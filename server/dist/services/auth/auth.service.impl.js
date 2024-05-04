@@ -27,8 +27,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const send_email_util_1 = __importDefault(require("@/utils/send-email.util"));
-const crypto_util_1 = __importDefault(require("@/utils/crypto.util"));
+const send_email_lib_1 = __importDefault(require("@/libraries/nodemailer/send-email.lib"));
+const crypto_lib_1 = __importDefault(require("@/libraries/crypto/crypto.lib"));
 const async_wrapper_util_1 = __importDefault(require("@/utils/async-wrapper.util"));
 const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
 const auth_token_util_1 = __importStar(require("@/utils/auth-token.util"));
@@ -111,7 +111,7 @@ class AuthService {
         // Generate tokens
         const resetToken = auth_token_util_1.default.generateToken(args);
         const shortToken = await auth_token_util_1.default.referenceToken();
-        const encryptedToken = crypto_util_1.default.encryptData(resetToken);
+        const encryptedToken = crypto_lib_1.default.encryptData(resetToken);
         const encodedToken = encodeURIComponent(shortToken);
         // Save token to the database
         await this.authRepository.saveResetToken({
@@ -119,7 +119,7 @@ class AuthService {
             encrypted: encryptedToken,
         });
         // Send reset password email
-        (0, send_email_util_1.default)(data.email, "Reset Password", encodedToken);
+        (0, send_email_lib_1.default)(data.email, "Reset Password", encodedToken);
         return "Token sent to your email";
     });
     resetPasswordForm = this.wrap.serviceWrap(async (tokenId) => {
@@ -128,7 +128,7 @@ class AuthService {
         const data = await this.authRepository.findResetTokenById(decodedToken);
         if (!data)
             throw api_exception_1.default.HTTP400Error("Invalid or expired token");
-        const decryptedToken = crypto_util_1.default.decryptData(data.encrypted);
+        const decryptedToken = crypto_lib_1.default.decryptData(data.encrypted);
         // then decrypt the code to check if it is still valid.
         return auth_token_util_1.default.verifyResetPasswordToken(decryptedToken, tokenId);
     });

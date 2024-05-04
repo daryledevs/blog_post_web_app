@@ -1,6 +1,6 @@
 import { Socket, Server } from "socket.io";
 
-class SocketController {
+class SocketService {
   private users: { userId: any; socketId: any }[] = [];
 
   public connection(io: Server): Promise<void> {
@@ -54,4 +54,4 @@ class SocketController {
   }
 };
 
-export default SocketController;
+export default SocketService;

@@ -31,17 +31,17 @@ const db_database_1 = require("./database/db.database");
 const socket_io_1 = require("socket.io");
 const dotenv = __importStar(require("dotenv"));
 const socket_config_1 = __importDefault(require("./config/socket.config"));
+const socket_lib_1 = __importDefault(require("./libraries/socket/socket.lib"));
 const http_1 = require("http");
-const socket_1 = __importDefault(require("./services/socket-io/socket"));
 dotenv.config();
 const server = (0, http_1.createServer)(app_1.default);
 const io = new socket_io_1.Server(server, socket_config_1.default);
-const socketController = new socket_1.default();
+const socketService = new socket_lib_1.default();
 const PORT = parseInt(process.env.SERVER_PORT ?? "5000");
 const HOST = process.env.SERVER_HOST || "localhost";
 server.listen(PORT, HOST, () => {
     console.log(`Server listening on ${HOST}:${PORT} in ${app_1.default.settings.env}`);
-    socketController.connection(io).then(() => {
+    socketService.connection(io).then(() => {
         console.log("Socket connection ready!");
     });
 });

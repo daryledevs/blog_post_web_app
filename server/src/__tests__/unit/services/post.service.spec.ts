@@ -5,7 +5,7 @@ import UserRepository                                        from "@/repositorie
 import PostRepository                                        from "@/repositories/post/post.repository.impl";
 import GenerateMockData                                      from "../../utils/generate-data.util";
 import ApiErrorException                                     from "@/exceptions/api.exception";
-import CloudinaryService                                     from "@/utils/cloudinary-service.util";
+import CloudinaryService                                     from "@/libraries/cloudinary/cloudinary-service.lib";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 
 vi.mock("@/repositories/feed/feed.repository.impl");
