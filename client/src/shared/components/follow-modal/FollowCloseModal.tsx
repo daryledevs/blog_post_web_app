@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router';
-import closeIcon from "../../../assets/icons/x_icon.png";
+import closeIcon from "@/assets/icons/x_icon.png";
 
 function FollowCloseModal() {
   const navigate = useNavigate();

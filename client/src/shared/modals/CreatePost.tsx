@@ -1,15 +1,17 @@
 import React, { useState, useCallback, useRef } from "react";
-import { useLocation } from "react-router-dom";
-import close from "../../assets/icons/close-modal.png";
-import image_gallery from "../../assets/icons/image-gallery.png";
-import ImageUploading, { ImageListType } from "react-images-uploading";
-import Cropper from "react-easy-crop";
-import arrow_left from "../../assets/icons/left-arrow.png";
-import { Area } from "react-easy-crop/types";
-import api from "../../config/api";
-import avatar from "../../assets/icons/avatar.png";
-import { useGetUserDataQuery } from "../../redux/api/userApi";
-import { ClickedLink } from "pages/Index";
+import Cropper                                  from "react-easy-crop";
+import { useLocation }                          from "react-router-dom";
+import ImageUploading, { ImageListType }        from "react-images-uploading";
+import { Area }                                 from "react-easy-crop/types";
+
+import api                                      from "@/config/api";
+import { ClickedLink }                          from "@/pages/Index";
+import { useGetUserDataQuery }                  from "@/redux/api/userApi";
+
+import close                                    from "@/assets/icons/close-modal.png";
+import image_gallery                            from "@/assets/icons/image-gallery.png";
+import arrow_left                               from "@/assets/icons/left-arrow.png";
+import avatar                                   from "@/assets/icons/avatar.png";
 
 interface Modal {
   clickedLink: ClickedLink;

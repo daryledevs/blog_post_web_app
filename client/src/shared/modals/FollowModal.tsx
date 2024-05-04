@@ -1,11 +1,13 @@
-import { useState, useEffect } from "react";
-import { useLocation, useParams } from "react-router";
-import FollowLists from "shared/components/follow-modal/FollowLists";
-import FollowModalTitle from "shared/components/follow-modal/FollowModalTitle";
 import {
   useGetFollowersAndFollowingListsMutation,
   useGetUserDataQuery,
-} from "redux/api/userApi";
+}                                 from "@/redux/api/userApi";
+
+import { useState, useEffect }    from "react";
+import { useLocation, useParams } from "react-router";
+
+import FollowLists                from "@/shared/components/follow-modal/FollowLists";
+import FollowModalTitle           from "@/shared/components/follow-modal/FollowModalTitle";
 
 function FollowModal() {
   const location = useLocation();
@@ -13,11 +15,9 @@ function FollowModal() {
   const { username } = useParams();
   const userApiData = useGetUserDataQuery({ person: username || "" });
   const [removedUsers, setRemovedUsers] = useState<Array<number>>([]);
-  
-  const [
-    fetchFollowsLists, 
-    { data: follows, isLoading }
-  ] = useGetFollowersAndFollowingListsMutation();
+
+  const [fetchFollowsLists, { data: follows, isLoading }] =
+    useGetFollowersAndFollowingListsMutation();
 
   useEffect(() => {
     if (userApiData.isLoading) return;

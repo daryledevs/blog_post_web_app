@@ -1,6 +1,6 @@
 import socketIO, { Socket } from "socket.io-client";
-import { MessageType } from "../interfaces/types";
-import socketConfig from "config/socketConfig";
+import { MessageType }      from "@/interfaces/types";
+import socketConfig         from "@/config/socketConfig";
 
 class SocketService {
   private socket: Socket;

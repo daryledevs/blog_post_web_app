@@ -1,4 +1,4 @@
-import avatar from "../../../assets/icons/avatar.png";
+import avatar from "@/assets/icons/avatar.png";
 
 function FollowUserAvatar({ avatar_url }: { avatar_url: string }) {
   return (

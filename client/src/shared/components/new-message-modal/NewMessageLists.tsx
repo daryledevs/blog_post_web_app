@@ -1,6 +1,6 @@
 import React                   from 'react'
 import NewMessageListsCard     from './NewMessageListsCard';
-import { useSearchUsersQuery } from 'redux/api/userApi';
+import { useSearchUsersQuery } from '@/redux/api/userApi';
 
 type NewMessageListsProps = {
   search: string;

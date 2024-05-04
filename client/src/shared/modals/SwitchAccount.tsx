@@ -1,9 +1,11 @@
-import {  useEffect } from 'react'
-import closeModal from "../../assets/icons/close.png";
-import avatar from "../../assets/icons/avatar.png";
-import { useGetUserDataQuery } from '../../redux/api/userApi';
-import { useAppDispatch, useAppSelector } from '../../hooks/reduxHooks';
-import { selectMessage, setSwitchAccountTrigger } from '../../redux/slices/messageSlice';
+import {  useEffect }                             from 'react'
+
+import closeModal                                 from "@/assets/icons/close.png";
+import avatar                                     from "@/assets/icons/avatar.png";
+
+import { useGetUserDataQuery }                    from '@/redux/api/userApi';
+import { useAppDispatch, useAppSelector }         from '@/hooks/reduxHooks';
+import { selectMessage, setSwitchAccountTrigger } from '@/redux/slices/messageSlice';
 
 function SwitchAccount() {
   const userDataApi = useGetUserDataQuery({ person: "" });
@@ -35,11 +37,14 @@ function SwitchAccount() {
             alt=""
           />
         </div>
-        <div className='switch-account__existing-account'>
-          <img src={user.avatar_url ? user.avatar_url : avatar} alt='' />
+        <div className="switch-account__existing-account">
+          <img
+            src={user.avatar_url ? user.avatar_url : avatar}
+            alt=""
+          />
           {user.username}
         </div>
-        <div className='switch-account__footer'>
+        <div className="switch-account__footer">
           <p>Login into an Existing Account</p>
         </div>
       </div>
@@ -47,4 +52,4 @@ function SwitchAccount() {
   );
 }
 
-export default SwitchAccount
+export default SwitchAccount;

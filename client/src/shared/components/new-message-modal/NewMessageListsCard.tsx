@@ -1,5 +1,5 @@
 import React  from "react";
-import avatar from "../../../assets/icons/avatar.png";
+import avatar from "@/assets/icons/avatar.png";
 
 type NewMessageListsCardProps = {
   user: any;

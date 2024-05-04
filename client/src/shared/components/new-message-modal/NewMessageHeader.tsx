@@ -1,6 +1,6 @@
-import closeModal               from "../../../assets/icons/close.png";
-import { useAppDispatch }       from 'hooks/reduxHooks';
-import { setNewMessageTrigger } from 'redux/slices/messageSlice';
+import closeModal               from "@/assets/icons/close.png";
+import { useAppDispatch }       from '@/hooks/reduxHooks';
+import { setNewMessageTrigger } from '@/redux/slices/messageSlice';
 
 function NewMessageHeader() {
   const dispatch = useAppDispatch();

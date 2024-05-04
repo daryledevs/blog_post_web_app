@@ -1,6 +1,6 @@
 import React, { useCallback }    from "react";
 import FollowUserCard            from "./FollowUserCard";
-import { useFollowUserMutation } from "redux/api/userApi";
+import { useFollowUserMutation } from "@/redux/api/userApi";
 
 type FollowListsProps = {
   path: string;
