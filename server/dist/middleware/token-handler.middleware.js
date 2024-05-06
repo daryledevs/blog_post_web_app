@@ -38,27 +38,36 @@ const tokenHandler = async (req, res, next) => {
         if ((0, route_exception_util_1.default)(req.path))
             return next();
         const userRepository = new user_repository_impl_1.default();
+        // get the refresh token and access token from the request
         const refreshToken = req.cookies.REFRESH_TOKEN;
         const accessToken = req.headers.authorization?.split(" ")[1];
+        // get the secret keys from the environment variables
         const refreshSecret = process.env.REFRESH_TKN_SECRET;
         const accessSecret = process.env.ACCESS_TKN_SECRET;
-        const isTokenInvalid = (0, token_invalid_util_1.default)(accessToken, refreshToken);
+        // check if the refresh token and access token are valid
+        const isRefreshTokenInvalid = (0, token_invalid_util_1.default)(refreshToken);
+        const isAccessTokenInvalid = (0, token_invalid_util_1.default)(accessToken);
         // if the token is not provided, return an error
-        if (isTokenInvalid)
+        if (isRefreshTokenInvalid) {
             return next(api_exception_1.default.HTTP401Error("Token is not provided"));
+        }
         // verify the refresh token and access token
         const { refreshError, refreshDecode } = await auth_token_util_1.default.verifyAuthToken(refreshToken, refreshSecret, "refresh");
         const { accessError, accessDecode } = await auth_token_util_1.default.verifyAuthToken(accessToken, accessSecret, "access");
-        const isTokenError = [refreshError, accessError].some((status) => status === "JsonWebTokenError");
-        // if the refresh token is not provided, return an error
-        if (isTokenError)
+        // if the token is not undefined or null but JsonWebTokenError, return an error
+        if (!isAccessTokenInvalid && accessError === "JsonWebTokenError") {
             return next(api_exception_1.default.HTTP401Error("Token is not valid"));
-        // if user is not found, return an error
+        }
+        else if (!isRefreshTokenInvalid && refreshError === "JsonWebTokenError") {
+            return next(api_exception_1.default.HTTP401Error("Token is not valid"));
+        }
         const result = await userRepository.findUserById(refreshDecode.user_id);
+        // if user is not found, return an error
         if (!result)
             return next(api_exception_1.default.HTTP404Error("User not found"));
-        // if the refresh token is expired, generate a new refresh token and access token
-        if (refreshError === "TokenExpiredError" || accessError === "TokenExpiredError") {
+        const isTokenExpired = [refreshError, accessError].some((status) => status === "TokenExpiredError");
+        // if the refresh token is expired, generate a new token
+        if (isTokenExpired) {
             // token options
             const payload = {
                 access: {
@@ -90,18 +99,16 @@ const tokenHandler = async (req, res, next) => {
                 .status(200)
                 .send({ accessToken: ACCESS_TOKEN });
         }
-        ;
-        // if the access token is not provided, generate a new access token
+        // if the access token is not provided but refresh token is exists
         if (!accessToken) {
             const { user_id, roles } = result;
             const ACCESS_TOKEN = auth_token_util_1.default.generateToken({
-                payload: { user_id, roles, },
+                payload: { user_id, roles },
                 secret: auth_token_util_1.TokenSecret.ACCESS_SECRET,
                 expiration: auth_token_util_1.Expiration.ACCESS_TOKEN_EXPIRATION,
             });
             return res.status(200).send({ accessToken: ACCESS_TOKEN });
         }
-        ;
         // if the access token is provided, decode the token and pass the user_id and roles to the next middleware
         req.body.user_id = refreshDecode.user_id;
         req.body.roles = accessDecode.roles;
