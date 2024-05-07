@@ -1,0 +1,53 @@
+// created this mixins only for here and readability 
+@mixin sidebar-logo {
+  .sidebar-logo {
+    .sidebar__logo-text{
+      display: none;
+    }
+
+    .sidebar__logo-icon {
+      display: block;
+    };
+  };
+};
+
+// created this mixins only for here and readability 
+@mixin sidebar-tab-lists {
+  .sidebar-tab-lists {
+    li {
+      &:nth-child(2) {
+        div {
+          border: 1px solid #ccc;
+        }
+      }
+
+      div {
+        justify-content: center;
+        padding-left: 0;
+        height: 5vh;
+
+        svg {
+          width: 65%;
+          height: 100%; 
+        }
+
+        span {
+          display: none;
+        };
+      };
+    };
+  };
+};
+
+
+.sidebar__container { 
+  @include device($breakpoint-lg) {
+    &.sidebar__show-search-tab {
+      position: relative;
+      width: 15%;
+
+      @include sidebar-logo;
+      @include sidebar-tab-lists;
+    };
+  };
+};

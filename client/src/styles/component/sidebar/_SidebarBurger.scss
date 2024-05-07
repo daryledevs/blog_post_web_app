@@ -1,0 +1,9 @@
+.sidebar-burger{
+  margin: auto auto 15% auto;
+  cursor: pointer;
+  display: none;
+
+  @include device($breakpoint-md) {
+    display: block;
+  };
+};

@@ -1,10 +1,10 @@
-import ProfileGalleryPictures from "./ProfileGalleryPictures";
+import GalleryPictures from "./GalleryPictures";
 
 const ProfileGallery = function ({ posts }: any) {
   return (
-    <div className="profile-gallery__container">
+    <div className="gallery">
       {posts.post.map((post: any, index: number) => (
-        <ProfileGalleryPictures
+        <GalleryPictures
           key={index}
           post={post}
         />

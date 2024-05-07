@@ -1,0 +1,14 @@
+.sidebar-tab-lists{
+  @include flexbox(center, center, row);
+  width: 100%;
+  
+  div:hover{
+    background-color: rgb(249, 249, 251);
+  };
+
+  @include device($breakpoint-md) {
+    @include flexbox(center, center, column);
+    @include dimension(100%, 50%);
+    margin: auto;
+  };
+};

@@ -22,14 +22,14 @@ function Sidebar({ clickedLink, setClickedLink }: IProps) {
       }`}
     >
       <SidebarLogo />
-      <ul className="sidebar__links">
+      <div className="sidebar-tab-lists">
         <SidebarTabLists
           avatar={user?.avatar_url}
           username={user?.username}
           clickedLink={clickedLink}
           setClickedLink={setClickedLink}
         />
-      </ul>
+      </div>
       <SidebarBurger />
     </div>
   );

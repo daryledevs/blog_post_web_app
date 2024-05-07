@@ -42,7 +42,7 @@ function SidebarTabCard({
   };
 
   return (
-    <li>
+    <li className="sidebar-tab-card">
       <div onClick={() => navigateHandler(item)}>
         <SidebarRenderIcon
           profileSrc={avatar}

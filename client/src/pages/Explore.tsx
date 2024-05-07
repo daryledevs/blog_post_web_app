@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import GridPost                       from "@/components/profile/ProfileGallery";
+import GridPost                       from "@/components/profile/profile-gallery/Gallery";
 import { useGetUserDataQuery }        from "@/redux/api/userApi";
 import { useGetExploreFeedQuery }     from "@/redux/api/feedApi";
 

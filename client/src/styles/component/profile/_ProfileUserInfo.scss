@@ -1,0 +1,11 @@
+.profile-user-info{
+  @include dimension(100%, min-content);
+  border-bottom: 1px solid #ccc;
+
+  .profile-user-info-header {
+    @include flexbox(flex-start, center, row);
+    gap: 5vw;
+    padding: 1rem;
+    border-bottom: 1px solid $border-color;
+  }
+}

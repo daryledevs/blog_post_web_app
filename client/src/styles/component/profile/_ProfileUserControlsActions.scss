@@ -1,0 +1,15 @@
+.profile-user-controls-actions {
+  @include flexbox(flex-start, flex-start, row);
+  width: 100%;
+  max-width: 260px;
+  gap: 10px;
+  
+  button {
+    @include dimension(max-content, min-content);
+    @include border-radius(8px);
+    border: none;
+    padding: 0.4rem 1rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+  };
+}

@@ -1,0 +1,14 @@
+.profile-header {
+  @include flexbox(center, center, column);
+  @include padding-y(0.75rem, 0.8rem);
+  border-bottom: 1px solid $border-color;
+
+  > p {
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  @include device($breakpoint-md) {
+    display: none;
+  }
+}

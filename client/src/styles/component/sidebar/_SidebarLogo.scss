@@ -1,0 +1,10 @@
+.sidebar-logo {
+  @include flexbox(center, center, row);
+  @include dimension(100%, 10%);
+  margin-top: 2.5vh;
+  display: none;
+
+  @include device($breakpoint-md) {
+    display: block;
+  };
+};

@@ -1,0 +1,9 @@
+span {
+  display: none;
+  text-decoration: "none";
+  color: "black";
+  
+  @include device($breakpoint-xl){
+    display: block;
+  };
+};

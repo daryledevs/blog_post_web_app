@@ -1,0 +1,16 @@
+.profile-user-controls {
+  @include flexbox();
+  @include dimension(100%, min-content);
+  gap: 0.5rem;
+  margin-top: -10px;
+  
+  p {
+    font-size: x-large;
+    width: max-content;
+    margin-right: 1rem;
+  }
+
+  @include device($breakpoint-sm) {  
+    flex-direction: row;
+  };
+}

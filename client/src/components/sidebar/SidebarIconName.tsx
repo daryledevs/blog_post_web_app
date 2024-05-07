@@ -4,8 +4,7 @@ function SidebarIconName({ name }: any) {
   return (
     <span
       style={{
-        textDecoration: "none",
-        color: "black",
+        
       }}
     >
       {name}

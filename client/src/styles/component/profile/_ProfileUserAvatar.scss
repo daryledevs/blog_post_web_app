@@ -1,0 +1,15 @@
+.profile-user-avatar{
+  @include dimension();
+
+  img {
+    @include border-radius(500px);
+    @include dimension(80px, 80px);
+    border: 1px solid #ccc;
+    margin: 10px;
+    cursor: pointer;
+
+    @include device(738px){
+      @include dimension(150px, 150px);
+    }
+  }
+}

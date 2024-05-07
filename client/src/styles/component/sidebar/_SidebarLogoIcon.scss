@@ -1,0 +1,14 @@
+.sidebar-logo__icon {
+  @include dimension(100%, 45%);
+  cursor: pointer;
+  display: none;
+  margin: auto;
+    
+  @include device($breakpoint-md) {
+    display: block;
+  };
+
+  @include device($breakpoint-xl) {
+    display: none;  
+  };
+};

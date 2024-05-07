@@ -1,0 +1,10 @@
+.sidebar-logo__text{
+  @include dimension(8vw, 100%);
+  cursor: pointer;
+  display: none;
+  margin-left: 10%; 
+
+  @include device($breakpoint-xl) {
+    display: block;
+  };
+};

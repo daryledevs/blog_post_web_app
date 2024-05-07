@@ -1,5 +1,5 @@
 
-import Links           from "@/shared/constants/nav_links";
+import links           from "@/shared/constants/nav_links";
 import SidebarTabCard  from "./SidebarTabCard";
 import { ClickedLink } from "@/pages/Index";
 
@@ -12,10 +12,10 @@ type SidebarTabListsProps = {
 
 function SidebarTabLists({ avatar, clickedLink, username, setClickedLink } : SidebarTabListsProps) {
   
-  return Links.map((item: any, index: any) => {
+  return links.map((item: any, index: any) => {
     const { name, link } = item;
     const isClicked = [link, name].includes(clickedLink.current);
-    
+
     return (
       <SidebarTabCard
         key={index}

@@ -1,0 +1,24 @@
+.profile-social-stats {
+  @include flexbox(center, center, column);
+
+  > p:first-child {
+    font-weight: 500;
+  }
+
+  > p:nth-child(2) {
+    font-size: small;
+    margin-top: 1px;
+  }
+
+  @include device($breakpoint-md) {
+    flex-direction: row;
+    
+    > p:first-child {
+      margin-right: 5px;
+    }
+
+    > p:nth-child(2) {
+      font-size: medium;
+    }
+  }
+}

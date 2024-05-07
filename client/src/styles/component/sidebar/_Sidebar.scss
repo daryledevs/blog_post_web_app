@@ -1,0 +1,17 @@
+.sidebar__container {
+  @include flexbox(space-between, center, row); 
+  @include dimension(100%, 5vh);
+  position: -webkit-sticky;
+  position: sticky;
+  z-index: 5555;
+  bottom: 0;  
+  border-top: 1px solid $border-color;
+  background-color: white;
+
+  @include device($breakpoint-md) {
+    @include flexbox();
+    border-right: 1px solid $border-color;
+    top: 0;
+    height: 100vh;
+  };
+};

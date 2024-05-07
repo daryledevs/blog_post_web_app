@@ -1,0 +1,9 @@
+.gallery {
+  @include dimension(100%, min-content);
+  display: grid;
+  grid-template-columns: 32% 32% 32%;
+  grid-auto-rows: 15vw;
+  grid-gap: 1vw;
+  margin: 10px auto;
+  justify-content: center;
+};

@@ -1,16 +1,9 @@
-import ProfileHeaderAvatar  from "./ProfileHeaderAvatar";
-import ProfileHeaderDetails from "./ProfileHeaderDetails";
-import { IEUserState }      from "@/interfaces/interface";
+import { ProfileProps } from "@/interfaces/types";
 
-type ProfileHeaderProps = {
-  user: IEUserState;
-};
-
-function ProfileHeader({ user }: ProfileHeaderProps) {
+function ProfileHeader({ user }: ProfileProps) {
   return (
-    <div className="profile__header">
-      <ProfileHeaderAvatar user={user} />
-      <ProfileHeaderDetails user={user} />
+    <div className="profile-header">
+      <p>{user.username}</p>
     </div>
   );
 }

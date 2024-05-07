@@ -1,3 +1,5 @@
+import { IEUserState } from "./interface";
+
 type PersonType = {
   user_id: number;
   username: string;
@@ -13,4 +15,8 @@ type MessageType = {
   text_message: string;
 };
 
-export type { MessageType, PersonType };
+type ProfileProps = {
+  user: IEUserState;
+};
+
+export type { MessageType, PersonType, ProfileProps };

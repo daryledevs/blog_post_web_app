@@ -1,60 +1,17 @@
-.profile__container{
+.profile{
   flex: 1;
+  order: 1;
   overflow-y: scroll;
-
-  .profile__parent {
+  @include dimension(100%, 95vh);
+  
+  .profile__container {
     display: flex;
-    height: 100vh;
     flex-direction: column;
-    width: 82%;
+    @include dimension(100%, 100%);
+  }
 
-    .profile__header{
-      display: flex;
-      justify-content: flex-start;
-      padding: 1% 1% 1% 10.5%;
-      width: 100%;
-      height: min-content;
-      border-bottom: 1px solid #ccc;
-      
-      .profile__avatar-container{
-        position: relative;
-        border-radius: 50%;
-        width: 20%;
-        height: 20vh;
-        margin-right: 1%;
-        border: 1px solid black; // temporary
-
-        .profile_avatar{
-          margin: auto;
-          position: absolute;
-          width: 100%;
-          inset: 0;
-        }
-      }
-
-      .profile__header-details{
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        height: 90%;
-
-        > p:first-child{
-          font-size: 0.8em;
-          font-weight: 700;
-        }
-
-        .profile__header-username{
-          line-height: 55%;
-          height: 50%;
-          font-size: 4em;
-        }
-
-        .profile__header-numbers{
-          width: 320px;
-          display: flex;
-          justify-content: space-between;
-        }
-      }
-    }
+  @include device($breakpoint-md) {
+    @include dimension(100%, 100vh);
+    order: 2;
   }
 }
