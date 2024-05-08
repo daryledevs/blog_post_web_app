@@ -62,7 +62,6 @@ class AuthService implements IAuthService {
       // Check if the password is correct
       const isPasswordMatch = bcrypt.compareSync(password, user.password);
       
-      console.log(password, user.password, isPasswordMatch)
       // If the password is incorrect, return an error
       if (!isPasswordMatch) throw ApiErrorException.HTTP401Error("Invalid password");
 

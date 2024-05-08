@@ -70,7 +70,6 @@ class AuthService {
             throw api_exception_1.default.HTTP404Error("User not found");
         // Check if the password is correct
         const isPasswordMatch = bcrypt_1.default.compareSync(password, user.password);
-        console.log(password, user.password, isPasswordMatch);
         // If the password is incorrect, return an error
         if (!isPasswordMatch)
             throw api_exception_1.default.HTTP401Error("Invalid password");
