@@ -1,10 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
-import baseApi from "./api/baseApi";
-import messageSlice from "./slices/messageSlice";
+import baseApi            from "./api/baseApi";
+import messageSlice       from "./slices/messageSlice";
+import sidebarSlice       from "./slices/sidebarSlice";
 
 const store = configureStore({
   reducer: {
     messages: messageSlice,
+    sidebar: sidebarSlice,
     [baseApi.reducerPath]: baseApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>

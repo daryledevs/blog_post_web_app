@@ -1,13 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { IEOpenConversation } from "../../interfaces/interface";
+import { IEOpenConversation, IEReduxState } from "../../interfaces/interface";
 
-type MessageStateType = {
+export interface IEMessageState {
   openConversation: IEOpenConversation[];
   newMessageTrigger: boolean;
   switchAccountTrigger: boolean;
 };
 
-const initialState: MessageStateType | null = {
+const initialState: IEMessageState | null = {
   openConversation: [],
   newMessageTrigger: false,
   switchAccountTrigger: false,
@@ -34,8 +34,7 @@ const messageSlice = createSlice({
   },
 });
 
-export const selectMessage = (state: { messages: MessageStateType }) =>
-  state.messages;
+export const selectMessage = (state: IEReduxState) => state.messages;
 
 export const {
   setOpenConversation,
