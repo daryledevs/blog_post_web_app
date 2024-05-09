@@ -1,18 +1,18 @@
-import { useState, useCallback, useRef } from "react";
-import Cropper                           from "react-easy-crop";
-import { useLocation }                   from "react-router-dom";
-import ImageUploading, { ImageListType } from "react-images-uploading";
-import { Area }                          from "react-easy-crop/types";
-import { useDispatch, useSelector }      from "react-redux";
+import { useState, useCallback, useRef }  from "react";
+import Cropper                            from "react-easy-crop";
+import { useLocation }                    from "react-router-dom";
+import ImageUploading, { ImageListType }  from "react-images-uploading";
+import { Area }                           from "react-easy-crop/types";
 
-import api                               from "@/config/api";
-import { useGetUserDataQuery }           from "@/redux/api/userApi";
-import { navigatedPage, selectSidebar }  from "@/redux/slices/sidebarSlice";
+import api                                from "@/config/api";
+import { useGetUserDataQuery }            from "@/redux/api/userApi";
+import { navigatedPage, selectSidebar }   from "@/redux/slices/sidebarSlice";
+import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 
-import close                             from "@/assets/icons/close-modal.png";
-import image_gallery                     from "@/assets/icons/image-gallery.png";
-import arrow_left                        from "@/assets/icons/left-arrow.png";
-import avatar                            from "@/assets/icons/avatar.png";
+import close                              from "@/assets/icons/close-modal.png";
+import image_gallery                      from "@/assets/icons/image-gallery.png";
+import arrow_left                         from "@/assets/icons/left-arrow.png";
+import avatar                             from "@/assets/icons/avatar.png";
 
 export interface IEGetCroppedImg {
   image: any;
@@ -25,8 +25,8 @@ function CreatePost() {
   const win: Window = window;
 
   const { pathname } = useLocation();
-  const dispatch = useDispatch();
-  const sidebarState = useSelector(selectSidebar);
+  const dispatch = useAppDispatch();
+  const sidebarState = useAppSelector(selectSidebar);
 
   const userDataApi = useGetUserDataQuery({ person: "" });
   const user = userDataApi?.data?.user;

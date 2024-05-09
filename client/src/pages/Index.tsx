@@ -1,18 +1,18 @@
-import { useEffect }                    from "react";
-import { Outlet, useLocation }          from "react-router-dom";
-import { useDispatch, useSelector }     from "react-redux";
+import { useEffect }                      from "react";
+import { Outlet, useLocation }            from "react-router-dom";
 
-import { useGetUserDataQuery }          from "@/redux/api/userApi";
-import { navigatedPage, selectSidebar } from "@/redux/slices/sidebarSlice";
+import { useGetUserDataQuery }            from "@/redux/api/userApi";
+import { navigatedPage, selectSidebar }   from "@/redux/slices/sidebarSlice";
+import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 
-import CreatePost                       from "@/shared/modals/CreatePost";
-import Sidebar                          from "@/components/sidebar/Sidebar";
-import SearchBar                        from "@/components/search-bar/SearchBar";
+import CreatePost                         from "@/shared/modals/CreatePost";
+import Sidebar                            from "@/components/sidebar/Sidebar";
+import SearchBar                          from "@/components/search-bar/SearchBar";
 
 function Index() {
   const { hash, pathname, search } = useLocation();
-  const sidebarState = useSelector(selectSidebar);
-  const dispatch = useDispatch();
+  const sidebarState = useAppSelector(selectSidebar);
+  const dispatch = useAppDispatch();
   
   const userDataApi = useGetUserDataQuery({ person: "" });
 

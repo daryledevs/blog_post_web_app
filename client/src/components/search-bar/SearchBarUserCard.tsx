@@ -1,9 +1,11 @@
+import { useNavigate }     from "react-router-dom";
+
 import avatar              from "@/assets/icons/avatar.png";
 import CloseIcon           from "@/assets/icons/svg/close-icon-black.svg?react";
-import { useNavigate }     from "react-router-dom";
+
+import { useAppDispatch }  from "@/hooks/reduxHooks";
 import { MutationTrigger } from "@reduxjs/toolkit/dist/query/react/buildHooks";
-import { useDispatch } from "react-redux";
-import { navigatedPage } from "@/redux/slices/sidebarSlice";
+import { navigatedPage }   from "@/redux/slices/sidebarSlice";
 
 type SearchBarUserCardProps = {
   user: any;
@@ -21,7 +23,7 @@ function SearchBarUserCard({
   onClick,
 }: SearchBarUserCardProps) {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const recentSearchesHandler = (
     person: any,

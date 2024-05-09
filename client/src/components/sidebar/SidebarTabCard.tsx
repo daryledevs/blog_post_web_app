@@ -1,9 +1,9 @@
-import { useNavigate }                  from 'react-router';
-import { useDispatch, useSelector }     from 'react-redux';
-import { navigatedPage, selectSidebar } from '@/redux/slices/sidebarSlice';
+import { useNavigate }                    from 'react-router';
+import { navigatedPage, selectSidebar }   from '@/redux/slices/sidebarSlice';
 
-import SidebarRenderIcon                from './SidebarRenderIcon';
-import SidebarIconName                  from './SidebarIconName';
+import SidebarRenderIcon                  from './SidebarRenderIcon';
+import SidebarIconName                    from './SidebarIconName';
+import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
 
 export interface SidebarProps {
   item: any;
@@ -19,8 +19,8 @@ function SidebarTabCard({
   username,
 }: SidebarProps) {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const sidebarState = useSelector(selectSidebar);
+  const dispatch = useAppDispatch();
+  const sidebarState = useAppSelector(selectSidebar);
 
   const dispatchHandler = (previous: string, current: string) => {
     dispatch(
