@@ -5,12 +5,12 @@
   position: sticky;
   z-index: 5555;
   bottom: 0;  
-  border-top: 1px solid $border-color;
+  border-top: 1px solid $border-grey;
   background-color: white;
 
   @include device($breakpoint-md) {
     @include flexbox();
-    border-right: 1px solid $border-color;
+    border-right: 1px solid $border-grey;
     top: 0;
     height: 100vh;
   };
