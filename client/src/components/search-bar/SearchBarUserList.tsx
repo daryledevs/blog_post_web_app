@@ -7,7 +7,6 @@ type SearchBarUserListProps = {
   list: any;
   user: any;
   setSearch: any;
-  setClickedLink: any;
   isRecentSearch: boolean;
   onClick: MutationTrigger<any>;
 }
@@ -16,7 +15,6 @@ function SearchBarUserList({
   list,
   user,
   setSearch,
-  setClickedLink,
   isRecentSearch,
   onClick,
 }: SearchBarUserListProps) {
@@ -30,7 +28,6 @@ function SearchBarUserList({
             user={searchUser}
             isRecentSearch={isRecentSearch}
             setSearch={setSearch}
-            setClickedLink={setClickedLink}
             onClick={onClick}
           />
         ))

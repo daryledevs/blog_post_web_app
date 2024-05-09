@@ -11,13 +11,11 @@ import {
 
 type SearchBarBodyProps = {
   search: string;
-  setClickedLink: React.Dispatch<React.SetStateAction<any>>;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
 };
 
 function SearchBarBody({
   search,
-  setClickedLink,
   setSearch,
 }: SearchBarBodyProps) {
   const userApiData = useGetUserDataQuery({ person: "" });
@@ -61,7 +59,6 @@ function SearchBarBody({
           user={user}
           isRecentSearch={!search}
           setSearch={setSearch}
-          setClickedLink={setClickedLink}
           onClick={search ? 
             saveRecentSearch : 
             deleteRecentSearch

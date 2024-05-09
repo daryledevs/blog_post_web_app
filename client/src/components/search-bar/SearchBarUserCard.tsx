@@ -2,6 +2,8 @@ import avatar              from "@/assets/icons/avatar.png";
 import CloseIcon           from "@/assets/icons/svg/close-icon-black.svg?react";
 import { useNavigate }     from "react-router-dom";
 import { MutationTrigger } from "@reduxjs/toolkit/dist/query/react/buildHooks";
+import { useDispatch } from "react-redux";
+import { navigatedPage } from "@/redux/slices/sidebarSlice";
 
 type SearchBarUserCardProps = {
   user: any;
@@ -9,18 +11,17 @@ type SearchBarUserCardProps = {
   isRecentSearch: boolean;
   onClick: MutationTrigger<any>;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
-  setClickedLink: React.Dispatch<React.SetStateAction<any>>;
 };
 
 function SearchBarUserCard({
   user,
   person,
   isRecentSearch,
-  setClickedLink,
   setSearch,
   onClick,
 }: SearchBarUserCardProps) {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const recentSearchesHandler = (
     person: any,
@@ -37,7 +38,7 @@ function SearchBarUserCard({
 
     // Reset the search and navigate to the user's profile
     setSearch("");
-    setClickedLink({ previous: "", current: "Profile" });
+    dispatch(navigatedPage({ previous: "", current: "Profile" }));
     navigate(`/${user.username}`);
   };
 

@@ -1,16 +1,15 @@
-import React             from 'react'
-import { useNavigate }   from 'react-router';
-import SidebarRenderIcon from './SidebarRenderIcon';
-import SidebarIconName   from './SidebarIconName';
-import { ClickedLink }   from '@/pages/Index';
+import { useNavigate }                  from 'react-router';
+import { useDispatch, useSelector }     from 'react-redux';
+import { navigatedPage, selectSidebar } from '@/redux/slices/sidebarSlice';
 
-interface SidebarProps {
+import SidebarRenderIcon                from './SidebarRenderIcon';
+import SidebarIconName                  from './SidebarIconName';
+
+export interface SidebarProps {
   item: any;
   avatar: string;
   username: string;
   isClicked: boolean;
-  clickedLink: ClickedLink;
-  setClickedLink: React.Dispatch<React.SetStateAction<ClickedLink>>;
 }
 
 function SidebarTabCard({
@@ -18,27 +17,47 @@ function SidebarTabCard({
   item,
   isClicked,
   username,
-  clickedLink,
-  setClickedLink,
 }: SidebarProps) {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const sidebarState = useSelector(selectSidebar);
 
+  const dispatchHandler = (previous: string, current: string) => {
+    dispatch(
+      navigatedPage({
+        previous: previous,
+        current: current,
+      })
+    );
+  };
+
+  // Determine the link based on the item
   const navigateHandler = (item: any) => {
-    if (item.link === "/profile") {
-      const link = `/${username}`;
+    const profilePage = `/${username}`;
+    const profileLink = "/profile";
+
+    // If the item link is "/profile", set the link to the username
+    const link = item.link === profileLink ? profilePage : item.link;
+    const name = item.name;
+
+    // If the link is "/profile" or the link is not "Create" or "Search",
+    // navigate to the page's link
+    if (link === "/profile" || link !== "none") {
       navigate(link);
-      setClickedLink({ previous: clickedLink.current, current: item.name });
-    } else if (item.link !== "none") {
-      navigate(item.link);
-      setClickedLink({ previous: clickedLink.current, current: item.link });
-    } else {
-      if (clickedLink.current === item.name) {
-        setClickedLink({ previous: "", current: clickedLink.previous });
-      } else {
-        setClickedLink({ previous: clickedLink.current, current: item.name });
-      }
-      
+      return dispatchHandler(
+        sidebarState.current,
+        link === "/profile" ? name : link
+      );
     }
+
+    // If the item is "Create" or "Search",
+    // then close the current view and navigate to the previous view
+    if (sidebarState.current === name) {
+      return dispatchHandler(sidebarState.current, sidebarState.previous);
+    }
+
+    // Navigation for "Create" or "Search" view
+    dispatchHandler(sidebarState.current, name);
   };
 
   return (

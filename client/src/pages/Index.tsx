@@ -1,51 +1,53 @@
-import React, { useEffect, useState }     from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { useEffect }                    from "react";
+import { Outlet, useLocation }          from "react-router-dom";
+import { useDispatch, useSelector }     from "react-redux";
 
-import CreatePost              from "@/shared/modals/CreatePost";
-import Sidebar                 from "@/components/sidebar/Sidebar";
-import SearchBar               from "@/components/search-bar/SearchBar";
-import { useGetUserDataQuery } from "@/redux/api/userApi";
+import { useGetUserDataQuery }          from "@/redux/api/userApi";
+import { navigatedPage, selectSidebar } from "@/redux/slices/sidebarSlice";
 
-export type ClickedLink = {
-  previous: string;
-  current: string;
-};
+import CreatePost                       from "@/shared/modals/CreatePost";
+import Sidebar                          from "@/components/sidebar/Sidebar";
+import SearchBar                        from "@/components/search-bar/SearchBar";
 
 function Index() {
   const { hash, pathname, search } = useLocation();
+  const sidebarState = useSelector(selectSidebar);
+  const dispatch = useDispatch();
   
   const userDataApi = useGetUserDataQuery({ person: "" });
 
-  const [clickedLink, setClickedLink] = useState<ClickedLink>({
-    previous: "",
-    current: pathname,
-  });
-
   useEffect(() => {
     if (userDataApi.data) {
-      const user = userDataApi.data.user;
-      const path = `/${user.username}` === pathname ? "/profile" : pathname;
-      setClickedLink({ previous: "", current: path });
-    }
+      const { username } = userDataApi.data.user;
+      const path = `/${username}` === pathname ? "/profile" : pathname;
+
+      dispatch(
+        navigatedPage({
+          previous: sidebarState.current,
+          current: path,
+        })
+      );
+      return;
+    } 
+    
+    if(!userDataApi.isLoading) {
+      dispatch(
+        navigatedPage({ 
+          previous: sidebarState.current, 
+          current: pathname 
+        })
+      );
+    };
   }, [userDataApi?.data?.user]);
 
   if (userDataApi.isLoading || !userDataApi.data) return null;
 
   return (
     <div className="index__container">
-      <CreatePost
-        clickedLink={clickedLink}
-        setClickedLink={setClickedLink}
-      />
+      <CreatePost />
       <div className="index__sidebar">
-        <Sidebar
-          clickedLink={clickedLink}
-          setClickedLink={setClickedLink}
-        />
-        <SearchBar
-          clickedLink={clickedLink}
-          setClickedLink={setClickedLink}
-        />
+        <Sidebar />
+        <SearchBar />
       </div>
       <Outlet />
     </div>

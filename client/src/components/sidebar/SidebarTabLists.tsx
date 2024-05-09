@@ -1,20 +1,20 @@
 
-import links           from "@/shared/constants/nav_links";
-import SidebarTabCard  from "./SidebarTabCard";
-import { ClickedLink } from "@/pages/Index";
+import { useSelector }   from "react-redux";
+import links             from "@/shared/constants/nav_links";
+import { selectSidebar } from "@/redux/slices/sidebarSlice";
+import SidebarTabCard    from "./SidebarTabCard";
 
 type SidebarTabListsProps = {
   avatar: string;
   username: string;
-  clickedLink: ClickedLink;
-  setClickedLink: React.Dispatch<React.SetStateAction<ClickedLink>>;
 };
 
-function SidebarTabLists({ avatar, clickedLink, username, setClickedLink } : SidebarTabListsProps) {
+function SidebarTabLists({ avatar, username } : SidebarTabListsProps) {
+  const sidebarState = useSelector(selectSidebar);
   
   return links.map((item: any, index: any) => {
     const { name, link } = item;
-    const isClicked = [link, name].includes(clickedLink.current);
+    const isClicked = [link, name].includes(sidebarState.current);
 
     return (
       <SidebarTabCard
@@ -23,8 +23,6 @@ function SidebarTabLists({ avatar, clickedLink, username, setClickedLink } : Sid
         avatar={avatar}
         username={username}
         isClicked={isClicked}
-        clickedLink={clickedLink}
-        setClickedLink={setClickedLink}
       />
     );
   });

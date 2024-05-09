@@ -1,24 +1,24 @@
-import React, { useState }     from "react";
-import SidebarBurger           from "./SidebarBurger";
-import SidebarLogo             from "./SidebarLogo";
-import SidebarTabLists         from "./SidebarTabLists";
-import { ClickedLink }         from "@/pages/Index";
+import { useSelector }         from "react-redux";
 import { useGetUserDataQuery } from "@/redux/api/userApi";
+import { selectSidebar }       from "@/redux/slices/sidebarSlice";
 
-interface IProps {
-  clickedLink: ClickedLink;
-  setClickedLink: React.Dispatch<React.SetStateAction<ClickedLink>>;
-}
+import SidebarLogo             from "./SidebarLogo";
+import SidebarBurger           from "./SidebarBurger";
+import SidebarTabLists         from "./SidebarTabLists";
 
-function Sidebar({ clickedLink, setClickedLink }: IProps) {
+function Sidebar() {
+  const sidebarState = useSelector(selectSidebar);
+
   const userDataApi = useGetUserDataQuery({ person: "" });
   const user = userDataApi?.data?.user;
-  if (userDataApi.isLoading || !userDataApi.data) return null;
+
+  if (userDataApi.isLoading || !user) return null;
 
   return (
     <div
       className={`sidebar__container ${
-        clickedLink.current === "Search" && "sidebar__show-search-tab"
+        sidebarState.current === "Search" && 
+        "sidebar__show-search-tab"
       }`}
     >
       <SidebarLogo />
@@ -26,8 +26,6 @@ function Sidebar({ clickedLink, setClickedLink }: IProps) {
         <SidebarTabLists
           avatar={user?.avatar_url}
           username={user?.username}
-          clickedLink={clickedLink}
-          setClickedLink={setClickedLink}
         />
       </div>
       <SidebarBurger />

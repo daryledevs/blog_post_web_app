@@ -1,36 +1,36 @@
-import React, { useState, useCallback, useRef } from "react";
-import Cropper                                  from "react-easy-crop";
-import { useLocation }                          from "react-router-dom";
-import ImageUploading, { ImageListType }        from "react-images-uploading";
-import { Area }                                 from "react-easy-crop/types";
+import { useState, useCallback, useRef } from "react";
+import Cropper                           from "react-easy-crop";
+import { useLocation }                   from "react-router-dom";
+import ImageUploading, { ImageListType } from "react-images-uploading";
+import { Area }                          from "react-easy-crop/types";
+import { useDispatch, useSelector }      from "react-redux";
 
-import api                                      from "@/config/api";
-import { ClickedLink }                          from "@/pages/Index";
-import { useGetUserDataQuery }                  from "@/redux/api/userApi";
+import api                               from "@/config/api";
+import { useGetUserDataQuery }           from "@/redux/api/userApi";
+import { navigatedPage, selectSidebar }  from "@/redux/slices/sidebarSlice";
 
-import close                                    from "@/assets/icons/close-modal.png";
-import image_gallery                            from "@/assets/icons/image-gallery.png";
-import arrow_left                               from "@/assets/icons/left-arrow.png";
-import avatar                                   from "@/assets/icons/avatar.png";
+import close                             from "@/assets/icons/close-modal.png";
+import image_gallery                     from "@/assets/icons/image-gallery.png";
+import arrow_left                        from "@/assets/icons/left-arrow.png";
+import avatar                            from "@/assets/icons/avatar.png";
 
-interface Modal {
-  clickedLink: ClickedLink;
-  setClickedLink: React.Dispatch<React.SetStateAction<ClickedLink>>;
-}
-
-interface IEGetCroppedImg {
+export interface IEGetCroppedImg {
   image: any;
   crop: any;
   fileName: string;
 }
 
-function CreatePost({ clickedLink, setClickedLink }: Modal) {
+function CreatePost() {
   let rootElement: HTMLElement = document.querySelector<HTMLElement>("div")!;
   const win: Window = window;
 
   const { pathname } = useLocation();
+  const dispatch = useDispatch();
+  const sidebarState = useSelector(selectSidebar);
+
   const userDataApi = useGetUserDataQuery({ person: "" });
   const user = userDataApi?.data?.user;
+
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const [next, setNext] = useState("Crop");
@@ -128,7 +128,13 @@ function CreatePost({ clickedLink, setClickedLink }: Modal) {
           "Content-Type": "multipart/form-data",
         },
       });
-      setClickedLink({ previous: clickedLink.current, current: "Create" });
+
+      dispatch(
+        navigatedPage({
+          previous: sidebarState.current,
+          current: "Create",
+        })
+      );
     } catch (error) {
       console.log(error);
     }
@@ -147,7 +153,7 @@ function CreatePost({ clickedLink, setClickedLink }: Modal) {
   // };
   // }, []);
 
-  if (userDataApi.isLoading || clickedLink.current !== "Create") return null;
+  if (userDataApi.isLoading || sidebarState.current !== "Create") return null;
 
   return (
     <div className="create-post__parent">
@@ -156,10 +162,12 @@ function CreatePost({ clickedLink, setClickedLink }: Modal) {
         alt=""
         className="create-post__close-modal"
         onClick={() =>
-          setClickedLink({
-            previous: "",
-            current: clickedLink.previous
-          })
+          dispatch(
+            navigatedPage({
+              previous: sidebarState.current,
+              current: sidebarState.previous,
+            })
+          )
         }
       />
 
