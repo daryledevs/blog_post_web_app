@@ -16,6 +16,11 @@
   height: $height;
 };
 
+@mixin max-dimension($maxWidth: auto, $maxHeight: auto) {
+  max-width: $maxWidth;
+  max-height: $maxHeight;
+};
+
 @mixin flexbox($justifyContent: flex-start, $alignItems: flex-start, $direction: column) {
   display: flex;
   justify-content: $justifyContent;

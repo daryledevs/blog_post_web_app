@@ -1,0 +1,7 @@
+.login-error-message {
+  @include margin-y(5px, 15px);
+  text-align: center;
+  font-size: 0.8rem;
+  width: 80%;
+  color: red;
+};

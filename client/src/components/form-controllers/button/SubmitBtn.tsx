@@ -2,7 +2,6 @@ import React from "react";
 
 type ButtonTypes = {
   text: string;
-  cursor?: string;
   styles?: React.CSSProperties | undefined;
   isValid?: boolean | undefined;
   defaultBgColor?: string;
@@ -15,7 +14,6 @@ type ButtonTypes = {
 function Button({
   text,
   isValid,
-  cursor,
   styles,
   className,
   defaultBgColor,
@@ -30,8 +28,6 @@ function Button({
     ? bgInvalidColor
     : defaultBgColor;
 
-  const cursorStyle = isValid ? cursor : "default";
-
   return (
     <button
       disabled={!isValid}
@@ -39,7 +35,6 @@ function Button({
       style={{
         ...styles,
         backgroundColor: bgColor,
-        cursor: cursorStyle,
       }}
     >
       {text}

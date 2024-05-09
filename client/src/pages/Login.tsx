@@ -1,9 +1,10 @@
 import { SubmitHandler }    from "react-hook-form";
 import Instagram            from "@/assets/images/instagram-logo.svg?react";
+import { useLoginMutation } from "@/redux/api/authApi";
 import LoginForm            from "@/components/login/LoginForm";
 import LoginErrorMessage    from "@/components/login/LoginErrorMessage";
 import LoginSignUpPrompt    from "@/components/login/LoginSignUpPrompt";
-import { useLoginMutation } from "@/redux/api/authApi";
+import LoginFooter          from "@/components/login/LoginFooter";
 
 type Inputs = {
   userCredential: string;
@@ -25,7 +26,7 @@ function Login() {
     <div className="login__container">
       <div className="login__wrapper">
         <div className="login__parent">
-          <Instagram style={{ margin: "1vh 0 4vh 0" }} />
+          <Instagram style={{ margin: "10px 0 40px 0" }} />
           <LoginForm onSubmit={onSubmit} />
           <LoginErrorMessage
             isError={isError}
@@ -34,6 +35,7 @@ function Login() {
         </div>
         <LoginSignUpPrompt />
       </div>
+        <LoginFooter />
     </div>
   );
 }

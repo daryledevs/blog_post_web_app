@@ -1,0 +1,5 @@
+.login-footer {
+  @include margin-y(auto, 20px);
+  color: $text-grey-blue;
+  font-size: small;
+};

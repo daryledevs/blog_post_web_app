@@ -1,0 +1,16 @@
+.login-signup-prompt {
+  @include flexbox(center, center, column);
+  border: 1px solid $border-grey;
+  margin-top: 10px;
+  padding: 15px;
+  
+  p {
+    font-size: 0.9rem;
+    
+    a {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: $text-bright-blue;
+    };
+  };
+};

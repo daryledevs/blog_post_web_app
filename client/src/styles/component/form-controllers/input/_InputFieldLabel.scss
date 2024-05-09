@@ -1,0 +1,12 @@
+.input-field-label {
+  height: fit-content;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  margin: auto 0.35rem;
+  font-size: 0.8rem;
+  color: $text-blue;
+  pointer-events: none;
+  user-select:none;
+};

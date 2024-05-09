@@ -6,6 +6,6 @@
     @include flexbox(flex-start, center, row);
     gap: 5vw;
     padding: 1rem;
-    border-bottom: 1px solid $border-color;
+    border-bottom: 1px solid $border-grey;
   }
 }

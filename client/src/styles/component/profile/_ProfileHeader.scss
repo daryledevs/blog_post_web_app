@@ -1,7 +1,7 @@
 .profile-header {
   @include flexbox(center, center, column);
   @include padding-y(0.75rem, 0.8rem);
-  border-bottom: 1px solid $border-color;
+  border-bottom: 1px solid $border-grey;
 
   > p {
     font-size: 0.9rem;

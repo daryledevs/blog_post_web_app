@@ -1,0 +1,6 @@
+.login-form-fields {
+  @include flexbox();
+  width: 100%;
+  gap: 0.5rem;
+  height: min-content
+};

@@ -3,8 +3,19 @@
 @import "./base/Reset.scss";
 
 @import "../styles/component/Chat.scss";
-@import "../styles/component/LoginForm.scss";
-@import "../styles/component/FormControllers/TextInput.scss";
+@import "../styles/component/form-controllers/input/InputField.scss";
+@import "../styles/component/form-controllers/input/InputFieldLabel.scss";
+@import "../styles/component/form-controllers/input/FieldErrorMessage.scss";
+@import "../styles/component/form-controllers/input/ShowPassword.scss";
+
+@import "../styles/pages/Login.scss";
+@import "../styles/component/login/LoginForm.scss";
+@import "../styles/component/login/LoginFormFields.scss";
+@import "../styles/component/login/LoginSignUpPrompt.scss";
+@import "../styles/component/login/ForgotPasswordLink.scss";
+@import "../styles/component/login/LoginSubmitBtn.scss";
+@import "../styles/component/login/LoginErrorMessage.scss";
+@import "../styles/component/login/LoginFooter.scss";
 
 @import "../styles/component/sidebar/Sidebar.scss";
 @import "../styles/component/sidebar/SidebarShowSearchTab";
@@ -31,7 +42,6 @@
 
 @import "../styles/pages/Explore.scss";
 @import "../styles/pages/Message.scss";
-@import "../styles/pages/Login.scss";
 @import "../styles/pages/Feed.scss";
 @import './pages/Index.scss';
 

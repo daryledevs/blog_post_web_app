@@ -1,9 +1,10 @@
 import React, { useState }                           from "react";
-import ShowPassword                                  from "./ShowPassword";
-import FieldErrorMessage                             from "./FieldErrorMessage";
 import { UseFormRegister, FieldError, UseFormWatch } from "react-hook-form";
+import ShowPassword                                  from "./ShowPassword";
+import InputFieldLabel                               from "./InputFieldLabel";
+import FieldErrorMessage                             from "./FieldErrorMessage";
 
-type TextInputProps = {
+export type TextInputProps = {
   inputTitle: string;
   type: string;
   placeholder: string;
@@ -44,7 +45,7 @@ function TextInput({
           required
           {...register(inputTitle, { required: true })}
         />
-        <label>{placeholder}</label>
+        <InputFieldLabel placeholder={placeholder} />
         <ShowPassword
           title={inputTitle}
           value={formValue}
