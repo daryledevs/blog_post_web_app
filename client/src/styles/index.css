@@ -459,13 +459,13 @@ button {
   position: relative;
 }
 
-span {
+.sidebar-icon-name {
   display: none;
   text-decoration: "none";
   color: "black";
 }
 @media (min-width: 1200px) {
-  span {
+  .sidebar-icon-name {
     display: block;
   }
 }

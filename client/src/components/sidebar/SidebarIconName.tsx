@@ -1,15 +1,5 @@
-import React from 'react'
-
-function SidebarIconName({ name }: any) {
-  return (
-    <span
-      style={{
-        
-      }}
-    >
-      {name}
-    </span>
-  );
+function SidebarIconName({ name }: { name: string }) {
+  return <span className="sidebar-icon-name">{name}</span>;
 }
 
-export default SidebarIconName
+export default SidebarIconName;
