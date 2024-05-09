@@ -16,8 +16,9 @@ const sidebarSlice = createSlice({
   initialState,
   reducers: {
     navigatedPage: (state, action) => {
-      state.previous = state.current;
-      state.current = action.payload;
+      const payload = action.payload;
+      state.previous = payload.previous;
+      state.current = payload.current;
     },
   },
 });
