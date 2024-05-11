@@ -1,6 +1,6 @@
 .profile-social-stats {
   @include flexbox(center, center, column);
-
+  
   > p:first-child {
     font-weight: 500;
   }

@@ -424,9 +424,6 @@ button {
   flex-direction: row;
   width: 100%;
 }
-.sidebar-tab-lists div:hover {
-  background-color: rgb(249, 249, 251);
-}
 @media (min-width: 768px) {
   .sidebar-tab-lists {
     display: flex;
@@ -435,7 +432,6 @@ button {
     flex-direction: column;
     width: 100%;
     height: 50%;
-    margin: auto;
   }
 }
 
@@ -443,20 +439,37 @@ button {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: row;
+  flex-direction: column;
   width: 100%;
   height: 100%;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
 }
 .sidebar-tab-card div {
-  cursor: pointer;
-  display: inherit;
+  width: 90%;
+  height: 100%;
+  display: flex;
+  justify-content: flex-start;
   align-items: center;
-  gap: 1vw;
+  flex-direction: row;
+  cursor: pointer;
+  border-radius: 9px;
+}
+.sidebar-tab-card div:hover {
+  background-color: rgb(242, 242, 242);
 }
 .sidebar-tab-card div svg {
   width: 100%;
   height: 3.2vh;
   position: relative;
+}
+@media (min-width: 1200px) {
+  .sidebar-tab-card div svg {
+    width: 30%;
+    height: 3.2vh;
+  }
 }
 
 .sidebar-icon-name {
@@ -482,17 +495,31 @@ button {
 }
 
 .profile, .explore__container {
+  width: 100%;
+  height: 95vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
   flex: 1;
   order: 1;
   overflow-y: scroll;
-  width: 100%;
-  height: 95vh;
 }
 .profile .profile__container, .explore__container .profile__container {
-  display: flex;
-  flex-direction: column;
   width: 100%;
   height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+}
+@media (min-width: 1024px) {
+  .profile .profile__container, .explore__container .profile__container {
+    max-width: 67%;
+    max-height: 100%;
+  }
 }
 @media (min-width: 768px) {
   .profile, .explore__container {
@@ -522,18 +549,22 @@ button {
 }
 
 .profile-user-info {
-  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 90%;
   height: min-content;
-  border-bottom: 1px solid #ccc;
 }
 .profile-user-info .profile-user-info-header {
   display: flex;
   justify-content: flex-start;
   align-items: center;
   flex-direction: row;
+  width: 100%;
+  height: auto;
   gap: 5vw;
   padding: 1rem;
-  border-bottom: 1px solid rgb(204, 204, 204);
 }
 
 .profile-user-avatar {
@@ -603,12 +634,23 @@ button {
   font-size: 0.9rem;
 }
 
+.profile-user-info-footer {
+  width: 100%;
+  border-top: 1px solid rgb(204, 204, 204);
+}
+@media (min-width: 768px) {
+  .profile-user-info-footer {
+    display: none;
+  }
+}
+
 .profile-user-stats, .profile-user-stats-xs, .profile-user-stats-md {
   display: flex;
   justify-content: space-around;
   align-items: center;
   flex-direction: row;
-  height: 90%;
+  width: 100%;
+  height: auto;
   padding: 0.8rem;
 }
 .profile-user-stats > p:first-child, .profile-user-stats-xs > p:first-child, .profile-user-stats-md > p:first-child {
@@ -668,12 +710,24 @@ button {
 .gallery {
   width: 100%;
   height: min-content;
+  padding-top: 5px;
+  padding-bottom: 5px;
   display: grid;
-  grid-template-columns: 32% 32% 32%;
-  grid-auto-rows: 15vw;
-  grid-gap: 1vw;
-  margin: 10px auto;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 30vw;
+  gap: 2px;
   justify-content: center;
+  border-top: 1px solid rgb(204, 204, 204);
+}
+@media (min-width: 768px) {
+  .gallery {
+    grid-template-rows: 28vw;
+  }
+}
+@media (min-width: 1024px) {
+  .gallery {
+    grid-template-rows: 19.5vw;
+  }
 }
 
 .gallery-pictures {
@@ -688,7 +742,6 @@ button {
   flex-direction: row;
   width: 100%;
   height: 100%;
-  gap: 1.2vw;
   position: relative;
   background-repeat: no-repeat;
   background-size: 100% 100%;
@@ -935,7 +988,7 @@ button {
 @media (min-width: 1200px) {
   .index__container .index__sidebar {
     order: 1;
-    width: 10vw;
+    width: 14vw;
   }
 }
 @media (min-width: 768px) {

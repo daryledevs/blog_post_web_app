@@ -1,7 +1,8 @@
-import ProfileUserStats from './ProfileUserStats';
-import ProfileUserAvatar from './ProfileUserAvatar';
-import { ProfileProps } from '@/interfaces/types';
-import ProfileUserControls from './ProfileUserControls';
+import ProfileUserStats      from './ProfileUserStats';
+import ProfileUserAvatar     from './ProfileUserAvatar';
+import { ProfileProps }      from '@/interfaces/types';
+import ProfileUserControls   from './ProfileUserControls';
+import ProfileUserInfoFooter from './ProfileUserInfoFooter';
 
 function ProfileUserInfo({ user }: ProfileProps) {
   return (
@@ -16,12 +17,7 @@ function ProfileUserInfo({ user }: ProfileProps) {
           />
         </div>
       </div>
-      <div className="profile-user-info-footer">
-        <ProfileUserStats
-          user={user}
-          className="profile-user-stats-xs"
-        />
-      </div>
+      <ProfileUserInfoFooter user={user} />
     </div>
   );
 }

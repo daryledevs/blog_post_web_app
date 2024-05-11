@@ -1,9 +1,18 @@
 .gallery {
   @include dimension(100%, min-content);
+  @include padding-y(5px, 5px);
   display: grid;
-  grid-template-columns: 32% 32% 32%;
-  grid-auto-rows: 15vw;
-  grid-gap: 1vw;
-  margin: 10px auto;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 30vw;
+  gap: 2px;
   justify-content: center;
+  border-top: 1px solid $border-grey;
+
+  @include device($breakpoint-md) {
+    grid-template-rows: 28vw;
+  };
+
+  @include device($breakpoint-lg) {
+    grid-template-rows: 19.5vw;
+  };
 };

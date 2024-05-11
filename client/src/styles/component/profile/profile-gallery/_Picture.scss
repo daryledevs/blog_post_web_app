@@ -1,9 +1,8 @@
 .picture {
   @include flexbox(center, center, row);
   @include dimension(100%, 100%);
-  gap: 1.2vw;
   position: relative;
   background-repeat: no-repeat;
   background-size: 100% 100%;
-  background-position: center center; 
+  background-position: center center;
 };

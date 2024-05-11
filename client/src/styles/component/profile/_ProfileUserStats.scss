@@ -1,16 +1,16 @@
 .profile-user-stats, .profile-user-stats-xs, .profile-user-stats-md {
   @include flexbox(space-around, center, row);
-  height: 90%;
+  @include dimension(100%, auto);
   padding: 0.8rem;
 
   > p:first-child{
     font-size: 0.8em;
     font-weight: 700;
-  }
+  };
 
   > div:nth-child(n + 2) {
     cursor: pointer;
-  }
+  };
 };
 
 .profile-user-stats-xs {
