@@ -41,7 +41,7 @@ class UsersController {
     async (req: Request, res: Response, next: NextFunction) => {
       const search = req.query.search;
       const users = await this.userService.searchUserByFields(search as string);
-      res.status(200).send(users);
+      res.status(200).send({ users });
     }
   );
 

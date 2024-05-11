@@ -29,7 +29,7 @@ class UsersController {
     searchUsersByQuery = this.wrap.apiWrap(async (req, res, next) => {
         const search = req.query.search;
         const users = await this.userService.searchUserByFields(search);
-        res.status(200).send(users);
+        res.status(200).send({ users });
     });
     deleteUser = this.wrap.apiWrap(async (req, res, next) => {
         const user_id = req.params.user_id;
