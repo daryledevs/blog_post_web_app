@@ -1,16 +1,26 @@
 .sidebar-tab-card {
-  @include flexbox(center, center, row);
+  @include flexbox(center, center, column);  
   @include dimension(100%, 100%);
-  
+  @include padding-y(5px, 5px);
+  @include padding-x(5px, 5px);
+
   div {
+    @include dimension(90%, 100%);
+    @include flexbox(flex-start, center, row);    
     cursor: pointer;
-    display: inherit;
-    align-items: center;
-    gap: 1vw;
+    border-radius: 9px;
+
+    &:hover{
+      background-color: rgb(242,242,242);
+    };
 
     svg {
       @include dimension(100%, 3.2vh);
       position: relative;
+
+      @include device($breakpoint-xl) {
+        @include dimension(30%, 3.2vh);
+      };
     };
   };
 };
