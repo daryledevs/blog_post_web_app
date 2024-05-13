@@ -15,20 +15,20 @@ export type ChatHistoryByIdType = {
   avatar_url: string | null;
 };
 
-interface IChatRepository {
+interface IEChatRepository {
   getUserConversationHistoryByUserId: (user_id: number, conversations: number[]) => Promise<ChatHistoryByIdType[]>;
 
-  findConversationByConversationId: (conversation_id: number) => Promise<SelectConversations | undefined>;
+  findConversationById: (conversation_id: number) => Promise<SelectConversations | undefined>;
 
   findConversationByUserId: (user_id: number[]) => Promise<SelectConversations | undefined>;
 
-  getMessagesByConversationId: (conversation_id: number, ids: number[] | number) => Promise<SelectMessages[]>;
+  getMessagesById: (conversation_id: number, ids: number[] | number) => Promise<SelectMessages[]>;
 
   saveNewConversation: (conversation: NewConversations) => Promise<bigint | undefined>;
 
   saveNewMessage: (message: MessageDataType) => Promise<void>;
 
-  deleteConversation: (conversation_id: number) => Promise<void>;
+  deleteConversationById: (conversation_id: number) => Promise<void>;
 }
 
-export default IChatRepository;
+export default IEChatRepository;

@@ -1,14 +1,14 @@
 import { SelectMessages }                       from "@/types/table.types";
 import { ChatHistoryByIdType, MessageDataType } from "@/repositories/chat/chat.repository";
 
-interface IChatService {
+interface IEChatService {
   getChatHistory: (userId: number, listId: number[]) => Promise<ChatHistoryByIdType[]>;
 
   getChatMessages: (chatId: number, listId: number[]) => Promise<SelectMessages[]>;
 
-  newMessageAndConversation: (conversation_id: number, messageData: MessageDataType) => Promise<string>;
+  newMessageAndConversation: (messageData: MessageDataType) => Promise<string>;
 
-  deleteConversation: (conversation_id: number) => Promise<string>;
+  deleteConversationById: (conversation_id: number) => Promise<string>;
 };
 
-export default IChatService;
+export default IEChatService;

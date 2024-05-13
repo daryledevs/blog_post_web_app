@@ -37,7 +37,7 @@ class ChatsRepository {
             .where("conversations.conversation_id", "not in", conversations)
             .execute();
     });
-    findConversationByConversationId = this.wrap.repoWrap(async (conversation_id) => {
+    findConversationById = this.wrap.repoWrap(async (conversation_id) => {
         return await this.database
             .selectFrom("conversations")
             .selectAll()
@@ -58,7 +58,7 @@ class ChatsRepository {
         ]))
             .executeTakeFirst();
     });
-    getMessagesByConversationId = this.wrap.repoWrap(async (conversation_id, ids) => {
+    getMessagesById = this.wrap.repoWrap(async (conversation_id, ids) => {
         return await this.database
             .selectFrom("messages")
             .selectAll()
@@ -82,7 +82,7 @@ class ChatsRepository {
             .values(message)
             .executeTakeFirst();
     });
-    deleteConversation = this.wrap.repoWrap(async (conversation_id) => {
+    deleteConversationById = this.wrap.repoWrap(async (conversation_id) => {
         await this.database
             .deleteFrom("conversations")
             .where("conversation_id", "=", conversation_id)

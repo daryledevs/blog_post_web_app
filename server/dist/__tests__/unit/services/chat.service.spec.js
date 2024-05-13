@@ -77,37 +77,37 @@ vitest_1.vi.mock("@/repositories/chat/chat.repository.impl");
     });
     (0, vitest_1.describe)("getChatMessages (Get the messages of a conversation)", () => {
         (0, vitest_1.test)("should return a list of messages", async () => {
-            chatRepository.findConversationByConversationId = vitest_1.vi
+            chatRepository.findConversationById = vitest_1.vi
                 .fn()
                 .mockResolvedValue(conversations[0]);
-            chatRepository.getMessagesByConversationId = vitest_1.vi
+            chatRepository.getMessagesById = vitest_1.vi
                 .fn()
                 .mockResolvedValue(chats);
             const result = await ChatService.getChatMessages(conversations[0].conversation_id, []);
             (0, vitest_1.expect)(result).toEqual(chats);
-            (0, vitest_1.expect)(chatRepository.findConversationByConversationId).toHaveBeenCalledWith(conversations[0].conversation_id);
-            (0, vitest_1.expect)(chatRepository.getMessagesByConversationId).toHaveBeenCalledWith(conversations[0].conversation_id, []);
+            (0, vitest_1.expect)(chatRepository.findConversationById).toHaveBeenCalledWith(conversations[0].conversation_id);
+            (0, vitest_1.expect)(chatRepository.getMessagesById).toHaveBeenCalledWith(conversations[0].conversation_id, []);
         });
         (0, vitest_1.test)("should throw an error when no args are provided", async () => {
-            chatRepository.findConversationByConversationId = vitest_1.vi.fn();
-            chatRepository.getMessagesByConversationId = vitest_1.vi.fn();
+            chatRepository.findConversationById = vitest_1.vi.fn();
+            chatRepository.getMessagesById = vitest_1.vi.fn();
             await (0, vitest_1.expect)(ChatService.getChatMessages(undefined, [])).rejects.toThrowError(error.noArgsMsg);
-            (0, vitest_1.expect)(chatRepository.findConversationByConversationId).not.toHaveBeenCalled();
-            (0, vitest_1.expect)(chatRepository.getMessagesByConversationId).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(chatRepository.findConversationById).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(chatRepository.getMessagesById).not.toHaveBeenCalled();
         });
         (0, vitest_1.test)("should throw an error when the chat is not found", async () => {
-            chatRepository.findConversationByConversationId = vitest_1.vi
+            chatRepository.findConversationById = vitest_1.vi
                 .fn()
                 .mockResolvedValue(undefined);
-            chatRepository.getMessagesByConversationId = vitest_1.vi.fn();
+            chatRepository.getMessagesById = vitest_1.vi.fn();
             await (0, vitest_1.expect)(ChatService.getChatMessages(conversations[0].conversation_id, [])).rejects.toThrowError(error.chatNotFound);
-            (0, vitest_1.expect)(chatRepository.findConversationByConversationId).toHaveBeenCalledWith(conversations[0].conversation_id);
-            (0, vitest_1.expect)(chatRepository.getMessagesByConversationId).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(chatRepository.findConversationById).toHaveBeenCalledWith(conversations[0].conversation_id);
+            (0, vitest_1.expect)(chatRepository.getMessagesById).not.toHaveBeenCalled();
         });
     });
     (0, vitest_1.describe)("newMessageAndConversation (Create a new message and conversation)", () => {
         (0, vitest_1.test)("should return a success message", async () => {
-            chatRepository.findConversationByConversationId = vitest_1.vi
+            chatRepository.findConversationById = vitest_1.vi
                 .fn()
                 .mockResolvedValue(conversations[0]);
             chatRepository.saveNewConversation = vitest_1.vi
@@ -118,12 +118,12 @@ vitest_1.vi.mock("@/repositories/chat/chat.repository.impl");
                 .mockResolvedValue("Message sent successfully");
             const result = await ChatService.newMessageAndConversation(conversations[0].conversation_id, chats[0]);
             (0, vitest_1.expect)(result).toEqual("Message sent successfully");
-            (0, vitest_1.expect)(chatRepository.findConversationByConversationId).toHaveBeenCalledWith(conversations[0].conversation_id);
+            (0, vitest_1.expect)(chatRepository.findConversationById).toHaveBeenCalledWith(conversations[0].conversation_id);
             (0, vitest_1.expect)(chatRepository.saveNewConversation).not.toHaveBeenCalled();
             (0, vitest_1.expect)(chatRepository.saveNewMessage).toHaveBeenCalledWith(chats[0]);
         });
         (0, vitest_1.test)("should create a new conversation and return a success message", async () => {
-            chatRepository.findConversationByConversationId = vitest_1.vi
+            chatRepository.findConversationById = vitest_1.vi
                 .fn()
                 .mockResolvedValue(undefined);
             chatRepository.saveNewConversation = vitest_1.vi
@@ -134,7 +134,7 @@ vitest_1.vi.mock("@/repositories/chat/chat.repository.impl");
                 .mockResolvedValue("Message sent successfully");
             const result = await ChatService.newMessageAndConversation(conversations[0].conversation_id, chats[0]);
             (0, vitest_1.expect)(result).toEqual("Message sent successfully");
-            (0, vitest_1.expect)(chatRepository.findConversationByConversationId).toHaveBeenCalledWith(conversations[0].conversation_id);
+            (0, vitest_1.expect)(chatRepository.findConversationById).toHaveBeenCalledWith(conversations[0].conversation_id);
             (0, vitest_1.expect)(chatRepository.saveNewConversation).toHaveBeenCalledWith({
                 user_one_id: chats[0].sender_id,
                 user_two_id: chats[0].receiver_id,
@@ -142,41 +142,41 @@ vitest_1.vi.mock("@/repositories/chat/chat.repository.impl");
             (0, vitest_1.expect)(chatRepository.saveNewMessage).toHaveBeenCalledWith(chats[0]);
         });
         (0, vitest_1.test)("should throw an error when no args are provided", async () => {
-            chatRepository.findConversationByConversationId = vitest_1.vi.fn();
+            chatRepository.findConversationById = vitest_1.vi.fn();
             chatRepository.saveNewConversation = vitest_1.vi.fn();
             chatRepository.saveNewMessage = vitest_1.vi.fn();
             await (0, vitest_1.expect)(ChatService.newMessageAndConversation(undefined, chats[0])).rejects.toThrowError(error.noArgsMsg);
-            (0, vitest_1.expect)(chatRepository.findConversationByConversationId).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(chatRepository.findConversationById).not.toHaveBeenCalled();
             (0, vitest_1.expect)(chatRepository.saveNewConversation).not.toHaveBeenCalled();
             (0, vitest_1.expect)(chatRepository.saveNewMessage).not.toHaveBeenCalled();
         });
     });
-    (0, vitest_1.describe)("deleteConversation (Delete user's conversation)", () => {
+    (0, vitest_1.describe)("deleteConversationById (Delete user's conversation)", () => {
         (0, vitest_1.test)("should return a success message", async () => {
-            chatRepository.findConversationByConversationId = vitest_1.vi
+            chatRepository.findConversationById = vitest_1.vi
                 .fn()
                 .mockResolvedValue(conversations[0]);
-            chatRepository.deleteConversation = vitest_1.vi.fn();
-            const result = await ChatService.deleteConversation(conversations[0].conversation_id);
+            chatRepository.deleteConversationById = vitest_1.vi.fn();
+            const result = await ChatService.deleteConversationById(conversations[0].conversation_id);
             (0, vitest_1.expect)(result).toEqual("Conversation deleted successfully");
-            (0, vitest_1.expect)(chatRepository.findConversationByConversationId).toHaveBeenCalledWith(conversations[0].conversation_id);
-            (0, vitest_1.expect)(chatRepository.deleteConversation).toHaveBeenCalledWith(conversations[0].conversation_id);
+            (0, vitest_1.expect)(chatRepository.findConversationById).toHaveBeenCalledWith(conversations[0].conversation_id);
+            (0, vitest_1.expect)(chatRepository.deleteConversationById).toHaveBeenCalledWith(conversations[0].conversation_id);
         });
         (0, vitest_1.test)("should throw an error when no args are provided", async () => {
-            chatRepository.findConversationByConversationId = vitest_1.vi.fn();
-            chatRepository.deleteConversation = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(ChatService.deleteConversation(undefined)).rejects.toThrowError(error.noArgsMsg);
-            (0, vitest_1.expect)(chatRepository.findConversationByConversationId).not.toHaveBeenCalled();
-            (0, vitest_1.expect)(chatRepository.deleteConversation).not.toHaveBeenCalled();
+            chatRepository.findConversationById = vitest_1.vi.fn();
+            chatRepository.deleteConversationById = vitest_1.vi.fn();
+            await (0, vitest_1.expect)(ChatService.deleteConversationById(undefined)).rejects.toThrowError(error.noArgsMsg);
+            (0, vitest_1.expect)(chatRepository.findConversationById).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(chatRepository.deleteConversationById).not.toHaveBeenCalled();
         });
         (0, vitest_1.test)("should throw an error when the conversation is not found", async () => {
-            chatRepository.findConversationByConversationId = vitest_1.vi
+            chatRepository.findConversationById = vitest_1.vi
                 .fn()
                 .mockResolvedValue(undefined);
-            chatRepository.deleteConversation = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(ChatService.deleteConversation(conversations[0].conversation_id)).rejects.toThrowError(error.conversationNotFound);
-            (0, vitest_1.expect)(chatRepository.findConversationByConversationId).toHaveBeenCalledWith(conversations[0].conversation_id);
-            (0, vitest_1.expect)(chatRepository.deleteConversation).not.toHaveBeenCalled();
+            chatRepository.deleteConversationById = vitest_1.vi.fn();
+            await (0, vitest_1.expect)(ChatService.deleteConversationById(conversations[0].conversation_id)).rejects.toThrowError(error.conversationNotFound);
+            (0, vitest_1.expect)(chatRepository.findConversationById).toHaveBeenCalledWith(conversations[0].conversation_id);
+            (0, vitest_1.expect)(chatRepository.deleteConversationById).not.toHaveBeenCalled();
         });
     });
 });

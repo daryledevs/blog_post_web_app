@@ -13,6 +13,7 @@ class ChatServices {
         this.chatRepository = chatRepository;
         this.userRepository = userRepository;
     }
+    ;
     getChatHistory = this.wrap.serviceWrap(async (userId, listId) => {
         // If no user id is provided, return an error
         if (!userId)
@@ -30,44 +31,69 @@ class ChatServices {
             throw api_exception_1.default.HTTP400Error("No arguments provided");
         // Check if the chat exists
         const data = await this.chatRepository
-            .findConversationByConversationId(chatId);
+            .findConversationById(chatId);
         // If the chat does not exist, return an error
         if (!data)
             throw api_exception_1.default.HTTP404Error("Chat not found");
         // Return the chat messages
         return await this.chatRepository
-            .getMessagesByConversationId(chatId, listId);
+            .getMessagesById(chatId, listId);
     });
-    newMessageAndConversation = this.wrap.serviceWrap(async (conversation_id, messageData) => {
-        // If no conversation id is provided, return an error
-        if (!conversation_id)
+    newMessageAndConversation = this.wrap.serviceWrap(async (messageData) => {
+        const conversation_id = messageData?.conversation_id;
+        const sender_id = messageData?.sender_id;
+        const receiver_id = messageData?.receiver_id;
+        let newMessageData = messageData;
+        if (!sender_id || !receiver_id) {
             throw api_exception_1.default.HTTP400Error("No arguments provided");
-        let newConversationId = conversation_id;
-        // Check if the conversation exists
-        const conversation = await this.chatRepository
-            .findConversationByConversationId(conversation_id);
-        // If the conversation does not exist, create a new conversation
-        if (!conversation) {
-            newConversationId = await this.chatRepository.saveNewConversation({
-                user_one_id: messageData.sender_id,
-                user_two_id: messageData.receiver_id,
-            });
         }
+        ;
+        if (conversation_id) {
+            // Check if the conversation exists
+            const conversation = await this.chatRepository
+                .findConversationById(conversation_id);
+            // If the conversation does not exist, return an error
+            if (!conversation)
+                throw api_exception_1.default.HTTP404Error("Conversation not found");
+        }
+        ;
+        // since the conversation_id is null or undefined, we need to check if it exists
+        if (!conversation_id) {
+            const user_id = [
+                sender_id,
+                receiver_id,
+                receiver_id,
+                sender_id,
+            ];
+            // Check if the conversation exists by users' id
+            const conversation = await this.chatRepository.findConversationByUserId(user_id);
+            newMessageData.conversation_id = conversation
+                ? // If the conversation exists, return the conversation_id
+                    conversation.conversation_id
+                : // If the conversation does not exist, create a new one
+                    (await this.chatRepository.saveNewConversation({
+                        user_one_id: sender_id,
+                        user_two_id: receiver_id,
+                    }));
+        }
+        ;
+        const { receiver_id: _, ...rest } = newMessageData;
         // Save the new message
-        return await this.chatRepository.saveNewMessage(messageData);
+        await this.chatRepository.saveNewMessage(rest);
+        return "Message sent successfully";
     });
-    deleteConversation = this.wrap.serviceWrap(async (conversation_id) => {
+    deleteConversationById = this.wrap.serviceWrap(async (conversation_id) => {
         // If no conversation id is provided, return an error
         if (!conversation_id)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
         // Check if the conversation exists
         const conversation = await this.chatRepository
-            .findConversationByConversationId(conversation_id);
+            .findConversationById(conversation_id);
         // If the conversation does not exist, return an error
         if (!conversation)
             throw api_exception_1.default.HTTP404Error("Conversation not found");
         // Return the deleted conversation
-        await this.chatRepository.deleteConversation(conversation_id);
+        await this.chatRepository.deleteConversationById(conversation_id);
         return "Conversation deleted successfully";
     });
 }

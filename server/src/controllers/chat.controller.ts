@@ -38,23 +38,20 @@ class ChatsController {
 
   public newMessageAndConversation = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { conversation_id, messageData } = req.body;
+      const { cookieOptions, user_id, roles, ...rest } = req.body;
 
-      const message = await this.chatsService.newMessageAndConversation(
-        conversation_id,
-        messageData
-      );
+      const message = await this.chatsService.newMessageAndConversation(rest);
 
       res.status(200).send({ message });
     }
   );
 
-  public deleteConversation = this.wrap.apiWrap(
+  public deleteConversationById = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
       const { conversation_id } = req.body;
       
       const message = await this.chatsService
-      .deleteConversation(conversation_id);
+      .deleteConversationById(conversation_id);
 
       res.status(200).send({ message });
     }

@@ -1,6 +1,6 @@
 import { SelectUsers, UpdateUsers } from "@/types/table.types";
 
-interface IUserRepository {
+interface IEUserRepository {
   findUserById: (user_id: number) => Promise<SelectUsers | undefined>;
 
   findUserByUsername: (username: string) => Promise<SelectUsers | undefined>;
@@ -16,4 +16,4 @@ interface IUserRepository {
   deleteUser: (user_id: number) => Promise<void>;
 };
 
-export default IUserRepository;
+export default IEUserRepository;

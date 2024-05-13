@@ -25,14 +25,14 @@ class ChatsController {
         res.status(200).send({ chats: data });
     });
     newMessageAndConversation = this.wrap.apiWrap(async (req, res, next) => {
-        const { conversation_id, messageData } = req.body;
-        const message = await this.chatsService.newMessageAndConversation(conversation_id, messageData);
+        const { cookieOptions, user_id, roles, ...rest } = req.body;
+        const message = await this.chatsService.newMessageAndConversation(rest);
         res.status(200).send({ message });
     });
-    deleteConversation = this.wrap.apiWrap(async (req, res, next) => {
+    deleteConversationById = this.wrap.apiWrap(async (req, res, next) => {
         const { conversation_id } = req.body;
         const message = await this.chatsService
-            .deleteConversation(conversation_id);
+            .deleteConversationById(conversation_id);
         res.status(200).send({ message });
     });
 }

@@ -1,15 +1,16 @@
 import {
   NewConversations,
+  NewMessages,
   SelectConversations,
   SelectMessages,
-}                                                                from "@/types/table.types";
-import db                                                        from "@/database/db.database";
-import { DB }                                                    from "@/types/schema.types";
-import { Kysely }                                                from "kysely";
-import AsyncWrapper                                              from "@/utils/async-wrapper.util";
-import IChatRepository, { ChatHistoryByIdType, MessageDataType } from "./chat.repository";
+}                                                from "@/types/table.types";
+import db                                        from "@/database/db.database";
+import { DB }                                    from "@/types/schema.types";
+import { Kysely }                                from "kysely";
+import AsyncWrapper                              from "@/utils/async-wrapper.util";
+import IEChatRepository, { ChatHistoryByIdType } from "./chat.repository";
 
-class ChatsRepository implements IChatRepository {
+class ChatsRepository implements IEChatRepository {
   private database: Kysely<DB>;
   private wrap: AsyncWrapper = new AsyncWrapper();
 
@@ -55,7 +56,7 @@ class ChatsRepository implements IChatRepository {
     }
   );
 
-  public findConversationByConversationId = this.wrap.repoWrap(
+  public findConversationById = this.wrap.repoWrap(
     async (
       conversation_id: number
     ): Promise<SelectConversations | undefined> => {
@@ -94,7 +95,7 @@ class ChatsRepository implements IChatRepository {
     }
   );
 
-  public getMessagesByConversationId = this.wrap.repoWrap(
+  public getMessagesById = this.wrap.repoWrap(
     async (
       conversation_id: number,
       ids: number[] | number
@@ -125,7 +126,7 @@ class ChatsRepository implements IChatRepository {
   );
 
   public saveNewMessage = this.wrap.repoWrap(
-    async (message: MessageDataType): Promise<void> => {
+    async (message: NewMessages): Promise<void> => {
       await this.database
         .insertInto("messages")
         .values(message)
@@ -133,7 +134,7 @@ class ChatsRepository implements IChatRepository {
     }
   );
 
-  public deleteConversation = this.wrap.repoWrap(
+  public deleteConversationById = this.wrap.repoWrap(
     async (conversation_id: number): Promise<void> => {
       await this.database
         .deleteFrom("conversations")
