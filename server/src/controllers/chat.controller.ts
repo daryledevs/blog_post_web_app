@@ -17,7 +17,7 @@ class ChatsController {
       const listId = conversations.length ? conversations : [0];
 
       const data = await this.chatsService.getChatHistory(user_id, listId);
-      res.status(200).send(data);
+      res.status(200).send({ chats: data });
     }
   );
 
@@ -32,7 +32,7 @@ class ChatsController {
         listId
       );
 
-      res.status(200).send({ chats: data });
+      res.status(200).send({ messages: data });
     }
   );
 

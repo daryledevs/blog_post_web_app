@@ -15,14 +15,14 @@ class ChatsController {
         const conversations = req.body || [0];
         const listId = conversations.length ? conversations : [0];
         const data = await this.chatsService.getChatHistory(user_id, listId);
-        res.status(200).send(data);
+        res.status(200).send({ chats: data });
     });
     getChatMessages = this.wrap.apiWrap(async (req, res, next) => {
         let conversation_id = req.params.conversation_id;
         const messages = req.body.messages || [0];
         const listId = messages.length ? messages : [0];
         const data = await this.chatsService.getChatMessages(conversation_id, listId);
-        res.status(200).send({ chats: data });
+        res.status(200).send({ messages: data });
     });
     newMessageAndConversation = this.wrap.apiWrap(async (req, res, next) => {
         const { cookieOptions, user_id, roles, ...rest } = req.body;
