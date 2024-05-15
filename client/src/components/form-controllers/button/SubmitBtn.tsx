@@ -1,7 +1,7 @@
 import React from "react";
 
 type ButtonTypes = {
-  text: string;
+  text?: string;
   styles?: React.CSSProperties | undefined;
   isValid?: boolean | undefined;
   defaultBgColor?: string;

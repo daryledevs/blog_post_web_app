@@ -1,0 +1,4 @@
+.chat-box {
+  @include flexbox();
+  @include dimension(auto, 100%);
+}

@@ -1,0 +1,11 @@
+.message-sidebar{
+  @include flexbox();
+  @include dimension(100%, 100%);
+  flex: 0.8;
+  max-width: 140px;
+
+  @include device($breakpoint-md) {    
+    flex: 1;
+    max-width: 400px;
+  };
+};

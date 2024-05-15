@@ -1,0 +1,21 @@
+.chat-history {
+  @include dimension(100%, 100%);
+  @include flexbox(flex-start, center, column);
+  position: relative;
+  
+  @include device($breakpoint-md) {    
+    align-items: flex-start;
+  };
+
+  > p {
+    @include padding-x(20px, 20px);
+    font-size: 1rem;
+    font-weight: 600;  
+    margin-bottom: 5px;
+    display: none;
+
+    @include device($breakpoint-md) {   
+      display: block; 
+    };
+  }
+};

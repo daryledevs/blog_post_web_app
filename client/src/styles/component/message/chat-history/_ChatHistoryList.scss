@@ -1,0 +1,4 @@
+.chat-history-list {
+  @include dimension(100%, 100%);
+  overflow-y: scroll;
+}

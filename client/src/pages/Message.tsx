@@ -16,8 +16,8 @@ function Message({ socketService }: { socketService: SocketService }) {
     <React.Fragment>
       <NewMessage />
       <SwitchAccount />
-      <div className="message__container">
-        <div className="message__parent">
+      <div className="message">
+        <div className="message__container">
           <MessageSidebar user={userApiData.data.user} />
           <MessageChatBox socketService={socketService} />
         </div>

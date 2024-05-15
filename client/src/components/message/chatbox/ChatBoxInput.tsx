@@ -1,9 +1,16 @@
+type ChatBoxInputProps = {
+  inputRef: React.RefObject<HTMLTextAreaElement | null>;
+  newMessage: any;
+  setNewMessage: React.Dispatch<React.SetStateAction<any>>;
+  sendMessageHandler: () => void;
+};
+
 function ChatBoxInput({
   inputRef,
   newMessage,
   setNewMessage,
   sendMessageHandler,
-}: any) {
+}: ChatBoxInputProps) {
   const eventFilter = (event: any) => {
     return (
       (event.key !== "Enter" && event.shiftKey === false) ||
@@ -15,9 +22,9 @@ function ChatBoxInput({
   return (
     <textarea
       rows={1}
-      ref={inputRef}
-      className="chat__input-box"
+      className="chat-box-input"
       value={newMessage?.text_message}
+      ref={inputRef as React.RefObject<HTMLTextAreaElement>}
       onChange={(event: any) =>
         setNewMessage({ ...newMessage, text_message: event.target.value })
       }

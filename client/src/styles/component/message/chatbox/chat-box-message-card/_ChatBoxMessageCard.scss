@@ -1,0 +1,21 @@
+.chat-box-message-card {
+  padding: 3px;
+  
+  .chat-box-message-card-container {
+    @include flexbox(flex-start, center, row);
+    @include dimension(auto, 100%);
+    gap: 0.8%;
+
+    .chat-box-message-card-image {
+      @include dimension(30px, 30px);
+      border-radius: 100%;
+    }
+
+    .chat-box-message-card-text {
+      @include border-radius(15px);
+      padding: 5px 10px;
+      color: white;
+      background-color: $background-blue;
+    };
+  };
+};

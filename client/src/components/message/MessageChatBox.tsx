@@ -1,5 +1,6 @@
-import ChatBox            from "./ChatBox";
+import ChatBox            from "./chatbox/ChatBox";
 import SocketService      from "@/services/SocketServices";
+import MessageNotView     from "./MessageNotView";
 import { selectMessage }  from "@/redux/slices/messageSlice";
 import { useAppSelector } from "@/hooks/reduxHooks";
 
@@ -11,15 +12,11 @@ function MessageChatBox({ socketService }: MessageChatBoxProps) {
   const messages = useAppSelector(selectMessage);
 
   return (
-    <div className="message__conversation-container">
+    <div className="message-chat-box">
       {messages.openConversation.length ? (
-        <ChatBox
-          socketService={socketService}
-        />
+        <ChatBox socketService={socketService} />
       ) : (
-        <p className="message__not-viewed">
-          open a conversation to start a chat.
-        </p>
+        <MessageNotView />
       )}
     </div>
   );

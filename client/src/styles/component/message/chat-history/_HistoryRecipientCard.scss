@@ -1,0 +1,24 @@
+.history-recipient-card, .history-recipient-card-active {
+  @include flexbox(center, center, row);
+  @include dimension(100%, 10%);
+  
+  position: relative;
+  cursor: pointer;
+
+  @include device($breakpoint-md) {    
+    @include padding-x(20px, 20px);
+    @include flexbox(flex-start, center, row);
+  };
+
+  .history-recipient-card-avatar {
+    @include dimension(30px, 25px);
+  };
+
+  &:hover {
+    background-color: $background-light-grey;
+  }
+}
+
+.history-recipient-card-active {
+  background-color: $background-medium-grey;
+}

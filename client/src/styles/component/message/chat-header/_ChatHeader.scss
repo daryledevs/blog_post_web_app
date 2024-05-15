@@ -1,0 +1,9 @@
+.chat-header {
+  @include flexbox(center, center, column);
+  @include dimension(100%, 12.5%);
+  @include padding-x(20px, 20px);
+
+  @include device($breakpoint-md) {    
+    @include flexbox(space-between, center, row);
+  };
+};

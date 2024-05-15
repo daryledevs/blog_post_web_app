@@ -1,0 +1,6 @@
+.chat-box-emoji {
+  @include flexbox(flex-start, center, row);
+  position: relative;
+  margin: 0 2px;
+  height: 100%;
+}

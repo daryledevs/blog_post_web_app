@@ -1,0 +1,18 @@
+.header-switch-account{
+  display: none;
+  cursor: pointer;
+
+  @include device($breakpoint-md){
+    @include flexbox(center, flex-start, row);
+  };
+  
+  p{
+    font-weight: 600;
+    font-size: 1.3rem;
+  };
+
+  .header-switch-account-icon{
+    @include dimension(15px, 15px);
+    @include margin(auto, 3px, 3px, 0);
+  };
+};

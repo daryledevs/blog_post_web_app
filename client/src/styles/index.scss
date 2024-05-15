@@ -2,7 +2,6 @@
 @import "./base/Mixins.scss";
 @import "./base/Reset.scss";
 
-@import "../styles/component/Chat.scss";
 @import "../styles/component/form-controllers/input/InputField.scss";
 @import "../styles/component/form-controllers/input/InputFieldLabel.scss";
 @import "../styles/component/form-controllers/input/FieldErrorMessage.scss";
@@ -41,8 +40,29 @@
 @import "../styles/component/profile/profile-gallery/Picture";
 @import "../styles/component/profile/profile-gallery/PicturesHover";
 
-@import "../styles/pages/Explore.scss";
 @import "../styles/pages/Message.scss";
+@import "../styles/component/message/MessageChatBox.scss";
+@import "../styles/component/message/MessageNotView.scss";
+@import "../styles/component/message/MessageSidebar.scss";
+@import "../styles/component/message/chat-header/ChatHeader.scss";
+@import "../styles/component/message/chat-header/HeaderNewMessage.scss";
+@import "../styles/component/message/chat-header/HeaderSwitchAccount.scss";
+@import "../styles/component/message/chat-history/ChatHistory.scss";
+@import "../styles/component/message/chat-history/RecipientDetails.scss";
+@import "../styles/component/message/chat-history/ChatHistoryList.scss";
+@import "../styles/component/message/chat-history/HistoryRecipientCard.scss";
+@import "../styles/component/message/chatbox/ChatBox.scss";
+@import "../styles/component/message/chatbox/ChatBoxMessageList.scss";
+@import "../styles/component/message/chatbox/ChatBoxSubmission.scss";
+@import "../styles/component/message/chatbox/ChatBoxStartConversation.scss";
+@import "../styles/component/message/chatbox/ChatBoxInput.scss";
+@import "../styles/component/message/chatbox/chat-emoji/ChatBoxEmoji.scss";
+@import "../styles/component/message/chatbox/chat-emoji/ChatBoxEmojiPicker.scss";
+@import "../styles/component/message/chatbox//chat-emoji/ChatBoxEmojiIcon.scss";
+@import "../styles/component/message/chatbox/chat-box-message-card/ChatBoxMessageCard.scss";
+@import "../styles/component/message/chatbox/chat-box-message-card/ChatBoxMessageOwnCard.scss";
+
+@import "../styles/pages/Explore.scss";
 @import "../styles/pages/Feed.scss";
 @import './pages/Index.scss';
 

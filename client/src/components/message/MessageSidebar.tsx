@@ -1,6 +1,6 @@
 import { useEffect }                       from "react";
-import ChatHeader                          from "./ChatHeader";
-import ChatHistory                         from "./ChatHistory";
+import ChatHeader                          from "./chat-header/ChatHeader";
+import ChatHistory                         from "./chat-history/ChatHistory";
 import { useGetUserConversationsMutation } from "@/redux/api/chatApi";
 
 type MessageSidebarProps = {
@@ -21,11 +21,11 @@ function MessageSidebar({ user }: MessageSidebarProps) {
   }, []);
 
   return (
-    <div className="message__sidebar">
+    <div className="message-sidebar">
       <ChatHeader user={user} />
       <ChatHistory
         isLoading={chatHistory.isLoading || !chatHistory.data}
-        list={chatHistory?.data?.list}
+        list={chatHistory?.data?.chats}
       />
     </div>
   );

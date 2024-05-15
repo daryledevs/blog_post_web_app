@@ -1,0 +1,10 @@
+.message-chat-box {
+  @include dimension(auto, 100%);
+  flex: 2;
+  position: relative;
+  border-left: 1px solid $border-grey;
+
+  @include device($breakpoint-md) {    
+    flex: 1;
+  };
+};

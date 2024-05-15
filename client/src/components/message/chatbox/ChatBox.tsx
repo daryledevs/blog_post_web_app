@@ -58,7 +58,7 @@ function ChatBox({ socketService }: IEChatProps) {
   if (isLoading || !userDataApi.data) return null;
 
   return (
-    <div className="chat__container">
+    <div className="chat-box">
       <ChatBoxMessageList
         messageRef={messageRef}
         comingMessage={comingMessage}

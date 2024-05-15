@@ -1,17 +1,25 @@
 import { useState } from 'react'
-import ChatBoxEmoji from './ChaBoxEmoji';
+import Button       from '@/components/form-controllers/button/SubmitBtn';
+import ChatBoxEmoji from './chat-emoji/ChatBoxEmoji';
 import ChatBoxInput from './ChatBoxInput';
+
+type ChatBoxSubmissionProps = {
+  inputRef: React.RefObject<HTMLTextAreaElement | null>;
+  newMessage: any;
+  setNewMessage: React.Dispatch<React.SetStateAction<any>>;
+  sendMessageHandler: () => void;
+};
 
 function ChatBoxSubmission({
   inputRef,
   newMessage,
   setNewMessage,
   sendMessageHandler,
-}: any) {
+}: ChatBoxSubmissionProps) {
   const [emojiModalTrigger, setEmojiModalTrigger] = useState<boolean>(false);
 
   return (
-    <div className="chat__input-container">
+    <div className="chat-box-submission">
       <ChatBoxEmoji
         newMessage={newMessage}
         setNewMessage={setNewMessage}
@@ -24,12 +32,11 @@ function ChatBoxSubmission({
         setNewMessage={setNewMessage}
         sendMessageHandler={sendMessageHandler}
       />
-      <button
-        className="chat__input-box-btn"
+      <Button
+        text="Send"
         onClick={sendMessageHandler}
-      >
-        Send
-      </button>
+        className="chat-box-send-button"
+      />
     </div>
   );
 }

@@ -1,0 +1,24 @@
+.chat-box-submission{
+  @include flexbox(flex-start, flex-start, row);
+  @include dimension(90%, max-content);
+  @include border-radius(25px);
+  border: 1px solid $border-grey;
+  margin: 15px auto;
+  
+  form {
+    display: flex;
+    width: 100%;
+  }
+
+  .chat-box-send-button {
+    @include dimension(max-content, max-content);
+    @include margin-x(10px, 10px);
+    cursor: pointer;
+    align-self: center;
+    border: none;
+    background-color: white;
+    color: $text-bright-blue;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+}
