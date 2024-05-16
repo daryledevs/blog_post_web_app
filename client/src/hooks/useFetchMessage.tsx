@@ -7,14 +7,20 @@ import SocketService from "@/services/SocketServices";
 import { useLazyGetChatMessagesQuery } from "@/redux/api/chatApi";
 
 type useFetchMessageProps = {
-  socketService: SocketService;
+  socketService: SocketService | null;
   openConversation: IEOpenConversation[];
+};
+
+type useFetchMessageReturn = {
+  comingMessage: MessageType[] | null[];
+  setComingMessage: any;
+  isLoading: boolean;
 };
 
 function useFetchMessage({
   socketService,
   openConversation,
-}: useFetchMessageProps) {
+}: useFetchMessageProps): useFetchMessageReturn | any {
   const [comingMessage, setComingMessage] = useState<MessageType[] | null[]>(
     []
   );
@@ -26,7 +32,7 @@ function useFetchMessage({
       messages: [],
     });
 
-    socketService.onMessageReceived((message: any) => {
+    socketService?.onMessageReceived((message: any) => {
       setComingMessage((prev: any) => [...prev, { ...message }]);
     });
   }, [getChatMessages, openConversation, socketService]);
@@ -38,11 +44,11 @@ function useFetchMessage({
     }
 
     if (allChatMessages.data) {
-      const data = allChatMessages?.data;
-      const chatData = data?.message ? data?.message : data?.chats;
-      setComingMessage(chatData);
+      setComingMessage(allChatMessages?.data?.messages);
     }
   }, [allChatMessages, allChatMessages.error]);
+
+  if (!socketService) return null;
 
   return {
     comingMessage,

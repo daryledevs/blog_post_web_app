@@ -13,7 +13,7 @@ import useSendMessageHandler           from "@/hooks/useSendMessage";
 import SocketService                   from "@/services/SocketServices";
 
 interface IEChatProps {
-  socketService: SocketService;
+  socketService: SocketService | null;
 }
 
 function ChatBox({ socketService }: IEChatProps) {

@@ -30,13 +30,13 @@ function PrivateRoute() {
   const restrictPublicRoutes = RedirectRoute({ 
     defaultPath: "/", routePath: PUBLIC_PATH 
   });
-  
-  const socketService = new SocketService("ws://localhost:5000");
+
   const feedRef = useRef<HTMLDivElement | null>(null);
   const userDataApi = useGetUserDataQuery({ person: "" });
   const user = userDataApi.data?.user;
   const [feeds, setFeeds] = useState<any>({ feed: [] });
   const [addFeedTrigger, setAddFeedTrigger] = useState<string>("not triggered yet");
+  const [socket, setSocket] = useState<SocketService | null>(null);
 
   // SERVICES
   const userTotalFeedApi = useGetTotalFeedQuery({});
@@ -55,12 +55,13 @@ function PrivateRoute() {
 
   useEffect(() => {
     if (user) {
-      socketService.addUserId(user.user_id);
-      socketService.onConnection();
+      console.log("User: ", user);
+      const socketService = new SocketService(
+        "ws://localhost:5000",
+        user.user_id
+      );
+      setSocket(socketService);
     }
-    return () => {
-      socketService.onDisconnect();
-    };
   }, [user]);
 
   return (
@@ -83,7 +84,7 @@ function PrivateRoute() {
         </Route>
         <Route
           path="/message"
-          element={<Message socketService={socketService} />}
+          element={<Message socketService={socket} />}
         />
         <Route path="/explore" element={<Explore />} /> 
         {restrictPublicRoutes}

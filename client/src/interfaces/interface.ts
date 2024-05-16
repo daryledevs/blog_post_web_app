@@ -33,8 +33,8 @@ interface IEUserState {
 
 interface IEOpenConversation extends PersonType {
   conversation_id: number;
-  user_one: number;
-  user_two: number;
+  user_one_id: number;
+  user_two_id: number;
 }
 
 interface IEReduxState {

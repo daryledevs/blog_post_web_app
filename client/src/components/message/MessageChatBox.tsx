@@ -5,7 +5,7 @@ import { selectMessage }  from "@/redux/slices/messageSlice";
 import { useAppSelector } from "@/hooks/reduxHooks";
 
 type MessageChatBoxProps = {
-  socketService: SocketService;
+  socketService: SocketService | null;
 };
 
 function MessageChatBox({ socketService }: MessageChatBoxProps) {
