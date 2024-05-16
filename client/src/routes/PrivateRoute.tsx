@@ -55,7 +55,6 @@ function PrivateRoute() {
 
   useEffect(() => {
     if (user) {
-      console.log("User: ", user);
       const socketService = new SocketService(
         "ws://localhost:5000",
         user.user_id
