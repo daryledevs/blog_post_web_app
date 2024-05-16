@@ -19,8 +19,8 @@ function Button({
   defaultBgColor,
   bgValidColor,
   bgInvalidColor,
+  onClick,
 }: ButtonTypes) {
-  
   // Set default values
   const bgColor = isValid
     ? bgValidColor
@@ -30,8 +30,9 @@ function Button({
 
   return (
     <button
-      disabled={!isValid}
+      disabled={isValid === true}
       className={className}
+      onClick={onClick}
       style={{
         ...styles,
         backgroundColor: bgColor,
