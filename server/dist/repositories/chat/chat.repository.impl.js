@@ -67,6 +67,7 @@ class ChatsRepository {
             eb("message_id", "not in", ids),
         ]))
             .limit(10)
+            .orderBy("messages.message_id", "desc")
             .execute();
     });
     saveNewConversation = this.wrap.repoWrap(async (conversation) => {

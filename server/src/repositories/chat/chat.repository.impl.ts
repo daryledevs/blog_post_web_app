@@ -110,6 +110,7 @@ class ChatsRepository implements IEChatRepository {
           ])
         )
         .limit(10)
+        .orderBy("messages.message_id", "desc")
         .execute();
     }
   );
