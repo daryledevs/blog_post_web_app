@@ -1,7 +1,10 @@
+import ApiErrorException  from "@/exceptions/api.exception";
+import AsyncWrapper       from "@/utils/async-wrapper.util";
 import { Socket, Server } from "socket.io";
 
 class SocketService {
   private users: { userId: any; socketId: any }[] = [];
+  private wrap: AsyncWrapper = new AsyncWrapper();
 
   public connection(io: Server): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -40,10 +43,17 @@ class SocketService {
     });
   }
 
-  private addUser(userId: any, socketId: any) {
-    !this.users.some((user) => user.userId === userId) &&
-      this.users.push({ userId, socketId });
-  }
+  private addUser = this.wrap.serviceWrap(
+    async (userId: any, socketId: any) => {
+      if (userId === null || userId === undefined) {
+        throw ApiErrorException.HTTP400Error("User ID is required");
+      }
+
+      if (!this.users.some((user) => user.userId === userId)) {
+        this.users.push({ userId, socketId });
+      }
+    }
+  );
 
   private removeUser(socketId: any) {
     this.users = this.users.filter((user) => user.socketId !== socketId);
@@ -52,6 +62,6 @@ class SocketService {
   private getUser(userId: any) {
     return this.users.find((user) => user.userId === userId);
   }
-};
+}
 
 export default SocketService;

@@ -1,7 +1,13 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
+const async_wrapper_util_1 = __importDefault(require("@/utils/async-wrapper.util"));
 class SocketService {
     users = [];
+    wrap = new async_wrapper_util_1.default();
     connection(io) {
         return new Promise((resolve, reject) => {
             io.on("connection", (socket) => {
@@ -32,10 +38,14 @@ class SocketService {
             this.removeUser(socket.id);
         });
     }
-    addUser(userId, socketId) {
-        !this.users.some((user) => user.userId === userId) &&
+    addUser = this.wrap.serviceWrap(async (userId, socketId) => {
+        if (userId === null || userId === undefined) {
+            throw api_exception_1.default.HTTP400Error("User ID is required");
+        }
+        if (!this.users.some((user) => user.userId === userId)) {
             this.users.push({ userId, socketId });
-    }
+        }
+    });
     removeUser(socketId) {
         this.users = this.users.filter((user) => user.socketId !== socketId);
     }
@@ -43,5 +53,4 @@ class SocketService {
         return this.users.find((user) => user.userId === userId);
     }
 }
-;
 exports.default = SocketService;
