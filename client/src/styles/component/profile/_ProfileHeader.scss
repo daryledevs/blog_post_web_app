@@ -1,11 +1,11 @@
 .profile-header {
   @include flexbox(center, center, column);
+  @include dimension(100%, min-content);
   @include padding-y(0.75rem, 0.8rem);
   border-bottom: 1px solid $border-grey;
 
   > p {
-    font-size: 0.9rem;
-    font-weight: 500;
+    @include text-styles(500, 0.9rem);
   }
 
   @include device($breakpoint-md) {

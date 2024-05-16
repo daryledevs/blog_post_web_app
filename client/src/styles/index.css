@@ -108,13 +108,14 @@ button {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  font-weight: bold;
+  font-size: 0.8rem;
+  color: black;
   position: absolute;
   top: 0;
   right: 5px;
   bottom: 0;
   width: max-content;
-  font-size: 0.8rem;
-  font-weight: bold;
   cursor: pointer;
   user-select: none;
 }
@@ -175,17 +176,17 @@ button {
   font-size: 0.9rem;
 }
 .login-signup-prompt p a {
-  font-size: 0.9rem;
   font-weight: bold;
+  font-size: 0.9rem;
   color: rgb(0, 149, 248);
 }
 
 .forgot-password-link {
   font-weight: bold;
-  margin-left: auto;
-  margin-bottom: 10px;
   font-size: 0.73rem;
   color: rgb(82, 179, 231);
+  margin-left: auto;
+  margin-bottom: 10px;
 }
 
 .login-form-submit-btn {
@@ -423,6 +424,7 @@ button {
     width: 100%;
     height: 100vh;
     order: 2;
+    padding: 1.5rem;
   }
 }
 
@@ -431,13 +433,16 @@ button {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  width: 100%;
+  height: min-content;
   padding-top: 0.75rem;
   padding-bottom: 0.8rem;
   border-bottom: 1px solid rgb(204, 204, 204);
 }
 .profile-header > p {
-  font-size: 0.9rem;
   font-weight: 500;
+  font-size: 0.9rem;
+  color: black;
 }
 @media (min-width: 768px) {
   .profile-header {
@@ -450,7 +455,7 @@ button {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  width: 90%;
+  width: 100%;
   height: min-content;
 }
 .profile-user-info .profile-user-info-header {
@@ -461,7 +466,11 @@ button {
   width: 100%;
   height: auto;
   gap: 5vw;
-  padding: 1rem;
+  padding: 1em;
+}
+.profile-user-info .profile-user-info-controls {
+  flex: 1;
+  min-width: fit-content;
 }
 
 .profile-user-avatar {
@@ -495,7 +504,6 @@ button {
   width: 100%;
   height: min-content;
   gap: 0.5rem;
-  margin-top: -10px;
 }
 .profile-user-controls p {
   font-size: x-large;
@@ -515,7 +523,7 @@ button {
   flex-direction: row;
   width: 100%;
   max-width: 260px;
-  gap: 10px;
+  gap: 1em;
 }
 .profile-user-controls-actions button {
   width: max-content;
@@ -525,10 +533,11 @@ button {
   -moz-border-radius: 8px;
   -ms-border-radius: 8px;
   -o-border-radius: 8px;
-  border: none;
-  padding: 0.4rem 1rem;
   font-weight: 500;
   font-size: 0.9rem;
+  color: black;
+  border: none;
+  padding: 0.4rem 1rem;
 }
 
 .profile-user-info-footer {
@@ -551,8 +560,9 @@ button {
   padding: 0.8rem;
 }
 .profile-user-stats > p:first-child, .profile-user-stats-xs > p:first-child, .profile-user-stats-md > p:first-child {
-  font-size: 0.8em;
   font-weight: 700;
+  font-size: 0.8rem;
+  color: black;
 }
 .profile-user-stats > div:nth-child(n+2), .profile-user-stats-xs > div:nth-child(n+2), .profile-user-stats-md > div:nth-child(n+2) {
   cursor: pointer;
@@ -573,8 +583,8 @@ button {
     justify-content: space-between;
     align-items: flex-start;
     flex-direction: row;
-    padding: 0;
     max-width: 300px;
+    padding: 0;
     margin-top: 1rem;
   }
 }
@@ -646,9 +656,10 @@ button {
 }
 
 .picture .pictures-hover-card {
-  display: none;
-  color: white;
   font-weight: bold;
+  font-size: 16px;
+  color: white;
+  display: none;
 }
 .picture .pictures-hover-card .pictures-hover__icon-heart {
   width: 20px;
@@ -668,10 +679,10 @@ button {
   content: "";
   position: absolute;
   inset: 0;
+  z-index: 1;
+  background-color: rgba(0, 0, 0, 0.4);
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
-  z-index: 1;
 }
 
 .message {
@@ -774,6 +785,7 @@ button {
 .header-switch-account p {
   font-weight: 600;
   font-size: 1.3rem;
+  color: black;
 }
 .header-switch-account .header-switch-account-icon {
   width: 15px;
@@ -798,8 +810,9 @@ button {
 .chat-history > p {
   padding-left: 20px;
   padding-right: 20px;
-  font-size: 1rem;
   font-weight: 600;
+  font-size: 1rem;
+  color: black;
   margin-bottom: 5px;
   display: none;
 }
@@ -895,13 +908,13 @@ button {
   height: max-content;
   margin-left: 10px;
   margin-right: 10px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: rgb(0, 149, 248);
   cursor: pointer;
   align-self: center;
   border: none;
   background-color: white;
-  color: rgb(0, 149, 248);
-  font-size: 0.9rem;
-  font-weight: 500;
 }
 
 .chat-box-input {

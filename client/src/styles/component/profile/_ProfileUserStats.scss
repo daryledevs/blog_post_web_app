@@ -4,13 +4,12 @@
   padding: 0.8rem;
 
   > p:first-child{
-    font-size: 0.8em;
-    font-weight: 700;
-  };
+    @include text-styles(700, 0.8rem);
+  }
 
   > div:nth-child(n + 2) {
     cursor: pointer;
-  };
+  }
 };
 
 .profile-user-stats-xs {
@@ -23,8 +22,8 @@
   display: none; 
   @include device($breakpoint-md) {
     @include flexbox(space-between, flex-start, row);
-    padding: 0;
     max-width: 300px;
+    padding: 0;
     margin-top: 1rem;
   }
 }

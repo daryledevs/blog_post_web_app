@@ -2,7 +2,6 @@
   @include flexbox();
   @include dimension(100%, min-content);
   gap: 0.5rem;
-  margin-top: -10px;
   
   p {
     font-size: x-large;

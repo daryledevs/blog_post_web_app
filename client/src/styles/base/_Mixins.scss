@@ -1,7 +1,7 @@
 
 @mixin bordered($borderWidth, $borderColor) {
   border: $borderWidth solid $borderColor;
-};
+}
 
 @mixin border-radius($radius) {
   border-radius: $radius;
@@ -9,52 +9,58 @@
   -moz-border-radius: $radius;
   -ms-border-radius: $radius;
   -o-border-radius: $radius;
-};
+}
+
+@mixin text-styles($weight: normal, $size: 16px, $color: black) {
+  font-weight: $weight;
+  font-size: $size;
+  color: $color;
+}
 
 @mixin dimension($width: auto, $height: auto) {
   width: $width;
   height: $height;
-};
+}
 
 @mixin max-dimension($maxWidth: auto, $maxHeight: auto) {
   max-width: $maxWidth;
   max-height: $maxHeight;
-};
+}
 
 @mixin flexbox($justifyContent: flex-start, $alignItems: flex-start, $direction: column) {
   display: flex;
   justify-content: $justifyContent;
   align-items: $alignItems;
   flex-direction: $direction;
-};
+}
 
 @mixin margin-x($marginLeft, $marginRight) {
   margin-left: $marginLeft;
   margin-right: $marginRight;
-};
+}
 
 @mixin margin-y($marginTop, $marginBottom) {
   margin-top: $marginTop;
   margin-bottom: $marginBottom;
-};
+}
 
 @mixin margin($marginTop, $marginBottom, $marginLeft, $marginRight) {
   margin: $marginTop $marginRight $marginBottom $marginLeft;
-};
+}
 
 @mixin padding-x($paddingLeft, $paddingRight) {
   padding-left: $paddingLeft;
   padding-right: $paddingRight;
-};
+}
 
 @mixin padding-y($paddingTop, $paddingBottom) {
   padding-top: $paddingTop;
   padding-bottom: $paddingBottom;
-};
+}
 
 @mixin padding($paddingTop, $paddingBottom, $paddingLeft, $paddingRight) {
   padding: $paddingTop $paddingBottom $paddingLeft $paddingRight;
-};
+}
 
 // usage: @include pseudo("", (top: 0, left: 0), 100px, 100px);
 @mixin pseudo($content: "", $position: (), $width: auto, $height: auto) {
@@ -65,7 +71,7 @@
   left: map-get($position, left);
   right: map-get($position, right);
   @include dimension($width, $height);
-};
+}
 
 @mixin device($breakpoint) {
   @media (min-width: $breakpoint) {

@@ -1,11 +1,16 @@
 .profile-user-info{
   @include flexbox(center, center, column);
-  @include dimension(90%, min-content);
+  @include dimension(100%, min-content);
 
   .profile-user-info-header {
     @include flexbox(flex-start, center, row);
     @include dimension(100%, auto);
     gap: 5vw;
-    padding: 1rem;
-  };
-};
+    padding: 1em;
+  }
+
+  .profile-user-info-controls {
+    flex: 1;
+    min-width: fit-content;
+  }
+}

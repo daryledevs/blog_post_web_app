@@ -13,12 +13,10 @@
   .chat-box-send-button {
     @include dimension(max-content, max-content);
     @include margin-x(10px, 10px);
+    @include text-styles(500, 0.9rem, $text-bright-blue);
     cursor: pointer;
     align-self: center;
     border: none;
     background-color: white;
-    color: $text-bright-blue;
-    font-size: 0.9rem;
-    font-weight: 500;
   }
 }

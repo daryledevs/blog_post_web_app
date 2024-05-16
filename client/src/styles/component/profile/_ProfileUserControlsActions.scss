@@ -2,14 +2,13 @@
   @include flexbox(flex-start, flex-start, row);
   width: 100%;
   max-width: 260px;
-  gap: 10px;
+  gap: 1em;
   
   button {
     @include dimension(max-content, min-content);
     @include border-radius(8px);
+    @include text-styles(500, 0.9rem);
     border: none;
     padding: 0.4rem 1rem;
-    font-weight: 500;
-    font-size: 0.9rem;
-  };
+  }
 }
