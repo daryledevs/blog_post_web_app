@@ -37,14 +37,14 @@ var Expiration;
     Expiration["REFRESH_TOKEN_EXPIRATION"] = "7d";
     Expiration["ACCESS_TOKEN_EXPIRATION"] = "15m";
     Expiration["RESET_TOKEN_EXPIRATION"] = "1hr";
-})(Expiration = exports.Expiration || (exports.Expiration = {}));
+})(Expiration || (exports.Expiration = Expiration = {}));
 ;
 var TokenSecret;
 (function (TokenSecret) {
     TokenSecret[TokenSecret["REFRESH_SECRET"] = process.env.REFRESH_TKN_SECRET] = "REFRESH_SECRET";
     TokenSecret[TokenSecret["ACCESS_SECRET"] = process.env.ACCESS_TKN_SECRET] = "ACCESS_SECRET";
     TokenSecret[TokenSecret["RESET_SECRET"] = process.env.RESET_PWD_TKN_SECRET] = "RESET_SECRET";
-})(TokenSecret = exports.TokenSecret || (exports.TokenSecret = {}));
+})(TokenSecret || (exports.TokenSecret = TokenSecret = {}));
 ;
 ;
 class AuthTokensUtil {

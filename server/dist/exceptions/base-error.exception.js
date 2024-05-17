@@ -9,7 +9,7 @@ var HttpStatusCode;
     HttpStatusCode[HttpStatusCode["CONFLICT"] = 409] = "CONFLICT";
     HttpStatusCode[HttpStatusCode["NOT_FOUND"] = 404] = "NOT_FOUND";
     HttpStatusCode[HttpStatusCode["INTERNAL_SERVER"] = 500] = "INTERNAL_SERVER";
-})(HttpStatusCode = exports.HttpStatusCode || (exports.HttpStatusCode = {}));
+})(HttpStatusCode || (exports.HttpStatusCode = HttpStatusCode = {}));
 ;
 class BaseError extends Error {
     name;
