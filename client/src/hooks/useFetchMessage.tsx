@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect }         from "react";
 
-import { MessageType } from "@/interfaces/types";
-import { IEOpenConversation } from "@/interfaces/interface";
+import { MessageType }                 from "@/interfaces/types";
+import { IEOpenConversation }          from "@/interfaces/interface";
 
-import SocketService from "@/services/SocketServices";
+import SocketService                   from "@/services/SocketServices";
 import { useLazyGetChatMessagesQuery } from "@/redux/api/chatApi";
 
 type useFetchMessageProps = {
@@ -47,7 +47,7 @@ function useFetchMessage({
   // UseEffect to fetch chat messages when the conversation changes
   useEffect(() => {
     const conversationId = openConversation?.[0]?.conversation_id;
-    if (conversationId) return
+    if (!conversationId) return
     getChatMessages({ conversation_id: conversationId, messages: [] });
   }, [getChatMessages, openConversation]);
 
