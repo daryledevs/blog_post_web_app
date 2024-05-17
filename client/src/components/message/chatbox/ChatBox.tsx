@@ -8,7 +8,7 @@ import { selectMessage }               from "@/redux/slices/messageSlice";
 import { useAppSelector }              from "@/hooks/reduxHooks";
 import useFetchMessage                 from "@/hooks/useFetchMessage";
 import useAdjustInputHeight            from "@/hooks/useAdjustInputHeight";
-import useSendMessageHandler           from "@/hooks/useSendMessage";
+import useSendMessage           from "@/hooks/useSendMessage";
 
 import SocketService                   from "@/services/SocketServices";
 
@@ -21,29 +21,20 @@ function ChatBox({ socketService }: IEChatProps) {
   const messageRef = useRef<HTMLDivElement>(null);
   const { openConversation } = useAppSelector(selectMessage);
 
-  // data
-  const userDataApi = useGetUserDataQuery({ person: ""});
   const [newMessage, setNewMessage] = useState<any>();
-
-  // trigger
-  const [clearMessage, setClearMessage] = useState<boolean>(false);
-
-  // custom hooks
-  useAdjustInputHeight({ inputRef, newMessage, clearMessage });
+  useAdjustInputHeight({ inputRef, newMessage });
   
   const { comingMessage, setComingMessage, isLoading } = useFetchMessage({
     socketService,
     openConversation,
   });
 
-  const sendMessageHandler = useSendMessageHandler({
-    userDataApi: userDataApi.data?.user,
+  const sendMessageHandler = useSendMessage({
     openConversation,
-    clearMessage,
     newMessage,
     socketService,
-    setClearMessage,
     setComingMessage,
+    setNewMessage,
   });
 
   useEffect(() => {
@@ -55,14 +46,13 @@ function ChatBox({ socketService }: IEChatProps) {
     ref.scrollTop = scrollHeight;
   }
 
-  if (isLoading || !userDataApi.data) return null;
+  if (isLoading) return null;
 
   return (
     <div className="chat-box">
       <ChatBoxMessageList
         messageRef={messageRef}
         comingMessage={comingMessage}
-        userDataApi={userDataApi.data.user}
       />
       <ChatBoxSubmission
         inputRef={inputRef}

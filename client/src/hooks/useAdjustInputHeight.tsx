@@ -3,10 +3,9 @@ import React, { useEffect } from 'react'
 type UseAdjustInputHeightProps = {
   inputRef: React.MutableRefObject<HTMLTextAreaElement | null> | null;
   newMessage: { text_message: string };
-  clearMessage: boolean;
 };
 
-function useAdjustInputHeight({ inputRef, newMessage, clearMessage }: UseAdjustInputHeightProps) {
+function useAdjustInputHeight({ inputRef, newMessage }: UseAdjustInputHeightProps) {
   useEffect(() => {
     if (inputRef?.current) {
       if (!newMessage?.text_message) inputRef.current.style.height = "0px";
@@ -14,7 +13,7 @@ function useAdjustInputHeight({ inputRef, newMessage, clearMessage }: UseAdjustI
       const scrollHeight = inputRef.current.scrollHeight;
       inputRef.current.style.height = scrollHeight + "px";
     }
-  }, [inputRef, newMessage, clearMessage]);
+  }, [inputRef, newMessage]);
 }
 
 export default useAdjustInputHeight
