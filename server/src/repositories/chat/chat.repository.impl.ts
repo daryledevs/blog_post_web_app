@@ -109,7 +109,7 @@ class ChatsRepository implements IEChatRepository {
             eb("message_id", "not in", ids),
           ])
         )
-        .limit(10)
+        .limit(30)
         .orderBy("messages.message_id", "desc")
         .execute();
     }

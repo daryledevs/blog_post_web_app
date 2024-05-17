@@ -66,7 +66,7 @@ class ChatsRepository {
             eb("conversation_id", "=", conversation_id),
             eb("message_id", "not in", ids),
         ]))
-            .limit(10)
+            .limit(30)
             .orderBy("messages.message_id", "desc")
             .execute();
     });

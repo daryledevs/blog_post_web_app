@@ -1,5 +1,6 @@
 .chat-box-message-card {
   padding: 3px;
+  width: 100%;
   
   .chat-box-message-card-container {
     @include flexbox(flex-start, center, row);
