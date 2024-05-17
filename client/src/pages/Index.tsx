@@ -1,46 +1,12 @@
-import { useEffect }                      from "react";
-import { Outlet, useLocation }            from "react-router-dom";
-
-import { useGetUserDataQuery }            from "@/redux/api/userApi";
-import { navigatedPage, selectSidebar }   from "@/redux/slices/sidebarSlice";
-import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
-
-import CreatePost                         from "@/shared/modals/CreatePost";
-import Sidebar                            from "@/components/sidebar/Sidebar";
-import SearchBar                          from "@/components/search-bar/SearchBar";
+import { Outlet }               from "react-router-dom";
+import CreatePost               from "@/shared/modals/CreatePost";
+import Sidebar                  from "@/components/sidebar/Sidebar";
+import SearchBar                from "@/components/search-bar/SearchBar";
+import useUpdateNavigationState from "@/hooks/useUpdateNavigatePage";
 
 function Index() {
-  const { hash, pathname, search } = useLocation();
-  const sidebarState = useAppSelector(selectSidebar);
-  const dispatch = useAppDispatch();
-  
-  const userDataApi = useGetUserDataQuery({ person: "" });
-
-  useEffect(() => {
-    if (userDataApi.data) {
-      const { username } = userDataApi.data.user;
-      const path = `/${username}` === pathname ? "/profile" : pathname;
-
-      dispatch(
-        navigatedPage({
-          previous: sidebarState.current,
-          current: path,
-        })
-      );
-      return;
-    } 
-    
-    if(!userDataApi.isLoading) {
-      dispatch(
-        navigatedPage({ 
-          previous: sidebarState.current, 
-          current: pathname 
-        })
-      );
-    };
-  }, [userDataApi?.data?.user]);
-
-  if (userDataApi.isLoading || !userDataApi.data) return null;
+  const { isLoading, error } = useUpdateNavigationState();
+  if (isLoading) return null;
 
   return (
     <div className="index__container">
