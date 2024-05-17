@@ -345,6 +345,16 @@ button {
   padding-left: 5px;
   padding-right: 5px;
 }
+@media (min-width: 320px) {
+  .sidebar-tab-card:nth-child(n+1) + :nth-child(-n+2) {
+    display: none;
+  }
+}
+@media (min-width: 768px) {
+  .sidebar-tab-card:nth-child(n+1) + :nth-child(-n+2) {
+    display: block;
+  }
+}
 .sidebar-tab-card div {
   width: 90%;
   height: 100%;

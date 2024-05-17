@@ -4,6 +4,16 @@
   @include padding-y(5px, 5px);
   @include padding-x(5px, 5px);
 
+  &:nth-child(n + 1) + :nth-child(-n + 2) {
+    @include device($breakpoint-xs) {
+      display: none;
+    }
+
+    @include device($breakpoint-md) {
+      display: block;
+    }
+  };
+
   div {
     @include dimension(90%, 100%);
     @include flexbox(flex-start, center, row);    
