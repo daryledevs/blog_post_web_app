@@ -1,8 +1,7 @@
 .sidebar-tab-card {
   @include flexbox(center, center, column);  
   @include dimension(100%, 100%);
-  @include padding-y(5px, 5px);
-  @include padding-x(5px, 5px);
+  padding: 5px;
 
   &:nth-child(n + 1) + :nth-child(-n + 2) {
     @include device($breakpoint-xs) {
@@ -21,7 +20,7 @@
     border-radius: 9px;
 
     &:hover{
-      background-color: rgb(242,242,242);
+      background-color: $background-light-grey-1;
     };
 
     svg {
