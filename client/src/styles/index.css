@@ -349,7 +349,7 @@ button {
 }
 @media (min-width: 768px) {
   .sidebar-tab-card:nth-child(n+1) + :nth-child(-n+2) {
-    display: block;
+    display: flex;
   }
 }
 .sidebar-tab-card div {

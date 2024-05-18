@@ -9,7 +9,7 @@
     }
 
     @include device($breakpoint-md) {
-      display: block;
+      display: flex;
     }
   };
 
