@@ -2,7 +2,7 @@ import usersPicture from "@/assets/icons/avatar.png";
 
 type UserAvatarProps = {
   avatar_url: string;
-  className: string;
+  className?: string;
 };
 
 function UserAvatar({ avatar_url, className } : UserAvatarProps) {

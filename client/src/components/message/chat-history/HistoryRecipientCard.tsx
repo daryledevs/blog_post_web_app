@@ -3,8 +3,8 @@ import {
   setOpenConversation,
 }                                         from "@/redux/slices/messageSlice";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
-import UserAvatar                         from "@/shared/components/UserAvatar";
-import RecipientDetails                   from "./RecipientDetails";
+import UserAvatar                         from "@/shared/components/UserComponents/UserAvatar";
+import UserFullName                       from "@/shared/components/UserComponents/UsersFullName";
 
 function HistoryRecipientCard({ chat }: { chat: any }) {
   const chatState = useAppSelector(selectMessage);
@@ -26,9 +26,10 @@ function HistoryRecipientCard({ chat }: { chat: any }) {
         avatar_url={chat.avatar_url}
         className="history-recipient-card-avatar"
       />
-      <RecipientDetails
+      <UserFullName
         first_name={chat.first_name}
         last_name={chat.last_name}
+        className="history-recipient-name"
       />
     </div>
   );

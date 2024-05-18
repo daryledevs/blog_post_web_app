@@ -1,5 +1,5 @@
 import usersPicture from "@/assets/icons/avatar.png";
-import UserAvatar from "@/shared/components/UserAvatar";
+import UserAvatar   from "@/shared/components/UserComponents/UserAvatar";
 
 type ChatBoxMessageCardProps = {
   value: string;
