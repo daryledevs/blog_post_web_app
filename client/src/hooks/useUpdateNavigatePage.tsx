@@ -36,7 +36,7 @@ function useUpdateNavigatePage(): NavigationStateStatus {
         })
       );
     }
-  }, [pathname, sidebarState, userDataApi, dispatch]);
+  }, [userDataApi?.data?.user]);
 
   // Return loading status and potential error
   return { isLoading: userDataApi.isLoading, error: userDataApi.error };
