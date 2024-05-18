@@ -9,9 +9,10 @@ type PersonType = {
 };
 
 type MessageType = {
+  conversation_id: number;
+  message_id: number;
   sender_id: number;
   receiver_id: number;
-  conversation_id: number;
   text_message: string;
 };
 
