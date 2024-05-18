@@ -33,31 +33,30 @@ function SidebarTabCard({
 
   // Determine the link based on the item
   const navigateHandler = (item: any) => {
-    const profilePage = `/${username}`;
-    const profileLink = "/profile";
-
-    // If the item link is "/profile", set the link to the username
-    const link = item.link === profileLink ? profilePage : item.link;
-    const name = item.name;
+    const link = item.link;
+    const linkName = item.name;
 
     // If the link is "/profile" or the link is not "Create" or "Search",
     // navigate to the page's link
-    if (link === "/profile" || link !== "none") {
-      navigate(link);
-      return dispatchHandler(
-        sidebarState.current,
-        link === "/profile" ? name : link
-      );
+    if ((link === "/profile" || link !== "none") ) {
+      const profilePage = `/${username}`;
+      const profileLink = "/profile";
+
+      // If the item link is "/profile", set the link to the username
+      const newLink = link === profileLink ? profilePage : link;
+      
+      navigate(newLink);
+      return dispatchHandler(sidebarState.current, link);
     }
 
     // If the item is "Create" or "Search",
     // then close the current view and navigate to the previous view
-    if (sidebarState.current === name) {
+    if (sidebarState.current === linkName) {
       return dispatchHandler(sidebarState.current, sidebarState.previous);
     }
 
     // Navigation for "Create" or "Search" view
-    dispatchHandler(sidebarState.current, name);
+    dispatchHandler(sidebarState.current, linkName);
   };
 
   return (
