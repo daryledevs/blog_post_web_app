@@ -1,7 +1,6 @@
 .history-recipient-card, .history-recipient-card-active {
   @include flexbox(center, center, row);
   @include dimension(100%, 10%);
-  
   position: relative;
   cursor: pointer;
 
@@ -12,7 +11,15 @@
 
   .history-recipient-card-avatar {
     @include dimension(30px, 25px);
-  };
+  }
+
+  .history-recipient-name {
+    display: none;
+
+    @include device($breakpoint-md) {    
+      display: block;
+    }
+  }
 
   &:hover {
     background-color: $background-light-grey;

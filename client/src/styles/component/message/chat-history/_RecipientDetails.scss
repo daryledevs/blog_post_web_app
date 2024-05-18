@@ -1,6 +1,0 @@
-.recipient-details {
-  display: none;
-  @include device($breakpoint-md) {    
-    display: block;
-  };
-}

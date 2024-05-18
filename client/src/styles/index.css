@@ -830,15 +830,6 @@ button {
   }
 }
 
-.recipient-details {
-  display: none;
-}
-@media (min-width: 768px) {
-  .recipient-details {
-    display: block;
-  }
-}
-
 .chat-history-list {
   width: 100%;
   height: 100%;
@@ -868,6 +859,14 @@ button {
 .history-recipient-card .history-recipient-card-avatar, .history-recipient-card-active .history-recipient-card-avatar {
   width: 30px;
   height: 25px;
+}
+.history-recipient-card .history-recipient-name, .history-recipient-card-active .history-recipient-name {
+  display: none;
+}
+@media (min-width: 768px) {
+  .history-recipient-card .history-recipient-name, .history-recipient-card-active .history-recipient-name {
+    display: block;
+  }
 }
 .history-recipient-card:hover, .history-recipient-card-active:hover {
   background-color: rgb(250, 250, 250);
