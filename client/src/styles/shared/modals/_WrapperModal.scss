@@ -1,0 +1,5 @@
+.wrapper-modal {
+  @include flexbox(center, center, column);
+  @include border-radius(8px);
+  background-color: white;
+}

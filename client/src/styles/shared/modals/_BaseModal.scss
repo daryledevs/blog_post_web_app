@@ -1,0 +1,4 @@
+.base-modal {
+  @include modal();
+  @include flexbox(center, center, row);
+}
