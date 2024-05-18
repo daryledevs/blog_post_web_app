@@ -25,7 +25,7 @@ function Recipients({
   return (
     <label>
       To:
-      <div className="recipients__container">
+      <div className="recipients">
         <RecipientsPersonList
           recipients={recipients}
           setRecipients={setRecipients}

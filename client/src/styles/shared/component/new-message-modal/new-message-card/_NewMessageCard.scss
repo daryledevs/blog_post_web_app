@@ -1,0 +1,9 @@
+.new-message-card {
+  @include flexbox(flex-start, flex-start, row);
+  cursor: pointer;
+  padding: 1%;
+
+  &:hover{
+    background-color: $background-lavender;
+  }
+}

@@ -5,7 +5,7 @@ import { setNewMessageTrigger } from '@/redux/slices/messageSlice';
 function NewMessageHeader() {
   const dispatch = useAppDispatch();
   return (
-    <div className="new-message__header">
+    <div className="new-message-header">
       <p>New message</p>
       <img
         alt=""

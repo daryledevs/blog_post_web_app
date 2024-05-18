@@ -70,9 +70,19 @@
 @import "../styles/shared/component/SearchBarHeader.scss";
 @import "../styles/shared/component/SearchBarBody.scss";
 
+@import "../styles/shared/modals/BaseModal.scss";
+@import "../styles/shared/modals/WrapperModal.scss";
+
+@import "../styles/shared/modals/NewMessage.scss";
+@import "../styles/shared/component/new-message-modal/NewHeaderMessage.scss";
+@import "../styles/shared/component/new-message-modal/NewMessageLists.scss";
+@import "../styles/shared/component/new-message-modal/new-message-card/NewMessageCard.scss";
+@import "../styles/shared/component/new-message-modal/new-message-card/NewMessageCardAvatar.scss";
+@import "../styles/shared/component/new-message-modal/new-message-card/NewMessageCardDetails.scss";
+@import "../styles/shared/component/new-message-modal/recipient/Recipients.scss";
+@import "../styles/shared/component/new-message-modal/recipient/RecipientPersonCard.scss";
+
 @import "../styles/shared/modals/CreatePost.scss";
 @import "../styles/shared/modals/FollowModal.scss";
-@import "../styles/shared/modals/NewMessage.scss";
-@import "../styles/shared/component/Recipients.scss";
 @import "../styles/shared/modals/SwitchAccount.scss";
 

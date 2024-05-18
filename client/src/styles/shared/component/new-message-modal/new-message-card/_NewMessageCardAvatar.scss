@@ -1,0 +1,15 @@
+.new-message-card-avatar {
+  position: relative;
+  width: 7.5%;
+  aspect-ratio: 1;
+  align-self: center;
+
+  img {
+    @include dimension(70%, 70%);
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    object-fit: cover;
+    object-position: center;
+  }
+}

@@ -1,0 +1,22 @@
+.recipient-person-card {
+  @include margin-x(1%, 1%);
+  @include flexbox(flex-start, center, row);
+  @include text-styles(16px, 500, $text-blue);
+  @include border-radius(20px);
+  cursor: pointer;
+  position: relative;
+  padding: 1.5% 2%;
+  flex-basis: 0;
+  background-color: $background-lightblue;
+
+  .recipient-person-card-username {
+    > p {
+      @include margin-x(5px, 5px);
+      line-height:0;
+
+      &:hover {
+        color: rgb(4, 71, 116);
+      }
+    }
+  }
+}

@@ -1,9 +1,13 @@
-import CloseIcon from "@/assets/icons/svg/close-icon-blue.svg?react";
+import CloseIcon    from "@/assets/icons/svg/close-icon-blue.svg?react";
+import UserUsername from "../../UserComponents/UserUsername";
 
 function RecipientPersonCard({ item, setRecipients }: any) {
   return (
-    <div className="recipients__selected-person">
-      <p>{item.username}</p>
+    <div className="recipient-person-card">
+      <UserUsername
+        username={item.username}
+        className="recipient-person-card-username"
+      />
       <CloseIcon
         onClick={() =>
           setRecipients((recipients: any) =>

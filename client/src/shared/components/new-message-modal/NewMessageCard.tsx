@@ -1,19 +1,20 @@
 import React  from "react";
-import avatar from "@/assets/icons/avatar.png";
+import UserAvatar from "../UserComponents/UserAvatar";
+import NewMessageCardDetails from "./NewMessageCardDetails";
 
-type NewMessageListsCardProps = {
+type NewMessageCardProps = {
   user: any;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
   recipients: any;
   setRecipients: React.Dispatch<React.SetStateAction<any>>;
 };
 
-function NewMessageListsCard({
+function NewMessageCard({
   user,
   recipients,
   setRecipients,
   setSearch,
-}: NewMessageListsCardProps) {
+}: NewMessageCardProps) {
   const isRecipients = recipients.some(
     (item: any) => item.user_id === user.user_id
   );
@@ -29,23 +30,16 @@ function NewMessageListsCard({
 
   return (
     <div
-      className="new-message__person"
+      className="new-message-card"
       onClick={() => newMessageHandler(user)}
     >
-      <div className="new-message__avatar">
-        <img
-          src={user.avatar_url ? user.avatar_url : avatar}
-          alt=""
-        />
-      </div>
-      <div className="new-message__user-details">
-        <p>{user.username}</p>
-        <p>
-          {user?.first_name} {user?.last_name}
-        </p>
-      </div>
+      <UserAvatar
+        avatar_url={user?.avatar}
+        className="new-message-card-avatar"
+      />
+      <NewMessageCardDetails user={user} />
     </div>
   );
 }
 
-export default NewMessageListsCard;
+export default NewMessageCard;

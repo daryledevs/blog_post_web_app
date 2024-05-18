@@ -1,0 +1,7 @@
+.new-message-search-list {
+  @include dimension(100%, auto);
+  flex: 1;
+  padding: 1%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}

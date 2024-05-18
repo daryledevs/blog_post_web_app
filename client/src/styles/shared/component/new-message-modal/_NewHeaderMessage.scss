@@ -1,0 +1,14 @@
+.new-message-header{
+  @include flexbox(center, center, row);
+  @include dimension(100%, 10%);
+  font-weight: bold;
+  position: relative;
+
+  img {
+    @include dimension(6%, auto);
+    position: absolute;
+    right: 1.2vh;
+    margin: 0 auto;
+    cursor: pointer;
+  }
+}

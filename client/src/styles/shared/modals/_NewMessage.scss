@@ -1,105 +1,41 @@
-.new-message__container{
-  @extend .follow-modal__container;
-  .new-message__parent{
-    @extend .follow-modal__parent;
-    width: 35%;
-    height: 65%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    
-    .new-message__header{
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 3%;
-      font-weight: bold;
-      position: relative;
-      width: 100%;
-
-      img {
-        position: absolute;
-        right: 1.2vh;
-        margin: 0 auto;
-        width: 6%;
-        cursor: pointer;
-      }
-    };
+.new-message-wrapper {
+  @include dimension(100%, 65%);
+  @include max-dimension(500px, 500px);
+  
+  .new-message-container {
+    @include flexbox(center, center, column);
+    flex: 1;
+    width: 100%;
 
     .new-message__search-bar {
-      display: flex;
-      width: 100%;
+      @include flexbox(center, center, row);
+      @include dimension(100%, auto);
       padding: 2% 0.5%;
       border: 1px solid #ccc;
 
       label {
+        @include flexbox(center, center, row);
+        @include dimension(auto, 100%);
         font-weight: bold;
-        height: auto;
-        display: flex;
         flex: 1;
       }
     }
 
-    .new-message__search-list {
-      flex: 1;
-      width: 100%;
-      overflow-y: scroll;
-      overflow-x: hidden;
-      padding: 1%;
-
-      .new-message__person{
-        cursor: pointer;
-        display: flex;
-        flex-direction: row;
-        padding: 1%;
-
-        .new-message__avatar {
-          position: relative;
-          width: 10%;
-          aspect-ratio: 1;
-
-          img {
-            position: absolute;
-            inset: 0;
-            margin: auto;
-            width: 70%;
-            height: 70%;
-            object-fit: cover;
-            object-position: center;
-          }
-        }
-
-        .new-message__person-details{
-          width: 100%;
-          text-align: left;
-
-          p:first-child{
-            font-weight: 500;
-          }
-        }
-      }
-      .new-message__person:hover{
-        background-color: rgb(243, 243, 252);
-      }
-    }
-
     button {
-      height: 8%;
-      width: 95%;
-      margin: 3% 0;
-      border-radius: 1vh;
+      @include dimension(95%, 8%);
+      @include margin-y(3%, 3%);
+      @include border-radius(11px);
+      cursor: pointer;
       outline: none;
       border: none;
-      background-color: rgb(0,149,246);
       color: white;
       font-weight: bold;
-      cursor: pointer;
+      background-color: $background-sky-blue;
     }
 
     button:disabled {
-      background-color: #ccc;
+      background-color: $background-medium-grey;
       cursor: not-allowed;
     }
-  };
-};
+  }
+}

@@ -1,5 +1,5 @@
 import React                   from 'react'
-import NewMessageListsCard     from './NewMessageListsCard';
+import NewMessageCard          from './NewMessageCard';
 import { useSearchUsersQuery } from '@/redux/api/userApi';
 
 type NewMessageListsProps = {
@@ -18,11 +18,11 @@ function NewMessageLists({
   const listsUsersApi = useSearchUsersQuery({ search }, { skip: !search });
   if (listsUsersApi.isLoading) return null;
   return (
-    <div className="new-message__search-list">
+    <div className="new-message-search-list">
       {listsUsersApi?.data?.users?.length ? (
         <React.Fragment>
           {listsUsersApi?.data?.users?.map((user: any, index: any) => (
-            <NewMessageListsCard
+            <NewMessageCard
               key={index}
               user={user}
               recipients={recipients}
