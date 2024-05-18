@@ -2,9 +2,17 @@ import ChatBoxMessage           from "./ChatBoxMessageCard";
 import { selectMessage }        from "@/redux/slices/messageSlice";
 import { useAppSelector }       from "@/hooks/reduxHooks";
 import ChatBoxStartConversation from "./ChatBoxStartConversation";
-import { useGetUserDataQuery } from "@/redux/api/userApi";
+import { useGetUserDataQuery }  from "@/redux/api/userApi";
 
-function ChatBoxMessageList({ messageRef, comingMessage }: any) {
+type ChatBoxMessageListProps = {
+  comingMessage: any;
+  observerRef: (node?: Element | null | undefined) => void;
+};
+
+function ChatBoxMessageList({
+  comingMessage,
+  observerRef,
+}: ChatBoxMessageListProps) {
   const messages = useAppSelector(selectMessage);
   const username = messages.openConversation?.[0]?.username;
   const userDataApi = useGetUserDataQuery({ person: "" });
@@ -13,13 +21,14 @@ function ChatBoxMessageList({ messageRef, comingMessage }: any) {
     return user_id === userDataApi?.data?.user.user_id ? "own" : "other";
   };
 
-  if(!userDataApi.data) return null;
-  
+  if (!userDataApi.data) return null;
+
   return (
-    <div
-      ref={messageRef}
-      className="chat-message-list"
-    >
+    <div className="chat-message-list">
+      <div
+        ref={observerRef}
+        className="chat-message-list-observer"
+      />
       {comingMessage ? (
         comingMessage?.map((data: any, index: number) => (
           <ChatBoxMessage

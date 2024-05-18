@@ -1,16 +1,14 @@
-import { useEffect, useState, useRef } from "react";
-import ChatBoxSubmission               from "./ChatBoxSubmission";
-import ChatBoxMessageList              from "./ChatBoxMessageList";
+import { useState, useRef } from "react";
+import ChatBoxSubmission    from "./ChatBoxSubmission";
+import ChatBoxMessageList   from "./ChatBoxMessageList";
+import { useInView }        from "react-intersection-observer";
 
-import { useGetUserDataQuery }         from "@/redux/api/userApi";
-import { selectMessage }               from "@/redux/slices/messageSlice";
-
-import { useAppSelector }              from "@/hooks/reduxHooks";
-import useFetchMessage                 from "@/hooks/useFetchMessage";
-import useAdjustInputHeight            from "@/hooks/useAdjustInputHeight";
-import useSendMessage           from "@/hooks/useSendMessage";
-
-import SocketService                   from "@/services/SocketServices";
+import { selectMessage }    from "@/redux/slices/messageSlice";
+import { useAppSelector }   from "@/hooks/reduxHooks";
+import useFetchMessage      from "@/hooks/useFetchMessage";
+import useAdjustInputHeight from "@/hooks/useAdjustInputHeight";
+import useSendMessage       from "@/hooks/useSendMessage";
+import SocketService        from "@/services/SocketServices";
 
 interface IEChatProps {
   socketService: SocketService | null;
@@ -18,13 +16,17 @@ interface IEChatProps {
 
 function ChatBox({ socketService }: IEChatProps) {
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
-  const messageRef = useRef<HTMLDivElement>(null);
   const { openConversation } = useAppSelector(selectMessage);
 
   const [newMessage, setNewMessage] = useState<any>();
   useAdjustInputHeight({ inputRef, newMessage });
+
+  const { ref, inView, } = useInView({
+    threshold: 0,
+  });
   
   const { comingMessage, setComingMessage, isLoading } = useFetchMessage({
+    inView,
     socketService,
     openConversation,
   });
@@ -37,21 +39,12 @@ function ChatBox({ socketService }: IEChatProps) {
     setNewMessage,
   });
 
-  useEffect(() => {
-    if (messageRef.current) scrollToDown(messageRef.current);
-  }, [openConversation]);
-
-  function scrollToDown(ref:any){
-    const scrollHeight = ref.scrollHeight;
-    ref.scrollTop = scrollHeight;
-  }
-
   if (isLoading) return null;
 
   return (
     <div className="chat-box">
       <ChatBoxMessageList
-        messageRef={messageRef}
+        observerRef={ref}
         comingMessage={comingMessage}
       />
       <ChatBoxSubmission
