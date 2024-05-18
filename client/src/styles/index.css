@@ -904,8 +904,6 @@ button {
   bottom: 0; /* in column-reverse, this makes it stick to the top */
   /* ensures it appears at the top of the flex container */
   order: 1;
-  /* makes it visible for the intersection observer but not visually to user */
-  border-top: 1px solid red;
 }
 
 .chat-box-submission {
