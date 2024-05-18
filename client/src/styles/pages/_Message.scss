@@ -2,6 +2,7 @@
   @include dimension(100%, 100vh);
   @include flexbox(center, center, column);
   overflow-y: scroll;
+  flex: 1;
 
   @include device($breakpoint-md) {    
     order: 2;

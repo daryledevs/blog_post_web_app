@@ -700,6 +700,7 @@ button {
   align-items: center;
   flex-direction: column;
   overflow-y: scroll;
+  flex: 1;
 }
 @media (min-width: 768px) {
   .message {
