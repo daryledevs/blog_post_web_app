@@ -1,18 +1,20 @@
-$text-grey:                  rgb(204, 204, 204);
-$text-blue:                  rgb(0,149,246);
-$text-grey-blue:             rgb(115,115,138);
-$text-sky-blue:              rgb(82,179,231);
-$text-bright-blue:           rgb(0,149,248);
-    
-$border-grey:                rgb(204, 204, 204);
-$border-light-grey:          rgb(219, 219, 219);
-    
-$outline-light-grey:         rgb(219, 219, 219);
+$text-grey:              rgb(204, 204, 204);
+$text-blue:              rgb(0, 149, 246);
+$text-grey-blue:         rgb(115, 115, 138);
+$text-sky-blue:          rgb(82, 179, 231);
+$text-bright-blue:       rgb(0, 149, 248);
 
-$background-medium-grey:     rgb(240, 240, 240);
-$background-light-grey:      rgb(250, 250, 250);
-$background-light-grey-1: rgb(242, 242, 242);
-$background-blue:            rgb(29, 117, 238);
+$border-grey:            rgb(204, 204, 204);
+$border-light-grey:      rgb(219, 219, 219);
+$outline-light-grey:     rgb(219, 219, 219);
+
+$background-medium-grey: rgb(240, 240, 240);
+$background-light-grey:  rgb(250, 250, 250);
+$background-light-grey-1:rgb(242, 242, 242);
+$background-blue:        rgb(29, 117, 238);
+$background-sky-blue:    rgb(0, 149, 246);
+$background-lavender:    rgb(243, 243, 252);
+$background-lightblue:   rgb(224, 241, 255);
 
 // Define individual breakpoint variables
 $breakpoint-xs: 320px;   // Extra small
