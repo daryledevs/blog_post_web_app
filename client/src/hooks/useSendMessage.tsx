@@ -36,6 +36,7 @@ function useSendMessage({
       receiver_id: receiver_id,
       conversation_id: conversation_id,
       text_message: newMessage.text_message,
+      message_id: newMessage.message_id,
     };
 
     sendMessage(data);
