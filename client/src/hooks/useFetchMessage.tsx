@@ -5,9 +5,11 @@ import { IEOpenConversation }          from "@/interfaces/interface";
 
 import SocketService                   from "@/services/SocketServices";
 import { useLazyGetChatMessagesQuery } from "@/redux/api/chatApi";
+import scrollChatIntoView              from "@/shared/utils/scrollChatIntoView";
 
 type useFetchMessageProps = {
   inView: boolean;
+  chatListRef: React.RefObject<HTMLDivElement> | null;
   socketService: SocketService | null;
   openConversation: IEOpenConversation[];
 };
@@ -20,11 +22,13 @@ type useFetchMessageReturn = {
 
 function useFetchMessage({
   inView,
+  chatListRef,
   socketService,
   openConversation,
 }: useFetchMessageProps): useFetchMessageReturn {
   const conversationId = openConversation?.[0]?.conversation_id;
   const [comingMessage, setComingMessage] = useState<MessageType[]>([]);
+  const [scrollView, setScrollView] = useState<boolean>(false);
 
   const [
     getChatMessages,
@@ -40,24 +44,16 @@ function useFetchMessage({
     };
 
     socketService.onMessageReceived(handleMessageReceived);
-
-    // Cleanup function to remove the event listener
-    // when the component unmounts or dependencies change
-    return () => {
-      socketService.onMessageReceived(handleMessageReceived);
-      setComingMessage([]);
-    };
   }, [socketService]);
 
-  // UseEffect to fetch chat messages when the conversation changes
+  // UseEffect to fetch initial data for chat messages
   useEffect(() => {
-    if (!conversationId) return;
     getChatMessages({ conversation_id: conversationId, messages: [] });
-  }, [getChatMessages]);
+  }, []);
 
   // UseEffect to fetch chat messages when the user scrolls to the top
   useEffect(() => {
-    if(!inView) return;
+    if (!inView) return;
     const ids = comingMessage.map((item) => item.message_id);
     getChatMessages({ conversation_id: conversationId, messages: ids });
   }, [getChatMessages, inView]);
@@ -69,10 +65,16 @@ function useFetchMessage({
       return;
     }
 
-    if (allChatMessages?.messages) {
-      setComingMessage((prev) => [...prev, ...allChatMessages.messages]);
+    if (allChatMessages?.messages && chatListRef?.current) {
+      setComingMessage((prev) => {
+        const messages = [...prev, ...allChatMessages.messages];
+        return messages.sort((a, b) => a.message_id - b.message_id);
+      });
+
+      if (scrollView) return;
+      scrollChatIntoView(chatListRef, () => setScrollView(true));
     }
-  }, [allChatMessages, chatMessagesError]);
+  }, [allChatMessages?.messages, chatMessagesError]);
 
   return {
     comingMessage,

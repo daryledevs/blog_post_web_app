@@ -1,18 +1,5 @@
 .chat-message-list {
-  @include dimension(100%, 100%);
-  @include flexbox(flex-start, flex-start, column-reverse);
+  @include dimension(100%, 100vh);
+  @include flexbox(flex-start, flex-start, column);
   overflow-y: scroll;
-
-  .chat-message-list-observer {
-    @include dimension(100%, auto);
-
-    /* sticks to the top in a reversed column direction */
-    /* also,  to prevent the scrollbar from moving to the top end */
-    position: -webkit-sticky;
-    position: sticky;
-    bottom: 0; /* in column-reverse, this makes it stick to the top */
-
-    /* ensures it appears at the top of the flex container */
-    order: 1;
-  }
 }

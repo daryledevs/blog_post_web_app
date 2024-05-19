@@ -16,6 +16,7 @@ interface IEChatProps {
 
 function ChatBox({ socketService }: IEChatProps) {
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
+  const chatListRef = useRef<HTMLDivElement | null>(null);
   const { openConversation } = useAppSelector(selectMessage);
 
   const [newMessage, setNewMessage] = useState<any>();
@@ -27,6 +28,7 @@ function ChatBox({ socketService }: IEChatProps) {
   
   const { comingMessage, setComingMessage, isLoading } = useFetchMessage({
     inView,
+    chatListRef,
     socketService,
     openConversation,
   });
@@ -39,11 +41,11 @@ function ChatBox({ socketService }: IEChatProps) {
     setNewMessage,
   });
 
-  if (isLoading) return null;
-
   return (
     <div className="chat-box">
       <ChatBoxMessageList
+        isLoading={isLoading}
+        chatListRef={chatListRef}
         observerRef={ref}
         comingMessage={comingMessage}
       />
