@@ -36,9 +36,17 @@ const messageSlice = createSlice({
         recipients: [...state.recipients, action.payload],
       };
     },
+    removeRecipient(state, action) {
+      return {
+        ...state,
+        recipients: state.recipients.filter(
+          (recipient: any) => recipient.user_id !== action.payload
+        ),
+      };
+    },
     setSearch: (state, action) => {
       state.search = action.payload;
-    },  
+    },
     setNewMessageTrigger: (state) => {
       state.newMessageTrigger = !state.newMessageTrigger;
     },
@@ -53,6 +61,7 @@ export const selectMessage = (state: IEReduxState) => state.messages;
 export const {
   setOpenConversation,
   setRecipients,
+  removeRecipient,
   setNewMessageTrigger,
   setSearch,
   setSwitchAccountTrigger,
