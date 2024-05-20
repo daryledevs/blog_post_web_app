@@ -37,7 +37,8 @@
   "scripts": {
     "start": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start:sass": "sass --watch src/styles/index.scss src/styles/index.css"
   },
   "eslintConfig": {
     "extends": [
