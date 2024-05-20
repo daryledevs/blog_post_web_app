@@ -1,32 +1,34 @@
-import React  from "react";
-import UserAvatar from "../UserComponents/UserAvatar";
-import NewMessageCardDetails from "./NewMessageCardDetails";
-
-type NewMessageCardProps = {
-  user: any;
-  setSearch: React.Dispatch<React.SetStateAction<string>>;
-  recipients: any;
-  setRecipients: React.Dispatch<React.SetStateAction<any>>;
-};
-
-function NewMessageCard({
-  user,
-  recipients,
+import {
+  selectMessage,
   setRecipients,
   setSearch,
-}: NewMessageCardProps) {
-  const isRecipients = recipients.some(
-    (item: any) => item.user_id === user.user_id
-  );
+}                                         from "@/redux/slices/messageSlice";
+import React, { useEffect }               from "react";
+import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
+import { IEUserState }                    from "@/interfaces/interface";
+import UserAvatar                         from "../UserComponents/UserAvatar";
+import NewMessageCardDetails              from "./NewMessageCardDetails";
 
-  function newMessageHandler(person: any) {
-    let newArr = [...recipients];
-    newArr.push(person);
-    setRecipients([...newArr]);
-    setSearch("");
+function NewMessageCard({ user }: { user: IEUserState }) {
+  const dispatch = useAppDispatch();
+  const message = useAppSelector(selectMessage);
+  const recipients = message.recipients;
+
+  const [isRecipient, setIsRecipient] = React.useState<boolean>(false);
+
+  function newMessageHandler(person: IEUserState) {
+    dispatch(setRecipients(person));
+    dispatch(setSearch(""));
   }
 
-  if (isRecipients) return null;
+  useEffect(() => {
+    if (!recipients?.length) return;
+    setIsRecipient(
+      recipients.some((item: any) => item.user_id === user.user_id)
+    );
+  }, [recipients]);
+
+  if (isRecipient) return null;
 
   return (
     <div

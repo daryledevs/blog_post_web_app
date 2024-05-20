@@ -2,8 +2,8 @@ import {
   selectMessage,
   setNewMessageTrigger,
   setOpenConversation,
+  setRecipients,
 }                                         from "../../redux/slices/messageSlice";
-import { useState }                       from "react";
 import BaseModal                          from "./BaseModal";
 import WrapperModal                       from "./WrapperModal";
 import Button                             from "../components/element/Button";
@@ -13,17 +13,16 @@ import NewMessageHeader                   from "../components/new-message-modal/
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 
 function NewMessage() {
-  const messages = useAppSelector(selectMessage);
   const dispatch = useAppDispatch();
-
-  const [recipients, setRecipients] = useState<any>([]);
-  const [search, setSearch] = useState<string>("");
+  const messages = useAppSelector(selectMessage);
+  const recipients = messages.recipients;
+  const recipientLimit = !recipients.length || recipients.length >= 2;
 
   function newChatHandler() {
     dispatch(setOpenConversation(recipients));
     dispatch(setNewMessageTrigger());
-    setRecipients([]);
-  }
+    dispatch(setRecipients([]));
+  };
 
   if (!messages.newMessageTrigger) return null;
 
@@ -33,24 +32,12 @@ function NewMessage() {
         <div className="new-message-container">
           <NewMessageHeader />
           <div className="new-message__search-bar">
-            <Recipients
-              search={search}
-              setSearch={setSearch}
-              recipients={recipients}
-              setRecipients={setRecipients}
-            />
+            <Recipients />
           </div>
-          <NewMessageLists
-            search={search}
-            setSearch={setSearch}
-            recipients={recipients}
-            setRecipients={setRecipients}
-          />
+          <NewMessageLists />
           <Button
             onClick={newChatHandler}
-            disabled={
-              !recipients.length || recipients.length >= 2 ? true : false
-            }
+            disabled={recipientLimit}
           >
             Chat
           </Button>

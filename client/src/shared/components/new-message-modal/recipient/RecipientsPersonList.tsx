@@ -1,22 +1,19 @@
-import React               from "react";
-import RecipientPersonCard from "./RecipientPersonCard";
+import React                from "react";
+import { IEUserState }      from "@/interfaces/interface";
+import { useAppSelector }   from "@/hooks/reduxHooks";
+import RecipientPersonCard  from "./RecipientPersonCard";
+import { selectMessage } from "@/redux/slices/messageSlice";
 
-type RecipientsPersonListProps = {
-  recipients: any;
-  setRecipients: React.Dispatch<React.SetStateAction<any>>;
-};
+function RecipientsPersonList() {
+  const message = useAppSelector(selectMessage);
+  const recipients = message.recipients;
 
-function RecipientsPersonList({
-  recipients,
-  setRecipients,
-}: RecipientsPersonListProps) {
   return (
     <React.Fragment>
-      {recipients.map((item: any, index: number) => (
+      {recipients?.map((user: IEUserState, index: number) => (
         <RecipientPersonCard
           key={index}
-          item={item}
-          setRecipients={setRecipients}
+          item={user}
         />
       ))}
     </React.Fragment>

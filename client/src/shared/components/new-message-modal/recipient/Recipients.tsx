@@ -1,43 +1,28 @@
-import Input                from "../../element/Input";
-import RecipientsPersonList from "./RecipientsPersonList";
+import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
+import { selectMessage, setSearch }       from "@/redux/slices/messageSlice";
+import Input                              from "../../element/Input";
+import RecipientsPersonList               from "./RecipientsPersonList";
 
-interface IERecipients {
-  user_id: number;
-  username: string;
-  first_name: string;
-  last_name: string;
-  avatar_url: string;
-}
+function Recipients() {
+  const dispatch = useAppDispatch();
+  const message = useAppSelector(selectMessage);
+  const search = message.search;
 
-interface RecipientsProps {
-  search: string;
-  recipients: IERecipients[];
-  setSearch: (value: any) => void;
-  setRecipients: (value: any) => void;
-}
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(setSearch(event.target.value));
+  };
 
-function Recipients({
-  search,
-  setSearch,
-  recipients,
-  setRecipients,
-}: RecipientsProps) {
   return (
     <label>
       To:
       <div className="recipients">
-        <RecipientsPersonList
-          recipients={recipients}
-          setRecipients={setRecipients}
-        />
+        <RecipientsPersonList />
         <Input
           id="search"
           type="text"
           value={search}
           placeholder="Search..."
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-            setSearch(event.target.value)
-          }
+          onChange={handleSearch}
         />
       </div>
     </label>
