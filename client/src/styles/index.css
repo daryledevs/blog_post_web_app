@@ -1380,7 +1380,7 @@ button {
   height: auto;
   text-align: left;
 }
-.new-message-card-details > p:first-child {
+.new-message-card-details > div:first-child {
   font-weight: 500;
 }
 

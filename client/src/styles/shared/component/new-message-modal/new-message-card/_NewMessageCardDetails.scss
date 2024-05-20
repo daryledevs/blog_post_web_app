@@ -2,7 +2,7 @@
   @include dimension(100%, auto);
   text-align: left;
 
-  > p:first-child{
+  > div:first-child{
     font-weight: 500;
   }
 }

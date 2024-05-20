@@ -1,5 +1,5 @@
 import { useCallback }    from "react";
-import UserUsername       from "../../UserComponents/UserUsername";
+import UserUsername       from "../../user/UserUsername";
 import CloseIcon          from "@/assets/icons/svg/close-icon-blue.svg?react";
 import { IEUserState }    from "@/interfaces/interface";
 import { useAppDispatch } from "@/hooks/reduxHooks";

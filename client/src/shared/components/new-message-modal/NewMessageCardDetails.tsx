@@ -1,9 +1,10 @@
-import UserDetails from '../UserComponents/UsersFullName';
+import UserUsername from '../user/UserUsername';
+import UserDetails from '../user/UsersFullName';
 
 function NewMessageCardDetails({ user }: any) {
   return (
     <div className="new-message-card-details">
-      <p>{user.username}</p>
+      <UserUsername username={user.username} />
       <UserDetails
         first_name={user.first_name}
         last_name={user.last_name}

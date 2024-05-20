@@ -1,6 +1,6 @@
 import React        from "react";
 import usersPicture from "@/assets/icons/avatar.png";
-import UserAvatar   from "@/shared/components/UserComponents/UserAvatar";
+import UserAvatar   from "@/shared/components/user/UserAvatar";
 
 type ChatBoxMessageCardProps = {
   value: string;

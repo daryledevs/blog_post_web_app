@@ -6,7 +6,7 @@ import {
 import React, { useEffect }               from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { IEUserState }                    from "@/interfaces/interface";
-import UserAvatar                         from "../UserComponents/UserAvatar";
+import UserAvatar                         from "../user/UserAvatar";
 import NewMessageCardDetails              from "./NewMessageCardDetails";
 
 function NewMessageCard({ user }: { user: IEUserState }) {
