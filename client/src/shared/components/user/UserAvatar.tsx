@@ -1,7 +1,7 @@
 import usersPicture from "@/assets/icons/avatar.png";
 
 type UserAvatarProps = {
-  avatar_url: string;
+  avatar_url: string | null;
   className?: string;
 };
 

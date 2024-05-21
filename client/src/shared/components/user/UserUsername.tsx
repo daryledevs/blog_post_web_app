@@ -1,5 +1,5 @@
 type UserUsernameProps = {
-  username: any;
+  username: string | null;
   className?: string;
 };
 
