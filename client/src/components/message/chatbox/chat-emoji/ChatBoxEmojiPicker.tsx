@@ -10,14 +10,13 @@ function ChatBoxEmojiPicker({
   emojiModalTrigger,
   setNewMessage,
   newMessage,
-
 }: ChatBoxEmojiProps) {
   // Function to choose emoji
   function chooseEmoji(emojiData: EmojiClickData, event: MouseEvent) {
-    setNewMessage({
-      ...newMessage,
-      text_message: newMessage?.text_message + emojiData.emoji,
-    });
+    setNewMessage((prev: any) => ({
+      ...prev,
+      text_message: (prev?.text_message ?? "") + emojiData.emoji,
+    }));
   }
 
   if (!emojiModalTrigger) return null;
