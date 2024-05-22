@@ -1,15 +1,19 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { IEOpenConversation, IEReduxState, IEUserState } from "../../interfaces/interface";
+import { createSlice, PayloadAction, Slice } from "@reduxjs/toolkit";
+import {
+  IEConversation,
+  IEReduxState,
+  IEUserState,
+} from "../../interfaces/interface";
 
-export interface IEMessageState {
-  openConversation: IEOpenConversation[];
-  recipients: IEUserState[],
+export interface IEConversationState {
+  openConversation: IEConversation[];
+  recipients: IEConversation[] | IEUserState[];
   search: string;
   newMessageTrigger: boolean;
   switchAccountTrigger: boolean;
-};
+}
 
-const initialState: IEMessageState | null = {
+const initialState: IEConversationState | null = {
   openConversation: [],
   recipients: [],
   search: "",
@@ -17,11 +21,14 @@ const initialState: IEMessageState | null = {
   switchAccountTrigger: false,
 };
 
-const messageSlice = createSlice({
+const messageSlice: Slice = createSlice({
   name: "messages",
   initialState,
   reducers: {
-    setOpenConversation: (state, action) => {
+    setOpenConversation: (
+      state,
+      action: PayloadAction<IEConversation | IEConversation[]>
+    ) => {
       const { payload } = action;
       const isArray = Array.isArray(payload);
       return {
@@ -30,13 +37,16 @@ const messageSlice = createSlice({
         openConversation: [...(isArray ? payload : [payload])],
       };
     },
-    setRecipients(state, action) {
+    setRecipients: (
+      state,
+      action: PayloadAction<IEConversation[] | IEUserState>
+    ) => {
       return {
         ...state,
         recipients: [...state.recipients, action.payload],
       };
     },
-    removeRecipient(state, action) {
+    removeRecipient: (state, action: PayloadAction<number>) => {
       return {
         ...state,
         recipients: state.recipients.filter(
@@ -44,7 +54,13 @@ const messageSlice = createSlice({
         ),
       };
     },
-    setSearch: (state, action) => {
+    resetRecipients: (state) => {
+      return {
+        ...state,
+        recipients: [],
+      };
+    },
+    setSearch: (state, action: PayloadAction<string>) => {
       state.search = action.payload;
     },
     setNewMessageTrigger: (state) => {
@@ -63,6 +79,7 @@ export const {
   setRecipients,
   removeRecipient,
   setNewMessageTrigger,
+  resetRecipients,
   setSearch,
   setSwitchAccountTrigger,
 } = messageSlice.actions;

@@ -1,11 +1,12 @@
 import React, { useCallback }         from 'react';
 import SocketService                  from '@/services/SocketServices';
-import { MessageType }                from '@/interfaces/types';
+import { MessageType }                from '@/interfaces/interface';
 import { useGetUserDataQuery }        from '@/redux/api/userApi';
 import { useSendNewMessagesMutation } from "@/redux/api/chatApi"; 
+import { useAppSelector } from './reduxHooks';
+import { selectMessage } from '@/redux/slices/messageSlice';
 
 type useSendMessageProps = {
-  openConversation: any;
   socketService: SocketService | null;
   newMessage: any;
   setComingMessage: React.Dispatch<React.SetStateAction<Array<any>>>;
@@ -14,29 +15,39 @@ type useSendMessageProps = {
 
 function useSendMessage({
   newMessage,
-  openConversation,
   socketService,
   setComingMessage,
   setNewMessage,
 }: useSendMessageProps) {
-  const [sendMessage] = useSendNewMessagesMutation();
+  const { openConversation } = useAppSelector(selectMessage);
+  const [sendMessage] = useSendNewMessagesMutation({
+    fixedCacheKey: "send-message-api",
+  });
+
   const userDataApi = useGetUserDataQuery({ person: "" });
 
   // returning it, to make an instance of this function
   return useCallback(() => {
     if (!newMessage?.text_message || !socketService) return;
     const user = userDataApi?.data?.user;
-    const { user_two_id, user_one_id, conversation_id } = openConversation[0];
-
+    const conversation_id = openConversation[0]?.conversation_id;
+    const user_id = openConversation[0]?.user_id;
+    const user_one_id = openConversation[0]?.user_one_id;
+    const user_two_id = openConversation[0]?.user_two_id;
+  
     const receiver_id =
-      user_one_id !== user.user_id ? user_one_id : user_two_id;
+      user_one_id && user_one_id !== user.user_id
+        ? user_one_id
+        : user_two_id
+        ? user_two_id
+        : user_id;
 
     const data = {
       sender_id: user.user_id,
       receiver_id: receiver_id,
-      conversation_id: conversation_id,
-      text_message: newMessage.text_message,
-      message_id: newMessage.message_id,
+      conversation_id: conversation_id || null,
+      text_message: newMessage?.text_message,
+      message_id: newMessage?.message_id || null,
     };
 
     sendMessage(data);

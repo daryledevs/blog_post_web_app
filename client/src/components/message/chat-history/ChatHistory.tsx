@@ -1,13 +1,14 @@
-import ChatHistoryList from "./ChatHistoryList";
+import { IEConversation }  from "@/interfaces/interface";
+import ChatHistoryList     from "./ChatHistoryList";
 
 type ChatHistoryProps = {
-  list: any;
+  list: IEConversation[];
   isLoading: boolean;
 };
 
 function ChatHistory({ list, isLoading }: ChatHistoryProps) {
   if (isLoading) return null;
-
+  
   return (
     <div className="chat-history">
       <p>Messages</p>

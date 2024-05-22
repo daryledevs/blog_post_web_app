@@ -3,10 +3,11 @@ import {
   setOpenConversation,
 }                                         from "@/redux/slices/messageSlice";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
+import { IEConversation }                 from "@/interfaces/interface";
 import UserAvatar                         from "@/shared/components/user/UserAvatar";
 import UserFullName                       from "@/shared/components/user/UsersFullName";
 
-function HistoryRecipientCard({ chat }: { chat: any }) {
+function HistoryRecipientCard({ chat }: { chat: IEConversation }) {
   const chatState = useAppSelector(selectMessage);
   const { openConversation } = chatState;
   const dispatch = useAppDispatch();
@@ -23,12 +24,12 @@ function HistoryRecipientCard({ chat }: { chat: any }) {
       onClick={() => dispatch(setOpenConversation(chat))}
     >
       <UserAvatar
-        avatar_url={chat.avatar_url}
+        avatar_url={chat?.avatar_url}
         className="history-recipient-card-avatar"
       />
       <UserFullName
-        first_name={chat.first_name}
-        last_name={chat.last_name}
+        first_name={chat?.first_name}
+        last_name={chat?.last_name}
         className="history-recipient-name"
       />
     </div>

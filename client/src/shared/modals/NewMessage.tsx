@@ -1,8 +1,8 @@
 import {
+  resetRecipients,
   selectMessage,
   setNewMessageTrigger,
   setOpenConversation,
-  setRecipients,
 }                                         from "../../redux/slices/messageSlice";
 import BaseModal                          from "./BaseModal";
 import WrapperModal                       from "./WrapperModal";
@@ -16,12 +16,20 @@ function NewMessage() {
   const dispatch = useAppDispatch();
   const messages = useAppSelector(selectMessage);
   const recipients = messages.recipients;
+  const openConversation = messages.openConversation;
   const recipientLimit = !recipients.length || recipients.length >= 2;
 
   function newChatHandler() {
+    const isUserInConversation = recipients.some((recipient) =>
+      openConversation.some(
+        (conversationParticipant) =>
+          recipient.user_id === conversationParticipant.user_id
+      )
+    );
+    dispatch(resetRecipients({}));
+    dispatch(setNewMessageTrigger({}));
+    if (isUserInConversation) return;
     dispatch(setOpenConversation(recipients));
-    dispatch(setNewMessageTrigger());
-    dispatch(setRecipients([]));
   };
 
   if (!messages.newMessageTrigger) return null;

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import ChatBoxSubmission    from "./ChatBoxSubmission";
 import ChatBoxMessageList   from "./ChatBoxMessageList";
 import { useInView }        from "react-intersection-observer";
@@ -17,24 +17,21 @@ interface IEChatProps {
 function ChatBox({ socketService }: IEChatProps) {
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const chatListRef = useRef<HTMLDivElement | null>(null);
-  const { openConversation } = useAppSelector(selectMessage);
-
   const [newMessage, setNewMessage] = useState<any>();
   useAdjustInputHeight({ inputRef, newMessage });
 
-  const { ref, inView, } = useInView({
-    threshold: 0,
+  const { ref, inView } = useInView({
+    threshold: 1,
   });
   
-  const { comingMessage, setComingMessage, isLoading } = useFetchMessage({
-    inView,
-    chatListRef,
-    socketService,
-    openConversation,
-  });
+  const { comingMessage, setComingMessage, isLoading } =
+    useFetchMessage({
+      inView,
+      chatListRef,
+      socketService,
+    });
 
   const sendMessageHandler = useSendMessage({
-    openConversation,
     newMessage,
     socketService,
     setComingMessage,
