@@ -17,6 +17,11 @@ class ChatsController {
         const data = await this.chatsService.getChatHistory(user_id, listId);
         res.status(200).send({ chats: data });
     });
+    getChatHistoryByUserId = this.wrap.apiWrap(async (req, res, next) => {
+        const usersId = req.params;
+        const data = await this.chatsService.getChatHistoryByUserId(usersId.user_one_id, usersId.user_two_id);
+        res.status(200).send({ conversation: data });
+    });
     getChatMessages = this.wrap.apiWrap(async (req, res, next) => {
         let conversation_id = req.params.conversation_id;
         const messages = req.body.messages || [0];
@@ -31,8 +36,7 @@ class ChatsController {
     });
     deleteConversationById = this.wrap.apiWrap(async (req, res, next) => {
         const { conversation_id } = req.body;
-        const message = await this.chatsService
-            .deleteConversationById(conversation_id);
+        const message = await this.chatsService.deleteConversationById(conversation_id);
         res.status(200).send({ message });
     });
 }

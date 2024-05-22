@@ -1,12 +1,13 @@
-import ChatsServices                       from "@/services/chat/chat.service.impl";
+
+import IEChatService                       from "@/services/chat/chat.service";
 import AsyncWrapper                        from "@/utils/async-wrapper.util";
 import { NextFunction, Request, Response } from "express";
 
 class ChatsController {
-  private chatsService: ChatsServices;
+  private chatsService: IEChatService;
   private wrap: AsyncWrapper = new AsyncWrapper();
 
-  constructor(chatsService: ChatsServices) {
+  constructor(chatsService: IEChatService) {
     this.chatsService = chatsService;
   }
 
@@ -18,6 +19,19 @@ class ChatsController {
 
       const data = await this.chatsService.getChatHistory(user_id, listId);
       res.status(200).send({ chats: data });
+    }
+  );
+
+  public getChatHistoryByUserId = this.wrap.apiWrap(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const usersId: any = req.params;
+
+      const data = await this.chatsService.getChatHistoryByUserId(
+        usersId.user_one_id,
+        usersId.user_two_id
+      );
+
+      res.status(200).send({ conversation: data });
     }
   );
 
@@ -49,9 +63,10 @@ class ChatsController {
   public deleteConversationById = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
       const { conversation_id } = req.body;
-      
-      const message = await this.chatsService
-      .deleteConversationById(conversation_id);
+
+      const message = await this.chatsService.deleteConversationById(
+        conversation_id
+      );
 
       res.status(200).send({ message });
     }

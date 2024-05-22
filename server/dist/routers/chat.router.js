@@ -12,5 +12,6 @@ const router = express_1.default.Router();
 const controller = new chat_controller_1.default(new chat_service_impl_1.default(new chat_repository_impl_1.default(), new user_repository_impl_1.default()));
 router.post("/:conversation_id/messages", controller.getChatMessages);
 router.post("/lists", controller.getChatHistory);
+router.get("/users/:user_one_id/:user_two_id", controller.getChatHistoryByUserId);
 router.post("/", controller.newMessageAndConversation);
 exports.default = router;

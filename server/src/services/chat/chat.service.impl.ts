@@ -1,22 +1,25 @@
 import IEChatRepository, {
   ChatHistoryByIdType,
   MessageDataType,
-}                         from "@/repositories/chat/chat.repository";
-import IChatService       from "./chat.service";
-import AsyncWrapper       from "@/utils/async-wrapper.util";
-import ApiErrorException  from "@/exceptions/api.exception";
-import { NewMessages, SelectMessages } from "@/types/table.types";
-import IEUserRepository   from "@/repositories/user/user.repository";
+}                                              from "@/repositories/chat/chat.repository";
+import IChatService                            from "./chat.service";
+import AsyncWrapper                            from "@/utils/async-wrapper.util";
+import ApiErrorException                       from "@/exceptions/api.exception";
+import IEUserRepository                        from "@/repositories/user/user.repository";
+import { SelectConversations, SelectMessages } from "@/types/table.types";
 
 class ChatServices implements IChatService {
   private chatRepository: IEChatRepository;
   private userRepository: IEUserRepository;
   private wrap: AsyncWrapper = new AsyncWrapper();
 
-  constructor(chatRepository: IEChatRepository, userRepository: IEUserRepository) {
+  constructor(
+    chatRepository: IEChatRepository,
+    userRepository: IEUserRepository
+  ) {
     this.chatRepository = chatRepository;
     this.userRepository = userRepository;
-  };
+  }
 
   public getChatHistory = this.wrap.serviceWrap(
     async (
@@ -44,41 +47,64 @@ class ChatServices implements IChatService {
       if (!chatId) throw ApiErrorException.HTTP400Error("No arguments provided");
 
       // Check if the chat exists
-      const data = await this.chatRepository
-        .findConversationById(chatId);
+      const data = await this.chatRepository.findConversationById(chatId);
 
       // If the chat does not exist, return an error
       if (!data) throw ApiErrorException.HTTP404Error("Chat not found");
 
       // Return the chat messages
-      return await this.chatRepository
-        .getMessagesById(chatId, listId);
+      return await this.chatRepository.getMessagesById(chatId, listId);
+    }
+  );
+
+  public getChatHistoryByUserId = this.wrap.serviceWrap(
+    async (
+      user_one_id: number,
+      user_two_id: number
+    ): Promise<SelectConversations> => {
+      // If no users' id is provided, return an error
+      if (!user_one_id || !user_two_id) {
+        throw ApiErrorException.HTTP400Error("No arguments provided");
+      }
+
+      // fetch the conversation exists
+      const conversation = await this.chatRepository.findConversationByUserId([
+        user_one_id,
+        user_two_id,
+      ]);
+
+      // If the conversation does not exist, return an error
+      if (!conversation) {
+        throw ApiErrorException.HTTP404Error("Conversation not found");
+      }
+
+      // Return the conversation
+      return conversation;
     }
   );
 
   public newMessageAndConversation = this.wrap.serviceWrap(
-    async (
-      messageData: MessageDataType
-    ): Promise<string> => {
+    async (messageData: MessageDataType): Promise<string> => {
       const conversation_id = messageData?.conversation_id;
       const sender_id = messageData?.sender_id;
       const receiver_id = messageData?.receiver_id;
-      
+
       let newMessageData = messageData;
 
       if (!sender_id || !receiver_id) {
         throw ApiErrorException.HTTP400Error("No arguments provided");
-      };
-      
+      }
 
       if (conversation_id) {
         // Check if the conversation exists
-        const conversation = await this.chatRepository
-          .findConversationById(conversation_id);
+        const conversation = await this.chatRepository.findConversationById(
+          conversation_id
+        );
 
         // If the conversation does not exist, return an error
-        if (!conversation) throw ApiErrorException.HTTP404Error("Conversation not found");
-      };
+        if (!conversation)
+          throw ApiErrorException.HTTP404Error("Conversation not found");
+      }
 
       // since the conversation_id is null or undefined, we need to check if it exists
       if (!conversation_id) {
@@ -90,8 +116,9 @@ class ChatServices implements IChatService {
         ];
 
         // Check if the conversation exists by users' id
-        const conversation =
-          await this.chatRepository.findConversationByUserId(user_id);
+        const conversation = await this.chatRepository.findConversationByUserId(
+          user_id
+        );
 
         newMessageData.conversation_id = conversation
           ? // If the conversation exists, return the conversation_id
@@ -101,8 +128,8 @@ class ChatServices implements IChatService {
               user_one_id: sender_id,
               user_two_id: receiver_id,
             })) as unknown as number);
-      };
-      
+      }
+
       const { receiver_id: _, ...rest } = newMessageData;
       // Save the new message
       await this.chatRepository.saveNewMessage(rest as any);
@@ -113,14 +140,17 @@ class ChatServices implements IChatService {
   public deleteConversationById = this.wrap.serviceWrap(
     async (conversation_id: number): Promise<string> => {
       // If no conversation id is provided, return an error
-      if (!conversation_id) throw ApiErrorException.HTTP400Error("No arguments provided");
+      if (!conversation_id)
+        throw ApiErrorException.HTTP400Error("No arguments provided");
 
       // Check if the conversation exists
-      const conversation = await this.chatRepository
-        .findConversationById(conversation_id);
+      const conversation = await this.chatRepository.findConversationById(
+        conversation_id
+      );
 
       // If the conversation does not exist, return an error
-      if (!conversation) throw ApiErrorException.HTTP404Error("Conversation not found");
+      if (!conversation)
+        throw ApiErrorException.HTTP404Error("Conversation not found");
 
       // Return the deleted conversation
       await this.chatRepository.deleteConversationById(conversation_id);
