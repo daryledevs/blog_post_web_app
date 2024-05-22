@@ -34,7 +34,8 @@ class ChatsRepository {
             .else(eb.ref("conversations.user_one_id"))
             .end()))
             .selectAll("users")
-            .where("conversations.conversation_id", "not in", conversations)
+            .where((eb) => eb("conversations.user_one_id", "=", user_id)
+            .or("conversations.user_two_id", "=", user_id))
             .execute();
     });
     findConversationById = this.wrap.repoWrap(async (conversation_id) => {
