@@ -1,7 +1,7 @@
 import { FetchBaseQueryError } from "@reduxjs/toolkit/dist/query";
 import { PersonType } from "./types";
 import { SerializedError } from "@reduxjs/toolkit";
-import { IEMessageState } from "@/redux/slices/messageSlice";
+import { IEConversationState } from "@/redux/slices/messageSlice";
 import { IESidebarState } from "@/redux/slices/sidebarSlice";
 
 interface IEPost {
@@ -30,16 +30,34 @@ interface IEUserState {
   birthday: string;
   fetch_status: FetchBaseQueryError | SerializedError;
 }
-
-interface IEOpenConversation extends PersonType {
+interface IEConversation extends PersonType {
   conversation_id: number;
   user_one_id: number;
   user_two_id: number;
 }
 
+interface IEChatMessage {
+  conversation_id: number | null;
+  message_id: number | null;
+  sender_id: number;
+  text_message: string;
+  time_sent?: string;
+}
+
+interface MessageType extends IEChatMessage {
+  text_message: string;
+};
+
 interface IEReduxState {
-  messages: IEMessageState;
+  messages: IEConversationState;
   sidebar: IESidebarState;
 };
 
-export type { IEPost, IEUserState, IEOpenConversation, IEReduxState };
+export type {
+  IEPost,
+  IEUserState,
+  IEConversation,
+  IEChatMessage,
+  MessageType,
+  IEReduxState,
+};

@@ -1,7 +1,6 @@
 import socketIO, { Socket } from "socket.io-client";
-import { MessageType }      from "@/interfaces/types";
+import { MessageType }      from "@/interfaces/interface";
 import socketConfig         from "@/config/socketConfig";
-import { IEUserState }      from "@/interfaces/interface";
 
 class SocketService {
   private socket: Socket;

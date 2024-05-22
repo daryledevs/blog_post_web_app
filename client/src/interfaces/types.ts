@@ -8,16 +8,8 @@ type PersonType = {
   avatar_url: string;
 };
 
-type MessageType = {
-  conversation_id: number;
-  message_id: number;
-  sender_id: number;
-  receiver_id: number;
-  text_message: string;
-};
-
 type ProfileProps = {
   user: IEUserState;
 };
 
-export type { MessageType, PersonType, ProfileProps };
+export type { PersonType, ProfileProps };
