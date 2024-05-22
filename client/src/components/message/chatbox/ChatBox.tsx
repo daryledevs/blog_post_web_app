@@ -1,10 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import ChatBoxSubmission    from "./ChatBoxSubmission";
-import ChatBoxMessageList   from "./ChatBoxMessageList";
 import { useInView }        from "react-intersection-observer";
 
-import { selectMessage }    from "@/redux/slices/messageSlice";
-import { useAppSelector }   from "@/hooks/reduxHooks";
+import ChatBoxSubmission    from "./ChatBoxSubmission";
+import ChatBoxMessageList   from "./ChatBoxMessageList";
+
 import useFetchMessage      from "@/hooks/useFetchMessage";
 import useAdjustInputHeight from "@/hooks/useAdjustInputHeight";
 import useSendMessage       from "@/hooks/useSendMessage";
@@ -21,7 +20,7 @@ function ChatBox({ socketService }: IEChatProps) {
   useAdjustInputHeight({ inputRef, newMessage });
 
   const { ref, inView } = useInView({
-    threshold: 1,
+    threshold: 0,
   });
   
   const { comingMessage, setComingMessage, isLoading } =
@@ -41,9 +40,9 @@ function ChatBox({ socketService }: IEChatProps) {
   return (
     <div className="chat-box">
       <ChatBoxMessageList
+        observerRef={ref}
         isLoading={isLoading}
         chatListRef={chatListRef}
-        observerRef={ref}
         comingMessage={comingMessage}
       />
       <ChatBoxSubmission

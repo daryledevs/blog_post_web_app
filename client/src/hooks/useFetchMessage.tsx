@@ -8,7 +8,6 @@ import { MessageType }                from "@/interfaces/interface";
 import { selectMessage }              from "@/redux/slices/messageSlice";
 import { useAppSelector }             from "./reduxHooks";
 import { useGetUserDataQuery }        from "@/redux/api/userApi";
-import scrollChatIntoView             from "@/shared/utils/scrollChatIntoView";
 
 type useFetchMessageProps = {
   inView: boolean;
@@ -30,8 +29,6 @@ function useFetchMessage({
   const { openConversation, recipients } = useAppSelector(selectMessage);
   const conversationId = openConversation?.[0]?.conversation_id;
   const [comingMessage, setComingMessage] = useState<MessageType[]>([]);
-  const [scrollView, setScrollView] = useState<boolean>(false);
-  const [isFirstView, setIsFirstView] = useState<boolean>(true);
 
   const userDataApi = useGetUserDataQuery(
     { person: "" },
@@ -72,8 +69,6 @@ function useFetchMessage({
   useEffect(() => {
     if (openConversation.length) {
       setComingMessage([]);
-      setScrollView(false);
-      setIsFirstView(true);
     }
   }, [openConversation]);
 
@@ -104,7 +99,6 @@ function useFetchMessage({
       .filter((id) => id !== null) as number[];
 
     if (inView && conversationId) {
-      console.log(inView);
       getChatMessages({
         conversation_id: conversationId,
         messages: ids,
@@ -117,15 +111,12 @@ function useFetchMessage({
 
   // UseEffect to handle the result of the fetch and error states
   useEffect(() => {
-    if (allChatMessages?.messages && chatListRef?.current) {
-      setComingMessage((prev: MessageType[]) => {
-        const messages = [...prev, ...allChatMessages.messages];
-        return messages.sort((a, b) => a.message_id! - b.message_id!);
-      });
-
-      if (scrollView) return;
-      scrollChatIntoView(chatListRef, () => setScrollView(true));
-    } 
+    if (inView && allChatMessages?.messages && chatListRef?.current) {
+      setComingMessage((prev: MessageType[]) => [
+        ...prev,
+        ...allChatMessages.messages,
+      ]);
+    }
   }, [allChatMessages?.messages]);
 
   // UseEffect to fetch conversation data when the user opens a new conversation

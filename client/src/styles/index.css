@@ -892,8 +892,20 @@ button {
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
-  flex-direction: column;
+  flex-direction: column-reverse;
   overflow-y: scroll;
+}
+.chat-message-list .chat-message-list-observer {
+  width: 100%;
+  height: auto;
+  /* sticks to the top in a reversed column direction */
+  /* also,  to prevent the scrollbar from moving to the top end */
+  position: -webkit-sticky;
+  position: sticky;
+  bottom: 0; /* in column-reverse, this makes it stick to the top */
+  border-top: 1px solid transparent;
+  /* ensures it appears at the top of the flex container */
+  order: 1;
 }
 
 .chat-box-submission {
