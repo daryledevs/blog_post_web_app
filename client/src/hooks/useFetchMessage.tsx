@@ -37,7 +37,11 @@ function useFetchMessage({
 
   const [
     getChatMessages,
-    { data: allChatMessages, error: chatMessagesError, isLoading: chatMessagesLoading },
+    {
+      data: allChatMessages,
+      error: chatMessagesError,
+      isLoading: chatMessagesLoading,
+    },
   ] = useLazyGetChatMessagesQuery();
 
   const [
@@ -57,8 +61,7 @@ function useFetchMessage({
 
     const handleMessageReceived = (message: MessageType) => {
       setComingMessage(
-        (prev: MessageType[]) =>
-          [message, ...prev] as MessageType[]
+        (prev: MessageType[]) => [message, ...prev] as MessageType[]
       );
     };
 
@@ -73,11 +76,20 @@ function useFetchMessage({
   }, [openConversation]);
 
   // UseEffect to fetch initial data for chat messages
-  // and fetch conversation data if from new message modal
   useEffect(() => {
     if (!conversationId) return;
     getChatMessages({ conversation_id: conversationId, messages: [] });
   }, [conversationId]);
+
+  // UseEffect to set the initial data for chat messages
+  useEffect(() => {
+    if (inView && allChatMessages?.messages) {
+      setComingMessage((prev: MessageType[]) => [
+        ...prev,
+        ...allChatMessages.messages,
+      ]);
+    }
+  }, [allChatMessages?.messages]);
 
   // UseEffect to fetch conversation data if from new message modal
   useEffect(() => {
@@ -107,17 +119,21 @@ function useFetchMessage({
       const newId = conversationData.conversation.conversation_id;
       getChatMessages({ conversation_id: newId, messages: ids });
     }
-  }, [inView, conversationData?.conversation]);
+    // 'comingMessage' as a dependency to update the chat messages as request payload
+    // 'conversationData' as a dependency to perform the fetch request with new id
+    // 'inView' as a dependency to trigger the fetch request when the user scrolls
+  }, [inView, conversationData?.conversation, comingMessage]);
 
-  // UseEffect to handle the result of the fetch and error states
+  // useEffect to set/update the chat messages data when the user scrolls
   useEffect(() => {
-    if (inView && allChatMessages?.messages && chatListRef?.current) {
+    if (inView && allChatMessages?.messages) {
       setComingMessage((prev: MessageType[]) => [
         ...prev,
         ...allChatMessages.messages,
       ]);
     }
-  }, [allChatMessages?.messages]);
+    // 'inView' as a dependency to set//update the fetch response's data
+  }, [inView]);
 
   // UseEffect to fetch conversation data when the user opens a new conversation
   useEffect(() => {
