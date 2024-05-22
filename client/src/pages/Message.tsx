@@ -7,15 +7,17 @@ import MessageChatBox          from "@/components/message/MessageChatBox";
 
 import SocketService           from "@/services/SocketServices";
 import { useGetUserDataQuery } from "@/redux/api/userApi";
+import { useAppDispatch }      from "@/hooks/reduxHooks";
+import { setOpenConversation } from "@/redux/slices/messageSlice";
 
 function Message({ socketService }: { socketService: SocketService | null }) {
+  const dispatch = useAppDispatch();
   const userApiData = useGetUserDataQuery({ person: "" });
 
+  // Reset open conversation when component unmount
   useEffect(() => {
-    if (!socketService) return;
-    socketService.onConnection();
-    return () => socketService.onDisconnect();
-  }, [socketService]);
+    dispatch(setOpenConversation([]));
+  }, []);
 
   if (userApiData.isLoading || !userApiData.data) return null;
 

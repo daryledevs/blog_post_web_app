@@ -60,6 +60,8 @@ function PrivateRoute() {
         user.user_id
       );
       setSocket(socketService);
+      socketService.onConnection();
+      return () => socketService.onDisconnect();
     }
   }, [user]);
 
