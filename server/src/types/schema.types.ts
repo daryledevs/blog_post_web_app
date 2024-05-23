@@ -6,84 +6,101 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
 
 export interface Comments {
   comment: string;
-  comment_id: Generated<number>;
-  created_at: Generated<Date>;
+  created_at: Generated<Date | null>;
+  id: Generated<number>;
   post_id: number;
   user_id: number;
+  uuid: string | null;
+}
+
+export interface ConversationMembers {
+  conversation_id: number;
+  id: Generated<number>;
+  joined_at: Generated<Date | null>;
+  user_id: number;
+  uuid: string;
 }
 
 export interface Conversations {
-  conversation_id: Generated<number>;
-  user_one_id: number;
-  user_two_id: number;
+  created_at: Generated<Date | null>;
+  id: Generated<number>;
+  uuid: string;
 }
 
 export interface Followers {
-  created_at: Generated<Date>;
+  created_at: Generated<Date | null>;
   followed_id: number;
   follower_id: number;
 }
 
 export interface Likes {
-  created_at: Generated<Date>;
+  created_at: Generated<Date | null>;
+  id: Generated<number>;
   post_id: number;
   user_id: number;
+  uuid: string | null;
 }
 
 export interface Messages {
   conversation_id: number;
-  message_id: Generated<number>;
+  id: Generated<number>;
   sender_id: number;
   text_message: string;
-  time_sent: Generated<Date>;
+  time_sent: Generated<Date | null>;
+  uuid: string | null;
 }
 
 export interface Posts {
   caption: string | null;
-  created_at: Generated<Date>;
+  created_at: Generated<Date | null>;
+  id: Generated<number>;
   image_id: string;
   image_url: string | null;
-  post_id: Generated<number>;
   privacy_level: Generated<string | null>;
   user_id: number;
-}
-
-export interface RecentSearches {
-  created_at: Generated<Date>;
-  recent_id: Generated<number>;
-  search_user_id: number;
-  user_id: number;
+  uuid: string | null;
 }
 
 export interface ResetPasswordToken {
-  created_at: Generated<Date>;
+  created_at: Generated<Date | null>;
   encrypted: string;
-  token_id: Generated<number>;
+  id: Generated<number>;
   user_id: number;
+  uuid: string | null;
+}
+
+export interface SearchHistory {
+  created_at: Generated<Date | null>;
+  id: Generated<number>;
+  search_id: number;
+  searcher_id: number;
+  uuid: string;
 }
 
 export interface Users {
   age: number | null;
   avatar_url: string | null;
   birthday: string | null;
-  created_at: Generated<Date>;
+  created_at: Generated<Date | null>;
   email: string;
   first_name: string | null;
+  id: Generated<number>;
   last_name: string | null;
   password: string;
   roles: Generated<string | null>;
-  user_id: Generated<number>;
   username: string;
+  uuid: string | null;
 }
 
 export interface DB {
   comments: Comments;
+  conversation_members: ConversationMembers;
   conversations: Conversations;
   followers: Followers;
   likes: Likes;
   messages: Messages;
   posts: Posts;
-  recent_searches: RecentSearches;
   reset_password_token: ResetPasswordToken;
+  search_history: SearchHistory;
   users: Users;
 }

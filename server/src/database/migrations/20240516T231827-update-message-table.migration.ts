@@ -8,3 +8,5 @@ export async function up(db: Kysely<any>): Promise<void> {
     )
     .execute();
 };
+
+export async function down(db: Kysely<any>): Promise<void> {}

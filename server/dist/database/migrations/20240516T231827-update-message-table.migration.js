@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.up = void 0;
+exports.down = exports.up = void 0;
 const kysely_1 = require("kysely");
 async function up(db) {
     await db.schema
@@ -10,3 +10,5 @@ async function up(db) {
 }
 exports.up = up;
 ;
+async function down(db) { }
+exports.down = down;
