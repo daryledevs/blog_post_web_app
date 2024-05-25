@@ -14,7 +14,7 @@ async function up(db) {
         .execute()
         .then(() => console.log("Altered users table successfully"));
     await (0, kysely_1.sql) `ALTER TABLE users CHANGE COLUMN id id INT UNSIGNED NOT NULL AUTO_INCREMENT FIRST;`.execute(db);
-    await (0, kysely_1.sql) `ALTER TABLE users MODIFY COLUMN uuid char(36) AFTER id;`.execute(db);
+    await (0, kysely_1.sql) `ALTER TABLE users MODIFY COLUMN uuid CHAR(36) NOT NULL UNIQUE AFTER id;`.execute(db);
     // Alter the followers table
     await db.schema
         .alterTable("followers")
@@ -56,7 +56,7 @@ async function up(db) {
         .execute()
         .then(() => console.log("Altered reset password token table successfully"));
     await (0, kysely_1.sql) `ALTER TABLE reset_password_token CHANGE COLUMN id id INT UNSIGNED NOT NULL AUTO_INCREMENT FIRST;`.execute(db);
-    await (0, kysely_1.sql) `ALTER TABLE reset_password_token MODIFY COLUMN uuid char(36) AFTER id;`.execute(db);
+    await (0, kysely_1.sql) `ALTER TABLE reset_password_token MODIFY COLUMN uuid CHAR(36) NOT NULL UNIQUE AFTER id;`.execute(db);
     // Alter the recent searches table
     await db.schema
         .createTable("search_history")
@@ -91,7 +91,7 @@ async function up(db) {
         .execute()
         .then(() => console.log("Alter Posts Table successfully"));
     await (0, kysely_1.sql) `ALTER TABLE posts CHANGE COLUMN id id INT UNSIGNED NOT NULL AUTO_INCREMENT FIRST;`.execute(db);
-    await (0, kysely_1.sql) `ALTER TABLE posts MODIFY COLUMN uuid char(36) AFTER id;`.execute(db);
+    await (0, kysely_1.sql) `ALTER TABLE posts MODIFY COLUMN uuid CHAR(36) NOT NULL UNIQUE AFTER id;`.execute(db);
     await db.schema
         .alterTable("posts")
         .addForeignKeyConstraint("fk_posts_user_id", ["user_id"], "users", ["id"])
@@ -113,7 +113,7 @@ async function up(db) {
         .execute()
         .then(() => console.log("Alter Comments table successfully"));
     await (0, kysely_1.sql) `ALTER TABLE comments CHANGE COLUMN id id INT UNSIGNED NOT NULL AUTO_INCREMENT FIRST;`.execute(db);
-    await (0, kysely_1.sql) `ALTER TABLE comments MODIFY COLUMN uuid char(36) AFTER id;`.execute(db);
+    await (0, kysely_1.sql) `ALTER TABLE comments MODIFY COLUMN uuid CHAR(36) NOT NULL UNIQUE AFTER id;`.execute(db);
     await db.schema
         .alterTable("comments")
         .addForeignKeyConstraint("fk_comments_post_id", ["post_id"], "posts", ["id"])
@@ -147,7 +147,7 @@ async function up(db) {
         .execute()
         .then(() => console.log("Likes table created"));
     await (0, kysely_1.sql) `ALTER TABLE likes CHANGE COLUMN id id INT UNSIGNED NOT NULL AUTO_INCREMENT FIRST;`.execute(db);
-    await (0, kysely_1.sql) `ALTER TABLE likes MODIFY COLUMN uuid char(36) AFTER id;`.execute(db);
+    await (0, kysely_1.sql) `ALTER TABLE likes MODIFY COLUMN uuid CHAR(36) NOT NULL UNIQUE AFTER id;`.execute(db);
     await db.schema
         .alterTable("likes")
         .addForeignKeyConstraint("fk_likes_post_id", ["post_id"], "posts", ["id"])
@@ -211,7 +211,7 @@ async function up(db) {
         .execute()
         .then(() => console.log("Altered Messages Table successfully"));
     await (0, kysely_1.sql) `ALTER TABLE messages CHANGE COLUMN id id INT UNSIGNED NOT NULL AUTO_INCREMENT FIRST;`.execute(db);
-    await (0, kysely_1.sql) `ALTER TABLE messages MODIFY COLUMN uuid char(36) AFTER id;`.execute(db);
+    await (0, kysely_1.sql) `ALTER TABLE messages MODIFY COLUMN uuid CHAR(36) NOT NULL UNIQUE AFTER id;`.execute(db);
     await db.schema
         .alterTable("messages")
         .addForeignKeyConstraint("fk_messages_conversation_id", ["conversation_id"], "conversations", ["id"])
