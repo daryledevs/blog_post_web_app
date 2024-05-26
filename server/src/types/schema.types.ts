@@ -10,7 +10,7 @@ export interface Comments {
   id: Generated<number>;
   post_id: number;
   user_id: number;
-  uuid: string | null;
+  uuid: Generated<string>;
 }
 
 export interface ConversationMembers {
@@ -18,13 +18,13 @@ export interface ConversationMembers {
   id: Generated<number>;
   joined_at: Generated<Date | null>;
   user_id: number;
-  uuid: string;
+  uuid: Generated<string>;
 }
 
 export interface Conversations {
   created_at: Generated<Date | null>;
   id: Generated<number>;
-  uuid: string;
+  uuid: Generated<string>;
 }
 
 export interface Followers {
@@ -38,7 +38,7 @@ export interface Likes {
   id: Generated<number>;
   post_id: number;
   user_id: number;
-  uuid: string | null;
+  uuid: Generated<string>;
 }
 
 export interface Messages {
@@ -47,7 +47,7 @@ export interface Messages {
   sender_id: number;
   text_message: string;
   time_sent: Generated<Date | null>;
-  uuid: string | null;
+  uuid: Generated<string>;
 }
 
 export interface Posts {
@@ -58,7 +58,7 @@ export interface Posts {
   image_url: string | null;
   privacy_level: Generated<string | null>;
   user_id: number;
-  uuid: string | null;
+  uuid: Generated<string>;
 }
 
 export interface ResetPasswordToken {
@@ -66,15 +66,15 @@ export interface ResetPasswordToken {
   encrypted: string;
   id: Generated<number>;
   user_id: number;
-  uuid: string | null;
+  uuid: Generated<string>;
 }
 
 export interface SearchHistory {
   created_at: Generated<Date | null>;
   id: Generated<number>;
-  search_id: number;
+  searched_id: number;
   searcher_id: number;
-  uuid: string;
+  uuid: Generated<string>;
 }
 
 export interface Users {
@@ -89,7 +89,7 @@ export interface Users {
   password: string;
   roles: Generated<string | null>;
   username: string;
-  uuid: string | null;
+  uuid: Generated<string>;
 }
 
 export interface DB {

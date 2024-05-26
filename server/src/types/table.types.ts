@@ -4,7 +4,7 @@ import {
   Likes,
   Messages,
   Posts,
-  RecentSearches,
+  SearchHistory,
   ResetPasswordToken,
   Users,
 }                                             from "./schema.types";
@@ -41,9 +41,9 @@ export type NewLikes    = Insertable<Likes>;
 export type UpdateLikes = Updateable<Likes>;
 
 // RECENT SEARCHES
-export type SelectSearches = Selectable<RecentSearches>;
-export type NewSearches    = Insertable<RecentSearches>;
-export type UpdateSearches = Updateable<RecentSearches>;
+export type SelectSearches = Selectable<SearchHistory>;
+export type NewSearches    = Insertable<SearchHistory>;
+export type UpdateSearches = Updateable<SearchHistory>;
 
 // RESET PASSWORD TOKEN
 export type SelectResetPasswordToken = Selectable<ResetPasswordToken>;
