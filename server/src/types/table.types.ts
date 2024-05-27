@@ -7,6 +7,7 @@ import {
   SearchHistory,
   ResetPasswordToken,
   Users,
+  ConversationMembers,
 }                                             from "./schema.types";
 import { Insertable, Selectable, Updateable } from "kysely";
 
@@ -24,6 +25,11 @@ export type UpdateFollowers = Updateable<Followers>;
 export type SelectConversations = Selectable<Conversations>;
 export type NewConversations    = Insertable<Conversations>;
 export type UpdateConversations = Updateable<Conversations>;
+
+// CONVERSATION MEMBERS
+export type SelectChatMembers = Selectable<ConversationMembers>;
+export type NewChatMembers    = Insertable<ConversationMembers>;
+export type UpdateChatMembers = Updateable<ConversationMembers>;
 
 // MESSAGES
 export type SelectMessages = Selectable<Messages>;
