@@ -7,14 +7,14 @@ async function up(db) {
     await db.schema
         .alterTable("users")
         .addColumn("id", "integer", (col) => col.notNull().autoIncrement().unsigned().primaryKey())
-        .addColumn("uuid", "char(36)", (col) => col.notNull().unique())
+        .addColumn("uuid", "binary(16)", (col) => col.notNull().unique())
         .modifyColumn("email", "varchar(255)", (col) => col.notNull().unique())
         .modifyColumn("username", "varchar(45)", (col) => col.notNull().unique())
         .modifyColumn("created_at", "timestamp", (col) => col.defaultTo((0, kysely_1.sql) `CURRENT_TIMESTAMP`))
         .execute()
         .then(() => console.log("Altered users table successfully"));
     await (0, kysely_1.sql) `ALTER TABLE users CHANGE COLUMN id id INT UNSIGNED NOT NULL AUTO_INCREMENT FIRST;`.execute(db);
-    await (0, kysely_1.sql) `ALTER TABLE users MODIFY COLUMN uuid CHAR(36) NOT NULL UNIQUE AFTER id;`.execute(db);
+    await (0, kysely_1.sql) `ALTER TABLE users MODIFY COLUMN uuid BINARY(16) NOT NULL UNIQUE AFTER id;`.execute(db);
     // Alter the followers table
     await db.schema
         .alterTable("followers")
@@ -51,18 +51,18 @@ async function up(db) {
     await db.schema
         .alterTable("reset_password_token")
         .addColumn("id", "integer", (col) => col.notNull().autoIncrement().unsigned().primaryKey())
-        .addColumn("uuid", "char(36)", (col) => col.notNull().unique())
+        .addColumn("uuid", "binary(16)", (col) => col.notNull().unique())
         .modifyColumn("created_at", "timestamp", (col) => col.defaultTo((0, kysely_1.sql) `CURRENT_TIMESTAMP`))
         .execute()
         .then(() => console.log("Altered reset password token table successfully"));
     await (0, kysely_1.sql) `ALTER TABLE reset_password_token CHANGE COLUMN id id INT UNSIGNED NOT NULL AUTO_INCREMENT FIRST;`.execute(db);
-    await (0, kysely_1.sql) `ALTER TABLE reset_password_token MODIFY COLUMN uuid CHAR(36) NOT NULL UNIQUE AFTER id;`.execute(db);
+    await (0, kysely_1.sql) `ALTER TABLE reset_password_token MODIFY COLUMN uuid BINARY(16) NOT NULL UNIQUE AFTER id;`.execute(db);
     // Alter the recent searches table
     await db.schema
         .createTable("search_history")
         .ifNotExists()
         .addColumn("id", "integer", (col) => col.notNull().autoIncrement().unsigned().primaryKey())
-        .addColumn("uuid", "char(36)", (col) => col.notNull().unique())
+        .addColumn("uuid", "binary(16)", (col) => col.notNull().unique())
         .addColumn("searcher_id", "integer", (col) => col.notNull().unsigned())
         .addColumn("search_id", "integer", (col) => col.notNull().unsigned())
         .addForeignKeyConstraint("fk_searcher_id", ["searcher_id"], "users", ["id"], (cb) => cb.onDelete("cascade"))
@@ -86,12 +86,12 @@ async function up(db) {
     await db.schema
         .alterTable("posts")
         .addColumn("id", "integer", (col) => col.notNull().autoIncrement().unsigned().primaryKey())
-        .addColumn("uuid", "char(36)", (col) => col.notNull().unique())
+        .addColumn("uuid", "binary(16)", (col) => col.notNull().unique())
         .modifyColumn("created_at", "timestamp", (col) => col.defaultTo((0, kysely_1.sql) `CURRENT_TIMESTAMP`))
         .execute()
         .then(() => console.log("Alter Posts Table successfully"));
     await (0, kysely_1.sql) `ALTER TABLE posts CHANGE COLUMN id id INT UNSIGNED NOT NULL AUTO_INCREMENT FIRST;`.execute(db);
-    await (0, kysely_1.sql) `ALTER TABLE posts MODIFY COLUMN uuid CHAR(36) NOT NULL UNIQUE AFTER id;`.execute(db);
+    await (0, kysely_1.sql) `ALTER TABLE posts MODIFY COLUMN uuid BINARY(16) NOT NULL UNIQUE AFTER id;`.execute(db);
     await db.schema
         .alterTable("posts")
         .addForeignKeyConstraint("fk_posts_user_id", ["user_id"], "users", ["id"])
@@ -108,12 +108,12 @@ async function up(db) {
     await db.schema
         .alterTable("comments")
         .addColumn("id", "integer", (col) => col.notNull().autoIncrement().unsigned().primaryKey())
-        .addColumn("uuid", "char(36)", (col) => col.notNull().unique())
+        .addColumn("uuid", "binary(16)", (col) => col.notNull().unique())
         .modifyColumn("created_at", "timestamp", (col) => col.defaultTo((0, kysely_1.sql) `CURRENT_TIMESTAMP`))
         .execute()
         .then(() => console.log("Alter Comments table successfully"));
     await (0, kysely_1.sql) `ALTER TABLE comments CHANGE COLUMN id id INT UNSIGNED NOT NULL AUTO_INCREMENT FIRST;`.execute(db);
-    await (0, kysely_1.sql) `ALTER TABLE comments MODIFY COLUMN uuid CHAR(36) NOT NULL UNIQUE AFTER id;`.execute(db);
+    await (0, kysely_1.sql) `ALTER TABLE comments MODIFY COLUMN uuid BINARY(16) NOT NULL UNIQUE AFTER id;`.execute(db);
     await db.schema
         .alterTable("comments")
         .addForeignKeyConstraint("fk_comments_post_id", ["post_id"], "posts", ["id"])
@@ -142,12 +142,12 @@ async function up(db) {
     await db.schema
         .alterTable("likes")
         .addColumn("id", "integer", (col) => col.notNull().autoIncrement().unsigned().primaryKey())
-        .addColumn("uuid", "char(36)", (col) => col.notNull().unique())
+        .addColumn("uuid", "binary(16)", (col) => col.notNull().unique())
         .modifyColumn("created_at", "timestamp", (col) => col.defaultTo((0, kysely_1.sql) `CURRENT_TIMESTAMP`))
         .execute()
         .then(() => console.log("Likes table created"));
     await (0, kysely_1.sql) `ALTER TABLE likes CHANGE COLUMN id id INT UNSIGNED NOT NULL AUTO_INCREMENT FIRST;`.execute(db);
-    await (0, kysely_1.sql) `ALTER TABLE likes MODIFY COLUMN uuid CHAR(36) NOT NULL UNIQUE AFTER id;`.execute(db);
+    await (0, kysely_1.sql) `ALTER TABLE likes MODIFY COLUMN uuid BINARY(16) NOT NULL UNIQUE AFTER id;`.execute(db);
     await db.schema
         .alterTable("likes")
         .addForeignKeyConstraint("fk_likes_post_id", ["post_id"], "posts", ["id"])
@@ -176,14 +176,14 @@ async function up(db) {
     await db.schema
         .createTable("conversations")
         .addColumn("id", "integer", (col) => col.notNull().autoIncrement().unsigned().primaryKey())
-        .addColumn("uuid", "char(36)", (col) => col.notNull().unique())
+        .addColumn("uuid", "binary(16)", (col) => col.notNull().unique())
         .addColumn("created_at", "timestamp", (col) => col.defaultTo((0, kysely_1.sql) `CURRENT_TIMESTAMP`))
         .execute()
         .then(() => console.log("Created Conversations Table successfully"));
     await db.schema
         .createTable("conversation_members")
         .addColumn("id", "integer", (col) => col.notNull().autoIncrement().unsigned().primaryKey())
-        .addColumn("uuid", "char(36)", (col) => col.notNull().unique())
+        .addColumn("uuid", "binary(16)", (col) => col.notNull().unique())
         .addColumn("conversation_id", "integer", (col) => col.notNull().unsigned())
         .addColumn("user_id", "integer", (col) => col.notNull().unsigned())
         .addForeignKeyConstraint("fk_members_conversation_id", ["conversation_id"], "users", ["id"])
@@ -207,11 +207,11 @@ async function up(db) {
     await db.schema
         .alterTable("messages")
         .addColumn("id", "integer", (col) => col.notNull().autoIncrement().unsigned().primaryKey())
-        .addColumn("uuid", "char(36)", (col) => col.notNull().unique())
+        .addColumn("uuid", "binary(16)", (col) => col.notNull().unique())
         .execute()
         .then(() => console.log("Altered Messages Table successfully"));
     await (0, kysely_1.sql) `ALTER TABLE messages CHANGE COLUMN id id INT UNSIGNED NOT NULL AUTO_INCREMENT FIRST;`.execute(db);
-    await (0, kysely_1.sql) `ALTER TABLE messages MODIFY COLUMN uuid CHAR(36) NOT NULL UNIQUE AFTER id;`.execute(db);
+    await (0, kysely_1.sql) `ALTER TABLE messages MODIFY COLUMN uuid BINARY(16) NOT NULL UNIQUE AFTER id;`.execute(db);
     await db.schema
         .alterTable("messages")
         .addForeignKeyConstraint("fk_messages_conversation_id", ["conversation_id"], "conversations", ["id"])

@@ -7,7 +7,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("id", "integer", (col) =>
       col.notNull().autoIncrement().unsigned().primaryKey()
     )
-    .addColumn("uuid", "char(36)", (col) =>
+    .addColumn("uuid", "binary(16)", (col) =>
       col.notNull().unique()
     )
     .modifyColumn("email", "varchar(255)", (col) => col.notNull().unique())
@@ -19,7 +19,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .then(() => console.log("Altered users table successfully"));
 
     await sql`ALTER TABLE users CHANGE COLUMN id id INT UNSIGNED NOT NULL AUTO_INCREMENT FIRST;`.execute(db);
-    await sql`ALTER TABLE users MODIFY COLUMN uuid CHAR(36) NOT NULL UNIQUE AFTER id;`.execute(db);
+    await sql`ALTER TABLE users MODIFY COLUMN uuid BINARY(16) NOT NULL UNIQUE AFTER id;`.execute(db);
 
   // Alter the followers table
   await db.schema
@@ -78,7 +78,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("id", "integer", (col) =>
       col.notNull().autoIncrement().unsigned().primaryKey()
     )
-    .addColumn("uuid", "char(36)", (col) =>
+    .addColumn("uuid", "binary(16)", (col) =>
       col.notNull().unique()
     )
     .modifyColumn("created_at", "timestamp", (col) =>
@@ -88,7 +88,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .then(() => console.log("Altered reset password token table successfully"));
 
   await sql`ALTER TABLE reset_password_token CHANGE COLUMN id id INT UNSIGNED NOT NULL AUTO_INCREMENT FIRST;`.execute(db);
-  await sql`ALTER TABLE reset_password_token MODIFY COLUMN uuid CHAR(36) NOT NULL UNIQUE AFTER id;`.execute(db);
+  await sql`ALTER TABLE reset_password_token MODIFY COLUMN uuid BINARY(16) NOT NULL UNIQUE AFTER id;`.execute(db);
 
   // Alter the recent searches table
   await db.schema
@@ -97,7 +97,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("id", "integer", (col) =>
       col.notNull().autoIncrement().unsigned().primaryKey()
     )
-    .addColumn("uuid", "char(36)", (col) =>
+    .addColumn("uuid", "binary(16)", (col) =>
       col.notNull().unique()
     )
     .addColumn("searcher_id", "integer", (col) => col.notNull().unsigned())
@@ -142,7 +142,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("id", "integer", (col) =>
       col.notNull().autoIncrement().unsigned().primaryKey()
     )
-    .addColumn("uuid", "char(36)", (col) =>
+    .addColumn("uuid", "binary(16)", (col) =>
       col.notNull().unique()
     )
     .modifyColumn("created_at", "timestamp", (col) =>
@@ -152,7 +152,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .then(() => console.log("Alter Posts Table successfully"));
 
   await sql`ALTER TABLE posts CHANGE COLUMN id id INT UNSIGNED NOT NULL AUTO_INCREMENT FIRST;`.execute(db);
-  await sql`ALTER TABLE posts MODIFY COLUMN uuid CHAR(36) NOT NULL UNIQUE AFTER id;`.execute(db);
+  await sql`ALTER TABLE posts MODIFY COLUMN uuid BINARY(16) NOT NULL UNIQUE AFTER id;`.execute(db);
 
   await db.schema
     .alterTable("posts")
@@ -174,7 +174,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("id", "integer", (col) =>
       col.notNull().autoIncrement().unsigned().primaryKey()
     )
-    .addColumn("uuid", "char(36)", (col) =>
+    .addColumn("uuid", "binary(16)", (col) =>
       col.notNull().unique()
     )
     .modifyColumn("created_at", "timestamp", (col) =>
@@ -184,7 +184,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .then(() => console.log("Alter Comments table successfully"));
 
   await sql`ALTER TABLE comments CHANGE COLUMN id id INT UNSIGNED NOT NULL AUTO_INCREMENT FIRST;`.execute(db);
-  await sql`ALTER TABLE comments MODIFY COLUMN uuid CHAR(36) NOT NULL UNIQUE AFTER id;`.execute(db);
+  await sql`ALTER TABLE comments MODIFY COLUMN uuid BINARY(16) NOT NULL UNIQUE AFTER id;`.execute(db);
 
   await db.schema
     .alterTable("comments")
@@ -220,7 +220,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("id", "integer", (col) =>
       col.notNull().autoIncrement().unsigned().primaryKey()
     )
-    .addColumn("uuid", "char(36)", (col) =>
+    .addColumn("uuid", "binary(16)", (col) =>
       col.notNull().unique()
     )
     .modifyColumn("created_at", "timestamp", (col) =>
@@ -230,7 +230,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .then(() => console.log("Likes table created"));
 
   await sql`ALTER TABLE likes CHANGE COLUMN id id INT UNSIGNED NOT NULL AUTO_INCREMENT FIRST;`.execute(db);
-  await sql`ALTER TABLE likes MODIFY COLUMN uuid CHAR(36) NOT NULL UNIQUE AFTER id;`.execute(db);
+  await sql`ALTER TABLE likes MODIFY COLUMN uuid BINARY(16) NOT NULL UNIQUE AFTER id;`.execute(db);
 
   await db.schema
     .alterTable("likes")
@@ -266,7 +266,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("id", "integer", (col) =>
       col.notNull().autoIncrement().unsigned().primaryKey()
     )
-    .addColumn("uuid", "char(36)", (col) =>
+    .addColumn("uuid", "binary(16)", (col) =>
       col.notNull().unique()
     )
     .addColumn("created_at", "timestamp", (col) =>
@@ -280,7 +280,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("id", "integer", (col) =>
       col.notNull().autoIncrement().unsigned().primaryKey()
     )
-    .addColumn("uuid", "char(36)", (col) =>
+    .addColumn("uuid", "binary(16)", (col) =>
       col.notNull().unique()
     )
     .addColumn("conversation_id", "integer", (col) => col.notNull().unsigned())
@@ -326,14 +326,14 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("id", "integer", (col) =>
       col.notNull().autoIncrement().unsigned().primaryKey()
     )
-    .addColumn("uuid", "char(36)", (col) =>
+    .addColumn("uuid", "binary(16)", (col) =>
       col.notNull().unique()
     )
     .execute()
     .then(() => console.log("Altered Messages Table successfully"));
 
   await sql`ALTER TABLE messages CHANGE COLUMN id id INT UNSIGNED NOT NULL AUTO_INCREMENT FIRST;`.execute(db);
-  await sql`ALTER TABLE messages MODIFY COLUMN uuid CHAR(36) NOT NULL UNIQUE AFTER id;`.execute(db);
+  await sql`ALTER TABLE messages MODIFY COLUMN uuid BINARY(16) NOT NULL UNIQUE AFTER id;`.execute(db);
 
   await db.schema
     .alterTable("messages")

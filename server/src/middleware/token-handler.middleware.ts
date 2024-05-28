@@ -54,7 +54,7 @@ const tokenHandler = async (req: Request, res: Response, next: NextFunction) => 
     }
 
     const result: SelectUsers | undefined = await userRepository.findUserById(
-      refreshDecode.user_id
+      refreshDecode.uuid
     );
 
     // if user is not found, return an error
@@ -69,11 +69,11 @@ const tokenHandler = async (req: Request, res: Response, next: NextFunction) => 
       // token options
       const payload = {
         access: {
-          user_id: accessDecode.user_id,
+          uuid: accessDecode.uuid,
           roles: accessDecode.roles,
         },
         refresh: {
-          user_id: refreshDecode.user_id,
+          uuid: refreshDecode.uuid,
           username: refreshDecode.username,
         },
       };
@@ -103,17 +103,17 @@ const tokenHandler = async (req: Request, res: Response, next: NextFunction) => 
 
     // if the access token is not provided but refresh token is exists
     if (!accessToken) {
-      const { user_id, roles } = result;
+      const { uuid, roles } = result;
       const ACCESS_TOKEN = AuthTokensUtil.generateToken({
-        payload: { user_id, roles },
+        payload: { uuid, roles },
         secret: TokenSecret.ACCESS_SECRET,
         expiration: Expiration.ACCESS_TOKEN_EXPIRATION,
       });
       return res.status(200).send({ accessToken: ACCESS_TOKEN });
     }
 
-    // if the access token is provided, decode the token and pass the user_id and roles to the next middleware
-    req.body.user_id = refreshDecode.user_id;
+    // if the access token is provided, decode the token and pass the uuid and roles to the next middleware
+    req.body.uuid = refreshDecode.uuid;
     req.body.roles = accessDecode.roles;
     next();
   } catch (error) {
