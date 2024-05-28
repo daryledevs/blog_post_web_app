@@ -12,11 +12,24 @@ class UserRepository implements IUserRepository {
   constructor() { this.database = db; };
 
   public findUserById = this.wrap.repoWrap(
-    async (user_id: number): Promise<SelectUsers | undefined> => {
+    async (uuid: string): Promise<SelectUsers | undefined> => {
       return await this.database
         .selectFrom("users")
-        .where("user_id", "=", user_id)
-        .selectAll()
+        .select([
+          "id",
+          sql`BIN_TO_UUID(uuid)`.as("uuid"),
+          "username",
+          "email",
+          "password",
+          "roles",
+          "avatar_url",
+          "first_name",
+          "last_name",
+          "birthday",
+          "age",
+          "created_at",
+        ])
+        .where("uuid", "=", sql`UUID_TO_BIN(${uuid})` as any)
         .executeTakeFirst();
     }
   );
@@ -25,8 +38,22 @@ class UserRepository implements IUserRepository {
     async (username: string): Promise<SelectUsers | undefined> => {
       return await this.database
         .selectFrom("users")
+        .select([
+          "id",
+          sql`BIN_TO_UUID(uuid)`.as("uuid"),
+          "username",
+          "email",
+          "password",
+          "roles",
+          "avatar_url",
+          "first_name",
+          "last_name",
+          "birthday",
+          "age",
+          "created_at",
+        ])
+        .select([sql`BIN_TO_UUID(uuid)`.as("uuid")])
         .where("username", "like", username + "%")
-        .selectAll()
         .executeTakeFirst();
     }
   );
@@ -35,6 +62,20 @@ class UserRepository implements IUserRepository {
     async (search: string): Promise<SelectUsers[]> => {
       return await this.database
         .selectFrom("users")
+        .select([
+          "id",
+          sql`BIN_TO_UUID(users.uuid)`.as("uuid"),
+          "username",
+          "email",
+          "password",
+          "roles",
+          "avatar_url",
+          "first_name",
+          "last_name",
+          "birthday",
+          "age",
+          "created_at",
+        ])
         .where((eb) =>
           eb.or([
             eb("username", "like", search + "%"),
@@ -52,7 +93,6 @@ class UserRepository implements IUserRepository {
             ),
           ])
         )
-        .selectAll()
         .execute();
     }
   );
@@ -61,8 +101,21 @@ class UserRepository implements IUserRepository {
     async (email: string): Promise<SelectUsers | undefined> => {
       return await this.database
         .selectFrom("users")
+        .select([
+          "id",
+          sql`BIN_TO_UUID(uuid)`.as("uuid"),
+          "username",
+          "email",
+          "password",
+          "roles",
+          "avatar_url",
+          "first_name",
+          "last_name",
+          "birthday",
+          "age",
+          "created_at",
+        ])
         .where("email", "=", email)
-        .selectAll()
         .executeTakeFirst();
     }
   );
@@ -71,7 +124,20 @@ class UserRepository implements IUserRepository {
     async (userCredential: string): Promise<SelectUsers | undefined> => {
       return await this.database
         .selectFrom("users")
-        .selectAll()
+        .select([
+          "id",
+          sql`BIN_TO_UUID(uuid)`.as("uuid"),
+          "username",
+          "email",
+          "password",
+          "roles",
+          "avatar_url",
+          "first_name",
+          "last_name",
+          "birthday",
+          "age",
+          "created_at",
+        ])
         .where((eb) =>
           eb.or([
             eb("email", "=", userCredential),
@@ -82,21 +148,21 @@ class UserRepository implements IUserRepository {
     }
   );
 
-  public updateUser = this.wrap.repoWrap(
-    async (user_id: number, user: UpdateUsers): Promise<UpdateUsers> => {
+  public updateUserById = this.wrap.repoWrap(
+    async (uuid: string, user: UpdateUsers): Promise<UpdateUsers> => {
       return (await this.database
         .updateTable("users")
         .set(user)
-        .where("user_id", "=", user_id)
+        .where("uuid", "=", uuid)
         .executeTakeFirstOrThrow()) as UpdateUsers;
     }
   );
 
-  public deleteUser = this.wrap.repoWrap(
-    async (user_id: number): Promise<void> => {
+  public deleteUserById = this.wrap.repoWrap(
+    async (uuid: string): Promise<void> => {
       await this.database
         .deleteFrom("users")
-        .where("user_id", "=", user_id)
+        .where("uuid", "=", uuid)
         .execute();
     }
   );

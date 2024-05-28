@@ -1,7 +1,7 @@
 import { SelectUsers, UpdateUsers } from "@/types/table.types";
 
 interface IEUserRepository {
-  findUserById: (user_id: number) => Promise<SelectUsers | undefined>;
+  findUserById: (uuid: string) => Promise<SelectUsers | undefined>;
 
   findUserByUsername: (username: string) => Promise<SelectUsers | undefined>;
 
@@ -11,9 +11,9 @@ interface IEUserRepository {
 
   findUserByCredentials: (userCredential: string) =>  Promise<SelectUsers | undefined>;
   
-  updateUser: (user_id: number, user: UpdateUsers) => Promise<UpdateUsers>;
+  updateUserById: (uuid: string, user: UpdateUsers) => Promise<UpdateUsers>;
 
-  deleteUser: (user_id: number) => Promise<void>;
+  deleteUserById: (uuid: string) => Promise<void>;
 };
 
 export default IEUserRepository;

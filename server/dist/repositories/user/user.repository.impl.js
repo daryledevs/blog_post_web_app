@@ -11,23 +11,64 @@ class UserRepository {
     wrap = new async_wrapper_util_1.default();
     constructor() { this.database = db_database_1.default; }
     ;
-    findUserById = this.wrap.repoWrap(async (user_id) => {
+    findUserById = this.wrap.repoWrap(async (uuid) => {
         return await this.database
             .selectFrom("users")
-            .where("user_id", "=", user_id)
-            .selectAll()
+            .select([
+            "id",
+            (0, kysely_1.sql) `BIN_TO_UUID(uuid)`.as("uuid"),
+            "username",
+            "email",
+            "password",
+            "roles",
+            "avatar_url",
+            "first_name",
+            "last_name",
+            "birthday",
+            "age",
+            "created_at",
+        ])
+            .where("uuid", "=", (0, kysely_1.sql) `UUID_TO_BIN(${uuid})`)
             .executeTakeFirst();
     });
     findUserByUsername = this.wrap.repoWrap(async (username) => {
         return await this.database
             .selectFrom("users")
+            .select([
+            "id",
+            (0, kysely_1.sql) `BIN_TO_UUID(uuid)`.as("uuid"),
+            "username",
+            "email",
+            "password",
+            "roles",
+            "avatar_url",
+            "first_name",
+            "last_name",
+            "birthday",
+            "age",
+            "created_at",
+        ])
+            .select([(0, kysely_1.sql) `BIN_TO_UUID(uuid)`.as("uuid")])
             .where("username", "like", username + "%")
-            .selectAll()
             .executeTakeFirst();
     });
     searchUsersByQuery = this.wrap.repoWrap(async (search) => {
         return await this.database
             .selectFrom("users")
+            .select([
+            "id",
+            (0, kysely_1.sql) `BIN_TO_UUID(users.uuid)`.as("uuid"),
+            "username",
+            "email",
+            "password",
+            "roles",
+            "avatar_url",
+            "first_name",
+            "last_name",
+            "birthday",
+            "age",
+            "created_at",
+        ])
             .where((eb) => eb.or([
             eb("username", "like", search + "%"),
             eb("first_name", "like", search + "%"),
@@ -39,37 +80,62 @@ class UserRepository {
                 )
               `, "like", search + "%"),
         ]))
-            .selectAll()
             .execute();
     });
     findUserByEmail = this.wrap.repoWrap(async (email) => {
         return await this.database
             .selectFrom("users")
+            .select([
+            "id",
+            (0, kysely_1.sql) `BIN_TO_UUID(uuid)`.as("uuid"),
+            "username",
+            "email",
+            "password",
+            "roles",
+            "avatar_url",
+            "first_name",
+            "last_name",
+            "birthday",
+            "age",
+            "created_at",
+        ])
             .where("email", "=", email)
-            .selectAll()
             .executeTakeFirst();
     });
     findUserByCredentials = this.wrap.repoWrap(async (userCredential) => {
         return await this.database
             .selectFrom("users")
-            .selectAll()
+            .select([
+            "id",
+            (0, kysely_1.sql) `BIN_TO_UUID(uuid)`.as("uuid"),
+            "username",
+            "email",
+            "password",
+            "roles",
+            "avatar_url",
+            "first_name",
+            "last_name",
+            "birthday",
+            "age",
+            "created_at",
+        ])
             .where((eb) => eb.or([
             eb("email", "=", userCredential),
             eb("username", "=", userCredential),
         ]))
             .executeTakeFirst();
     });
-    updateUser = this.wrap.repoWrap(async (user_id, user) => {
+    updateUserById = this.wrap.repoWrap(async (uuid, user) => {
         return (await this.database
             .updateTable("users")
             .set(user)
-            .where("user_id", "=", user_id)
+            .where("uuid", "=", uuid)
             .executeTakeFirstOrThrow());
     });
-    deleteUser = this.wrap.repoWrap(async (user_id) => {
+    deleteUserById = this.wrap.repoWrap(async (uuid) => {
         await this.database
             .deleteFrom("users")
-            .where("user_id", "=", user_id)
+            .where("uuid", "=", uuid)
             .execute();
     });
 }
