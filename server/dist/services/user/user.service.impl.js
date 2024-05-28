@@ -11,12 +11,12 @@ class UserService {
     constructor(userRepository) {
         this.userRepository = userRepository;
     }
-    getUserById = this.wrap.serviceWrap(async (id) => {
+    getUserById = this.wrap.serviceWrap(async (uuid) => {
         // If no parameters are provided, return an error
-        if (!id)
+        if (!uuid)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
         // search the user by user_id
-        const data = await this.userRepository.findUserById(id);
+        const data = await this.userRepository.findUserById(uuid);
         // If the user is not found, return an error
         if (!data)
             throw api_exception_1.default.HTTP404Error("User not found");
@@ -44,27 +44,27 @@ class UserService {
             throw api_exception_1.default.HTTP404Error("User not found");
         return data;
     });
-    updateUser = this.wrap.serviceWrap(async (id, user) => {
+    updateUserById = this.wrap.serviceWrap(async (uuid, user) => {
         // If no parameters are provided, return an error
-        if (!id)
+        if (!uuid)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
         // search the user by email
-        const data = await this.userRepository.findUserById(id);
+        const data = await this.userRepository.findUserById(uuid);
         // If the user is not found, return an error
         if (!data)
             throw api_exception_1.default.HTTP404Error("User not found");
-        return await this.userRepository.updateUser(id, user);
+        return await this.userRepository.updateUserById(uuid, user);
     });
-    deleteUserById = this.wrap.serviceWrap(async (id) => {
+    deleteUserById = this.wrap.serviceWrap(async (uuid) => {
         // If no parameters are provided, return an error
-        if (!id)
+        if (!uuid)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
         // search the user by email
-        const data = await this.userRepository.findUserById(id);
+        const data = await this.userRepository.findUserById(uuid);
         // If the user is not found, return an error
         if (!data)
             throw api_exception_1.default.HTTP404Error("User not found");
-        await this.userRepository.deleteUser(id);
+        await this.userRepository.deleteUserById(uuid);
         return "User deleted successfully";
     });
     searchUserByFields = this.wrap.serviceWrap(async (search) => {
