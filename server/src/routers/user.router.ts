@@ -4,8 +4,8 @@ import FollowService            from "@/services/follow/follow.service.impl";
 import UserRepository           from "@/repositories/user/user.repository.impl";
 import UsersController          from "@/controllers/user.controller";
 import FollowRepository         from "@/repositories/follow/follow.repository.impl";
-import RecentSearchService      from "@/services/recent-search/recent-search.service.impl";
-import RecentSearchesRepository from "@/repositories/recent-search/recent-search.repository.impl";
+import SearchHistoryService     from "@/services/search-history/search-history.service.impl";
+import SearchHistoryRepository  from "@/repositories/search-history/search-history.repository.impl";
 
 const router = express.Router();
 
@@ -17,22 +17,22 @@ const controller: UsersController = new UsersController(
     new UserRepository(),
     new FollowRepository(),
   ),
-  new RecentSearchService(
+  new SearchHistoryService(
     new UserRepository(),
-    new RecentSearchesRepository(),
+    new SearchHistoryRepository(),
   ),
 );
 
 router.get("/",                                       controller.getUserData);
 router.get("/lists",                                  controller.searchUsersByQuery);
 router.get("/:user_id/follows/stats",                 controller.getFollowStats);
-router.get("/:user_id/recent-searches",               controller.getRecentSearches);
+router.get("/:searcher_uuid/searches",                controller.getSearchHistory);
 router.post("/:user_id/lists",                        controller.getFollowerFollowingLists);
 
-router.post("/:user_id/follows/:followed_id",         controller.toggleFollow);
-router.post("/:user_id/recent-searches/:searched_id", controller.saveRecentSearches);
+router.post("/:user_id/follows/:followed_id",          controller.toggleFollow);
+router.post("/:searcher_uuid/searches/:searched_uuid", controller.saveRecentSearches);
 
-router.delete("/recent-searches/:recent_id",          controller.removeRecentSearches);
-router.delete("/:user_id/",                           controller.deleteUser);
+router.delete("/searches/:uuid",                       controller.removeRecentSearches);
+router.delete("/:user_id/",                            controller.deleteUser);
 
 export default router;

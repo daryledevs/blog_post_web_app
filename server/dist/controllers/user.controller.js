@@ -7,22 +7,22 @@ const async_wrapper_util_1 = __importDefault(require("@/utils/async-wrapper.util
 class UsersController {
     userService;
     followService;
-    recentSearchService;
+    searchHistoryService;
     wrap = new async_wrapper_util_1.default();
-    constructor(userService, followService, recentSearchService) {
+    constructor(userService, followService, searchHistoryService) {
         this.userService = userService;
         this.followService = followService;
-        this.recentSearchService = recentSearchService;
+        this.searchHistoryService = searchHistoryService;
     }
     getUserData = this.wrap.apiWrap(async (req, res, next) => {
         let user;
-        const user_id = req.body.user_id;
+        const uuid = req.body.uuid;
         const person = req.query.person || "";
         if (person) {
             user = await this.userService.getUserByUsername(person);
         }
         else {
-            user = await this.userService.getUserById(user_id);
+            user = await this.userService.getUserById(uuid);
         }
         res.status(200).send({ user });
     });
@@ -41,12 +41,6 @@ class UsersController {
         const stats = await this.followService.getFollowStats(user_id);
         res.status(200).send(stats);
     });
-    getRecentSearches = this.wrap.apiWrap(async (req, res, next) => {
-        const user_id = req.params.user_id;
-        const searches = await this.recentSearchService
-            .getAllRecentSearches(user_id);
-        res.status(200).send(searches);
-    });
     getFollowerFollowingLists = this.wrap.apiWrap(async (req, res, next) => {
         const user_id = req.params.user_id;
         const fetch = req.query.fetch;
@@ -60,16 +54,22 @@ class UsersController {
         const message = await this.followService.toggleFollow(user_id, followed_id);
         res.status(200).send(message);
     });
+    getSearchHistory = this.wrap.apiWrap(async (req, res, next) => {
+        const searcher_uuid = req.params.searcher_uuid;
+        const searches = await this.searchHistoryService
+            .getUsersSearchHistoryById(searcher_uuid);
+        res.status(200).send(searches);
+    });
     saveRecentSearches = this.wrap.apiWrap(async (req, res, next) => {
-        const user_id = req.params.user_id;
-        const search_user_id = req.params.searched_id;
-        const message = await this.recentSearchService.saveRecentSearches(user_id, search_user_id);
+        const searcher_uuid = req.params.searcher_uuid;
+        const search_uuid = req.params.search_uuid;
+        const message = await this.searchHistoryService.saveUsersSearch(searcher_uuid, search_uuid);
         res.status(200).send(message);
     });
     removeRecentSearches = this.wrap.apiWrap(async (req, res, next) => {
-        const recent_id = req.params.recent_id;
-        const message = await this.recentSearchService
-            .removeRecentSearches(recent_id);
+        const uuid = req.params.uuid;
+        const message = await this.searchHistoryService
+            .removeRecentSearchesById(uuid);
         res.status(200).send(message);
     });
 }
