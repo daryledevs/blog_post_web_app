@@ -67,7 +67,7 @@ class ApiErrorException extends BaseError {
     );
   };
 
-  public static HTTP500Error = (message: string, error: Error): ApiErrorException => {
+  public static HTTP500Error = (message: string, error?: Error): ApiErrorException => {
     return new ApiErrorException(
       "INTERNAL SERVER ERROR",
       HttpStatusCode.INTERNAL_SERVER,
