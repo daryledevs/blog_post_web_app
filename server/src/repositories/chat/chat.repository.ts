@@ -1,14 +1,21 @@
-import { NewConversations, NewMessages, SelectConversations, SelectMessages } from "@/types/table.types";
+import {
+  NewChatMembers,
+  NewConversations,
+  NewMessages,
+  SelectConversations,
+  SelectMessages,
+} from "@/types/table.types";
 
-export interface MessageDataType extends NewMessages {
-  receiver_id: number;
+export interface MessageDataType {
+  conversation_id: string;
+  sender_id: string;
+  receiver_id: string;
+  text_message: string;
 };
 
-export type ChatHistoryByIdType = {
-  conversation_id: number;
-  user_one_id: number;
-  user_two_id: number;
-  user_id: number | null;
+export type ChatHistoryType = {
+  id: number,
+  uuid: any,
   username: string | null;
   first_name: string | null;
   last_name: string | null;
@@ -16,17 +23,23 @@ export type ChatHistoryByIdType = {
 };
 
 interface IEChatRepository {
-  getUserConversationHistoryByUserId: (user_id: number, conversations: number[]) => Promise<ChatHistoryByIdType[]>;
+  findAllConversationByUserId: (user_id: number, conversations: number[]) => Promise<ChatHistoryType[]>;
 
-  findConversationById: (conversation_id: number) => Promise<SelectConversations | undefined>;
+  findAllMessagesById: (conversation_id: number, ids: number[] | number) => Promise<SelectMessages[]>;
 
-  findConversationByUserId: (user_id: number[]) => Promise<SelectConversations | undefined>;
+  findOneConversationById: (uuid: string) => Promise<SelectConversations | undefined>;
 
-  getMessagesById: (conversation_id: number, ids: number[] | number) => Promise<SelectMessages[]>;
+  findOneConversationByMembersId: (member_id: number[]) => Promise<SelectConversations | undefined>;
 
-  saveNewConversation: (conversation: NewConversations) => Promise<bigint | undefined>;
+  findOneMessageById: (uuid: string) => Promise<SelectMessages | undefined>;
 
-  saveNewMessage: (message: MessageDataType) => Promise<void>;
+  saveNewConversation: (conversation: NewConversations) => Promise<number | bigint | undefined>;
+
+  saveMultipleChatMembers: (message: NewChatMembers[]) => Promise<void>;
+
+  saveNewChatMember: (message: NewChatMembers) => Promise<void>;
+
+  saveNewMessage: (message: NewMessages) => Promise<void>;
 
   deleteConversationById: (conversation_id: number) => Promise<void>;
 }
