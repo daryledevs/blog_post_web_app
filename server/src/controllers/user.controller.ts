@@ -1,19 +1,19 @@
 import AsyncWrapper                        from "@/utils/async-wrapper.util";
-import FollowService                       from "@/services/follow/follow.service.impl";
 import IEUserService                       from "@/services/user/user.service";
 import { SelectUsers }                     from "@/types/table.types";
+import IEFollowService                     from "@/services/follow/follow.service";
 import IESearchHistoryService              from "@/services/search-history/search-history.service";
 import { NextFunction, Request, Response } from "express";
 
 class UsersController {
   private userService: IEUserService;
-  private followService: FollowService;
+  private followService: IEFollowService;
   private searchHistoryService: IESearchHistoryService;
   private wrap: AsyncWrapper = new AsyncWrapper();
 
   constructor(
     userService: IEUserService,
-    followService: FollowService,
+    followService: IEFollowService,
     searchHistoryService: IESearchHistoryService
   ) {
     this.userService = userService;
@@ -47,28 +47,28 @@ class UsersController {
 
   public deleteUser = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const user_id = req.params.user_id;
-      const message = await this.userService.deleteUserById(user_id);
+      const id = req.params.id;
+      const message = await this.userService.deleteUserById(id);
       res.status(200).send(message);
     }
   );
 
   public getFollowStats = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const user_id = req.params.user_id;
-      const stats   = await this.followService.getFollowStats(user_id);
+      const uuid = req.params.uuid;
+      const stats = await this.followService.getFollowStats(uuid);
       res.status(200).send(stats);
     }
   );
 
   public getFollowerFollowingLists = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const user_id = req.params.user_id;
+      const id = req.params.id;
       const fetch   = req.query.fetch;
       const listsId = req.body.listsId;
 
       const users = await this.followService.getFollowerFollowingLists(
-        user_id,
+        id,
         fetch as string,
         listsId
       );
@@ -79,11 +79,11 @@ class UsersController {
 
   public toggleFollow = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const user_id     = req.params.user_id;
+      const follower_id = req.params.follower_id;
       const followed_id = req.params.followed_id;
 
       const message = await this.followService.toggleFollow(
-        user_id,
+        follower_id,
         followed_id
       );
 
