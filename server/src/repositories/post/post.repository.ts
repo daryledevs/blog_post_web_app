@@ -1,25 +1,25 @@
-import { NewPosts, SelectLikes, SelectPosts, UpdatePosts } from "@/types/table.types";
+import { NewLikes, NewPosts, SelectLikes, SelectPosts, UpdatePosts } from "@/types/table.types";
 
-interface IPostRepository {
-  findPostsByPostId: (post_id: number) => Promise<SelectPosts | undefined>;
-  
-  getUserPosts: (user_id: number) => Promise<SelectPosts[]>;
+interface IEPostRepository {
+  findPostsByPostId: (uuid: string) => Promise<SelectPosts | undefined>;
 
-  getUserTotalPosts: (user_id: number) => Promise<string | number | bigint>;
+  findAllPostsByUserId: (user_id: number) => Promise<SelectPosts[]>;
 
-  newPost: (post: NewPosts) => Promise<void>;
+  findUserTotalPostsByUserId: (user_id: number) => Promise<string | number | bigint>;
 
-  editPost: (post_id: number, post: UpdatePosts) => Promise<void>;
+  createNewPost: (post: NewPosts) => Promise<void>;
 
-  deletePost: (post_id: number) => Promise<void>;
+  editPostByPostId: (uuid: string, post: UpdatePosts) => Promise<void>;
 
-  getLikesCountForPost: (post_id: number) => Promise<number>;
+  deletePostById: (post_id: number) => Promise<void>;
 
-  isUserLikePost: (like: SelectLikes) => Promise<SelectLikes | undefined>;
+  findPostsLikeCount: (post_id: number) => Promise<number>;
 
-  toggleUserLikeForPost: (like: SelectLikes) => Promise<void>;
+  isUserLikePost: (user_id: number, post_id: number) => Promise<SelectLikes | undefined>;
 
-  removeUserLikeForPost: (like: SelectLikes) => Promise<void>;
+  likeUsersPostById: (like: NewLikes) => Promise<void>;
+
+  dislikeUsersPostById: (id: number) => Promise<void>;
 }
 
-export default IPostRepository;
+export default IEPostRepository;

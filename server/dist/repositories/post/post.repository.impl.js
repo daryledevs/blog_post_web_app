@@ -6,26 +6,37 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const db_database_1 = __importDefault(require("@/database/db.database"));
 const cloudinary_1 = __importDefault(require("cloudinary"));
 const async_wrapper_util_1 = __importDefault(require("@/utils/async-wrapper.util"));
+const kysely_1 = require("kysely");
 const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
 class PostRepository {
     database;
     wrap = new async_wrapper_util_1.default();
     constructor() { this.database = db_database_1.default; }
     ;
-    findPostsByPostId = this.wrap.repoWrap(async (post_id) => {
+    findPostsByPostId = this.wrap.repoWrap(async (uuid) => {
         return this.database
             .selectFrom("posts")
-            .selectAll()
-            .where("posts.post_id", "=", post_id)
+            .select([
+            "id",
+            (0, kysely_1.sql) `BIN_TO_UUID(uuid)`.as("uuid"),
+            "user_id",
+            "caption",
+            "image_id",
+            "image_url",
+            "privacy_level",
+            "created_at",
+        ])
+            .where("uuid", "=", uuid)
             .executeTakeFirst();
     });
-    getUserPosts = this.wrap.repoWrap(async (user_id) => {
+    findAllPostsByUserId = this.wrap.repoWrap(async (user_id) => {
         return await this.database
             .selectFrom("posts")
-            .innerJoin("users", "posts.user_id", "users.user_id")
-            .leftJoin("likes", "posts.post_id", "likes.post_id")
+            .innerJoin("users", "posts.user_id", "users.id")
+            .leftJoin("likes", "posts.id", "likes.post_id")
             .select((eb) => [
-            "posts.post_id",
+            "posts.id",
+            (0, kysely_1.sql) `BIN_TO_UUID(posts.uuid)`.as("uuid"),
             "posts.image_id",
             "posts.image_url",
             "posts.user_id",
@@ -39,44 +50,50 @@ class PostRepository {
         ])
             .where("posts.user_id", "=", user_id)
             .orderBy("posts.created_at", "desc")
-            .groupBy("posts.post_id")
+            .groupBy("posts.id")
             .execute();
     });
-    getUserTotalPosts = this.wrap.repoWrap(async (user_id) => {
+    findUserTotalPostsByUserId = this.wrap.repoWrap(async (user_id) => {
         const query = this.database
             .selectFrom("posts")
-            .select((eb) => eb.fn.count("posts.post_id").as("count"))
+            .select((eb) => eb.fn.count("posts.id").as("count"))
             .where("user_id", "=", user_id);
         const { count } = await this.database
             .selectNoFrom((eb) => eb.fn.coalesce(query, eb.lit(0)).as("count"))
             .executeTakeFirstOrThrow();
         return count;
     });
-    newPost = this.wrap.repoWrap(async (post) => {
-        await this.database.insertInto("posts").values(post).execute();
+    createNewPost = this.wrap.repoWrap(async (post) => {
+        await this.database
+            .insertInto("posts")
+            .values(post)
+            .execute();
     });
-    editPost = this.wrap.repoWrap(async (post_id, post) => {
+    editPostByPostId = this.wrap.repoWrap(async (uuid, post) => {
         await this.database
             .updateTable("posts")
             .set(post)
-            .where("post_id", "=", post_id)
+            .where("uuid", "=", uuid)
             .executeTakeFirst();
     });
-    deletePost = this.wrap.repoWrap(async (post_id) => {
+    deletePostById = this.wrap.repoWrap(async (post_id) => {
         const { image_id } = (await this.database
             .selectFrom("posts")
             .select(["image_id"])
-            .where("post_id", "=", post_id)
+            .where("id", "=", post_id)
             .executeTakeFirst());
+        // deletes the image associated with a user's post from the cloud storage
         const status = await cloudinary_1.default.v2.uploader.destroy(image_id);
-        if (status.result !== "ok")
+        // throws an error if the image deletion was not successful
+        if (status.result !== "ok") {
             throw api_exception_1.default.HTTP400Error("Delete image failed");
+        }
         await this.database
             .deleteFrom("posts")
-            .where("post_id", "=", post_id)
+            .where("id", "=", post_id)
             .executeTakeFirst();
     });
-    getLikesCountForPost = this.wrap.repoWrap(async (post_id) => {
+    findPostsLikeCount = this.wrap.repoWrap(async (post_id) => {
         const query = this.database
             .selectFrom("likes")
             .select((eb) => eb.fn.count("likes.post_id").as("count"))
@@ -86,29 +103,32 @@ class PostRepository {
             .executeTakeFirstOrThrow();
         return count;
     });
-    isUserLikePost = this.wrap.repoWrap(async (like) => {
+    isUserLikePost = this.wrap.repoWrap(async (user_id, post_id) => {
         return await this.database
             .selectFrom("likes")
-            .selectAll()
+            .select([
+            "id",
+            (0, kysely_1.sql) `BIN_TO_UUID(uuid)`.as("uuid"),
+            "user_id",
+            "post_id",
+            "created_at",
+        ])
             .where((eb) => eb.and([
-            eb("likes.post_id", "=", like.post_id),
-            eb("likes.user_id", "=", like.user_id),
+            eb("likes.user_id", "=", user_id),
+            eb("likes.post_id", "=", post_id),
         ]))
             .executeTakeFirst();
     });
-    toggleUserLikeForPost = this.wrap.repoWrap(async (like) => {
+    likeUsersPostById = this.wrap.repoWrap(async (like) => {
         await this.database
             .insertInto("likes")
             .values(like)
             .execute();
     });
-    removeUserLikeForPost = this.wrap.repoWrap(async (like) => {
+    dislikeUsersPostById = this.wrap.repoWrap(async (id) => {
         await this.database
             .deleteFrom("likes")
-            .where((eb) => eb.and([
-            eb("likes.post_id", "=", like.post_id),
-            eb("likes.user_id", "=", like.user_id),
-        ]))
+            .where("id", "=", id)
             .execute();
     });
 }

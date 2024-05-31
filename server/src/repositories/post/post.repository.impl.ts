@@ -1,4 +1,5 @@
 import {
+  NewLikes,
   NewPosts,
   SelectLikes,
   SelectPosts,
@@ -6,36 +7,46 @@ import {
 }                        from "@/types/table.types";
 import db                from "@/database/db.database";
 import { DB }            from "@/types/schema.types";
-import { Kysely }        from "kysely";
 import cloudinary        from "cloudinary";
 import AsyncWrapper      from "@/utils/async-wrapper.util";
-import IPostRepository   from "./post.repository";
+import { Kysely, sql }   from "kysely";
+import IEPostRepository  from "./post.repository";
 import ApiErrorException from "@/exceptions/api.exception";
 
-class PostRepository implements IPostRepository {
+class PostRepository implements IEPostRepository {
   private database: Kysely<DB>;
   private wrap: AsyncWrapper = new AsyncWrapper();
 
   constructor() { this.database = db; };
 
   public findPostsByPostId = this.wrap.repoWrap(
-    async (post_id: number): Promise<SelectPosts | undefined> => {
+    async (uuid: string): Promise<SelectPosts | undefined> => {
       return this.database
         .selectFrom("posts")
-        .selectAll()
-        .where("posts.post_id", "=", post_id)
+        .select([
+          "id",
+          sql`BIN_TO_UUID(uuid)`.as("uuid"),
+          "user_id",
+          "caption",
+          "image_id",
+          "image_url",
+          "privacy_level",
+          "created_at",
+        ])
+        .where("uuid", "=", uuid)
         .executeTakeFirst();
     }
   );
 
-  public getUserPosts = this.wrap.repoWrap(
+  public findAllPostsByUserId = this.wrap.repoWrap(
     async (user_id: number): Promise<SelectPosts[]> => {
       return await this.database
         .selectFrom("posts")
-        .innerJoin("users", "posts.user_id", "users.user_id")
-        .leftJoin("likes", "posts.post_id", "likes.post_id")
+        .innerJoin("users", "posts.user_id", "users.id")
+        .leftJoin("likes", "posts.id", "likes.post_id")
         .select((eb) => [
-          "posts.post_id",
+          "posts.id",
+          sql`BIN_TO_UUID(posts.uuid)`.as("uuid"),
           "posts.image_id",
           "posts.image_url",
           "posts.user_id",
@@ -49,16 +60,16 @@ class PostRepository implements IPostRepository {
         ])
         .where("posts.user_id", "=", user_id)
         .orderBy("posts.created_at", "desc")
-        .groupBy("posts.post_id")
+        .groupBy("posts.id")
         .execute();
     }
   );
 
-  public getUserTotalPosts = this.wrap.repoWrap(
+  public findUserTotalPostsByUserId = this.wrap.repoWrap(
     async (user_id: number): Promise<string | number | bigint> => {
       const query = this.database
         .selectFrom("posts")
-        .select((eb) => eb.fn.count<number>("posts.post_id").as("count"))
+        .select((eb) => eb.fn.count<number>("posts.id").as("count"))
         .where("user_id", "=", user_id);
 
       const { count } = await this.database
@@ -69,40 +80,49 @@ class PostRepository implements IPostRepository {
     }
   );
 
-  public newPost = this.wrap.repoWrap(async (post: NewPosts): Promise<void> => {
-    await this.database.insertInto("posts").values(post).execute();
-  });
+  public createNewPost = this.wrap.repoWrap(
+    async (post: NewPosts): Promise<void> => {
+      await this.database
+        .insertInto("posts")
+        .values(post)
+        .execute();
+    }
+  );
 
-  public editPost = this.wrap.repoWrap(
-    async (post_id: number, post: UpdatePosts): Promise<void> => {
+  public editPostByPostId = this.wrap.repoWrap(
+    async (uuid: string, post: UpdatePosts): Promise<void> => {
       await this.database
         .updateTable("posts")
         .set(post)
-        .where("post_id", "=", post_id)
+        .where("uuid", "=", uuid)
         .executeTakeFirst();
     }
   );
 
-  public deletePost = this.wrap.repoWrap(
+  public deletePostById = this.wrap.repoWrap(
     async (post_id: number): Promise<void> => {
       const { image_id } = (await this.database
         .selectFrom("posts")
         .select(["image_id"])
-        .where("post_id", "=", post_id)
+        .where("id", "=", post_id)
         .executeTakeFirst()) as { image_id: string };
 
+      // deletes the image associated with a user's post from the cloud storage
       const status = await cloudinary.v2.uploader.destroy(image_id);
-      if (status.result !== "ok")
+
+      // throws an error if the image deletion was not successful
+      if (status.result !== "ok") {
         throw ApiErrorException.HTTP400Error("Delete image failed");
+      }
 
       await this.database
         .deleteFrom("posts")
-        .where("post_id", "=", post_id)
+        .where("id", "=", post_id)
         .executeTakeFirst();
     }
   );
 
-  public getLikesCountForPost = this.wrap.repoWrap(
+  public findPostsLikeCount = this.wrap.repoWrap(
     async (post_id: number): Promise<number> => {
       const query = this.database
         .selectFrom("likes")
@@ -118,22 +138,28 @@ class PostRepository implements IPostRepository {
   );
 
   public isUserLikePost = this.wrap.repoWrap(
-    async (like: SelectLikes): Promise<SelectLikes | undefined> => {
+    async (user_id: number, post_id: number): Promise<SelectLikes | undefined> => {
       return await this.database
         .selectFrom("likes")
-        .selectAll()
+        .select([
+          "id",
+          sql`BIN_TO_UUID(uuid)`.as("uuid"),
+          "user_id",
+          "post_id",
+          "created_at",
+        ])
         .where((eb) =>
           eb.and([
-            eb("likes.post_id", "=", like.post_id),
-            eb("likes.user_id", "=", like.user_id),
+            eb("likes.user_id", "=", user_id),
+            eb("likes.post_id", "=", post_id),
           ])
         )
         .executeTakeFirst();
     }
   );
 
-  public toggleUserLikeForPost = this.wrap.repoWrap(
-    async (like: SelectLikes): Promise<void> => {
+  public likeUsersPostById = this.wrap.repoWrap(
+    async (like: NewLikes): Promise<void> => {
       await this.database
         .insertInto("likes")
         .values(like)
@@ -141,16 +167,11 @@ class PostRepository implements IPostRepository {
     }
   );
 
-  public removeUserLikeForPost = this.wrap.repoWrap(
-    async (like: SelectLikes): Promise<void> => {
+  public dislikeUsersPostById = this.wrap.repoWrap(
+    async (id: number): Promise<void> => {
       await this.database
         .deleteFrom("likes")
-        .where((eb) =>
-          eb.and([
-            eb("likes.post_id", "=", like.post_id),
-            eb("likes.user_id", "=", like.user_id),
-          ])
-        )
+        .where("id", "=", id)
         .execute();
     }
   );
