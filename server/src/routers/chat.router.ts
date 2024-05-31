@@ -14,9 +14,9 @@ const controller: ChatsController = new ChatsController(
   )
 );
 
-router.post("/:conversation_id/messages",      controller.getChatMessages);
-router.post("/lists",                          controller.getChatHistory);
-router.get("/users/:user_one_id/:user_two_id", controller.getChatHistoryByUserId);
-router.post("/",                               controller.newMessageAndConversation);
+router.post("/:uuid/messages",  controller.getChatMessages);
+router.post("/lists",           controller.getChatHistory);
+router.post("/",                controller.newMessageAndConversation);
+router.delete("/:uuid",         controller.deleteConversationById)
 
 export default router;

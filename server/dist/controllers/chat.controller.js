@@ -12,21 +12,16 @@ class ChatsController {
     }
     getChatHistory = this.wrap.apiWrap(async (req, res, next) => {
         const user_id = req.query.user_id;
-        const conversations = req.body || [0];
+        const conversations = req.body.conversations || [0];
         const listId = conversations.length ? conversations : [0];
         const data = await this.chatsService.getChatHistory(user_id, listId);
         res.status(200).send({ chats: data });
     });
-    getChatHistoryByUserId = this.wrap.apiWrap(async (req, res, next) => {
-        const usersId = req.params;
-        const data = await this.chatsService.getChatHistoryByUserId(usersId.user_one_id, usersId.user_two_id);
-        res.status(200).send({ conversation: data });
-    });
     getChatMessages = this.wrap.apiWrap(async (req, res, next) => {
-        let conversation_id = req.params.conversation_id;
+        let uuid = req.params.uuid;
         const messages = req.body.messages || [0];
         const listId = messages.length ? messages : [0];
-        const data = await this.chatsService.getChatMessages(conversation_id, listId);
+        const data = await this.chatsService.getChatMessages(uuid, listId);
         res.status(200).send({ messages: data });
     });
     newMessageAndConversation = this.wrap.apiWrap(async (req, res, next) => {
@@ -35,8 +30,8 @@ class ChatsController {
         res.status(200).send({ message });
     });
     deleteConversationById = this.wrap.apiWrap(async (req, res, next) => {
-        const { conversation_id } = req.body;
-        const message = await this.chatsService.deleteConversationById(conversation_id);
+        const uuid = req.params.uuid;
+        const message = await this.chatsService.deleteConversationById(uuid);
         res.status(200).send({ message });
     });
 }
