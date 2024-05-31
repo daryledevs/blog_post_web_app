@@ -16,13 +16,13 @@ const uploadOption = (0, multer_middleware_1.default)("./uploads/post");
 const option_field = [{ name: "img", maxCount: 1 }, { name: "imgs", maxCount: 7 }];
 const middleware = uploadOption.fields(option_field);
 // post
-router.get("/", controller.getUserPost);
-router.get("/stats", controller.getUserTotalPosts);
-router.patch("/:post_id", controller.editPost);
+router.get("/by-user/:user_uuid", controller.getUserPosts);
+router.get("/by-user/:user_uuid/stats", controller.getUserTotalPosts);
+router.patch("/:uuid", controller.editPost);
 router.post("/", middleware, controller.newPost);
-router.delete("/:post_id", controller.deletePost);
+router.delete("/:uuid", controller.deletePost);
 // likes
-router.get("/:post_id/likes", controller.getLikesCountForPost);
-router.get("/:post_id/users/:user_id/likes", controller.checkUserLikeStatusForPost);
-router.put("/:post_id/users/:user_id/likes", controller.toggleUserLikeForPost);
+router.get("/:uuid/likes", controller.getLikesCountForPost);
+router.get("/:uuid/by-user/:user_uuid/likes", controller.checkUserLikeStatusForPost);
+router.put("/:uuid/by-user/:user_uuid/likes", controller.toggleUserLikeForPost);
 exports.default = router;

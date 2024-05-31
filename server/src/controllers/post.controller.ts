@@ -1,29 +1,29 @@
 import * as dotenv                         from "dotenv";
-import PostsService                        from "@/services/post/post.service.impl";
+import IEPostsService                      from "@/services/post/post.service";
 import AsyncWrapper                        from "@/utils/async-wrapper.util";
 import { Response, Request, NextFunction } from "express";
 dotenv.config();
 
 class PostsController {
-  private postsService: PostsService;
+  private postsService: IEPostsService;
   private wrap: AsyncWrapper = new AsyncWrapper();
 
-  constructor(postsService: PostsService) {
+  constructor(postsService: IEPostsService) {
     this.postsService = postsService;
   }
 
-  public getUserPost = this.wrap.apiWrap(
+  public getUserPosts = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { user_id } = req.query;
-      const data = await this.postsService.getUserPosts(user_id as any);
+      const user_uuid = req.params?.user_uuid;
+      const data = await this.postsService.getAllPostsByUsersUuid(user_uuid);
       res.status(200).send({ post: data });
     }
   );
 
   public getUserTotalPosts = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { user_id } = req.query;
-      const data = await this.postsService.getUserTotalPosts(user_id as any);
+      const user_uuid = req.params?.user_uuid;
+      const data = await this.postsService.geTotalPostsByUsersUuid(user_uuid);
       res.status(200).send({ totalPost: data });
     }
   );
@@ -36,48 +36,60 @@ class PostsController {
         ((req.files as { [fieldname: string]: Express.Multer.File[] })
           ?.img as Express.Multer.File[]) || null;
 
-      const data = await this.postsService.newPost(files?.[0], rest);
+      const data = await this.postsService.createNewPost(files?.[0], rest);
       res.status(200).send({ message: data });
     }
   );
 
   public editPost = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const post_id: any = req.params;
-      const { user_id, roles, cookieOptions, ...rest } = req.body;
-      const data = await this.postsService.editPost(post_id, rest);
+      const uuid = req.params?.uuid;
+      const { user_uuid, roles, cookieOptions, ...rest } = req.body;
+      const data = await this.postsService.updatePostByUuid(uuid, rest);
       res.status(200).send({ message: data });
     }
   );
 
   public deletePost = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const post_id: any = req.params;
-      const data = await this.postsService.deletePost(post_id);
+      const uuid = req.params?.uuid;
+      const data = await this.postsService.deletePostByUuid(uuid);
       res.status(200).send({ message: data });
     }
   );
 
   public getLikesCountForPost = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const post_id: any = req.params;
-      const data = await this.postsService.getLikesCountForPost(post_id);
+      const uuid = req.params?.uuid;
+      const data = await this.postsService.getPostLikesCountByUuid(uuid);
       res.status(200).send({ count: data });
     }
   );
 
   public checkUserLikeStatusForPost = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const args: any = req.params;
-      const data = await this.postsService.checkUserLikeStatusForPost(args);
+      const user_uuid = req.params?.user_uuid;
+      const post_uuid = req.params?.uuid;
+
+      const data = await this.postsService.getUserLikeStatusForPostByUuid(
+        user_uuid,
+        post_uuid
+      );
+
       res.status(200).send({ status: data ? true : false });
     }
   );
 
   public toggleUserLikeForPost = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const args: any = req.params;
-      const data = await this.postsService.toggleUserLikeForPost(args);
+      const user_uuid = req.params?.user_uuid;
+      const post_uuid = req.params?.uuid;
+
+      const data = await this.postsService.toggleUserLikeForPost(
+        user_uuid,
+        post_uuid
+      );
+
       return res.status(200).send({ message: data });
     }
   );

@@ -35,47 +35,49 @@ class PostsController {
     constructor(postsService) {
         this.postsService = postsService;
     }
-    getUserPost = this.wrap.apiWrap(async (req, res, next) => {
-        const { user_id } = req.query;
-        const data = await this.postsService.getUserPosts(user_id);
+    getUserPosts = this.wrap.apiWrap(async (req, res, next) => {
+        const user_uuid = req.params?.user_uuid;
+        const data = await this.postsService.getAllPostsByUsersUuid(user_uuid);
         res.status(200).send({ post: data });
     });
     getUserTotalPosts = this.wrap.apiWrap(async (req, res, next) => {
-        const { user_id } = req.query;
-        const data = await this.postsService.getUserTotalPosts(user_id);
+        const user_uuid = req.params?.user_uuid;
+        const data = await this.postsService.geTotalPostsByUsersUuid(user_uuid);
         res.status(200).send({ totalPost: data });
     });
     newPost = this.wrap.apiWrap(async (req, res, next) => {
         const { cookieOptions, ...rest } = req.body;
         const files = req.files
             ?.img || null;
-        const data = await this.postsService.newPost(files?.[0], rest);
+        const data = await this.postsService.createNewPost(files?.[0], rest);
         res.status(200).send({ message: data });
     });
     editPost = this.wrap.apiWrap(async (req, res, next) => {
-        const post_id = req.params;
-        const { user_id, roles, cookieOptions, ...rest } = req.body;
-        const data = await this.postsService.editPost(post_id, rest);
+        const uuid = req.params?.uuid;
+        const { user_uuid, roles, cookieOptions, ...rest } = req.body;
+        const data = await this.postsService.updatePostByUuid(uuid, rest);
         res.status(200).send({ message: data });
     });
     deletePost = this.wrap.apiWrap(async (req, res, next) => {
-        const post_id = req.params;
-        const data = await this.postsService.deletePost(post_id);
+        const uuid = req.params?.uuid;
+        const data = await this.postsService.deletePostByUuid(uuid);
         res.status(200).send({ message: data });
     });
     getLikesCountForPost = this.wrap.apiWrap(async (req, res, next) => {
-        const post_id = req.params;
-        const data = await this.postsService.getLikesCountForPost(post_id);
+        const uuid = req.params?.uuid;
+        const data = await this.postsService.getPostLikesCountByUuid(uuid);
         res.status(200).send({ count: data });
     });
     checkUserLikeStatusForPost = this.wrap.apiWrap(async (req, res, next) => {
-        const args = req.params;
-        const data = await this.postsService.checkUserLikeStatusForPost(args);
+        const user_uuid = req.params?.user_uuid;
+        const post_uuid = req.params?.uuid;
+        const data = await this.postsService.getUserLikeStatusForPostByUuid(user_uuid, post_uuid);
         res.status(200).send({ status: data ? true : false });
     });
     toggleUserLikeForPost = this.wrap.apiWrap(async (req, res, next) => {
-        const args = req.params;
-        const data = await this.postsService.toggleUserLikeForPost(args);
+        const user_uuid = req.params?.user_uuid;
+        const post_uuid = req.params?.uuid;
+        const data = await this.postsService.toggleUserLikeForPost(user_uuid, post_uuid);
         return res.status(200).send({ message: data });
     });
 }
