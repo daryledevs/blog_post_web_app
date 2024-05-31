@@ -2,11 +2,11 @@ import { SelectFollowers } from "@/types/table.types";
 import { FollowStatsType } from "@/repositories/follow/follow.repository";
 
 interface IFollowService {
-  getFollowStats: (user_id: any) => Promise<FollowStatsType>;
+  getFollowStats: (uuid: string | undefined) => Promise<FollowStatsType>;
 
-  getFollowerFollowingLists: (user_id: any, fetch: string, listsId: number[]) => Promise<SelectFollowers[]>;
+  getFollowerFollowingLists: (uuid: string | undefined, fetch: string, listsId: number[]) => Promise<SelectFollowers[]>;
 
-  toggleFollow: (user_id: any, followed_id: any) => Promise<string>;
+  toggleFollow: (follower_id: string | undefined, followed_id: string | undefined) => Promise<string>;
 };
 
 export default IFollowService;
