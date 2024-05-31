@@ -1,16 +1,14 @@
-import { SelectConversations, SelectMessages }  from "@/types/table.types";
-import { ChatHistoryByIdType, MessageDataType } from "@/repositories/chat/chat.repository";
+import { ChatHistoryType }              from "@/repositories/chat/chat.repository";
+import { NewMessages, SelectMessages }  from "@/types/table.types";
 
 interface IEChatService {
-  getChatHistory: (userId: number, listId: number[]) => Promise<ChatHistoryByIdType[]>;
+  getChatHistory: (uuid: string | undefined, listId: number[]) => Promise<ChatHistoryType[]>;
 
-  getChatHistoryByUserId: (user_one_id: number, user_two_id: number) => Promise<SelectConversations>;
+  getChatMessages: (uuid: string | undefined, listId: number[]) => Promise<SelectMessages[]>;
 
-  getChatMessages: (chatId: number, listId: number[]) => Promise<SelectMessages[]>;
+  newMessageAndConversation: (messageData: NewMessages) => Promise<string>;
 
-  newMessageAndConversation: (messageData: MessageDataType) => Promise<string>;
-
-  deleteConversationById: (conversation_id: number) => Promise<string>;
+  deleteConversationById: (uuid: string | undefined) => Promise<string>;
 };
 
 export default IEChatService;

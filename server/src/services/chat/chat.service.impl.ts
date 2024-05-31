@@ -1,14 +1,14 @@
 import IEChatRepository, {
-  ChatHistoryByIdType,
+  ChatHistoryType,
   MessageDataType,
-}                                              from "@/repositories/chat/chat.repository";
-import IChatService                            from "./chat.service";
-import AsyncWrapper                            from "@/utils/async-wrapper.util";
-import ApiErrorException                       from "@/exceptions/api.exception";
-import IEUserRepository                        from "@/repositories/user/user.repository";
-import { SelectConversations, SelectMessages } from "@/types/table.types";
+}                         from "@/repositories/chat/chat.repository";
+import IEChatService      from "./chat.service";
+import AsyncWrapper       from "@/utils/async-wrapper.util";
+import IEUserRepository   from "@/repositories/user/user.repository";
+import ApiErrorException  from "@/exceptions/api.exception";
+import { SelectMessages } from "@/types/table.types";
 
-class ChatServices implements IChatService {
+class ChatServices implements IEChatService {
   private chatRepository: IEChatRepository;
   private userRepository: IEUserRepository;
   private wrap: AsyncWrapper = new AsyncWrapper();
@@ -22,138 +22,117 @@ class ChatServices implements IChatService {
   }
 
   public getChatHistory = this.wrap.serviceWrap(
-    async (
-      userId: number,
-      listId: number[]
-    ): Promise<ChatHistoryByIdType[]> => {
+    async (uuid: string | undefined, listId: number[]): Promise<ChatHistoryType[]> => {
       // If no user id is provided, return an error
-      if (!userId) throw ApiErrorException.HTTP400Error("No arguments provided");
+      if (!uuid) throw ApiErrorException.HTTP400Error("No arguments provided");
 
       // If the user is not found, return an error
-      const isUserExist = await this.userRepository.findUserById(userId);
-      if (!isUserExist) throw ApiErrorException.HTTP404Error("User not found");
+      const user = await this.userRepository.findUserById(uuid);
+      if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
       // Return the chat history
-      return await this.chatRepository.getUserConversationHistoryByUserId(
-        userId,
+      return await this.chatRepository.findAllConversationByUserId(
+        user.id,
         listId
       );
     }
   );
 
   public getChatMessages = this.wrap.serviceWrap(
-    async (chatId: number, listId: number[]): Promise<SelectMessages[]> => {
+    async (uuid: string | undefined, listId: number[]): Promise<SelectMessages[]> => {
       // If no chat id is provided, return an error
-      if (!chatId) throw ApiErrorException.HTTP400Error("No arguments provided");
+      if (!uuid) throw ApiErrorException.HTTP400Error("No arguments provided");
 
       // Check if the chat exists
-      const data = await this.chatRepository.findConversationById(chatId);
+      const data = await this.chatRepository.findOneConversationById(uuid);
 
       // If the chat does not exist, return an error
       if (!data) throw ApiErrorException.HTTP404Error("Chat not found");
 
       // Return the chat messages
-      return await this.chatRepository.getMessagesById(chatId, listId);
-    }
-  );
-
-  public getChatHistoryByUserId = this.wrap.serviceWrap(
-    async (
-      user_one_id: number,
-      user_two_id: number
-    ): Promise<SelectConversations> => {
-      // If no users' id is provided, return an error
-      if (!user_one_id || !user_two_id) {
-        throw ApiErrorException.HTTP400Error("No arguments provided");
-      }
-
-      // fetch the conversation exists
-      const conversation = await this.chatRepository.findConversationByUserId([
-        user_one_id,
-        user_two_id,
-      ]);
-
-      // If the conversation does not exist, return an error
-      if (!conversation) {
-        throw ApiErrorException.HTTP404Error("Conversation not found");
-      }
-
-      // Return the conversation
-      return conversation;
+      return await this.chatRepository.findAllMessagesById(data.id, listId);
     }
   );
 
   public newMessageAndConversation = this.wrap.serviceWrap(
     async (messageData: MessageDataType): Promise<string> => {
-      const conversation_id = messageData?.conversation_id;
-      const sender_id = messageData?.sender_id;
-      const receiver_id = messageData?.receiver_id;
+      // destructure the necessary properties from messageData
+      const { conversation_id, sender_id, receiver_id, text_message } =
+        messageData;
 
-      let newMessageData = messageData;
-
+      // validate that sender_id and receiver_id are provided
       if (!sender_id || !receiver_id) {
         throw ApiErrorException.HTTP400Error("No arguments provided");
       }
 
+      // fetch the sender and receiver from the user repository
+      const sender = await this.userRepository.findUserById(sender_id);
+      if (!sender) throw ApiErrorException.HTTP404Error("User not found");
+
+      const receiver = await this.userRepository.findUserById(receiver_id);
+      if (!receiver) throw ApiErrorException.HTTP404Error("User not found");
+
+      let conversation;
       if (conversation_id) {
-        // Check if the conversation exists
-        const conversation = await this.chatRepository.findConversationById(
+        // if conversation_id is provided, fetch the conversation by its ID
+        conversation = await this.chatRepository.findOneConversationById(
           conversation_id
         );
-
-        // If the conversation does not exist, return an error
-        if (!conversation)
-          throw ApiErrorException.HTTP404Error("Conversation not found");
-      }
-
-      // since the conversation_id is null or undefined, we need to check if it exists
-      if (!conversation_id) {
-        const user_id: number[] = [
-          sender_id,
-          receiver_id,
-          receiver_id,
-          sender_id,
-        ];
-
-        // Check if the conversation exists by users' id
-        const conversation = await this.chatRepository.findConversationByUserId(
-          user_id
+        // if the conversation doesn't exists, throw an error
+        if (!conversation) throw ApiErrorException.HTTP404Error("Conversation not found");
+      } else {
+        // if conversation_id is not provided, fetch the conversation by the member IDs
+        conversation = await this.chatRepository.findOneConversationByMembersId(
+          [sender.id, receiver.id]
         );
-
-        newMessageData.conversation_id = conversation
-          ? // If the conversation exists, return the conversation_id
-            (conversation.conversation_id as number)
-          : // If the conversation does not exist, create a new one
-            ((await this.chatRepository.saveNewConversation({
-              user_one_id: sender_id,
-              user_two_id: receiver_id,
-            })) as unknown as number);
       }
 
-      const { receiver_id: _, ...rest } = newMessageData;
-      // Save the new message
-      await this.chatRepository.saveNewMessage(rest as any);
+      // determine the conversation ID, creating a new conversation if necessary
+      const newConversationId = conversation
+        ? conversation.id
+        : await this.createConversation(sender.id, receiver.id);
+
+      // save the new message in the chat repository
+      await this.chatRepository.saveNewMessage({
+        conversation_id: newConversationId,
+        sender_id: sender.id,
+        text_message,
+      });
+
       return "Message sent successfully";
     }
   );
 
+  private createConversation = this.wrap.serviceWrap(
+    async (senderId: number, receiverId: number): Promise<number> => {
+      const newConversationId = (await this.chatRepository.saveNewConversation(
+        {}
+      )) as number;
+
+      await this.chatRepository.saveMultipleChatMembers([
+        { conversation_id: newConversationId, user_id: senderId },
+        { conversation_id: newConversationId, user_id: receiverId },
+      ]);
+
+      return newConversationId;
+    }
+  );
+
   public deleteConversationById = this.wrap.serviceWrap(
-    async (conversation_id: number): Promise<string> => {
+    async (uuid: string | undefined): Promise<string> => {
       // If no conversation id is provided, return an error
-      if (!conversation_id)
-        throw ApiErrorException.HTTP400Error("No arguments provided");
+      if (!uuid) throw ApiErrorException.HTTP400Error("No arguments provided");
 
       // Check if the conversation exists
-      const conversation = await this.chatRepository.findConversationById(
-        conversation_id
+      const conversation = await this.chatRepository.findOneConversationById(
+        uuid
       );
 
       // If the conversation does not exist, return an error
-      if (!conversation)
-        throw ApiErrorException.HTTP404Error("Conversation not found");
+      if (!conversation) throw ApiErrorException.HTTP404Error("Conversation not found");
 
       // Return the deleted conversation
-      await this.chatRepository.deleteConversationById(conversation_id);
+      await this.chatRepository.deleteConversationById(conversation.id);
       return "Conversation deleted successfully";
     }
   );
