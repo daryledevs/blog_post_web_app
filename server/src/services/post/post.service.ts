@@ -1,23 +1,23 @@
 import { NewPosts, SelectLikes, SelectPosts, UpdatePosts } from "@/types/table.types";
 
-interface IPostService {
-  findPostsByPostId: (post_id: number) => Promise<SelectPosts | undefined>;
+interface IEPostService {
+  getPostByUuid: (uuid: string | undefined) => Promise<SelectPosts | undefined>;
 
-  getUserPosts: (user_id: number) => Promise<SelectPosts[]>;
+  getAllPostsByUsersUuid: (user_uuid: string | undefined) => Promise<SelectPosts[]>;
 
-  getUserTotalPosts: (user_id: number) => Promise<string | number | bigint>;
+  geTotalPostsByUsersUuid: (user_uuid: string | undefined) => Promise<string | number | bigint>;
 
-  newPost: (file: Express.Multer.File | null | undefined, post: NewPosts) => Promise<string>;
+  createNewPost: (file: Express.Multer.File | null | undefined, post: NewPosts) => Promise<string>;
 
-  editPost: (post_id: number, post: UpdatePosts) => Promise<string | undefined>;
+  updatePostByUuid: (uuid: string | undefined, post: UpdatePosts | undefined) => Promise<string | undefined>;
 
-  deletePost: (post_id: number) => Promise<string>;
+  deletePostByUuid: (uuid: string | undefined) => Promise<string>;
 
-  getLikesCountForPost: (post_id: number) => Promise<number>;
+  getPostLikesCountByUuid: (uuid: string | undefined) => Promise<number>;
 
-  checkUserLikeStatusForPost: (like: SelectLikes) => Promise<SelectLikes | undefined>;
+  getUserLikeStatusForPostByUuid: (user_uuid: string | undefined, post_uuid: string | undefined) => Promise<SelectLikes | undefined>;
 
-  toggleUserLikeForPost: (like: SelectLikes) => Promise<string>;
-};
+  toggleUserLikeForPost: (user_uuid: string | undefined, post_uuid: string | undefined) => Promise<string>;
+}
 
-export default IPostService;
+export default IEPostService;

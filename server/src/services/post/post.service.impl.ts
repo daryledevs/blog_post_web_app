@@ -1,96 +1,99 @@
 import {
+  NewLikes,
   NewPosts,
   SelectLikes,
   SelectPosts,
   UpdatePosts,
-}                           from "@/types/table.types";
-import { join }             from "path";
-import AsyncWrapper         from "@/utils/async-wrapper.util";
-import IPostService         from "./post.service";
-import PostRepository       from "@/repositories/post/post.repository.impl";
-import UserRepository       from "@/repositories/user/user.repository.impl";
-import ApiErrorException    from "@/exceptions/api.exception";
-import CloudinaryService    from "@/libraries/cloudinary/cloudinary-service.lib";
+}                        from "@/types/table.types";
+import { join }          from "path";
+import AsyncWrapper      from "@/utils/async-wrapper.util";
+import IEPostService     from "./post.service";
+import IEPostRepository  from "@/repositories/post/post.repository";
+import IEUserRepository  from "@/repositories/user/user.repository";
+import ApiErrorException from "@/exceptions/api.exception";
+import CloudinaryService from "@/libraries/cloudinary/cloudinary-service.lib";
 
-class PostService implements IPostService {
-  private postRepository: PostRepository;
-  private userRepository: UserRepository;
+class PostService implements IEPostService {
+  private postRepository: IEPostRepository;
+  private userRepository: IEUserRepository;
   private cloudinary: CloudinaryService;
   private wrap: AsyncWrapper = new AsyncWrapper();
 
   constructor(
-    postRepository: PostRepository,
-    userRepository: UserRepository,
+    postRepository: IEPostRepository,
+    userRepository: IEUserRepository,
     cloudinary: CloudinaryService
   ) {
     this.postRepository = postRepository;
     this.userRepository = userRepository;
     this.cloudinary = cloudinary;
-  };
+  }
 
-  public findPostsByPostId = this.wrap.serviceWrap(
-    async (post_id: number): Promise<SelectPosts | undefined> => {
-      // Check if the post_id is provided
-      if (!post_id) throw ApiErrorException.HTTP400Error("No arguments provided");
-        
+  public getPostByUuid = this.wrap.serviceWrap(
+    async (uuid: string | undefined): Promise<SelectPosts | undefined> => {
+      // check if the post_id is provided
+      if (!uuid) throw ApiErrorException.HTTP400Error("No arguments provided");
 
-      // If the post is not found, return an error
-      const data = await this.postRepository.findPostsByPostId(post_id);
-      if (!data) throw ApiErrorException.HTTP404Error("Post not found");
+      // if the post is not found, return an error
+      const post = await this.postRepository.findPostsByPostId(uuid);
+      if (!post) throw ApiErrorException.HTTP404Error("Post not found");
 
-      // Return the post
-      return data;
+      // return the post
+      return post;
     }
   );
 
-  public getUserPosts = this.wrap.serviceWrap(
-    async (user_id: number): Promise<SelectPosts[]> => {
-      // Check if the user_id is provided
-      if (!user_id) throw ApiErrorException.HTTP400Error("No arguments provided");
-      
-      // If the user is not found, return an error
-      const isUserExist = await this.userRepository.findUserById(user_id);
-      if (!isUserExist) throw ApiErrorException.HTTP404Error("User not found");
+  public getAllPostsByUsersUuid = this.wrap.serviceWrap(
+    async (user_uuid: string): Promise<SelectPosts[]> => {
+      // check if the user_uuid is provided
+      if (!user_uuid) throw ApiErrorException.HTTP400Error("No arguments provided");
 
-      // Get the posts for the user
-      return await this.postRepository.getUserPosts(user_id as any);
+      // if the user is not found, return an error
+      const user = await this.userRepository.findUserById(user_uuid);
+      if (!user) throw ApiErrorException.HTTP404Error("User not found");
+
+      // get the posts for the user
+      return await this.postRepository.findAllPostsByUserId(user.id);
     }
   );
 
-  public getUserTotalPosts = this.wrap.serviceWrap(
-    async (user_id: number): Promise<string | number | bigint> => {
-      // Check if the user_id is provided
-      if (!user_id) throw ApiErrorException.HTTP400Error("No arguments provided");
-      
-      // If the user is not found, return an error
-      const isUserExist = await this.userRepository.findUserById(user_id);
-      if (!isUserExist) throw ApiErrorException.HTTP404Error("User not found");
+  public geTotalPostsByUsersUuid = this.wrap.serviceWrap(
+    async (user_uuid: string): Promise<string | number | bigint> => {
+      // check if the user_uuid is provided
+      if (!user_uuid) throw ApiErrorException.HTTP400Error("No arguments provided");
 
-      // Get the total posts for the user
-      return await this.postRepository.getUserTotalPosts(user_id);
+      // if the user is not found, return an error
+      const user = await this.userRepository.findUserById(user_uuid);
+      if (!user) throw ApiErrorException.HTTP404Error("User not found");
+
+      // get the total posts for the user
+      return await this.postRepository.findUserTotalPostsByUserId(user.id);
     }
   );
 
-  public newPost = this.wrap.serviceWrap(
+  public createNewPost = this.wrap.serviceWrap(
     async (
-      file: Express.Multer.File | null | undefined,
-      post: NewPosts
+      post: NewPosts,
+      file: Express.Multer.File | null | undefined
     ): Promise<string> => {
-      // Check if the image is uploaded
+      // check if the image is uploaded
       if (!file) throw ApiErrorException.HTTP400Error("No image uploaded");
       if (!post?.user_id) throw ApiErrorException.HTTP400Error("No arguments provided");
+      const user_uuid = post.user_id as unknown as string;
 
-      // If the user is not found, return an error
-      const isUserExist = await this.userRepository.findUserById(post.user_id);
-      if (!isUserExist) throw ApiErrorException.HTTP404Error("User not found");
+      // if the user is not found, return an error
+      const user = await this.userRepository.findUserById(user_uuid);
+      if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
       const path = join(file.destination, file.filename);
+      
       const { image_id, image_url } =
         await this.cloudinary.uploadAndDeleteLocal(path);
 
-      // Create a new post
-      await this.postRepository.newPost({
+      // create a new post
+      await this.postRepository.createNewPost({
         ...post,
+        user_id: user.id,
         image_id,
         image_url,
       });
@@ -99,101 +102,109 @@ class PostService implements IPostService {
     }
   );
 
-  public editPost = this.wrap.serviceWrap(
-    async (post_id: number, post: UpdatePosts): Promise<string | undefined> => {
-      // Check if the arguments is provided
-      if (!post_id) throw ApiErrorException.HTTP400Error("No arguments provided");
+  public updatePostByUuid = this.wrap.serviceWrap(
+    async (uuid: string, post: UpdatePosts): Promise<string | undefined> => {
+      // check if the arguments is provided
+      if (!uuid) throw ApiErrorException.HTTP400Error("No arguments provided");
       if (post.image_url) {
         throw ApiErrorException.HTTP400Error(
           "Image url is not allowed to be changed"
         );
       }
 
-      // If the post is not found, return an error
-      const data = await this.postRepository.findPostsByPostId(post_id);
+      // if the post is not found, return an error
+      const data = await this.postRepository.findPostsByPostId(uuid);
       if (!data) throw ApiErrorException.HTTP404Error("Post not found");
 
-      // Edit the post
-      return this.postRepository.editPost(post_id, post);
+      // edit the post
+      await this.postRepository.editPostByPostId(uuid, post);
+      return "Post edited successfully";
     }
   );
 
-  public deletePost = this.wrap.serviceWrap(
-    async (post_id: number): Promise<string> => {
+  public deletePostByUuid = this.wrap.serviceWrap(
+    async (uuid: string | undefined): Promise<string> => {
       // check if the arguments is provided
-      if (!post_id) throw ApiErrorException.HTTP400Error("No arguments provided");
+      if (!uuid) throw ApiErrorException.HTTP400Error("No arguments provided");
 
-      // If the post is not found, return an error
-      const data = await this.postRepository.findPostsByPostId(post_id);
-      if (!data) throw ApiErrorException.HTTP404Error("Post not found");
+      // if the post is not found, return an error
+      const post = await this.postRepository.findPostsByPostId(uuid);
+      if (!post) throw ApiErrorException.HTTP404Error("Post not found");
 
-      // Delete the post
-      return await this.postRepository.deletePost(post_id);
+      // delete the post
+      await this.postRepository.deletePostById(post.id);
+
+      return "";
     }
   );
 
-  public getLikesCountForPost = this.wrap.serviceWrap(
-    async (post_id: number): Promise<number> => {
+  public getPostLikesCountByUuid = this.wrap.serviceWrap(
+    async (uuid: string): Promise<number> => {
       // check if the arguments is provided
-      if (!post_id) throw ApiErrorException.HTTP400Error("No arguments provided");
+      if (!uuid) throw ApiErrorException.HTTP400Error("No arguments provided");
 
-      // Check if the post_id is provided
-      const data = await this.postRepository.findPostsByPostId(post_id);
-      if (!data) throw ApiErrorException.HTTP404Error("Post not found");
+      // check if the post_id is provided
+      const post = await this.postRepository.findPostsByPostId(uuid);
+      if (!post) throw ApiErrorException.HTTP404Error("Post not found");
 
-      // Get the total likes for the post
-      return await this.postRepository.getLikesCountForPost(post_id);
+      // get the total likes for the post
+      return await this.postRepository.findPostsLikeCount(post.id);
     }
   );
 
-  public checkUserLikeStatusForPost = this.wrap.serviceWrap(
-    async (like: SelectLikes): Promise<SelectLikes | undefined> => {
+  public getUserLikeStatusForPostByUuid = this.wrap.serviceWrap(
+    async (
+      user_uuid: string | undefined,
+      post_uuid: string | undefined
+    ): Promise<SelectLikes | undefined> => {
       // check if the arguments is provided
-      if (!like?.post_id || !like?.user_id) {
+      if (!user_uuid || !post_uuid) {
         throw ApiErrorException.HTTP400Error("No arguments provided");
       }
 
       // If the user is not found, return an error
-      const isUserExist = await this.userRepository.findUserById(like.user_id);
-      if (!isUserExist) throw ApiErrorException.HTTP404Error("User not found");
+      const user = await this.userRepository.findUserById(user_uuid);
+      if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
       // If the post is not found, return an error
-      const isPostExist = await this.postRepository.findPostsByPostId(
-        like.post_id
-      );
-      if (!isPostExist) throw ApiErrorException.HTTP404Error("Post not found");
+      const post = await this.postRepository.findPostsByPostId(post_uuid);
+      if (!post) throw ApiErrorException.HTTP404Error("Post not found");
 
       // If the post is not found, return an error
-      return await this.postRepository.isUserLikePost(like);
+      return await this.postRepository.isUserLikePost(user.id, post.id);
     }
   );
 
   public toggleUserLikeForPost = this.wrap.serviceWrap(
-    async (like: SelectLikes): Promise<string> => {
+    async (
+      user_uuid: string | undefined,
+      post_uuid: string | undefined
+    ): Promise<string> => {
       // check if the arguments is provided
-      if (!like?.post_id || !like?.user_id) {
+      if (!user_uuid || !post_uuid) {
         throw ApiErrorException.HTTP400Error("No arguments provided");
-      };
+      }
 
       // If the user is not found, return an error
-      const user = await this.userRepository.findUserById(like.user_id);
+      const user = await this.userRepository.findUserById(user_uuid);
       if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
       // If the post is not found, return an error
-      const post = await this.postRepository.findPostsByPostId(like.post_id);
+      const post = await this.postRepository.findPostsByPostId(post_uuid);
       if (!post) throw ApiErrorException.HTTP404Error("Post not found");
-      
+
       // Check to see if the user already likes the post.
-      const data = await this.postRepository.isUserLikePost(like);
+      const like = await this.postRepository.isUserLikePost(user.id, post.id);
 
       // If the user hasn't liked the post yet, then create or insert.
-      if (!data) {
-        await this.postRepository.toggleUserLikeForPost(like);
+      if (!like) {
+        const data = { user_id: user.id, post_id: post.id };
+        await this.postRepository.likeUsersPostById(data);
         return "Like added successfully";
       }
 
       // If the user has already liked the post, then delete or remove.
-      await this.postRepository.removeUserLikeForPost(like);
+      await this.postRepository.dislikeUsersPostById(like.id);
       return "Like removed successfully";
     }
   );
