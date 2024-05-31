@@ -1,32 +1,34 @@
-import db                                     from "@/database/db.database";
-import { DB }                                 from "@/types/schema.types";
-import { Kysely }                             from "kysely";
-import AsyncWrapper                           from "@/utils/async-wrapper.util";
-import { NewFollowers, SelectFollowers }      from "@/types/table.types";
-import IFollowRepository, { FollowStatsType } from "./follow.repository";
+import db                                      from "@/database/db.database";
+import { DB }                                  from "@/types/schema.types";
+import { Kysely }                              from "kysely";
+import AsyncWrapper                            from "@/utils/async-wrapper.util";
+import { NewFollowers, SelectFollowers }       from "@/types/table.types";
+import IEFollowRepository, { FollowStatsType } from "./follow.repository";
 
-class FollowRepository implements IFollowRepository {
+class FollowRepository implements IEFollowRepository {
   private database: Kysely<DB>;
   private wrap: AsyncWrapper = new AsyncWrapper();
 
-  constructor() { this.database = db; };
+  constructor() {
+    this.database = db;
+  }
 
-  public getFollowStats = this.wrap.repoWrap(
-    async (user_id: number): Promise<FollowStatsType> => {
+  public findUserFollowStatsById = this.wrap.repoWrap(
+    async (id: number): Promise<FollowStatsType> => {
       const queryFollowers = this.database
         .selectFrom("followers")
-        .innerJoin("users", "followers.followed_id", "users.user_id")
+        .innerJoin("users", "followers.followed_id", "users.id")
         .select((eb) => [eb.fn.count<number>("followed_id").as("followers")])
-        .where("followers.followed_id", "=", user_id)
+        .where("followers.followed_id", "=", id)
         .groupBy("followers.followed_id");
 
       const queryFollowing = this.database
         .selectFrom("followers")
-        .innerJoin("users", "followers.follower_id", "users.user_id")
+        .innerJoin("users", "followers.follower_id", "users.id")
         .select((eb) =>
           eb.fn.count<number>("followers.follower_id").as("following")
         )
-        .where("followers.follower_id", "=", user_id)
+        .where("followers.follower_id", "=", id)
         .groupBy("followers.follower_id");
 
       const { followers, following } = await this.database
@@ -40,14 +42,14 @@ class FollowRepository implements IFollowRepository {
     }
   );
 
-  public getFollowersLists = this.wrap.repoWrap(
-    async (user_id: number, listsId: number[]): Promise<SelectFollowers[]> => {
+  public findAllFollowersById = this.wrap.repoWrap(
+    async (id: number, listsId: number[]): Promise<SelectFollowers[]> => {
       return await this.database
         .selectFrom("followers")
-        .innerJoin("users", "followers.follower_id", "users.user_id")
+        .innerJoin("users", "followers.follower_id", "users.id")
         .where((eb) =>
           eb.and([
-            eb("followers.followed_id", "=", user_id),
+            eb("followers.followed_id", "=", id),
             eb("followers.follower_id", "not in", listsId),
           ])
         )
@@ -57,14 +59,14 @@ class FollowRepository implements IFollowRepository {
     }
   );
 
-  public getFollowingLists = this.wrap.repoWrap(
-    async (user_id: number, listsId: number[]): Promise<SelectFollowers[]> => {
+  public findAllFollowingById = this.wrap.repoWrap(
+    async (id: number, listsId: number[]): Promise<SelectFollowers[]> => {
       return await this.database
         .selectFrom("followers")
-        .innerJoin("users", "followers.followed_id", "users.user_id")
+        .innerJoin("users", "followers.followed_id", "users.id")
         .where((eb) =>
           eb.and([
-            eb("followers.follower_id", "=", user_id),
+            eb("followers.follower_id", "=", id),
             eb("followers.followed_id", "not in", listsId),
           ])
         )
@@ -74,7 +76,7 @@ class FollowRepository implements IFollowRepository {
     }
   );
 
-  public isFollowUser = this.wrap.repoWrap(
+  public isUserFollowing = this.wrap.repoWrap(
     async (identifier: NewFollowers): Promise<boolean> => {
       const result = await this.database
         .selectFrom("followers")

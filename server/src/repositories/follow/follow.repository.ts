@@ -5,18 +5,18 @@ export type FollowStatsType = {
   following: number;
 };
 
-interface IFollowRepository {
-  getFollowStats: (user_id: number) => Promise<FollowStatsType>;
+interface IEFollowRepository {
+  findUserFollowStatsById: (id: number) => Promise<FollowStatsType>;
 
-  getFollowersLists: (user_id: number, listsId: number[]) => Promise<SelectFollowers[]>;
+  findAllFollowersById: (id: number, listsId: number[]) => Promise<SelectFollowers[]>;
 
-  getFollowingLists: (user_id: number, listsId: number[]) => Promise<SelectFollowers[]>;
+  findAllFollowingById: (id: number, listsId: number[]) => Promise<SelectFollowers[]>;
 
-  isFollowUser: (identifier: SelectFollowers) => Promise<boolean>;
+  isUserFollowing: (identifier: NewFollowers) => Promise<boolean>;
 
   followUser: (identifier: NewFollowers) => Promise<void>;
 
-  unfollowUser: (identifier: SelectFollowers) => Promise<void>;
+  unfollowUser: (identifier: NewFollowers) => Promise<void>;
 }
 
-export default IFollowRepository;
+export default IEFollowRepository;
