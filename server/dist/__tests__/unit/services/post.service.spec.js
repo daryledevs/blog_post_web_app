@@ -12,10 +12,11 @@ const generate_data_util_1 = __importDefault(require("../../utils/generate-data.
 const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
 const cloudinary_service_lib_1 = __importDefault(require("@/libraries/cloudinary/cloudinary-service.lib"));
 const vitest_1 = require("vitest");
+const stream_1 = require("stream");
 vitest_1.vi.mock("@/repositories/feed/feed.repository.impl");
 vitest_1.vi.mock("@/repositories/user/user.repository.impl");
 vitest_1.vi.mock("@/utils/cloudinary-service.util");
-(0, vitest_1.describe)("FeedService", () => {
+(0, vitest_1.describe)("PostService", () => {
     let cloudinary;
     let postRepository;
     let userRepository;
@@ -43,71 +44,73 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
     afterAll(() => {
         vitest_1.vi.restoreAllMocks();
     });
-    (0, vitest_1.describe)("findPostsByPostId (get post by id)", async () => {
+    (0, vitest_1.describe)("getPostByUuid (get post by id)", async () => {
         (0, vitest_1.test)("should return the correct result", async () => {
-            postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(existingPost);
-            const result = await postService.findPostsByPostId(existingPost.post_id);
+            postRepository.findPostsByPostId = vitest_1.vi
+                .fn()
+                .mockResolvedValue(existingPost);
+            const result = await postService.getPostByUuid(existingPost.uuid);
             (0, vitest_1.expect)(result).toEqual(existingPost);
-            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(existingPost.post_id);
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(existingPost.uuid);
         });
         (0, vitest_1.test)("should throw an error if no args provided", async () => {
             postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(null);
-            await (0, vitest_1.expect)(postService.findPostsByPostId(null)).rejects.toThrow(error.noArgsMsg);
+            await (0, vitest_1.expect)(postService.getPostByUuid(null)).rejects.toThrow(error.noArgsMsg);
             (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toHaveBeenCalled();
         });
         (0, vitest_1.test)("should throw an error if post not found", async () => {
             postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(null);
-            await (0, vitest_1.expect)(postService.findPostsByPostId(nonExistingPost.post_id)).rejects.toThrow(error.postNotFoundMsg);
-            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(nonExistingPost.post_id);
+            await (0, vitest_1.expect)(postService.getPostByUuid(nonExistingPost.uuid)).rejects.toThrow(error.postNotFoundMsg);
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(nonExistingPost.uuid);
         });
     });
-    (0, vitest_1.describe)("getUserPosts", async () => {
+    (0, vitest_1.describe)("getAllPostsByUsersUuid", async () => {
         (0, vitest_1.test)("should return the correct result", async () => {
             userRepository.findUserById = vitest_1.vi.fn().mockResolvedValue(existingUser);
-            postRepository.getUserPosts = vitest_1.vi.fn().mockResolvedValue(posts);
-            const result = await postService.getUserPosts(existingUser.user_id);
+            postRepository.findAllPostsByUserId = vitest_1.vi.fn().mockResolvedValue(posts);
+            const result = await postService.getAllPostsByUsersUuid(existingUser.uuid);
             (0, vitest_1.expect)(result).toEqual(posts);
-            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(existingUser.user_id);
-            (0, vitest_1.expect)(postRepository.getUserPosts).toHaveBeenCalledWith(existingUser.user_id);
+            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(existingUser.uuid);
+            (0, vitest_1.expect)(postRepository.findAllPostsByUserId).toHaveBeenCalledWith(existingUser.id);
         });
         (0, vitest_1.test)("should throw an error if no args provided", async () => {
             userRepository.findUserById = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(postService.getUserPosts(null)).rejects.toThrow(error.noArgsMsg);
+            await (0, vitest_1.expect)(postService.getAllPostsByUsersUuid(null)).rejects.toThrow(error.noArgsMsg);
             (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
         });
         (0, vitest_1.test)("should throw an error if user not found", async () => {
             userRepository.findUserById = vitest_1.vi.fn().mockResolvedValue(null);
-            await (0, vitest_1.expect)(postService.getUserPosts(notFoundUser.user_id)).rejects.toThrow(error.userNotFoundMsg);
-            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
+            await (0, vitest_1.expect)(postService.getAllPostsByUsersUuid(notFoundUser.uuid)).rejects.toThrow(error.userNotFoundMsg);
+            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.uuid);
         });
     });
-    (0, vitest_1.describe)("getUserTotalPosts (get the total post available for feed)", async () => {
+    (0, vitest_1.describe)("geTotalPostsByUsersUuid (get the total post available for feed)", async () => {
         (0, vitest_1.test)("should return the correct result", async () => {
             userRepository.findUserById = vitest_1.vi.fn().mockResolvedValue(existingUser);
-            postRepository.getUserTotalPosts = vitest_1.vi.fn().mockResolvedValue(posts.length);
-            const result = await postService.getUserTotalPosts(existingUser.user_id);
+            postRepository.findUserTotalPostsByUserId = vitest_1.vi.fn().mockResolvedValue(posts.length);
+            const result = await postService.geTotalPostsByUsersUuid(existingUser.uuid);
             (0, vitest_1.expect)(result).toEqual(posts.length);
-            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(existingUser.user_id);
-            (0, vitest_1.expect)(postRepository.getUserTotalPosts).toHaveBeenCalledWith(existingUser.user_id);
+            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(existingUser.uuid);
+            (0, vitest_1.expect)(postRepository.findUserTotalPostsByUserId).toHaveBeenCalledWith(existingUser.id);
         });
         (0, vitest_1.test)("should throw an error if no args provided", async () => {
             userRepository.findUserById = vitest_1.vi.fn();
-            postRepository.getUserTotalPosts = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(postService.getUserTotalPosts(undefined))
+            postRepository.findUserTotalPostsByUserId = vitest_1.vi.fn();
+            await (0, vitest_1.expect)(postService.geTotalPostsByUsersUuid(undefined))
                 .rejects.toThrow(error.noArgsMsg);
             (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
-            (0, vitest_1.expect)(postRepository.getUserTotalPosts).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(postRepository.findUserTotalPostsByUserId).not.toHaveBeenCalled();
         });
         (0, vitest_1.test)("should throw an error if user not found", async () => {
             userRepository.findUserById = vitest_1.vi.fn().mockResolvedValue(undefined);
-            postRepository.getUserTotalPosts = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(postService.getUserTotalPosts(notFoundUser.user_id))
+            postRepository.findUserTotalPostsByUserId = vitest_1.vi.fn();
+            await (0, vitest_1.expect)(postService.geTotalPostsByUsersUuid(notFoundUser.uuid))
                 .rejects.toThrow(error.userNotFoundMsg);
-            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
-            (0, vitest_1.expect)(postRepository.getUserTotalPosts).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.uuid);
+            (0, vitest_1.expect)(postRepository.findUserTotalPostsByUserId).not.toHaveBeenCalled();
         });
     });
-    (0, vitest_1.describe)("newPost (create new post from the user)", async () => {
+    (0, vitest_1.describe)("createNewPost (create new post from the user)", async () => {
         (0, vitest_1.test)("should return the correct result", async () => {
             const { image_url, image_id, ...rest } = existingPost;
             const buffer = Buffer.alloc(1024 * 1024 * 10, ".");
@@ -117,29 +120,35 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
                 originalname: faker_1.faker.system.fileName(),
                 size: buffer.length,
                 filename: faker_1.faker.system.fileName(),
-                destination: faker_1.faker.system.directoryPath()
+                destination: faker_1.faker.system.directoryPath(),
+                fieldname: "",
+                encoding: "",
+                stream: new stream_1.Readable(),
+                path: faker_1.faker.system.filePath(),
+                image_id,
+                user_id: rest.user_id,
             };
             userRepository.findUserById = vitest_1.vi
                 .fn()
                 .mockResolvedValue(existingUser);
-            postRepository.newPost = vitest_1.vi
+            postRepository.createNewPost = vitest_1.vi
                 .fn()
                 .mockResolvedValue(existingPost);
             cloudinary.uploadAndDeleteLocal = vitest_1.vi
                 .fn()
                 .mockResolvedValue({ image_url, image_id });
-            const result = await postService.newPost(file, rest);
+            const result = await postService.createNewPost(rest, file);
             (0, vitest_1.expect)(result).toBe("Post created successfully");
             (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(existingPost.user_id);
             (0, vitest_1.expect)(cloudinary.uploadAndDeleteLocal).toHaveBeenCalledWith((0, path_1.join)(file.destination, file.filename));
-            (0, vitest_1.expect)(postRepository.newPost).toHaveBeenCalledWith({
+            (0, vitest_1.expect)(postRepository.createNewPost).toHaveBeenCalledWith({
                 ...rest,
                 image_url,
                 image_id,
             });
         });
         (0, vitest_1.test)("should throw an error if no args provided", async () => {
-            const { image_url, image_id, ...rest } = existingPost;
+            const { image_url, image_id, user_id, ...rest } = existingPost;
             const buffer = Buffer.alloc(1024 * 1024 * 10, ".");
             const file = {
                 buffer,
@@ -148,24 +157,30 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
                 size: buffer.length,
                 filename: faker_1.faker.system.fileName(),
                 destination: faker_1.faker.system.directoryPath(),
+                fieldname: "",
+                encoding: "",
+                stream: new stream_1.Readable,
+                path: faker_1.faker.system.filePath(),
+                image_id,
+                user_id,
             };
             userRepository.findUserById = vitest_1.vi.fn();
-            postRepository.newPost = vitest_1.vi.fn();
+            postRepository.createNewPost = vitest_1.vi.fn();
             cloudinary.uploadAndDeleteLocal = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(postService.newPost(file, undefined))
+            await (0, vitest_1.expect)(postService.createNewPost(undefined, file))
                 .rejects.toThrow(error.noArgsMsg);
             (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
-            (0, vitest_1.expect)(postRepository.newPost).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(postRepository.createNewPost).not.toHaveBeenCalled();
             (0, vitest_1.expect)(cloudinary.uploadAndDeleteLocal).not.toHaveBeenCalled();
         });
         (0, vitest_1.test)("should throw an error if no image uploaded", async () => {
             userRepository.findUserById = vitest_1.vi.fn();
-            postRepository.newPost = vitest_1.vi.fn();
+            postRepository.createNewPost = vitest_1.vi.fn();
             cloudinary.uploadAndDeleteLocal = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(postService.newPost(undefined, undefined))
+            await (0, vitest_1.expect)(postService.createNewPost(undefined, undefined))
                 .rejects.toThrow("No image uploaded");
             (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
-            (0, vitest_1.expect)(postRepository.newPost).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(postRepository.createNewPost).not.toHaveBeenCalled();
             (0, vitest_1.expect)(cloudinary.uploadAndDeleteLocal).not.toHaveBeenCalled();
         });
         (0, vitest_1.test)("should throw an error if user not found", async () => {
@@ -178,164 +193,106 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
                 size: buffer.length,
                 filename: faker_1.faker.system.fileName(),
                 destination: faker_1.faker.system.directoryPath(),
+                fieldname: "",
+                encoding: "",
+                stream: new stream_1.Readable(),
+                path: faker_1.faker.system.filePath(),
+                image_id,
+                user_id: rest.user_id,
             };
             userRepository.findUserById = vitest_1.vi.fn().mockResolvedValue(undefined);
-            postRepository.newPost = vitest_1.vi.fn();
+            postRepository.createNewPost = vitest_1.vi.fn();
             cloudinary.uploadAndDeleteLocal = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(postService.newPost(file, rest))
+            await (0, vitest_1.expect)(postService.createNewPost(rest, file))
                 .rejects.toThrow(error.userNotFoundMsg);
             (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(existingPost.user_id);
-            (0, vitest_1.expect)(postRepository.newPost).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(postRepository.createNewPost).not.toHaveBeenCalled();
             (0, vitest_1.expect)(cloudinary.uploadAndDeleteLocal).not.toHaveBeenCalled();
         });
     });
-    (0, vitest_1.describe)("editPost (edit the user's post)", () => {
+    (0, vitest_1.describe)("updatePostByUuid (edit the user's post)", () => {
         (0, vitest_1.test)("should throw an error if no args provided", async () => {
-            postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(existingPost);
-            postRepository.editPost = vitest_1.vi.fn().mockResolvedValue(existingPost);
-            const { image_url, image_id, ...rest } = existingPost;
-            const result = await postService.editPost(existingPost.post_id, rest);
-            (0, vitest_1.expect)(result).toBe(existingPost);
-            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(existingPost.post_id);
-            (0, vitest_1.expect)(postRepository.editPost).toHaveBeenCalledWith(existingPost.post_id, rest);
-        });
-        (0, vitest_1.test)("should throw an error if no args provided", async () => {
-            postRepository.findPostsByPostId = vitest_1.vi.fn();
-            postRepository.editPost = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(postService.editPost(undefined, undefined))
-                .rejects.toThrow(error.noArgsMsg);
-            (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toHaveBeenCalled();
-            (0, vitest_1.expect)(postRepository.editPost).not.toHaveBeenCalled();
-        });
-        (0, vitest_1.test)("should throw an error if post not found", async () => {
-            postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(undefined);
-            postRepository.editPost = vitest_1.vi.fn();
-            const { image_url, image_id, ...rest } = nonExistingPost;
-            await (0, vitest_1.expect)(postService.editPost(rest.post_id, rest)).rejects.toThrow(error.postNotFoundMsg);
-            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(rest.post_id);
-            (0, vitest_1.expect)(postRepository.editPost).not.toHaveBeenCalled();
-        });
-    });
-    (0, vitest_1.describe)("deletePost (delete the user's post)", async () => {
-        (0, vitest_1.test)("should return the correct result", async () => {
-            postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(existingPost);
-            postRepository.deletePost = vitest_1.vi.fn().mockResolvedValue("Post deleted successfully");
-            const result = await postService.deletePost(existingPost.post_id);
-            (0, vitest_1.expect)(result).toBe("Post deleted successfully");
-            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(existingPost.post_id);
-            (0, vitest_1.expect)(postRepository.deletePost).toHaveBeenCalledWith(existingPost.post_id);
-        });
-        (0, vitest_1.test)("should throw an error if no args provided", async () => {
-            postRepository.findPostsByPostId = vitest_1.vi.fn();
-            postRepository.deletePost = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(postService.deletePost(undefined))
-                .rejects.toThrow(error.noArgsMsg);
-            (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toHaveBeenCalled();
-            (0, vitest_1.expect)(postRepository.deletePost).not.toHaveBeenCalled();
-        });
-        (0, vitest_1.test)("should throw an error if post not found", async () => {
-            postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(undefined);
-            postRepository.deletePost = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(postService.deletePost(nonExistingPost.post_id))
-                .rejects.toThrow(error.postNotFoundMsg);
-            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(nonExistingPost.post_id);
-            (0, vitest_1.expect)(postRepository.deletePost).not.toHaveBeenCalled();
-        });
-    });
-    (0, vitest_1.describe)("getLikesCountForPost (get the total likes for the post)", async () => {
-        (0, vitest_1.test)("should return the correct result", async () => {
-            postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(existingPost);
-            postRepository.getLikesCountForPost = vitest_1.vi.fn().mockResolvedValue(10);
-            const result = await postService.getLikesCountForPost(existingPost.post_id);
-            (0, vitest_1.expect)(result).toBe(10);
-            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(existingPost.post_id);
-            (0, vitest_1.expect)(postRepository.getLikesCountForPost).toHaveBeenCalledWith(existingPost.post_id);
-        });
-        (0, vitest_1.test)("should throw an error if no args provided", async () => {
-            postRepository.findPostsByPostId = vitest_1.vi.fn();
-            postRepository.getLikesCountForPost = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(postService.getLikesCountForPost(undefined))
-                .rejects.toThrow(error.noArgsMsg);
-            (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toHaveBeenCalled();
-            (0, vitest_1.expect)(postRepository.getLikesCountForPost).not.toHaveBeenCalled();
-        });
-        (0, vitest_1.test)("should throw an error if post not found", async () => {
-            postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(undefined);
-            postRepository.getLikesCountForPost = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(postService.getLikesCountForPost(nonExistingPost.post_id))
-                .rejects.toThrow(error.postNotFoundMsg);
-            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(nonExistingPost.post_id);
-            (0, vitest_1.expect)(postRepository.getLikesCountForPost).not.toHaveBeenCalled();
-        });
-    });
-    (0, vitest_1.describe)("checkUserLikeStatusForPost (check if the user liked the post)", async () => {
-        (0, vitest_1.test)("should return the correct result", async () => {
-            const like = generate_data_util_1.default.createLike(existingPost.post_id, existingPost.user_id);
-            userRepository.findUserById = vitest_1.vi.fn().mockResolvedValue(existingUser);
-            postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(existingPost);
-            postRepository.isUserLikePost = vitest_1.vi.fn().mockResolvedValue(like);
-            const result = await postService.checkUserLikeStatusForPost(like);
-            (0, vitest_1.expect)(result).toBe(like);
-            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(like.user_id);
-            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(like.post_id);
-            (0, vitest_1.expect)(postRepository.isUserLikePost).toHaveBeenCalledWith(like);
-        });
-        (0, vitest_1.test)("should throw an error if no args provided", async () => {
-            userRepository.findUserById = vitest_1.vi.fn();
-            postRepository.findPostsByPostId = vitest_1.vi.fn();
-            postRepository.isUserLikePost = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(postService.checkUserLikeStatusForPost(undefined))
-                .rejects.toThrow(error.noArgsMsg);
-            (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
-            (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toHaveBeenCalled();
-            (0, vitest_1.expect)(postRepository.isUserLikePost).not.toHaveBeenCalled();
-        });
-        (0, vitest_1.test)("should throw an error if user not found", async () => {
-            const like = generate_data_util_1.default.createLike(existingPost.post_id, existingPost.user_id);
-            userRepository.findUserById = vitest_1.vi.fn().mockResolvedValue(undefined);
-            postRepository.findPostsByPostId = vitest_1.vi.fn();
-            postRepository.isUserLikePost = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(postService.checkUserLikeStatusForPost(like))
-                .rejects.toThrow(error.userNotFoundMsg);
-            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(like.user_id);
-            (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toHaveBeenCalled();
-            (0, vitest_1.expect)(postRepository.isUserLikePost).not.toHaveBeenCalled();
-        });
-        (0, vitest_1.test)("should throw an error if post not found", async () => {
-            const like = generate_data_util_1.default.createLike(existingPost.post_id, existingPost.user_id);
-            userRepository.findUserById = vitest_1.vi.fn().mockResolvedValue(existingUser);
-            postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(undefined);
-            postRepository.isUserLikePost = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(postService.checkUserLikeStatusForPost(like))
-                .rejects.toThrow(error.postNotFoundMsg);
-            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(like.user_id);
-            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(like.post_id);
-            (0, vitest_1.expect)(postRepository.isUserLikePost).not.toHaveBeenCalled();
-        });
-    });
-    (0, vitest_1.describe)("toggleUserLikeForPost (toggle the user's like for the post)", async () => {
-        (0, vitest_1.test)("should return the 'like added successfully' message", async () => {
-            const like = generate_data_util_1.default.createLike(existingPost.post_id, existingPost.user_id);
-            userRepository.findUserById = vitest_1.vi
-                .fn()
-                .mockResolvedValue(existingUser);
             postRepository.findPostsByPostId = vitest_1.vi
                 .fn()
                 .mockResolvedValue(existingPost);
-            postRepository.isUserLikePost = vitest_1.vi
-                .fn()
-                .mockResolvedValue(undefined);
-            postRepository.toggleUserLikeForPost = vitest_1.vi.fn();
-            postRepository.removeUserLikeForPost = vitest_1.vi.fn();
-            const result = await postService.toggleUserLikeForPost(like);
-            (0, vitest_1.expect)(result).toBe("Like added successfully");
-            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(like.user_id);
-            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(like.post_id);
-            (0, vitest_1.expect)(postRepository.isUserLikePost).toHaveBeenCalledWith(like);
-            (0, vitest_1.expect)(postRepository.removeUserLikeForPost).not.toHaveBeenCalled();
+            postRepository.editPostByPostId = vitest_1.vi.fn();
+            const { image_url, image_id, ...rest } = existingPost;
+            const result = await postService.updatePostByUuid(existingPost.uuid, rest);
+            (0, vitest_1.expect)(result).toBe("Post edited successfully");
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(existingPost.uuid);
+            (0, vitest_1.expect)(postRepository.editPostByPostId).toHaveBeenCalledWith(existingPost.uuid, rest);
         });
-        (0, vitest_1.test)("should return the 'like removed successfully' message", async () => {
-            const like = generate_data_util_1.default.createLike(existingPost.post_id, existingPost.user_id);
+        (0, vitest_1.test)("should throw an error if no args provided", async () => {
+            postRepository.findPostsByPostId = vitest_1.vi.fn();
+            postRepository.editPostByPostId = vitest_1.vi.fn();
+            await (0, vitest_1.expect)(postService.updatePostByUuid(undefined, undefined)).rejects.toThrow(error.noArgsMsg);
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(postRepository.editPostByPostId).not.toHaveBeenCalled();
+        });
+        (0, vitest_1.test)("should throw an error if post not found", async () => {
+            postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(undefined);
+            postRepository.editPostByPostId = vitest_1.vi.fn();
+            const { image_url, image_id, ...rest } = nonExistingPost;
+            await (0, vitest_1.expect)(postService.updatePostByUuid(rest.uuid, rest)).rejects.toThrow(error.postNotFoundMsg);
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(rest.uuid);
+            (0, vitest_1.expect)(postRepository.editPostByPostId).not.toHaveBeenCalled();
+        });
+    });
+    (0, vitest_1.describe)("deletePostByUuid (delete the user's post)", async () => {
+        (0, vitest_1.test)("should return the correct result", async () => {
+            postRepository.findPostsByPostId = vitest_1.vi
+                .fn()
+                .mockResolvedValue(existingPost);
+            postRepository.deletePostById = vitest_1.vi.fn();
+            const result = await postService.deletePostByUuid(existingPost.uuid);
+            (0, vitest_1.expect)(result).toBe("Post deleted successfully");
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(existingPost.uuid);
+            (0, vitest_1.expect)(postRepository.deletePostById).toHaveBeenCalledWith(existingPost.id);
+        });
+        (0, vitest_1.test)("should throw an error if no args provided", async () => {
+            postRepository.findPostsByPostId = vitest_1.vi.fn();
+            postRepository.deletePostById = vitest_1.vi.fn();
+            await (0, vitest_1.expect)(postService.deletePostByUuid(undefined)).rejects.toThrow(error.noArgsMsg);
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(postRepository.deletePostById).not.toHaveBeenCalled();
+        });
+        (0, vitest_1.test)("should throw an error if post not found", async () => {
+            postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(undefined);
+            postRepository.deletePostById = vitest_1.vi.fn();
+            await (0, vitest_1.expect)(postService.deletePostByUuid(nonExistingPost.uuid)).rejects.toThrow(error.postNotFoundMsg);
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(nonExistingPost.uuid);
+            (0, vitest_1.expect)(postRepository.deletePostById).not.toHaveBeenCalled();
+        });
+    });
+    (0, vitest_1.describe)("getPostLikesCountByUuid (get the total likes for the post)", async () => {
+        (0, vitest_1.test)("should return the correct result", async () => {
+            postRepository.findPostsByPostId = vitest_1.vi
+                .fn()
+                .mockResolvedValue(existingPost);
+            postRepository.findPostsLikeCount = vitest_1.vi.fn().mockResolvedValue(10);
+            const result = await postService.getPostLikesCountByUuid(existingPost.uuid);
+            (0, vitest_1.expect)(result).toBe(10);
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(existingPost.uuid);
+            (0, vitest_1.expect)(postRepository.findPostsLikeCount).toHaveBeenCalledWith(existingPost.id);
+        });
+        (0, vitest_1.test)("should throw an error if no args provided", async () => {
+            postRepository.findPostsByPostId = vitest_1.vi.fn();
+            postRepository.findPostsLikeCount = vitest_1.vi.fn();
+            await (0, vitest_1.expect)(postService.getPostLikesCountByUuid(undefined)).rejects.toThrow(error.noArgsMsg);
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(postRepository.findPostsLikeCount).not.toHaveBeenCalled();
+        });
+        (0, vitest_1.test)("should throw an error if post not found", async () => {
+            postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(undefined);
+            postRepository.findPostsLikeCount = vitest_1.vi.fn();
+            await (0, vitest_1.expect)(postService.getPostLikesCountByUuid(nonExistingPost.uuid)).rejects.toThrow(error.postNotFoundMsg);
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(nonExistingPost.uuid);
+            (0, vitest_1.expect)(postRepository.findPostsLikeCount).not.toHaveBeenCalled();
+        });
+    });
+    (0, vitest_1.describe)("getUserLikeStatusForPostByUuid (check if the user liked the post)", async () => {
+        (0, vitest_1.test)("should return the correct result", async () => {
+            const like = generate_data_util_1.default.createLike(existingPost.user_id, existingPost.id);
             userRepository.findUserById = vitest_1.vi
                 .fn()
                 .mockResolvedValue(existingUser);
@@ -345,44 +302,109 @@ vitest_1.vi.mock("@/utils/cloudinary-service.util");
             postRepository.isUserLikePost = vitest_1.vi
                 .fn()
                 .mockResolvedValue(like);
-            postRepository.toggleUserLikeForPost = vitest_1.vi.fn();
-            postRepository.removeUserLikeForPost = vitest_1.vi.fn();
-            const result = await postService.toggleUserLikeForPost(like);
-            (0, vitest_1.expect)(result).toBe("Like removed successfully");
-            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(like.user_id);
-            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(like.post_id);
-            (0, vitest_1.expect)(postRepository.isUserLikePost).toHaveBeenCalledWith(like);
-            (0, vitest_1.expect)(postRepository.removeUserLikeForPost).toHaveBeenCalledWith(like);
-            (0, vitest_1.expect)(postRepository.toggleUserLikeForPost).not.toHaveBeenCalled();
+            const result = await postService.getUserLikeStatusForPostByUuid(existingUser.uuid, existingPost.uuid);
+            (0, vitest_1.expect)(result).toBe(like);
+            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(existingUser.uuid);
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(existingPost.uuid);
+            (0, vitest_1.expect)(postRepository.isUserLikePost).toHaveBeenCalledWith(existingUser.id, existingPost.id);
         });
         (0, vitest_1.test)("should throw an error if no args provided", async () => {
             userRepository.findUserById = vitest_1.vi.fn();
             postRepository.findPostsByPostId = vitest_1.vi.fn();
             postRepository.isUserLikePost = vitest_1.vi.fn();
-            postRepository.toggleUserLikeForPost = vitest_1.vi.fn();
-            postRepository.removeUserLikeForPost = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(postService.toggleUserLikeForPost(undefined))
+            await (0, vitest_1.expect)(postService.getUserLikeStatusForPostByUuid(undefined, undefined)).rejects.toThrow(error.noArgsMsg);
+            (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(postRepository.isUserLikePost).not.toHaveBeenCalled();
+        });
+        (0, vitest_1.test)("should throw an error if user not found", async () => {
+            userRepository.findUserById = vitest_1.vi.fn().mockResolvedValue(undefined);
+            postRepository.findPostsByPostId = vitest_1.vi.fn();
+            postRepository.isUserLikePost = vitest_1.vi.fn();
+            await (0, vitest_1.expect)(postService.getUserLikeStatusForPostByUuid(notFoundUser.uuid, existingPost.uuid)).rejects.toThrow(error.userNotFoundMsg);
+            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.uuid);
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(postRepository.isUserLikePost).not.toHaveBeenCalled();
+        });
+        (0, vitest_1.test)("should throw an error if post not found", async () => {
+            userRepository.findUserById = vitest_1.vi.fn().mockResolvedValue(existingUser);
+            postRepository.findPostsByPostId = vitest_1.vi.fn().mockResolvedValue(undefined);
+            postRepository.isUserLikePost = vitest_1.vi.fn();
+            await (0, vitest_1.expect)(postService.getUserLikeStatusForPostByUuid(existingUser.uuid, nonExistingPost.uuid)).rejects.toThrow(error.postNotFoundMsg);
+            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(existingUser.uuid);
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(nonExistingPost.uuid);
+            (0, vitest_1.expect)(postRepository.isUserLikePost).not.toHaveBeenCalled();
+        });
+    });
+    (0, vitest_1.describe)("toggleUserLikeForPost (toggle the user's like for the post)", async () => {
+        (0, vitest_1.test)("should return the 'like added successfully' message", async () => {
+            const expectedMsg = "Like added successfully";
+            userRepository.findUserById = vitest_1.vi
+                .fn()
+                .mockResolvedValue(existingUser);
+            postRepository.findPostsByPostId = vitest_1.vi
+                .fn()
+                .mockResolvedValue(existingPost);
+            postRepository.isUserLikePost = vitest_1.vi
+                .fn()
+                .mockResolvedValue(undefined);
+            postRepository.likeUsersPostById = vitest_1.vi.fn();
+            postRepository.dislikeUsersPostById = vitest_1.vi.fn();
+            const result = await postService.toggleUserLikeForPost(existingUser.uuid, existingPost.uuid);
+            (0, vitest_1.expect)(result).toBe(expectedMsg);
+            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(existingUser.uuid);
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(existingPost.uuid);
+            (0, vitest_1.expect)(postRepository.isUserLikePost).toHaveBeenCalledWith(existingUser.id, existingPost.id);
+            (0, vitest_1.expect)(postRepository.dislikeUsersPostById).not.toHaveBeenCalled();
+        });
+        (0, vitest_1.test)("should return the 'like removed successfully' message", async () => {
+            const expectedMsg = "Like removed successfully";
+            const like = generate_data_util_1.default.createLike(existingPost.user_id, existingPost.id);
+            userRepository.findUserById = vitest_1.vi
+                .fn()
+                .mockResolvedValue(existingUser);
+            postRepository.findPostsByPostId = vitest_1.vi
+                .fn()
+                .mockResolvedValue(existingPost);
+            postRepository.isUserLikePost = vitest_1.vi
+                .fn()
+                .mockResolvedValue(like);
+            postRepository.likeUsersPostById = vitest_1.vi.fn();
+            postRepository.dislikeUsersPostById = vitest_1.vi.fn();
+            const result = await postService.toggleUserLikeForPost(existingUser.uuid, existingPost.uuid);
+            (0, vitest_1.expect)(result).toBe(expectedMsg);
+            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(existingUser.uuid);
+            (0, vitest_1.expect)(postRepository.findPostsByPostId).toHaveBeenCalledWith(existingPost.uuid);
+            (0, vitest_1.expect)(postRepository.isUserLikePost).toHaveBeenCalledWith(existingUser.id, existingPost.id);
+            (0, vitest_1.expect)(postRepository.dislikeUsersPostById).toHaveBeenCalledWith(like.id);
+            (0, vitest_1.expect)(postRepository.likeUsersPostById).not.toHaveBeenCalled();
+        });
+        (0, vitest_1.test)("should throw an error if no args provided", async () => {
+            userRepository.findUserById = vitest_1.vi.fn();
+            postRepository.findPostsByPostId = vitest_1.vi.fn();
+            postRepository.isUserLikePost = vitest_1.vi.fn();
+            postRepository.likeUsersPostById = vitest_1.vi.fn();
+            postRepository.dislikeUsersPostById = vitest_1.vi.fn();
+            await (0, vitest_1.expect)(postService.toggleUserLikeForPost(undefined, undefined))
                 .rejects.toThrow(error.noArgsMsg);
             (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
             (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toHaveBeenCalled();
             (0, vitest_1.expect)(postRepository.isUserLikePost).not.toHaveBeenCalled();
-            (0, vitest_1.expect)(postRepository.toggleUserLikeForPost).not.toHaveBeenCalled();
-            (0, vitest_1.expect)(postRepository.removeUserLikeForPost).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(postRepository.likeUsersPostById).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(postRepository.dislikeUsersPostById).not.toHaveBeenCalled();
         });
         (0, vitest_1.test)("should throw an error if user not found", async () => {
-            const like = generate_data_util_1.default.createLike(existingPost.post_id, existingPost.user_id);
             userRepository.findUserById = vitest_1.vi.fn().mockResolvedValue(undefined);
             postRepository.findPostsByPostId = vitest_1.vi.fn();
             postRepository.isUserLikePost = vitest_1.vi.fn();
-            postRepository.toggleUserLikeForPost = vitest_1.vi.fn();
-            postRepository.removeUserLikeForPost = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(postService.toggleUserLikeForPost(like))
-                .rejects.toThrow(error.userNotFoundMsg);
-            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(like.user_id);
+            postRepository.likeUsersPostById = vitest_1.vi.fn();
+            postRepository.dislikeUsersPostById = vitest_1.vi.fn();
+            await (0, vitest_1.expect)(postService.toggleUserLikeForPost(notFoundUser.uuid, existingPost.uuid)).rejects.toThrow(error.userNotFoundMsg);
+            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.uuid);
             (0, vitest_1.expect)(postRepository.findPostsByPostId).not.toHaveBeenCalled();
             (0, vitest_1.expect)(postRepository.isUserLikePost).not.toHaveBeenCalled();
-            (0, vitest_1.expect)(postRepository.toggleUserLikeForPost).not.toHaveBeenCalled();
-            (0, vitest_1.expect)(postRepository.removeUserLikeForPost).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(postRepository.likeUsersPostById).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(postRepository.dislikeUsersPostById).not.toHaveBeenCalled();
         });
     });
 });

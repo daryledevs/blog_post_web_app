@@ -1,8 +1,11 @@
 import UserRepository                                        from "@/repositories/user/user.repository.impl";
 import FollowService                                         from "@/services/follow/follow.service.impl";
+import IEFollowService                                       from "@/services/follow/follow.service";
 import FollowRepository                                      from "@/repositories/follow/follow.repository.impl";
 import GenerateMockData                                      from "../../utils/generate-data.util";
+import IEUserRepository                                      from "@/repositories/user/user.repository";
 import ApiErrorException                                     from "@/exceptions/api.exception";
+import IEFollowRepository                                    from "@/repositories/follow/follow.repository";
 import { SelectFollowers, SelectUsers }                      from "@/types/table.types";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 
@@ -11,9 +14,9 @@ vi.mock("@/repositories/user/user.repository.impl");
 vi.mock("@/repositories/follow/follow.repository.impl");
 
 describe('FollowService', () => {
-  let userRepository:   UserRepository;
-  let followRepository: FollowRepository;
-  let followService:    FollowService;
+  let userRepository:   IEUserRepository;
+  let followRepository: IEFollowRepository;
+  let followService:    IEFollowService;
 
   const error = {
     noArgsMsg: ApiErrorException.HTTP400Error("No arguments provided"),
@@ -56,27 +59,27 @@ describe('FollowService', () => {
         .fn()
         .mockResolvedValue(existingUser);
 
-      followRepository.getFollowStats = vi
+      followRepository.findUserFollowStatsById = vi
         .fn()
         .mockResolvedValue({ followers: 1, following: 1 });
 
-      const result = await followService.getFollowStats(existingUser.user_id);
+      const result = await followService.getFollowStats(existingUser.uuid);
 
       expect(result).toStrictEqual({ followers: 1, following: 1 });
-      expect(userRepository.findUserById).toHaveBeenCalledWith(existingUser.user_id);
-      expect(followRepository.getFollowStats).toHaveBeenCalledWith(existingUser.user_id);
+      expect(userRepository.findUserById).toHaveBeenCalledWith(existingUser.uuid);
+      expect(followRepository.findUserFollowStatsById).toHaveBeenCalledWith(existingUser.id);
     });
 
     test("should throw an error when no args are provided", async () => {
       userRepository.findUserById = vi.fn();
-      followRepository.getFollowStats = vi.fn();
+      followRepository.findUserFollowStatsById = vi.fn();
 
       await expect(
         followService.getFollowStats(undefined as any)
       ).rejects.toThrow(error.noArgsMsg);
 
       expect(userRepository.findUserById).not.toHaveBeenCalled();
-      expect(followRepository.getFollowStats).not.toHaveBeenCalled();
+      expect(followRepository.findUserFollowStatsById).not.toHaveBeenCalled();
     });
 
     test("should throw an error when user is not found", async () => {
@@ -84,37 +87,37 @@ describe('FollowService', () => {
         .fn()
         .mockResolvedValue(null);
 
-      followRepository.getFollowStats = vi.fn();
+      followRepository.findUserFollowStatsById = vi.fn();
 
       await expect(
-        followService.getFollowStats(notFoundUser.user_id)
+        followService.getFollowStats(notFoundUser.uuid)
       ).rejects.toThrow(error.userNotFoundMsg);
 
-      expect(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
-      expect(followRepository.getFollowStats).not.toHaveBeenCalled();
+      expect(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.uuid);
+      expect(followRepository.findUserFollowStatsById).not.toHaveBeenCalled();
     });
   });
   
   describe("getFollowerFollowingLists (Get the followers and following lists)", () => {
     test("should return the correct result with followers", async () => {
       const expectedResult = followers.filter(
-        (f) => f.follower_id === existingUser.user_id
+        (f) => f.follower_id === existingUser.uuid
       );
       
       userRepository.findUserById = vi
         .fn()
         .mockResolvedValue(existingUser);
       
-      followRepository.getFollowersLists = vi
+      followRepository.findAllFollowersById = vi
         .fn()
         .mockResolvedValue(expectedResult);
 
-      followRepository.getFollowingLists = vi
+      followRepository.findAllFollowingById = vi
         .fn()
         .mockResolvedValue([]);
 
       const result = await followService.getFollowerFollowingLists(
-        existingUser.user_id,
+        existingUser.uuid,
         "followers",
         [0]
       );
@@ -123,58 +126,56 @@ describe('FollowService', () => {
       expect(Array.isArray(result)).toBeTruthy();
 
       expect(userRepository.findUserById)
-        .toHaveBeenCalledWith(existingUser.user_id);
+        .toHaveBeenCalledWith(existingUser.uuid);
 
-      expect(followRepository.getFollowersLists)
-        .toHaveBeenCalledWith(existingUser.user_id, [0]);
+      expect(followRepository.findAllFollowersById)
+        .toHaveBeenCalledWith(existingUser.id, [0]);
 
-      expect(followRepository.getFollowingLists).not.toHaveBeenCalled();
+      expect(followRepository.findAllFollowingById).not.toHaveBeenCalled();
     });
 
     test("should return the correct result with following", async () => {
       const expectedResult = following.filter(
-        (f) => f.followed_id === existingUser.user_id
+        (f) => f.followed_id === existingUser.uuid
       );
 
       userRepository.findUserById = vi
         .fn()
         .mockResolvedValue(existingUser);
 
-      followRepository.getFollowersLists = vi
-        .fn()
-        .mockResolvedValue([]);
+      followRepository.findAllFollowersById = vi.fn()
 
-      followRepository.getFollowingLists = vi
+      followRepository.findAllFollowingById = vi
         .fn()
         .mockResolvedValue(expectedResult);
       
       const result = await followService
-        .getFollowerFollowingLists(existingUser.user_id, "following", [0]);
+        .getFollowerFollowingLists(existingUser.uuid, "following", [0]);
 
       expect(result).toStrictEqual(expectedResult);
       expect(Array.isArray(result)).toBeTruthy();
 
       expect(userRepository.findUserById)
-        .toHaveBeenCalledWith(existingUser.user_id);
+        .toHaveBeenCalledWith(existingUser.uuid);
         
-      expect(followRepository.getFollowersLists).not.toHaveBeenCalled();
+      expect(followRepository.findAllFollowersById).not.toHaveBeenCalled();
 
-      expect(followRepository.getFollowingLists)
-        .toHaveBeenCalledWith(existingUser.user_id, [0]);
+      expect(followRepository.findAllFollowingById)
+        .toHaveBeenCalledWith(existingUser.id, [0]);
     });
 
     test("should throw an error when no args are provided", async () => {
       userRepository.findUserById = vi.fn();
-      followRepository.getFollowersLists = vi.fn();
-      followRepository.getFollowingLists = vi.fn();
+      followRepository.findAllFollowersById = vi.fn();
+      followRepository.findAllFollowingById = vi.fn();
       
       await expect(
         followService.getFollowerFollowingLists(undefined as any, "followers", [0])
       ).rejects.toThrow(error.noArgsMsg);
 
       expect(userRepository.findUserById).not.toHaveBeenCalled();
-      expect(followRepository.getFollowersLists).not.toHaveBeenCalled();
-      expect(followRepository.getFollowingLists).not.toHaveBeenCalled();
+      expect(followRepository.findAllFollowersById).not.toHaveBeenCalled();
+      expect(followRepository.findAllFollowingById).not.toHaveBeenCalled();
     });
 
     test("should throw an error when user is not found", async () => {
@@ -182,16 +183,16 @@ describe('FollowService', () => {
         .fn()
         .mockResolvedValue(null);
 
-      followRepository.getFollowersLists = vi.fn();
-      followRepository.getFollowingLists = vi.fn();
+      followRepository.findAllFollowersById = vi.fn();
+      followRepository.findAllFollowingById = vi.fn();
 
       await expect(
-        followService.getFollowerFollowingLists(notFoundUser.user_id, "following", [0])
+        followService.getFollowerFollowingLists(notFoundUser.uuid, "following", [0])
       ).rejects.toThrow(error.userNotFoundMsg);
 
-      expect(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
-      expect(followRepository.getFollowersLists).not.toHaveBeenCalled();
-      expect(followRepository.getFollowingLists).not.toHaveBeenCalled();
+      expect(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.uuid);
+      expect(followRepository.findAllFollowersById).not.toHaveBeenCalled();
+      expect(followRepository.findAllFollowingById).not.toHaveBeenCalled();
     });
 
     test("should throw an error when invalid fetch parameter", async () => {
@@ -199,24 +200,29 @@ describe('FollowService', () => {
         .fn()
         .mockResolvedValue(existingUser);
 
-      followRepository.getFollowersLists = vi.fn();
-      followRepository.getFollowingLists = vi.fn();
+      followRepository.findAllFollowersById = vi.fn();
+      followRepository.findAllFollowingById = vi.fn();
         
       await expect(
-        followService.getFollowerFollowingLists(existingUser.user_id, "invalid", [0])
+        followService.getFollowerFollowingLists(existingUser.uuid, "invalid", [0])
       ).rejects.toThrow(error.followFetch);
 
-      expect(userRepository.findUserById).toHaveBeenCalledWith(existingUser.user_id);
-      expect(followRepository.getFollowersLists).not.toHaveBeenCalled();
-      expect(followRepository.getFollowingLists).not.toHaveBeenCalled();
+      expect(userRepository.findUserById).toHaveBeenCalledWith(existingUser.uuid);
+      expect(followRepository.findAllFollowersById).not.toHaveBeenCalled();
+      expect(followRepository.findAllFollowingById).not.toHaveBeenCalled();
     });
   });
 
   describe("toggleFollow (User like and unlike the other user)", () => {
     test("should return the correct result", async () => {
-      const args = {
-        follower_id: existingUser.user_id,
-        followed_id: otherExistingUser.user_id,
+      const publicIds = {
+        follower_id: existingUser.uuid,
+        followed_id: otherExistingUser.uuid,
+      };
+
+      const privateIds = {
+        follower_id: existingUser.id,
+        followed_id: otherExistingUser.id,
       };
 
       userRepository.findUserById = vi
@@ -224,7 +230,7 @@ describe('FollowService', () => {
         .mockImplementationOnce(() => Promise.resolve(existingUser))
         .mockImplementationOnce(() => Promise.resolve(otherExistingUser));
 
-      followRepository.isFollowUser = vi
+      followRepository.isUserFollowing = vi
         .fn()
         .mockResolvedValue(false);
 
@@ -234,20 +240,27 @@ describe('FollowService', () => {
       
       followRepository.unfollowUser = vi.fn();
 
-      const result = await followService
-        .toggleFollow(args.follower_id, args.followed_id);
+      const result = await followService.toggleFollow(
+        publicIds.follower_id,
+        publicIds.followed_id
+      );
 
       expect(result).toBe("User followed successfully");
       expect(userRepository.findUserById).toHaveBeenCalledTimes(2);
-      expect(followRepository.isFollowUser).toHaveBeenCalledWith(args);
-      expect(followRepository.followUser).toHaveBeenCalledWith(args);
+      expect(followRepository.isUserFollowing).toHaveBeenCalledWith(privateIds);
+      expect(followRepository.followUser).toHaveBeenCalledWith(privateIds);
       expect(followRepository.unfollowUser).not.toHaveBeenCalled();
     });
 
     test("should return the correct result", async () => {
-      const args = {
-        follower_id: existingUser.user_id,
-        followed_id: otherExistingUser.user_id,
+      const publicIds = {
+        follower_id: existingUser.uuid,
+        followed_id: otherExistingUser.uuid,
+      };
+
+      const privateIds = {
+        follower_id: existingUser.id,
+        followed_id: otherExistingUser.id,
       };
       
       userRepository.findUserById = vi
@@ -255,7 +268,7 @@ describe('FollowService', () => {
         .mockImplementationOnce(() => Promise.resolve(existingUser))
         .mockImplementationOnce(() => Promise.resolve(otherExistingUser));
 
-      followRepository.isFollowUser = vi
+      followRepository.isUserFollowing = vi
         .fn()
         .mockResolvedValue(true);
 
@@ -265,24 +278,26 @@ describe('FollowService', () => {
         .fn()
         .mockResolvedValue("User unfollowed successfully");
 
-      const result = await followService
-        .toggleFollow(args.follower_id, args.followed_id);
+      const result = await followService.toggleFollow(
+        publicIds.follower_id,
+        publicIds.followed_id
+      );
 
       expect(result).toBe("User unfollowed successfully");
       expect(userRepository.findUserById).toHaveBeenCalledTimes(2);
-      expect(followRepository.isFollowUser).toHaveBeenCalledWith(args);
+      expect(followRepository.isUserFollowing).toHaveBeenCalledWith(privateIds);
       expect(followRepository.followUser).not.toHaveBeenCalled();
-      expect(followRepository.unfollowUser).toHaveBeenCalledWith(args);
+      expect(followRepository.unfollowUser).toHaveBeenCalledWith(privateIds);
     });
 
     test("should throw an error when no args are provided", async () => {
       const noArgs = {
         follower_id: undefined as any,
-        followed_id: otherExistingUser.user_id,
+        followed_id: otherExistingUser.uuid,
       };
 
       userRepository.findUserById = vi.fn();
-      followRepository.isFollowUser = vi.fn();
+      followRepository.isUserFollowing = vi.fn();
       followRepository.followUser = vi.fn();
       followRepository.unfollowUser = vi.fn();
       
@@ -291,22 +306,22 @@ describe('FollowService', () => {
       ).rejects.toThrow(error.noArgsMsg);
 
       expect(userRepository.findUserById).not.toHaveBeenCalled();
-      expect(followRepository.isFollowUser).not.toHaveBeenCalled();
+      expect(followRepository.isUserFollowing).not.toHaveBeenCalled();
       expect(followRepository.followUser).not.toHaveBeenCalled();
       expect(followRepository.unfollowUser).not.toHaveBeenCalled();
     });
 
     test("should throw an error when user is not found", async () => {
       const notFoundUserArgs = {
-        follower_id: notFoundUser.user_id,
-        followed_id: otherExistingUser.user_id,
+        follower_id: notFoundUser.uuid,
+        followed_id: otherExistingUser.uuid,
       };
 
       userRepository.findUserById = vi
         .fn()
         .mockResolvedValue(undefined);
 
-      followRepository.isFollowUser = vi.fn();
+      followRepository.isUserFollowing = vi.fn();
       followRepository.followUser = vi.fn();
       followRepository.unfollowUser = vi.fn();
 
@@ -320,18 +335,18 @@ describe('FollowService', () => {
       expect(userRepository.findUserById)
         .toHaveBeenCalledWith(notFoundUserArgs.follower_id);
 
-      expect(followRepository.isFollowUser).not.toHaveBeenCalled();
+      expect(followRepository.isUserFollowing).not.toHaveBeenCalled();
       expect(followRepository.followUser).not.toHaveBeenCalled();
       expect(followRepository.unfollowUser).not.toHaveBeenCalled();
     });
 
     test("should throw an error when the other is not found", async () => {
       const notFoundOtherUserArgs = {
-        follower_id: existingUser.user_id,
-        followed_id: notFoundUser.user_id,
+        follower_id: existingUser.uuid,
+        followed_id: notFoundUser.uuid,
       };
 
-      followRepository.isFollowUser = vi.fn();
+      followRepository.isUserFollowing = vi.fn();
       followRepository.followUser = vi.fn();
       followRepository.unfollowUser = vi.fn();
 
@@ -345,7 +360,7 @@ describe('FollowService', () => {
           notFoundOtherUserArgs.follower_id,
           notFoundOtherUserArgs.followed_id
         )
-      ).rejects.toThrow("The user to be followed doesn't exist");
+      ).rejects.toThrow("User not found");
 
       expect(userRepository.findUserById)
         .toHaveBeenCalledWith(notFoundOtherUserArgs.follower_id);
@@ -353,7 +368,7 @@ describe('FollowService', () => {
       expect(userRepository.findUserById)
         .toHaveBeenCalledWith(notFoundOtherUserArgs.followed_id);
 
-      expect(followRepository.isFollowUser).not.toHaveBeenCalled();
+      expect(followRepository.isUserFollowing).not.toHaveBeenCalled();
       expect(followRepository.followUser).not.toHaveBeenCalled();
       expect(followRepository.unfollowUser).not.toHaveBeenCalled();
     });

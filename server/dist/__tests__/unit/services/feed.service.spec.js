@@ -6,9 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const feed_service_impl_1 = __importDefault(require("@/services/feed/feed.service.impl"));
 const feed_repository_impl_1 = __importDefault(require("@/repositories/feed/feed.repository.impl"));
 const user_repository_impl_1 = __importDefault(require("@/repositories/user/user.repository.impl"));
+const generate_data_util_1 = __importDefault(require("../../utils/generate-data.util"));
 const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
 const vitest_1 = require("vitest");
-const generate_data_util_1 = __importDefault(require("../../utils/generate-data.util"));
 vitest_1.vi.mock("@/repositories/feed/feed.repository.impl");
 vitest_1.vi.mock("@/repositories/user/user.repository.impl");
 (0, vitest_1.describe)("FeedService", () => {
@@ -37,14 +37,14 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
         (0, vitest_1.test)("should return the correct result", async () => {
             userRepository.findUserById = vitest_1.vi.fn().mockResolvedValueOnce(existingUser);
             feedRepository.getUserFeed = vitest_1.vi.fn().mockResolvedValueOnce([]);
-            const userFeed = await feedService.getUserFeed(existingUser.user_id, [0]);
+            const userFeed = await feedService.getUserFeed(existingUser.uuid, [0]);
             (0, vitest_1.expect)(userFeed).toBeInstanceOf(Array);
             (0, vitest_1.expect)(userFeed).toStrictEqual([]);
             (0, vitest_1.expect)(userFeed).toHaveLength(0);
             (0, vitest_1.expect)(userRepository.findUserById)
-                .toHaveBeenCalledWith(existingUser.user_id);
+                .toHaveBeenCalledWith(existingUser.uuid);
             (0, vitest_1.expect)(feedRepository.getUserFeed)
-                .toHaveBeenCalledWith(existingUser.user_id, [0]);
+                .toHaveBeenCalledWith(existingUser.id, [0]);
         });
         (0, vitest_1.test)("should throw an error if no arguments are provided", async () => {
             userRepository.findUserById = vitest_1.vi.fn();
@@ -56,9 +56,9 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
         (0, vitest_1.test)("should throw an error if the user is not found", async () => {
             userRepository.findUserById = vitest_1.vi.fn().mockResolvedValueOnce(null);
             feedRepository.getUserFeed = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(feedService.getUserFeed(nonExistingUser.user_id, [])).rejects.toThrow(error.userNotFoundMsg);
+            await (0, vitest_1.expect)(feedService.getUserFeed(nonExistingUser.uuid, [])).rejects.toThrow(error.userNotFoundMsg);
             (0, vitest_1.expect)(userRepository.findUserById)
-                .toHaveBeenCalledWith(nonExistingUser.user_id);
+                .toHaveBeenCalledWith(nonExistingUser.uuid);
             (0, vitest_1.expect)(feedRepository.getUserFeed).not.toHaveBeenCalled();
         });
     });
@@ -66,14 +66,14 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
         (0, vitest_1.test)("should return the correct result", async () => {
             userRepository.findUserById = vitest_1.vi.fn().mockResolvedValueOnce(existingUser);
             feedRepository.getExploreFeed = vitest_1.vi.fn().mockResolvedValueOnce([]);
-            const exploreFeed = await feedService.getExploreFeed(existingUser.user_id);
+            const exploreFeed = await feedService.getExploreFeed(existingUser.uuid);
             (0, vitest_1.expect)(exploreFeed).toBeInstanceOf(Array);
             (0, vitest_1.expect)(exploreFeed).toStrictEqual([]);
             (0, vitest_1.expect)(exploreFeed).toHaveLength(0);
             (0, vitest_1.expect)(userRepository.findUserById)
-                .toHaveBeenCalledWith(existingUser.user_id);
+                .toHaveBeenCalledWith(existingUser.uuid);
             (0, vitest_1.expect)(feedRepository.getExploreFeed)
-                .toHaveBeenCalledWith(existingUser.user_id);
+                .toHaveBeenCalledWith(existingUser.id);
         });
         (0, vitest_1.test)("should throw an error if no arguments are provided", async () => {
             userRepository.findUserById = vitest_1.vi.fn();
@@ -85,9 +85,9 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
         (0, vitest_1.test)("should throw an error if the user is not found", async () => {
             userRepository.findUserById = vitest_1.vi.fn().mockResolvedValueOnce(null);
             feedRepository.getExploreFeed = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(feedService.getExploreFeed(nonExistingUser.user_id)).rejects.toThrow(error.userNotFoundMsg);
+            await (0, vitest_1.expect)(feedService.getExploreFeed(nonExistingUser.uuid)).rejects.toThrow(error.userNotFoundMsg);
             (0, vitest_1.expect)(userRepository.findUserById)
-                .toHaveBeenCalledWith(nonExistingUser.user_id);
+                .toHaveBeenCalledWith(nonExistingUser.uuid);
             (0, vitest_1.expect)(feedRepository.getExploreFeed).not.toHaveBeenCalled();
         });
     });

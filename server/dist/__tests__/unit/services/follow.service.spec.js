@@ -44,205 +44,209 @@ vitest_1.vi.mock("@/repositories/follow/follow.repository.impl");
             userRepository.findUserById = vitest_1.vi
                 .fn()
                 .mockResolvedValue(existingUser);
-            followRepository.getFollowStats = vitest_1.vi
+            followRepository.findUserFollowStatsById = vitest_1.vi
                 .fn()
                 .mockResolvedValue({ followers: 1, following: 1 });
-            const result = await followService.getFollowStats(existingUser.user_id);
+            const result = await followService.getFollowStats(existingUser.uuid);
             (0, vitest_1.expect)(result).toStrictEqual({ followers: 1, following: 1 });
-            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(existingUser.user_id);
-            (0, vitest_1.expect)(followRepository.getFollowStats).toHaveBeenCalledWith(existingUser.user_id);
+            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(existingUser.uuid);
+            (0, vitest_1.expect)(followRepository.findUserFollowStatsById).toHaveBeenCalledWith(existingUser.id);
         });
         (0, vitest_1.test)("should throw an error when no args are provided", async () => {
             userRepository.findUserById = vitest_1.vi.fn();
-            followRepository.getFollowStats = vitest_1.vi.fn();
+            followRepository.findUserFollowStatsById = vitest_1.vi.fn();
             await (0, vitest_1.expect)(followService.getFollowStats(undefined)).rejects.toThrow(error.noArgsMsg);
             (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
-            (0, vitest_1.expect)(followRepository.getFollowStats).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(followRepository.findUserFollowStatsById).not.toHaveBeenCalled();
         });
         (0, vitest_1.test)("should throw an error when user is not found", async () => {
             userRepository.findUserById = vitest_1.vi
                 .fn()
                 .mockResolvedValue(null);
-            followRepository.getFollowStats = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(followService.getFollowStats(notFoundUser.user_id)).rejects.toThrow(error.userNotFoundMsg);
-            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
-            (0, vitest_1.expect)(followRepository.getFollowStats).not.toHaveBeenCalled();
+            followRepository.findUserFollowStatsById = vitest_1.vi.fn();
+            await (0, vitest_1.expect)(followService.getFollowStats(notFoundUser.uuid)).rejects.toThrow(error.userNotFoundMsg);
+            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.uuid);
+            (0, vitest_1.expect)(followRepository.findUserFollowStatsById).not.toHaveBeenCalled();
         });
     });
     (0, vitest_1.describe)("getFollowerFollowingLists (Get the followers and following lists)", () => {
         (0, vitest_1.test)("should return the correct result with followers", async () => {
-            const expectedResult = followers.filter((f) => f.follower_id === existingUser.user_id);
+            const expectedResult = followers.filter((f) => f.follower_id === existingUser.uuid);
             userRepository.findUserById = vitest_1.vi
                 .fn()
                 .mockResolvedValue(existingUser);
-            followRepository.getFollowersLists = vitest_1.vi
+            followRepository.findAllFollowersById = vitest_1.vi
                 .fn()
                 .mockResolvedValue(expectedResult);
-            followRepository.getFollowingLists = vitest_1.vi
+            followRepository.findAllFollowingById = vitest_1.vi
                 .fn()
                 .mockResolvedValue([]);
-            const result = await followService.getFollowerFollowingLists(existingUser.user_id, "followers", [0]);
+            const result = await followService.getFollowerFollowingLists(existingUser.uuid, "followers", [0]);
             (0, vitest_1.expect)(result).toStrictEqual(expectedResult);
             (0, vitest_1.expect)(Array.isArray(result)).toBeTruthy();
             (0, vitest_1.expect)(userRepository.findUserById)
-                .toHaveBeenCalledWith(existingUser.user_id);
-            (0, vitest_1.expect)(followRepository.getFollowersLists)
-                .toHaveBeenCalledWith(existingUser.user_id, [0]);
-            (0, vitest_1.expect)(followRepository.getFollowingLists).not.toHaveBeenCalled();
+                .toHaveBeenCalledWith(existingUser.uuid);
+            (0, vitest_1.expect)(followRepository.findAllFollowersById)
+                .toHaveBeenCalledWith(existingUser.id, [0]);
+            (0, vitest_1.expect)(followRepository.findAllFollowingById).not.toHaveBeenCalled();
         });
         (0, vitest_1.test)("should return the correct result with following", async () => {
-            const expectedResult = following.filter((f) => f.followed_id === existingUser.user_id);
+            const expectedResult = following.filter((f) => f.followed_id === existingUser.uuid);
             userRepository.findUserById = vitest_1.vi
                 .fn()
                 .mockResolvedValue(existingUser);
-            followRepository.getFollowersLists = vitest_1.vi
-                .fn()
-                .mockResolvedValue([]);
-            followRepository.getFollowingLists = vitest_1.vi
+            followRepository.findAllFollowersById = vitest_1.vi.fn();
+            followRepository.findAllFollowingById = vitest_1.vi
                 .fn()
                 .mockResolvedValue(expectedResult);
             const result = await followService
-                .getFollowerFollowingLists(existingUser.user_id, "following", [0]);
+                .getFollowerFollowingLists(existingUser.uuid, "following", [0]);
             (0, vitest_1.expect)(result).toStrictEqual(expectedResult);
             (0, vitest_1.expect)(Array.isArray(result)).toBeTruthy();
             (0, vitest_1.expect)(userRepository.findUserById)
-                .toHaveBeenCalledWith(existingUser.user_id);
-            (0, vitest_1.expect)(followRepository.getFollowersLists).not.toHaveBeenCalled();
-            (0, vitest_1.expect)(followRepository.getFollowingLists)
-                .toHaveBeenCalledWith(existingUser.user_id, [0]);
+                .toHaveBeenCalledWith(existingUser.uuid);
+            (0, vitest_1.expect)(followRepository.findAllFollowersById).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(followRepository.findAllFollowingById)
+                .toHaveBeenCalledWith(existingUser.id, [0]);
         });
         (0, vitest_1.test)("should throw an error when no args are provided", async () => {
             userRepository.findUserById = vitest_1.vi.fn();
-            followRepository.getFollowersLists = vitest_1.vi.fn();
-            followRepository.getFollowingLists = vitest_1.vi.fn();
+            followRepository.findAllFollowersById = vitest_1.vi.fn();
+            followRepository.findAllFollowingById = vitest_1.vi.fn();
             await (0, vitest_1.expect)(followService.getFollowerFollowingLists(undefined, "followers", [0])).rejects.toThrow(error.noArgsMsg);
             (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
-            (0, vitest_1.expect)(followRepository.getFollowersLists).not.toHaveBeenCalled();
-            (0, vitest_1.expect)(followRepository.getFollowingLists).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(followRepository.findAllFollowersById).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(followRepository.findAllFollowingById).not.toHaveBeenCalled();
         });
         (0, vitest_1.test)("should throw an error when user is not found", async () => {
             userRepository.findUserById = vitest_1.vi
                 .fn()
                 .mockResolvedValue(null);
-            followRepository.getFollowersLists = vitest_1.vi.fn();
-            followRepository.getFollowingLists = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(followService.getFollowerFollowingLists(notFoundUser.user_id, "following", [0])).rejects.toThrow(error.userNotFoundMsg);
-            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.user_id);
-            (0, vitest_1.expect)(followRepository.getFollowersLists).not.toHaveBeenCalled();
-            (0, vitest_1.expect)(followRepository.getFollowingLists).not.toHaveBeenCalled();
+            followRepository.findAllFollowersById = vitest_1.vi.fn();
+            followRepository.findAllFollowingById = vitest_1.vi.fn();
+            await (0, vitest_1.expect)(followService.getFollowerFollowingLists(notFoundUser.uuid, "following", [0])).rejects.toThrow(error.userNotFoundMsg);
+            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.uuid);
+            (0, vitest_1.expect)(followRepository.findAllFollowersById).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(followRepository.findAllFollowingById).not.toHaveBeenCalled();
         });
         (0, vitest_1.test)("should throw an error when invalid fetch parameter", async () => {
             userRepository.findUserById = vitest_1.vi
                 .fn()
                 .mockResolvedValue(existingUser);
-            followRepository.getFollowersLists = vitest_1.vi.fn();
-            followRepository.getFollowingLists = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(followService.getFollowerFollowingLists(existingUser.user_id, "invalid", [0])).rejects.toThrow(error.followFetch);
-            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(existingUser.user_id);
-            (0, vitest_1.expect)(followRepository.getFollowersLists).not.toHaveBeenCalled();
-            (0, vitest_1.expect)(followRepository.getFollowingLists).not.toHaveBeenCalled();
+            followRepository.findAllFollowersById = vitest_1.vi.fn();
+            followRepository.findAllFollowingById = vitest_1.vi.fn();
+            await (0, vitest_1.expect)(followService.getFollowerFollowingLists(existingUser.uuid, "invalid", [0])).rejects.toThrow(error.followFetch);
+            (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledWith(existingUser.uuid);
+            (0, vitest_1.expect)(followRepository.findAllFollowersById).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(followRepository.findAllFollowingById).not.toHaveBeenCalled();
         });
     });
     (0, vitest_1.describe)("toggleFollow (User like and unlike the other user)", () => {
         (0, vitest_1.test)("should return the correct result", async () => {
-            const args = {
-                follower_id: existingUser.user_id,
-                followed_id: otherExistingUser.user_id,
+            const publicIds = {
+                follower_id: existingUser.uuid,
+                followed_id: otherExistingUser.uuid,
+            };
+            const privateIds = {
+                follower_id: existingUser.id,
+                followed_id: otherExistingUser.id,
             };
             userRepository.findUserById = vitest_1.vi
                 .fn()
                 .mockImplementationOnce(() => Promise.resolve(existingUser))
                 .mockImplementationOnce(() => Promise.resolve(otherExistingUser));
-            followRepository.isFollowUser = vitest_1.vi
+            followRepository.isUserFollowing = vitest_1.vi
                 .fn()
                 .mockResolvedValue(false);
             followRepository.followUser = vitest_1.vi
                 .fn()
                 .mockResolvedValue("User followed successfully");
             followRepository.unfollowUser = vitest_1.vi.fn();
-            const result = await followService
-                .toggleFollow(args.follower_id, args.followed_id);
+            const result = await followService.toggleFollow(publicIds.follower_id, publicIds.followed_id);
             (0, vitest_1.expect)(result).toBe("User followed successfully");
             (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledTimes(2);
-            (0, vitest_1.expect)(followRepository.isFollowUser).toHaveBeenCalledWith(args);
-            (0, vitest_1.expect)(followRepository.followUser).toHaveBeenCalledWith(args);
+            (0, vitest_1.expect)(followRepository.isUserFollowing).toHaveBeenCalledWith(privateIds);
+            (0, vitest_1.expect)(followRepository.followUser).toHaveBeenCalledWith(privateIds);
             (0, vitest_1.expect)(followRepository.unfollowUser).not.toHaveBeenCalled();
         });
         (0, vitest_1.test)("should return the correct result", async () => {
-            const args = {
-                follower_id: existingUser.user_id,
-                followed_id: otherExistingUser.user_id,
+            const publicIds = {
+                follower_id: existingUser.uuid,
+                followed_id: otherExistingUser.uuid,
+            };
+            const privateIds = {
+                follower_id: existingUser.id,
+                followed_id: otherExistingUser.id,
             };
             userRepository.findUserById = vitest_1.vi
                 .fn()
                 .mockImplementationOnce(() => Promise.resolve(existingUser))
                 .mockImplementationOnce(() => Promise.resolve(otherExistingUser));
-            followRepository.isFollowUser = vitest_1.vi
+            followRepository.isUserFollowing = vitest_1.vi
                 .fn()
                 .mockResolvedValue(true);
             followRepository.followUser = vitest_1.vi.fn();
             followRepository.unfollowUser = vitest_1.vi
                 .fn()
                 .mockResolvedValue("User unfollowed successfully");
-            const result = await followService
-                .toggleFollow(args.follower_id, args.followed_id);
+            const result = await followService.toggleFollow(publicIds.follower_id, publicIds.followed_id);
             (0, vitest_1.expect)(result).toBe("User unfollowed successfully");
             (0, vitest_1.expect)(userRepository.findUserById).toHaveBeenCalledTimes(2);
-            (0, vitest_1.expect)(followRepository.isFollowUser).toHaveBeenCalledWith(args);
+            (0, vitest_1.expect)(followRepository.isUserFollowing).toHaveBeenCalledWith(privateIds);
             (0, vitest_1.expect)(followRepository.followUser).not.toHaveBeenCalled();
-            (0, vitest_1.expect)(followRepository.unfollowUser).toHaveBeenCalledWith(args);
+            (0, vitest_1.expect)(followRepository.unfollowUser).toHaveBeenCalledWith(privateIds);
         });
         (0, vitest_1.test)("should throw an error when no args are provided", async () => {
             const noArgs = {
                 follower_id: undefined,
-                followed_id: otherExistingUser.user_id,
+                followed_id: otherExistingUser.uuid,
             };
             userRepository.findUserById = vitest_1.vi.fn();
-            followRepository.isFollowUser = vitest_1.vi.fn();
+            followRepository.isUserFollowing = vitest_1.vi.fn();
             followRepository.followUser = vitest_1.vi.fn();
             followRepository.unfollowUser = vitest_1.vi.fn();
             await (0, vitest_1.expect)(followService.toggleFollow(noArgs.follower_id, noArgs.followed_id)).rejects.toThrow(error.noArgsMsg);
             (0, vitest_1.expect)(userRepository.findUserById).not.toHaveBeenCalled();
-            (0, vitest_1.expect)(followRepository.isFollowUser).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(followRepository.isUserFollowing).not.toHaveBeenCalled();
             (0, vitest_1.expect)(followRepository.followUser).not.toHaveBeenCalled();
             (0, vitest_1.expect)(followRepository.unfollowUser).not.toHaveBeenCalled();
         });
         (0, vitest_1.test)("should throw an error when user is not found", async () => {
             const notFoundUserArgs = {
-                follower_id: notFoundUser.user_id,
-                followed_id: otherExistingUser.user_id,
+                follower_id: notFoundUser.uuid,
+                followed_id: otherExistingUser.uuid,
             };
             userRepository.findUserById = vitest_1.vi
                 .fn()
                 .mockResolvedValue(undefined);
-            followRepository.isFollowUser = vitest_1.vi.fn();
+            followRepository.isUserFollowing = vitest_1.vi.fn();
             followRepository.followUser = vitest_1.vi.fn();
             followRepository.unfollowUser = vitest_1.vi.fn();
             await (0, vitest_1.expect)(followService.toggleFollow(notFoundUserArgs.follower_id, notFoundUserArgs.followed_id)).rejects.toThrow(error.userNotFoundMsg);
             (0, vitest_1.expect)(userRepository.findUserById)
                 .toHaveBeenCalledWith(notFoundUserArgs.follower_id);
-            (0, vitest_1.expect)(followRepository.isFollowUser).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(followRepository.isUserFollowing).not.toHaveBeenCalled();
             (0, vitest_1.expect)(followRepository.followUser).not.toHaveBeenCalled();
             (0, vitest_1.expect)(followRepository.unfollowUser).not.toHaveBeenCalled();
         });
         (0, vitest_1.test)("should throw an error when the other is not found", async () => {
             const notFoundOtherUserArgs = {
-                follower_id: existingUser.user_id,
-                followed_id: notFoundUser.user_id,
+                follower_id: existingUser.uuid,
+                followed_id: notFoundUser.uuid,
             };
-            followRepository.isFollowUser = vitest_1.vi.fn();
+            followRepository.isUserFollowing = vitest_1.vi.fn();
             followRepository.followUser = vitest_1.vi.fn();
             followRepository.unfollowUser = vitest_1.vi.fn();
             userRepository.findUserById = vitest_1.vi
                 .fn()
                 .mockImplementationOnce(() => Promise.resolve(existingUser))
                 .mockImplementationOnce(() => Promise.resolve(undefined));
-            await (0, vitest_1.expect)(followService.toggleFollow(notFoundOtherUserArgs.follower_id, notFoundOtherUserArgs.followed_id)).rejects.toThrow("The user to be followed doesn't exist");
+            await (0, vitest_1.expect)(followService.toggleFollow(notFoundOtherUserArgs.follower_id, notFoundOtherUserArgs.followed_id)).rejects.toThrow("User not found");
             (0, vitest_1.expect)(userRepository.findUserById)
                 .toHaveBeenCalledWith(notFoundOtherUserArgs.follower_id);
             (0, vitest_1.expect)(userRepository.findUserById)
                 .toHaveBeenCalledWith(notFoundOtherUserArgs.followed_id);
-            (0, vitest_1.expect)(followRepository.isFollowUser).not.toHaveBeenCalled();
+            (0, vitest_1.expect)(followRepository.isUserFollowing).not.toHaveBeenCalled();
             (0, vitest_1.expect)(followRepository.followUser).not.toHaveBeenCalled();
             (0, vitest_1.expect)(followRepository.unfollowUser).not.toHaveBeenCalled();
         });

@@ -1,19 +1,23 @@
 import UserRepository                                        from "@/repositories/user/user.repository.impl";
 import GenerateMockData                                      from "../../utils/generate-data.util";
+import IEUserRepository                                      from "@/repositories/user/user.repository";
 import ApiErrorException                                     from "@/exceptions/api.exception";
-import RecentSearchService                                   from "@/services/recent-search/recent-search.service.impl";
-import RecentSearchRepository                                from "@/repositories/recent-search/recent-search.repository.impl";
+import SearchHistoryService                                  from "@/services/search-history/search-history.service.impl";
+import IESearchHistoryService                                from "@/services/search-history/search-history.service";
+import SearchHistoryRepository                               from "@/repositories/search-history/search-history.repository.impl";
+import IESearchHistoryRepository                             from "@/repositories/search-history/search-history.repository";
 import { SelectSearches, SelectUsers }                       from "@/types/table.types";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 
+
 vi.mock("@/repositories/user/user.repository.impl");
 
-vi.mock("@/repositories/recent-search/recent-search.repository.impl");
+vi.mock("@/repositories/search-history/search-history.repository.impl");
 
-describe("RecentSearchService", () => {
-  let userRepository: UserRepository;
-  let recentSearchRepository: RecentSearchRepository;
-  let recentSearchService: RecentSearchService;
+describe("SearchHistoryService", () => {
+  let userRepository:          IEUserRepository;
+  let searchHistoryRepository: IESearchHistoryRepository;
+  let searchHistoryService:    IESearchHistoryService;
 
   const error = {
     noArgsMsg: ApiErrorException.HTTP400Error("No arguments provided"),
@@ -28,6 +32,7 @@ describe("RecentSearchService", () => {
   let users: SelectUsers[] = GenerateMockData.createUserList(10);
   const notFoundUser = GenerateMockData.createUser();
   const existingUser = users[0]!;
+  const otherExistingUser = users[1]!;
 
   // Create a mock of the recent searches
   let recentSearches: SelectSearches[] = GenerateMockData.generateMockData(
@@ -38,17 +43,17 @@ describe("RecentSearchService", () => {
   const existingSearch = recentSearches[0]!;
 
   const notFoundSearch = GenerateMockData.createRecentSearch(
-    notFoundUser.user_id,
-    notFoundUser.user_id
+    notFoundUser.id,
+    notFoundUser.id
   );
 
   beforeEach(() => {
     userRepository = new UserRepository();
-    recentSearchRepository = new RecentSearchRepository();
+    searchHistoryRepository = new SearchHistoryRepository();
 
-    recentSearchService = new RecentSearchService(
+    searchHistoryService = new SearchHistoryService(
       userRepository,
-      recentSearchRepository
+      searchHistoryRepository
     );
   });
 
@@ -60,46 +65,46 @@ describe("RecentSearchService", () => {
     vi.restoreAllMocks();
   });
 
-  describe("getAllRecentSearches (Get all the recent searches)", () => {
+  describe("getUsersSearchHistoryById (Get all the recent searches)", () => {
     test("should return the correct result", async () => {
       const expectedResult = recentSearches.filter(
-        (r) => r.user_id === existingUser.user_id
+        (r) => r.uuid === existingUser.uuid
       );
 
       userRepository.findUserById = vi
         .fn()
         .mockResolvedValue(existingUser);
 
-      recentSearchRepository.getRecentSearches = vi
+      searchHistoryRepository.findSearchHistoryById = vi
         .fn()
         .mockResolvedValue(expectedResult);
 
-      const result = await recentSearchService
-        .getAllRecentSearches(existingUser.user_id);
+      const result = await searchHistoryService
+        .getUsersSearchHistoryById(existingUser.uuid);
 
       expect(result).toStrictEqual(expectedResult);
       expect(Array.isArray(result)).toBe(true);
       expect(result).toHaveLength(expectedResult.length);
 
       expect(userRepository.findUserById)
-        .toHaveBeenCalledWith(existingUser.user_id);
+        .toHaveBeenCalledWith(existingUser.uuid);
 
-      expect(recentSearchRepository.getRecentSearches)
-        .toHaveBeenCalledWith(existingUser.user_id);
+      expect(searchHistoryRepository.findSearchHistoryById)
+        .toHaveBeenCalledWith(existingUser.id);
     });
 
     test("should throw an error when no args are provided", async () => {
       userRepository.findUserById = vi.fn();
-      recentSearchRepository.getRecentSearches = vi.fn();
+      searchHistoryRepository.findSearchHistoryById = vi.fn();
 
       await expect(
-        recentSearchService.getAllRecentSearches(undefined as any)
+        searchHistoryService.getUsersSearchHistoryById(undefined as any)
       ).rejects.toThrow(error.noArgsMsg);
 
       expect(userRepository.findUserById)
         .not.toHaveBeenCalled();
 
-      expect(recentSearchRepository.getRecentSearches)
+      expect(searchHistoryRepository.findSearchHistoryById)
         .not.toHaveBeenCalled();
     });
 
@@ -108,21 +113,21 @@ describe("RecentSearchService", () => {
         .fn()
         .mockResolvedValue(undefined);
 
-      recentSearchRepository.getRecentSearches = vi.fn();
+      searchHistoryRepository.findSearchHistoryById = vi.fn();
 
       await expect(
-        recentSearchService.getAllRecentSearches(notFoundUser.user_id)
+        searchHistoryService.getUsersSearchHistoryById(notFoundUser.uuid)
       ).rejects.toThrow(error.userNotFoundMsg);
 
       expect(userRepository.findUserById)
-        .toHaveBeenCalledWith(notFoundUser.user_id);
+        .toHaveBeenCalledWith(notFoundUser.uuid);
 
-      expect(recentSearchRepository.getRecentSearches)
+      expect(searchHistoryRepository.findSearchHistoryById)
         .not.toHaveBeenCalled();
     });
   });
 
-  describe("saveRecentSearches (Save the recent searches)", () => {
+  describe("saveUsersSearch (Save the recent searches)", () => {
     test("should return the correct result", async () => {
       userRepository.findUserById = vi
         .fn()
@@ -132,75 +137,73 @@ describe("RecentSearchService", () => {
         .fn()
         .mockResolvedValue(newSearch);
 
-      recentSearchRepository.findUsersSearchByUserId = vi
+      searchHistoryRepository.findUsersSearchByUsersId = vi
         .fn()
         .mockResolvedValue(null);
 
-      recentSearchRepository.saveRecentSearches = vi
+      searchHistoryRepository.saveUsersSearch = vi
         .fn()
         .mockResolvedValue("Search user saved successfully");
 
-      const result = await recentSearchService
-        .saveRecentSearches(existingUser.user_id, newSearch.user_id);
+      const result = await searchHistoryService.saveUsersSearch(
+        existingUser.uuid,
+        newSearch.uuid
+      );
 
       expect(result).toBe("Search user saved successfully");
 
       expect(userRepository.findUserById)
-        .toHaveBeenCalledWith(existingUser.user_id);
+        .toHaveBeenCalledWith(existingUser.uuid);
 
       expect(userRepository.findUserById)
-        .toHaveBeenCalledWith(newSearch.user_id);
+        .toHaveBeenCalledWith(newSearch.uuid);
     });
     
     test("should return the correct result when search user is already saved", async () => {
       userRepository.findUserById = vi
         .fn()
         .mockImplementationOnce(() => Promise.resolve(existingUser))
-        .mockImplementationOnce(() => Promise.resolve(existingUser));
+        .mockImplementationOnce(() => Promise.resolve(otherExistingUser));
 
-      recentSearchRepository.findUsersSearchByUserId = vi
+      searchHistoryRepository.findUsersSearchByUsersId = vi
         .fn()
         .mockResolvedValue(existingSearch);
 
-      recentSearchRepository.saveRecentSearches = vi.fn();
+      searchHistoryRepository.saveUsersSearch = vi.fn();
 
-      const result = await recentSearchService.saveRecentSearches(
-        existingSearch?.user_id,
-        existingSearch?.search_user_id
+      const result = await searchHistoryService.saveUsersSearch(
+        existingUser?.uuid,
+        otherExistingUser?.uuid
       );
 
       expect(result).equal("Search user already saved");
 
-      expect(userRepository.findUserById)
-        .toHaveBeenCalledWith(existingSearch?.user_id);
-
-      expect(userRepository.findUserById)
-        .toHaveBeenCalledWith(existingSearch?.search_user_id);
+      expect(userRepository.findUserById).toHaveBeenCalledTimes(2);
 
       expect(
-        recentSearchRepository.findUsersSearchByUserId
+        searchHistoryRepository.findUsersSearchByUsersId
       ).toHaveBeenCalledWith(
-        existingSearch?.user_id,
-        existingSearch?.search_user_id
+        existingSearch?.searcher_id,
+        existingSearch?.searched_id
       );
 
-      expect(recentSearchRepository.saveRecentSearches)
+      expect(searchHistoryRepository.saveUsersSearch)
         .not.toHaveBeenCalled();
     });
 
     test("should throw an error when no args are provided", async () => {
       userRepository.findUserById = vi.fn();
-      recentSearchRepository.saveRecentSearches = vi.fn();
+      searchHistoryRepository.saveUsersSearch = vi.fn();
 
       await expect(
-        recentSearchService.saveRecentSearches(
+        searchHistoryService.saveUsersSearch(
           undefined as any,
-          existingUser.user_id
+          existingUser.uuid
         )
       ).rejects.toThrow(error.noArgsMsg);
 
       expect(userRepository.findUserById).not.toHaveBeenCalled();
-      expect(recentSearchRepository.saveRecentSearches).not.toHaveBeenCalled();
+      expect(searchHistoryRepository.saveUsersSearch).not.toHaveBeenCalled();
     });
 
     test("should throw an error when user is not found", async () => {
@@ -208,19 +211,19 @@ describe("RecentSearchService", () => {
         .fn()
         .mockResolvedValue(undefined);
 
-      recentSearchRepository.saveRecentSearches = vi.fn();
+      searchHistoryRepository.saveUsersSearch = vi.fn();
 
       await expect(
-        recentSearchService.saveRecentSearches(
-          notFoundUser.user_id,
-          existingUser.user_id
+        searchHistoryService.saveUsersSearch(
+          notFoundUser.uuid,
+          existingUser.uuid
         )
       ).rejects.toThrow(error.userNotFoundMsg);
 
       expect(userRepository.findUserById)
-        .toHaveBeenCalledWith(notFoundUser.user_id);
+        .toHaveBeenCalledWith(notFoundUser.uuid);
 
-      expect(recentSearchRepository.saveRecentSearches)
+      expect(searchHistoryRepository.saveUsersSearch)
         .not.toHaveBeenCalled();
     });
 
@@ -230,75 +233,76 @@ describe("RecentSearchService", () => {
         .mockImplementationOnce(() => Promise.resolve(existingUser))
         .mockImplementationOnce(() => Promise.resolve(undefined));
         
-      recentSearchRepository.saveRecentSearches = vi.fn();
+      searchHistoryRepository.saveUsersSearch = vi.fn();
 
       await expect(
-        recentSearchService.saveRecentSearches(
-          existingSearch?.user_id,
-          notFoundSearch.search_user_id
+        searchHistoryService.saveUsersSearch(
+          existingSearch?.uuid,
+          notFoundSearch.uuid
         )
       ).rejects.toThrow(error.searchUserNotFound);
 
       expect(userRepository.findUserById)
-        .toHaveBeenCalledWith(existingSearch?.user_id);
+        .toHaveBeenCalledWith(existingSearch?.uuid);
 
-      expect(userRepository.findUserById)
-        .toHaveBeenCalledWith(notFoundSearch.search_user_id);
+      expect(userRepository.findUserById).toHaveBeenCalledWith(
+        notFoundSearch.uuid
+      );
 
-      expect(recentSearchRepository.saveRecentSearches).not.toHaveBeenCalled();
+      expect(searchHistoryRepository.saveUsersSearch).not.toHaveBeenCalled();
     });
   });
 
-  describe("removeRecentSearches (Remove the recent searches)", () => {
+  describe("removeRecentSearchesById (Remove the recent searches)", () => {
     test("should return the correct result", async () => {
-      recentSearchRepository.findUsersSearchByRecentId = vi
+      searchHistoryRepository.findUsersSearchById = vi
         .fn()
         .mockResolvedValue(existingSearch);
 
-      recentSearchRepository.deleteRecentSearches = vi.fn();
+      searchHistoryRepository.deleteUsersSearchById = vi.fn();
 
-      const result = await recentSearchService
-        .removeRecentSearches(existingSearch.recent_id);
+      const result = await searchHistoryService
+        .removeRecentSearchesById(existingSearch.uuid);
 
       expect(result).toBe("Search user deleted successfully");
 
-      expect(recentSearchRepository.findUsersSearchByRecentId)
-        .toHaveBeenCalledWith(existingSearch.recent_id);
+      expect(searchHistoryRepository.findUsersSearchById)
+        .toHaveBeenCalledWith(existingSearch.uuid);
 
-      expect(recentSearchRepository.deleteRecentSearches)
-        .toHaveBeenCalledWith(existingSearch.recent_id);
+      expect(searchHistoryRepository.deleteUsersSearchById)
+        .toHaveBeenCalledWith(existingSearch.id);
     });
 
     test("should throw an error when no args are provided", async () => {
-      recentSearchRepository.findUsersSearchByRecentId = vi.fn();
-      recentSearchRepository.deleteRecentSearches = vi.fn();
+      searchHistoryRepository.findUsersSearchById = vi.fn();
+      searchHistoryRepository.deleteUsersSearchById = vi.fn();
 
       await expect(
-        recentSearchService.removeRecentSearches(undefined as any)
+        searchHistoryService.removeRecentSearchesById(undefined as any)
       ).rejects.toThrow(error.noArgsMsg);
 
-      expect(recentSearchRepository.findUsersSearchByRecentId)
+      expect(searchHistoryRepository.findUsersSearchById)
         .not.toHaveBeenCalled();
 
-      expect(recentSearchRepository.deleteRecentSearches)
+      expect(searchHistoryRepository.deleteUsersSearchById)
         .not.toHaveBeenCalled();
     });
 
     test("should throw an error when user is not found", async () => {
-      recentSearchRepository.findUsersSearchByRecentId = vi
+      searchHistoryRepository.findUsersSearchById = vi
         .fn()
         .mockResolvedValue(undefined);
         
-      recentSearchRepository.deleteRecentSearches = vi.fn();
+      searchHistoryRepository.deleteUsersSearchById = vi.fn();
       
       await expect(
-        recentSearchService.removeRecentSearches(notFoundSearch.user_id)
+        searchHistoryService.removeRecentSearchesById(notFoundSearch.uuid)
       ).rejects.toThrow(error.recentSearchNotFound);
 
-      expect(recentSearchRepository.findUsersSearchByRecentId)
-        .toHaveBeenCalledWith(notFoundSearch.user_id);
+      expect(searchHistoryRepository.findUsersSearchById)
+        .toHaveBeenCalledWith(notFoundSearch.uuid);
 
-      expect(recentSearchRepository.deleteRecentSearches)
+      expect(searchHistoryRepository.deleteUsersSearchById)
         .not.toHaveBeenCalled();
     });
   });

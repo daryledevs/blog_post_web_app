@@ -1,5 +1,9 @@
 import {
+  SelectChatMembers,
+  SelectConversations,
   SelectFollowers,
+  SelectLikes,
+  SelectMessages,
   SelectPosts,
   SelectSearches,
   SelectUsers,
@@ -10,22 +14,21 @@ class GenerateMockData {
   static generateMockData = (
     changeArg: boolean,
     list: any[],
-    callback: Function,
+    callback: Function
   ) => {
     return list.flatMap((u, i) => {
       let nextUser = list[i + 1];
-      let nextUserId = nextUser ? nextUser.user_id : u.user_id;
+      let nextUserId = nextUser ? nextUser.id : u.id;
 
-      const args = changeArg
-        ? [nextUserId, u.user_id]
-        : [u.user_id, nextUserId];
+      const args = changeArg ? [nextUserId, u.id] : [u.id, nextUserId];
 
       return callback(args[0], args[1]);
     });
   };
 
   static createUser = (): SelectUsers => ({
-    user_id: faker.number.int({ min: 1, max: 1000 }),
+    id: faker.number.int({ min: 1, max: 999 }),
+    uuid: faker.string.uuid(),
     username: faker.internet.userName(),
     email: faker.internet.email(),
     password: faker.internet.password(),
@@ -52,17 +55,19 @@ class GenerateMockData {
   });
 
   static createRecentSearch = (
-    user_id: number,
-    search_user_id: number
+    searcher_id: number,
+    searched_id: number
   ): SelectSearches => ({
-    recent_id: faker.number.int({ min: 1, max: 1000 }),
-    user_id: user_id,
-    search_user_id: search_user_id,
+    id: faker.number.int({ min: 1, max: 1000 }),
+    uuid: faker.string.uuid(),
+    searcher_id: searcher_id,
+    searched_id: searched_id,
     created_at: new Date(faker.date.past().toISOString()),
   });
 
   static createPost = (user_id: number): SelectPosts => ({
-    post_id: faker.number.int({ min: 1, max: 999 }),
+    id: faker.number.int({ min: 1, max: 999 }),
+    uuid: faker.string.uuid(),
     image_id: faker.string.uuid(),
     image_url: faker.image.url(),
     user_id: user_id,
@@ -71,28 +76,41 @@ class GenerateMockData {
     created_at: new Date(faker.date.past().toISOString()),
   });
 
-  static createLike = (post_id: number, user_id: number): any => ({
+  static createLike = (user_id: number, post_id: number): SelectLikes => ({
+    id: faker.number.int({ min: 1, max: 999 }),
+    uuid: faker.string.uuid(),
+    user_id: user_id,
     post_id: post_id,
+    created_at: new Date(faker.date.past().toISOString()),
+  });
+
+  static createConversation = (): SelectConversations => ({
+    id: faker.number.int({ min: 1, max: 1000 }),
+    uuid: faker.string.uuid(),
+    created_at: new Date(faker.date.past().toISOString()),
+  });
+
+  static createConversationMembers = (
+    user_id: number,
+    conversation_id: number,
+  ): SelectChatMembers => ({
+    id: faker.number.int({ min: 1, max: 1000 }),
+    uuid: faker.string.uuid(),
     user_id: user_id,
-    created_at: new Date(faker.date.past().toISOString()),
-  });
-
-  static createConversation = (
-    user_one_id: number,
-    user_two_id: number
-  ): any => ({
-    conversation_id: faker.number.int({ min: 1, max: 1000 }),
-    user_one_id: user_one_id,
-    user_two_id: user_two_id,
-    created_at: new Date(faker.date.past().toISOString()),
-  });
-
-  static createMessage = (conversation_id: number, user_id: number): any => ({
-    message_id: faker.number.int({ min: 1, max: 1000 }),
     conversation_id: conversation_id,
-    user_id: user_id,
-    message: faker.lorem.text(),
-    created_at: new Date(faker.date.past().toISOString()),
+    joined_at: new Date(faker.date.past().toISOString()),
+  });
+
+  static createMessage = (
+    user_id: number,
+    conversation_id: number,
+  ): SelectMessages => ({
+    id: faker.number.int({ min: 1, max: 1000 }),
+    uuid: faker.string.uuid(),
+    sender_id: user_id,
+    conversation_id: conversation_id,
+    text_message: faker.lorem.text(),
+    time_sent: new Date(faker.date.past().toISOString()),
   });
 };
 

@@ -1,6 +1,8 @@
 import UserService                                           from "@/services/user/user.service.impl";
+import IEUserService                                         from "@/services/user/user.service";
 import UserRepository                                        from "@/repositories/user/user.repository.impl";
 import { SelectUsers }                                       from "@/types/table.types";
+import IEUserRepository                                      from "@/repositories/user/user.repository";
 import GenerateMockData                                      from "../../utils/generate-data.util";
 import ApiErrorException                                     from "@/exceptions/api.exception";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
@@ -8,8 +10,8 @@ import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 vi.mock("@/repositories/user/user.repository.impl");
 
 describe("UserService", () => {
-  let userService: UserService;
-  let userRepository: UserRepository;
+  let userService:    IEUserService;
+  let userRepository: IEUserRepository;
 
   const error = {
     noArgsMsg: ApiErrorException.HTTP400Error("No arguments provided"),
@@ -40,11 +42,11 @@ describe("UserService", () => {
         .fn()
         .mockResolvedValue(existingUser);
 
-      const result = await userService.getUserById(existingUser.user_id);
+      const result = await userService.getUserById(existingUser.uuid);
 
       expect(result).toBe(existingUser);
       expect(userRepository.findUserById)
-        .toHaveBeenCalledWith(existingUser.user_id);
+        .toHaveBeenCalledWith(existingUser.uuid);
     });
 
     test("should throw an error when no args are provided", async () => {
@@ -63,11 +65,11 @@ describe("UserService", () => {
         .mockResolvedValue(undefined)
 
       await expect(
-        userService.getUserById(notFoundUser.user_id)
+        userService.getUserById(notFoundUser.uuid)
       ).rejects.toThrow(error.userNotFoundMsg);
 
       expect(userRepository.findUserById)
-        .toHaveBeenCalledWith(notFoundUser.user_id);
+        .toHaveBeenCalledWith(notFoundUser.uuid);
     });
   });
 
@@ -146,28 +148,28 @@ describe("UserService", () => {
   describe("updateUser (Update user's data)", () => {
     test("should return the correct result", async () => {
       userRepository.findUserById = vi.fn().mockResolvedValue(existingUser);
-      userRepository.updateUser = vi.fn().mockResolvedValue(existingUser);
+      userRepository.updateUserById = vi.fn().mockResolvedValue(existingUser);
       
-      const result = await userService.updateUser(
-        existingUser.user_id,
+      const result = await userService.updateUserById(
+        existingUser.uuid,
         existingUser
       );
 
       expect(result).toStrictEqual(existingUser);
       expect(userRepository.findUserById)
-        .toHaveBeenCalledWith(existingUser.user_id);
+        .toHaveBeenCalledWith(existingUser.uuid);
     });
 
     test("should throw an error when no args are provided", async () => {
       userRepository.findUserById = vi.fn();
-      userRepository.updateUser = vi.fn();
+      userRepository.updateUserById = vi.fn();
 
       await expect(
-        userService.updateUser(undefined as any, existingUser)
+        userService.updateUserById(undefined as any, existingUser)
       ).rejects.toThrow(error.noArgsMsg);
 
       expect(userRepository.findUserById).not.toHaveBeenCalled();
-      expect(userRepository.updateUser).not.toHaveBeenCalled();
+      expect(userRepository.updateUserById).not.toHaveBeenCalled();
     });
 
     test("should throw an error when user is not found", async () => {
@@ -175,16 +177,16 @@ describe("UserService", () => {
         .fn()
         .mockResolvedValue(undefined);
       
-      userRepository.updateUser = vi.fn();
+      userRepository.updateUserById = vi.fn();
 
       await expect(
-        userService.updateUser(notFoundUser.user_id, notFoundUser)
+        userService.updateUserById(notFoundUser.uuid, notFoundUser)
       ).rejects.toThrow(error.userNotFoundMsg);
 
       expect(userRepository.findUserById)
-        .toHaveBeenCalledWith(notFoundUser.user_id);
+        .toHaveBeenCalledWith(notFoundUser.uuid);
 
-      expect(userRepository.updateUser).not.toHaveBeenCalled();
+      expect(userRepository.updateUserById).not.toHaveBeenCalled();
     });
   });
 
@@ -194,28 +196,28 @@ describe("UserService", () => {
         .fn()
         .mockResolvedValue(existingUser);
 
-      userRepository.deleteUser = vi.fn();
+      userRepository.deleteUserById = vi.fn();
 
-      const result = await userService.deleteUserById(existingUser.user_id);
+      const result = await userService.deleteUserById(existingUser.uuid);
 
       expect(result).toBe("User deleted successfully");
       expect(userRepository.findUserById)
-        .toHaveBeenCalledWith(existingUser.user_id);
+        .toHaveBeenCalledWith(existingUser.uuid);
 
-      expect(userRepository.deleteUser)
-        .toHaveBeenCalledWith(existingUser.user_id);
+      expect(userRepository.deleteUserById)
+        .toHaveBeenCalledWith(existingUser.uuid);
     });
 
     test("should throw an error when no args are provided", async () => {
       userRepository.findUserById = vi.fn();
-      userRepository.deleteUser = vi.fn();
+      userRepository.deleteUserById = vi.fn();
 
       await expect(
         userService.deleteUserById(undefined as any)
       ).rejects.toThrow(error.noArgsMsg);
 
       expect(userRepository.findUserById).not.toHaveBeenCalled();
-      expect(userRepository.deleteUser).not.toHaveBeenCalled();
+      expect(userRepository.deleteUserById).not.toHaveBeenCalled();
     });
 
     test("should throw an error when user is not found", async () => {
@@ -223,16 +225,16 @@ describe("UserService", () => {
         .fn()
         .mockResolvedValue(undefined);
 
-      userRepository.deleteUser = vi.fn();
+      userRepository.deleteUserById = vi.fn();
 
       await expect(
-        userService.deleteUserById(notFoundUser.user_id)
+        userService.deleteUserById(notFoundUser.uuid)
       ).rejects.toThrow(error.userNotFoundMsg);
 
       expect(userRepository.findUserById)
-        .toHaveBeenCalledWith(notFoundUser.user_id);
+        .toHaveBeenCalledWith(notFoundUser.uuid);
 
-      expect(userRepository.deleteUser).not.toHaveBeenCalled();
+      expect(userRepository.deleteUserById).not.toHaveBeenCalled();
     });
   });
 

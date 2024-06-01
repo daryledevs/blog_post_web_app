@@ -5,15 +5,14 @@ class GenerateMockData {
     static generateMockData = (changeArg, list, callback) => {
         return list.flatMap((u, i) => {
             let nextUser = list[i + 1];
-            let nextUserId = nextUser ? nextUser.user_id : u.user_id;
-            const args = changeArg
-                ? [nextUserId, u.user_id]
-                : [u.user_id, nextUserId];
+            let nextUserId = nextUser ? nextUser.id : u.id;
+            const args = changeArg ? [nextUserId, u.id] : [u.id, nextUserId];
             return callback(args[0], args[1]);
         });
     };
     static createUser = () => ({
-        user_id: faker_1.faker.number.int({ min: 1, max: 1000 }),
+        id: faker_1.faker.number.int({ min: 1, max: 999 }),
+        uuid: faker_1.faker.string.uuid(),
         username: faker_1.faker.internet.userName(),
         email: faker_1.faker.internet.email(),
         password: faker_1.faker.internet.password(),
@@ -33,14 +32,16 @@ class GenerateMockData {
         followed_id: followed_id,
         created_at: new Date(faker_1.faker.date.past().toISOString()),
     });
-    static createRecentSearch = (user_id, search_user_id) => ({
-        recent_id: faker_1.faker.number.int({ min: 1, max: 1000 }),
-        user_id: user_id,
-        search_user_id: search_user_id,
+    static createRecentSearch = (searcher_id, searched_id) => ({
+        id: faker_1.faker.number.int({ min: 1, max: 1000 }),
+        uuid: faker_1.faker.string.uuid(),
+        searcher_id: searcher_id,
+        searched_id: searched_id,
         created_at: new Date(faker_1.faker.date.past().toISOString()),
     });
     static createPost = (user_id) => ({
-        post_id: faker_1.faker.number.int({ min: 1, max: 999 }),
+        id: faker_1.faker.number.int({ min: 1, max: 999 }),
+        uuid: faker_1.faker.string.uuid(),
         image_id: faker_1.faker.string.uuid(),
         image_url: faker_1.faker.image.url(),
         user_id: user_id,
@@ -48,23 +49,32 @@ class GenerateMockData {
         privacy_level: faker_1.faker.string.fromCharacters(["public", "private"]),
         created_at: new Date(faker_1.faker.date.past().toISOString()),
     });
-    static createLike = (post_id, user_id) => ({
+    static createLike = (user_id, post_id) => ({
+        id: faker_1.faker.number.int({ min: 1, max: 999 }),
+        uuid: faker_1.faker.string.uuid(),
+        user_id: user_id,
         post_id: post_id,
+        created_at: new Date(faker_1.faker.date.past().toISOString()),
+    });
+    static createConversation = () => ({
+        id: faker_1.faker.number.int({ min: 1, max: 1000 }),
+        uuid: faker_1.faker.string.uuid(),
+        created_at: new Date(faker_1.faker.date.past().toISOString()),
+    });
+    static createConversationMembers = (user_id, conversation_id) => ({
+        id: faker_1.faker.number.int({ min: 1, max: 1000 }),
+        uuid: faker_1.faker.string.uuid(),
         user_id: user_id,
-        created_at: new Date(faker_1.faker.date.past().toISOString()),
-    });
-    static createConversation = (user_one_id, user_two_id) => ({
-        conversation_id: faker_1.faker.number.int({ min: 1, max: 1000 }),
-        user_one_id: user_one_id,
-        user_two_id: user_two_id,
-        created_at: new Date(faker_1.faker.date.past().toISOString()),
-    });
-    static createMessage = (conversation_id, user_id) => ({
-        message_id: faker_1.faker.number.int({ min: 1, max: 1000 }),
         conversation_id: conversation_id,
-        user_id: user_id,
-        message: faker_1.faker.lorem.text(),
-        created_at: new Date(faker_1.faker.date.past().toISOString()),
+        joined_at: new Date(faker_1.faker.date.past().toISOString()),
+    });
+    static createMessage = (user_id, conversation_id) => ({
+        id: faker_1.faker.number.int({ min: 1, max: 1000 }),
+        uuid: faker_1.faker.string.uuid(),
+        sender_id: user_id,
+        conversation_id: conversation_id,
+        text_message: faker_1.faker.lorem.text(),
+        time_sent: new Date(faker_1.faker.date.past().toISOString()),
     });
 }
 ;
