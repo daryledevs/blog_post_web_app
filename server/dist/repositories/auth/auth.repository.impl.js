@@ -26,7 +26,7 @@ class AuthRepository {
         return await this.database
             .selectFrom("reset_password_token")
             .selectAll()
-            .where("token_id", "=", token_id)
+            .where("id", "=", token_id)
             .executeTakeFirst();
     });
     saveResetToken = this.wrap.repoWrap(async (token) => {
@@ -38,7 +38,7 @@ class AuthRepository {
     deleteResetToken = this.wrap.repoWrap(async (token_id) => {
         await this.database
             .deleteFrom("reset_password_token")
-            .where("token_id", "=", token_id)
+            .where("id", "=", token_id)
             .execute();
     });
 }

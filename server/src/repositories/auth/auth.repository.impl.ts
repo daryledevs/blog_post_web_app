@@ -3,13 +3,13 @@ import {
   NewUsers,
   SelectResetPasswordToken,
   SelectUsers,
-}                        from "@/types/table.types";
-import db                from "@/database/db.database";
-import { DB }            from "@/types/schema.types";
-import { Kysely }        from "kysely";
-import AsyncWrapper      from "@/utils/async-wrapper.util";
-import UserRepository    from "../user/user.repository.impl";
-import IAuthRepository   from "./auth.repository";
+}                      from "@/types/table.types";
+import db              from "@/database/db.database";
+import { DB }          from "@/types/schema.types";
+import { Kysely }      from "kysely";
+import AsyncWrapper    from "@/utils/async-wrapper.util";
+import UserRepository  from "../user/user.repository.impl";
+import IAuthRepository from "./auth.repository";
 
 class AuthRepository implements IAuthRepository {
   private database: Kysely<DB>;
@@ -37,7 +37,7 @@ class AuthRepository implements IAuthRepository {
       return await this.database
         .selectFrom("reset_password_token")
         .selectAll()
-        .where("token_id", "=", token_id)
+        .where("id", "=", token_id)
         .executeTakeFirst();
     }
   );
@@ -55,7 +55,7 @@ class AuthRepository implements IAuthRepository {
     async (token_id: number): Promise<void> => {
       await this.database
         .deleteFrom("reset_password_token")
-        .where("token_id", "=", token_id)
+        .where("id", "=", token_id)
         .execute();
     }
   );

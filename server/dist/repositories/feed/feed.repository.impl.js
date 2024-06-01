@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_database_1 = __importDefault(require("@/database/db.database"));
 const async_wrapper_util_1 = __importDefault(require("@/utils/async-wrapper.util"));
+const uuid_to_bin_1 = __importDefault(require("@/utils/uuid-to-bin"));
 const kysely_1 = require("kysely");
 class FeedRepository {
     database;
@@ -21,16 +22,20 @@ class FeedRepository {
             .executeTakeFirstOrThrow();
         return count;
     });
-    getUserFeed = this.wrap.repoWrap(async (user_id, post_ids) => {
+    getUserFeed = this.wrap.repoWrap(async (user_id, post_uuids) => {
+        const postUuidsToBinQuery = (0, uuid_to_bin_1.default)(post_uuids);
         return await this.database
             .selectFrom("followers")
             .innerJoin("posts", "followers.followed_id", "posts.user_id")
-            .innerJoin("users", "users.user_id", "posts.user_id")
+            .innerJoin("users", "users.id", "posts.user_id")
             .select((eb) => [
-            "posts.post_id",
+            "posts.id",
+            (0, kysely_1.sql) `BIN_TO_UUID(posts.uuid)`.as("uuid"),
             "posts.image_id",
             "posts.image_url",
-            "users.user_id",
+            "posts.user_id",
+            "users.id",
+            (0, kysely_1.sql) `BIN_TO_UUID(users.uuid)`.as("uuid"),
             "users.username",
             "users.first_name",
             "users.last_name",
@@ -41,13 +46,13 @@ class FeedRepository {
             eb
                 .selectFrom("likes")
                 .select((eb) => eb.fn.count("likes.post_id").as("count"))
-                .whereRef("posts.post_id", "=", "likes.post_id")
+                .whereRef("posts.id", "=", "likes.post_id")
                 .as("count"),
         ])
             .where((eb) => eb.and([
             eb("followers.follower_id", "=", user_id),
             eb("posts.created_at", ">", (0, kysely_1.sql) `DATE_SUB(CURDATE(), INTERVAL 3 DAY)`),
-            eb("posts.post_id", "not in", post_ids),
+            eb("posts.uuid", "not in", postUuidsToBinQuery),
         ]))
             .orderBy((0, kysely_1.sql) `"RAND()"`)
             .limit(3)
@@ -56,16 +61,18 @@ class FeedRepository {
     getExploreFeed = this.wrap.repoWrap(async (user_id) => {
         return await this.database
             .selectFrom("posts")
-            .innerJoin("users", "users.user_id", "posts.user_id")
+            .innerJoin("users", "users.id", "posts.user_id")
             .leftJoin("followers", (join) => join.on((eb) => eb.and([
-            eb("followers.followed_id", "=", eb.ref("users.user_id")),
+            eb("followers.followed_id", "=", eb.ref("users.id")),
             eb("followers.follower_id", "=", user_id),
         ])))
             .select((eb) => [
-            "posts.post_id",
+            "posts.id",
+            (0, kysely_1.sql) `BIN_TO_UUID(posts.uuid)`.as("uuid"),
             "posts.image_id",
             "posts.image_url",
-            "users.user_id",
+            "posts.user_id",
+            "users.id",
             "users.username",
             "users.first_name",
             "users.last_name",
@@ -76,16 +83,16 @@ class FeedRepository {
             eb
                 .selectFrom("likes")
                 .select((eb) => eb.fn.count("likes.post_id").as("count"))
-                .whereRef("posts.post_id", "=", "likes.post_id")
+                .whereRef("posts.id", "=", "likes.post_id")
                 .as("count"),
         ])
             .where((eb) => eb.and([
             eb("posts.created_at", ">", (0, kysely_1.sql) `DATE_SUB(CURDATE(), INTERVAL 3 DAY)`),
             eb("followers.follower_id", "is", eb.lit(null)),
-            eb("users.user_id", "!=", user_id),
+            eb("users.id", "!=", user_id),
         ]))
             .orderBy((0, kysely_1.sql) `"RAND()"`)
-            .limit(3)
+            .limit(30)
             .execute();
     });
 }

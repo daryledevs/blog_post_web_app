@@ -1,11 +1,12 @@
-import db                from "@/database/db.database";
-import { DB }            from "@/types/schema.types";
-import AsyncWrapper      from "@/utils/async-wrapper.util";
-import { Kysely, sql }   from "kysely";
-import { SelectPosts }   from "@/types/table.types";
-import IFeedRepository   from "./feed.repository";
+import db               from "@/database/db.database";
+import { DB }           from "@/types/schema.types";
+import AsyncWrapper     from "@/utils/async-wrapper.util";
+import sqlUuidsToBin    from "@/utils/uuid-to-bin";
+import { Kysely, sql }  from "kysely";
+import { SelectPosts }  from "@/types/table.types";
+import IEFeedRepository from "./feed.repository";
 
-class FeedRepository implements IFeedRepository {
+class FeedRepository implements IEFeedRepository {
   private database: Kysely<DB>;
   private wrap: AsyncWrapper = new AsyncWrapper();
 
@@ -27,16 +28,21 @@ class FeedRepository implements IFeedRepository {
   });
 
   public getUserFeed = this.wrap.repoWrap(
-    async (user_id: number, post_ids: number[]): Promise<SelectPosts[]> => {
+    async (user_id: number, post_uuids: string[]): Promise<SelectPosts[]> => {
+      const postUuidsToBinQuery = sqlUuidsToBin(post_uuids);
+
       return await this.database
         .selectFrom("followers")
         .innerJoin("posts", "followers.followed_id", "posts.user_id")
-        .innerJoin("users", "users.user_id", "posts.user_id")
+        .innerJoin("users", "users.id", "posts.user_id")
         .select((eb) => [
-          "posts.post_id",
+          "posts.id",
+          sql`BIN_TO_UUID(posts.uuid)`.as("uuid"),
           "posts.image_id",
           "posts.image_url",
-          "users.user_id",
+          "posts.user_id",
+          "users.id",
+          sql`BIN_TO_UUID(users.uuid)`.as("uuid"),
           "users.username",
           "users.first_name",
           "users.last_name",
@@ -47,7 +53,7 @@ class FeedRepository implements IFeedRepository {
           eb
             .selectFrom("likes")
             .select((eb) => eb.fn.count("likes.post_id").as("count"))
-            .whereRef("posts.post_id", "=", "likes.post_id")
+            .whereRef("posts.id", "=", "likes.post_id")
             .as("count"),
         ])
         .where((eb) =>
@@ -58,7 +64,7 @@ class FeedRepository implements IFeedRepository {
               ">",
               sql<Date>`DATE_SUB(CURDATE(), INTERVAL 3 DAY)`
             ),
-            eb("posts.post_id", "not in", post_ids),
+            eb("posts.uuid", "not in", postUuidsToBinQuery),
           ])
         )
         .orderBy(sql`"RAND()"`)
@@ -68,23 +74,25 @@ class FeedRepository implements IFeedRepository {
   );
 
   public getExploreFeed = this.wrap.repoWrap(
-    async (user_id: number): Promise<SelectPosts[]> => {
+    async (user_id: number): Promise<any[]> => {
       return await this.database
         .selectFrom("posts")
-        .innerJoin("users", "users.user_id", "posts.user_id")
+        .innerJoin("users", "users.id", "posts.user_id")
         .leftJoin("followers", (join) =>
           join.on((eb) =>
             eb.and([
-              eb("followers.followed_id", "=", eb.ref("users.user_id")),
+              eb("followers.followed_id", "=", eb.ref("users.id")),
               eb("followers.follower_id", "=", user_id),
             ])
           )
         )
         .select((eb) => [
-          "posts.post_id",
+          "posts.id",
+          sql`BIN_TO_UUID(posts.uuid)`.as("uuid"),
           "posts.image_id",
           "posts.image_url",
-          "users.user_id",
+          "posts.user_id",
+          "users.id",
           "users.username",
           "users.first_name",
           "users.last_name",
@@ -95,7 +103,7 @@ class FeedRepository implements IFeedRepository {
           eb
             .selectFrom("likes")
             .select((eb) => eb.fn.count("likes.post_id").as("count"))
-            .whereRef("posts.post_id", "=", "likes.post_id")
+            .whereRef("posts.id", "=", "likes.post_id")
             .as("count"),
         ])
         .where((eb) =>
@@ -106,11 +114,11 @@ class FeedRepository implements IFeedRepository {
               sql<Date>`DATE_SUB(CURDATE(), INTERVAL 3 DAY)`
             ),
             eb("followers.follower_id", "is", eb.lit(null)),
-            eb("users.user_id", "!=", user_id),
+            eb("users.id", "!=", user_id),
           ])
         )
         .orderBy(sql`"RAND()"`)
-        .limit(3)
+        .limit(30)
         .execute();
     }
   );

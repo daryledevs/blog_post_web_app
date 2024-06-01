@@ -1,21 +1,20 @@
-import jwt                                             from "jsonwebtoken";
-import bcrypt                                          from "bcrypt";
-import sendEmail                                       from "@/libraries/nodemailer/send-email.lib";
-import CryptoUtil                                      from "@/libraries/crypto/crypto.lib";
-import AsyncWrapper                                    from "@/utils/async-wrapper.util";
-import { NewUsers }                                    from "@/types/table.types";
-import AuthRepository                                  from "@/repositories/auth/auth.repository.impl";
-import UserRepository                                  from "@/repositories/user/user.repository.impl";
-import ApiErrorException                               from "@/exceptions/api.exception";
-import AuthTokensUtil, { Expiration, TokenSecret }     from "@/utils/auth-token.util";
-import IAuthService, { IResetPasswordForm, LoginType } from "./auth.service";
+import bcrypt                                           from "bcrypt";
+import sendEmail                                        from "@/libraries/nodemailer/send-email.lib";
+import CryptoUtil                                       from "@/libraries/crypto/crypto.lib";
+import AsyncWrapper                                     from "@/utils/async-wrapper.util";
+import { NewUsers }                                     from "@/types/table.types";
+import IEAuthRepository                                 from "@/repositories/auth/auth.repository";
+import IEUserRepository                                 from "@/repositories/user/user.repository";
+import ApiErrorException                                from "@/exceptions/api.exception";
+import AuthTokensUtil, { Expiration, TokenSecret }      from "@/utils/auth-token.util";
+import IEAuthService, { IResetPasswordForm, LoginType } from "./auth.service";
 
-class AuthService implements IAuthService {
-  private authRepository: AuthRepository;
-  private userRepository: UserRepository;
+class AuthService implements IEAuthService {
+  private authRepository: IEAuthRepository;
+  private userRepository: IEUserRepository;
   private wrap = new AsyncWrapper();
 
-  constructor(authRepository: AuthRepository, userRepository: UserRepository) {
+  constructor(authRepository: IEAuthRepository, userRepository: IEUserRepository) {
     this.authRepository = authRepository;
     this.userRepository = userRepository;
   }
@@ -67,13 +66,13 @@ class AuthService implements IAuthService {
 
       const args = {
         accessToken: {
-          payload: { user_id: user.user_id, roles: user.roles },
+          payload: { uuid: user.uuid, roles: user.roles },
           secret: TokenSecret.ACCESS_SECRET,
           expiration: Expiration.ACCESS_TOKEN_EXPIRATION,
         },
 
         refreshToken: {
-          payload: { user_id: user.user_id, username: user.username },
+          payload: { uuid: user.uuid, username: user.username },
           secret: TokenSecret.REFRESH_SECRET,
           expiration: Expiration.REFRESH_TOKEN_EXPIRATION,
         },
@@ -100,7 +99,7 @@ class AuthService implements IAuthService {
       const args = {
         payload: {
           email: data.email,
-          user_id: user.user_id as any,
+          user_id: user.id as any,
         },
         secret: TokenSecret.RESET_SECRET,
         expiration: Expiration.RESET_TOKEN_EXPIRATION,
@@ -115,7 +114,7 @@ class AuthService implements IAuthService {
 
       // Save token to the database
       await this.authRepository.saveResetToken({
-        user_id: user.user_id,
+        user_id: user.id,
         encrypted: encryptedToken,
       });
 
@@ -162,7 +161,7 @@ class AuthService implements IAuthService {
       if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
       // Update the user's password and delete the reset password token from the database.
-      await this.userRepository.updateUser(user_id, { password: hashPassword });
+      await this.userRepository.updateUserById(user_id, { password: hashPassword });
       await this.authRepository.deleteResetToken(decodedTokenId);
 
       // add here confirmation email to the user that the password has been reset.

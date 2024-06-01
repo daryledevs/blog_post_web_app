@@ -75,12 +75,12 @@ class AuthService {
             throw api_exception_1.default.HTTP401Error("Invalid password");
         const args = {
             accessToken: {
-                payload: { user_id: user.user_id, roles: user.roles },
+                payload: { uuid: user.uuid, roles: user.roles },
                 secret: auth_token_util_1.TokenSecret.ACCESS_SECRET,
                 expiration: auth_token_util_1.Expiration.ACCESS_TOKEN_EXPIRATION,
             },
             refreshToken: {
-                payload: { user_id: user.user_id, username: user.username },
+                payload: { uuid: user.uuid, username: user.username },
                 secret: auth_token_util_1.TokenSecret.REFRESH_SECRET,
                 expiration: auth_token_util_1.Expiration.REFRESH_TOKEN_EXPIRATION,
             },
@@ -102,7 +102,7 @@ class AuthService {
         const args = {
             payload: {
                 email: data.email,
-                user_id: user.user_id,
+                user_id: user.id,
             },
             secret: auth_token_util_1.TokenSecret.RESET_SECRET,
             expiration: auth_token_util_1.Expiration.RESET_TOKEN_EXPIRATION,
@@ -114,7 +114,7 @@ class AuthService {
         const encodedToken = encodeURIComponent(shortToken);
         // Save token to the database
         await this.authRepository.saveResetToken({
-            user_id: user.user_id,
+            user_id: user.id,
             encrypted: encryptedToken,
         });
         // Send reset password email
@@ -151,7 +151,7 @@ class AuthService {
         if (!user)
             throw api_exception_1.default.HTTP404Error("User not found");
         // Update the user's password and delete the reset password token from the database.
-        await this.userRepository.updateUser(user_id, { password: hashPassword });
+        await this.userRepository.updateUserById(user_id, { password: hashPassword });
         await this.authRepository.deleteResetToken(decodedTokenId);
         // add here confirmation email to the user that the password has been reset.
         return "Reset password successfully";

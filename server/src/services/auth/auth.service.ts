@@ -15,7 +15,7 @@ export type IResetPasswordForm = {
   };
 };
 
-interface IAuthService {
+interface IEAuthService {
   register: (data: NewUsers) => Promise<string>;
 
   login: (userCredential: string, password: string) => Promise<LoginType>;
@@ -27,4 +27,4 @@ interface IAuthService {
   resetPassword: (data:any) => Promise<string>;
 };
 
-export default IAuthService;
+export default IEAuthService;
