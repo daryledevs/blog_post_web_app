@@ -38,7 +38,7 @@ class ChatServices {
     });
     newMessageAndConversation = this.wrap.serviceWrap(async (messageData) => {
         // destructure the necessary properties from messageData
-        const { conversation_id, sender_id, receiver_id, text_message } = messageData;
+        const { conversation_id, sender_id, receiver_id, text_message } = messageData ?? {};
         // validate that sender_id and receiver_id are provided
         if (!sender_id || !receiver_id) {
             throw api_exception_1.default.HTTP400Error("No arguments provided");

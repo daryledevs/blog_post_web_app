@@ -96,7 +96,7 @@ class PostService {
             throw api_exception_1.default.HTTP404Error("Post not found");
         // delete the post
         await this.postRepository.deletePostById(post.id);
-        return "";
+        return "Post deleted successfully";
     });
     getPostLikesCountByUuid = this.wrap.serviceWrap(async (uuid) => {
         // check if the arguments is provided

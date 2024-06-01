@@ -134,7 +134,7 @@ class PostService implements IEPostService {
       // delete the post
       await this.postRepository.deletePostById(post.id);
 
-      return "";
+      return "Post deleted successfully";
     }
   );
 

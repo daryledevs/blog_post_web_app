@@ -57,8 +57,12 @@ class ChatServices implements IEChatService {
   public newMessageAndConversation = this.wrap.serviceWrap(
     async (messageData: MessageDataType): Promise<string> => {
       // destructure the necessary properties from messageData
-      const { conversation_id, sender_id, receiver_id, text_message } =
-        messageData;
+      const { 
+        conversation_id, 
+        sender_id, 
+        receiver_id, 
+        text_message 
+      } = messageData ?? {};
 
       // validate that sender_id and receiver_id are provided
       if (!sender_id || !receiver_id) {

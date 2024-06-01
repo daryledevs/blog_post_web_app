@@ -73,7 +73,7 @@ class FollowService {
         return await this.followRepository.findAllFollowersById(id, lists);
     });
     getFollowing = this.wrap.serviceWrap(async (id, lists) => {
-        return await this.followRepository.findAllFollowersById(id, lists);
+        return await this.followRepository.findAllFollowingById(id, lists);
     });
 }
 ;

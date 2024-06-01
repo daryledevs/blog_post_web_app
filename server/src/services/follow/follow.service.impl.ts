@@ -101,7 +101,7 @@ class FollowService implements IEFollowService {
 
   private getFollowing = this.wrap.serviceWrap(
     async (id: number, lists: number[]): Promise<SelectFollowers[]> => {
-      return await this.followRepository.findAllFollowersById(id, lists);
+      return await this.followRepository.findAllFollowingById(id, lists);
     }
   );
 };
