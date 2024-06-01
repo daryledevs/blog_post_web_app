@@ -7,7 +7,7 @@ interface IEPostService {
 
   geTotalPostsByUsersUuid: (user_uuid: string | undefined) => Promise<string | number | bigint>;
 
-  createNewPost: (file: Express.Multer.File | null | undefined, post: NewPosts) => Promise<string>;
+  createNewPost: (file: Express.Multer.File | null | undefined, post: NewPosts | undefined) => Promise<string>;
 
   updatePostByUuid: (uuid: string | undefined, post: UpdatePosts | undefined) => Promise<string | undefined>;
 

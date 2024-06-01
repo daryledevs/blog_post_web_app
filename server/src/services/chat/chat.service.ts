@@ -6,7 +6,7 @@ interface IEChatService {
 
   getChatMessages: (uuid: string | undefined, listId: number[]) => Promise<SelectMessages[]>;
 
-  newMessageAndConversation: (messageData: NewMessages) => Promise<string>;
+  newMessageAndConversation: (messageData: NewMessages | undefined) => Promise<string>;
 
   deleteConversationById: (uuid: string | undefined) => Promise<string>;
 };
