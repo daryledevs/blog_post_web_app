@@ -79,12 +79,12 @@ class UsersController {
 
   public toggleFollow = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const follower_id = req.params.follower_id;
-      const followed_id = req.params.followed_id;
+      const follower_uuid = req.params.follower_uuid;
+      const followed_uuid = req.params.followed_uuid;
 
       const message = await this.followService.toggleFollow(
-        follower_id,
-        followed_id
+        follower_uuid,
+        followed_uuid
       );
 
       res.status(200).send(message);

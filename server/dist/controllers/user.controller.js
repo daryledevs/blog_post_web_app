@@ -49,9 +49,9 @@ class UsersController {
         res.status(200).send(users);
     });
     toggleFollow = this.wrap.apiWrap(async (req, res, next) => {
-        const follower_id = req.params.follower_id;
-        const followed_id = req.params.followed_id;
-        const message = await this.followService.toggleFollow(follower_id, followed_id);
+        const follower_uuid = req.params.follower_uuid;
+        const followed_uuid = req.params.followed_uuid;
+        const message = await this.followService.toggleFollow(follower_uuid, followed_uuid);
         res.status(200).send(message);
     });
     getSearchHistory = this.wrap.apiWrap(async (req, res, next) => {

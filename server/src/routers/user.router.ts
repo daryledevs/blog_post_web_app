@@ -23,16 +23,21 @@ const controller: UsersController = new UsersController(
   ),
 );
 
-router.get("/",                                        controller.getUserData);
-router.get("/lists",                                   controller.searchUsersByQuery);
-router.get("/:id/follows/stats",                       controller.getFollowStats);
-router.get("/:searcher_uuid/searches",                 controller.getSearchHistory);
-router.post("/:id/lists",                              controller.getFollowerFollowingLists);
+// user endpoints
+router.get("/",                                        controller.getUserData); 
+router.get("/search",                                  controller.searchUsersByQuery); 
 
-router.post("/:follower_id/follows/:followed_id",      controller.toggleFollow);
-router.post("/:searcher_uuid/searches/:searched_uuid", controller.saveRecentSearches);
+// follow endpoints
+router.get("/:uuid/follow-stats",                      controller.getFollowStats);
+router.post("/:uuid/follow-lists",                     controller.getFollowerFollowingLists); 
+router.post("/:follower_uuid/follow/:followed_uuid",   controller.toggleFollow); 
 
-router.delete("/searches/:uuid",                       controller.removeRecentSearches);
-router.delete("/:id/",                                 controller.deleteUser);
+// search endpoints
+router.get("/:searcher_uuid/searches",                 controller.getSearchHistory); 
+router.post("/:searcher_uuid/searches/:searched_uuid", controller.saveRecentSearches); 
+router.delete("/:uuid/searches",                       controller.removeRecentSearches); 
+
+// user's account endpoints
+router.delete("/:uuid",                                controller.deleteUser); 
 
 export default router;
