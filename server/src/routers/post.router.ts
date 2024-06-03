@@ -1,7 +1,9 @@
 import express           from "express";
 import uploadImage       from "@/middleware/multer.middleware";
+import LikeService       from "@/services/like/like.service.impl";
 import PostsService      from "@/services/post/post.service.impl";
 import UserRepository    from "@/repositories/user/user.repository.impl";
+import LikeRepository    from "@/repositories/like/like.repository.impl";
 import PostsController   from "@/controllers/post.controller";
 import PostsRepository   from "@/repositories/post/post.repository.impl";
 import CloudinaryService from "@/libraries/cloudinary/cloudinary-service.lib";
@@ -13,6 +15,11 @@ const controller: PostsController = new PostsController(
     new PostsRepository(),
     new UserRepository(),
     new CloudinaryService()
+  ),
+  new LikeService(
+    new LikeRepository(),
+    new PostsRepository(),
+    new UserRepository()
   )
 );
 

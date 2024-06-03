@@ -1,21 +1,24 @@
 import * as dotenv                         from "dotenv";
-import IEPostsService                      from "@/services/post/post.service";
 import AsyncWrapper                        from "@/utils/async-wrapper.util";
+import IEPostService                       from "@/services/post/post.service";
+import IELikeService                       from "@/services/like/like.service";
 import { Response, Request, NextFunction } from "express";
 dotenv.config();
 
 class PostsController {
-  private postsService: IEPostsService;
+  private postService: IEPostService;
+  private likeService: IELikeService;
   private wrap: AsyncWrapper = new AsyncWrapper();
 
-  constructor(postsService: IEPostsService) {
-    this.postsService = postsService;
-  }
+  constructor(postService: IEPostService, likeService: IELikeService) {
+    this.postService = postService;
+    this.likeService = likeService;
+  };
 
   public getUserPosts = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
       const user_uuid = req.params?.user_uuid;
-      const data = await this.postsService.getAllPostsByUsersUuid(user_uuid);
+      const data = await this.postService.getAllPostsByUsersUuid(user_uuid);
       res.status(200).send({ post: data });
     }
   );
@@ -23,7 +26,7 @@ class PostsController {
   public getUserTotalPosts = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
       const user_uuid = req.params?.user_uuid;
-      const data = await this.postsService.geTotalPostsByUsersUuid(user_uuid);
+      const data = await this.postService.geTotalPostsByUsersUuid(user_uuid);
       res.status(200).send({ totalPost: data });
     }
   );
@@ -36,7 +39,7 @@ class PostsController {
         ((req.files as { [fieldname: string]: Express.Multer.File[] })
           ?.img as Express.Multer.File[]) || null;
 
-      const data = await this.postsService.createNewPost(files?.[0], rest);
+      const data = await this.postService.createNewPost(files?.[0], rest);
       res.status(200).send({ message: data });
     }
   );
@@ -45,7 +48,7 @@ class PostsController {
     async (req: Request, res: Response, next: NextFunction) => {
       const uuid = req.params?.uuid;
       const { user_uuid, roles, cookieOptions, ...rest } = req.body;
-      const data = await this.postsService.updatePostByUuid(uuid, rest);
+      const data = await this.postService.updatePostByUuid(uuid, rest);
       res.status(200).send({ message: data });
     }
   );
@@ -53,7 +56,7 @@ class PostsController {
   public deletePost = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
       const uuid = req.params?.uuid;
-      const data = await this.postsService.deletePostByUuid(uuid);
+      const data = await this.postService.deletePostByUuid(uuid);
       res.status(200).send({ message: data });
     }
   );
@@ -61,7 +64,7 @@ class PostsController {
   public getLikesCountForPost = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
       const uuid = req.params?.uuid;
-      const data = await this.postsService.getPostLikesCountByUuid(uuid);
+      const data = await this.likeService.getPostLikesCountByUuid(uuid);
       res.status(200).send({ count: data });
     }
   );
@@ -71,7 +74,7 @@ class PostsController {
       const user_uuid = req.params?.user_uuid;
       const post_uuid = req.params?.uuid;
 
-      const data = await this.postsService.getUserLikeStatusForPostByUuid(
+      const data = await this.likeService.getUserLikeStatusForPostByUuid(
         user_uuid,
         post_uuid
       );
@@ -85,7 +88,7 @@ class PostsController {
       const user_uuid = req.params?.user_uuid;
       const post_uuid = req.params?.uuid;
 
-      const data = await this.postsService.toggleUserLikeForPost(
+      const data = await this.likeService.toggleUserLikeForPost(
         user_uuid,
         post_uuid
       );
