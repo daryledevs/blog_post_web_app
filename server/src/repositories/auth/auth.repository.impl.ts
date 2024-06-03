@@ -6,10 +6,10 @@ import {
 }                      from "@/types/table.types";
 import db              from "@/database/db.database";
 import { DB }          from "@/types/schema.types";
-import { Kysely }      from "kysely";
 import AsyncWrapper    from "@/utils/async-wrapper.util";
 import UserRepository  from "../user/user.repository.impl";
 import IAuthRepository from "./auth.repository";
+import { Kysely, sql } from "kysely";
 
 class AuthRepository implements IAuthRepository {
   private database: Kysely<DB>;
@@ -26,9 +26,26 @@ class AuthRepository implements IAuthRepository {
       const { insertId } = await this.database
         .insertInto("users")
         .values(user)
-        .executeTakeFirstOrThrow();
+        .executeTakeFirst();
 
-      return await this.userRepository.findUserById(Number(insertId));
+      return await this.database
+        .selectFrom("users")
+        .select([
+          "id",
+          sql`BIN_TO_UUID(uuid)`.as("uuid"),
+          "username",
+          "email",
+          "password",
+          "roles",
+          "avatar_url",
+          "first_name",
+          "last_name",
+          "birthday",
+          "age",
+          "created_at",
+        ])
+        .where("id", "=", insertId as any)
+        .executeTakeFirst();
     }
   );
 
@@ -36,7 +53,13 @@ class AuthRepository implements IAuthRepository {
     async (token_id: number): Promise<SelectResetPasswordToken | undefined> => {
       return await this.database
         .selectFrom("reset_password_token")
-        .selectAll()
+        .select([
+          "id",
+          sql`BIN_TO_UUID(uuid)`.as("uuid"),
+          "encrypted",
+          "user_id",
+          "created_at",
+        ])
         .where("id", "=", token_id)
         .executeTakeFirst();
     }

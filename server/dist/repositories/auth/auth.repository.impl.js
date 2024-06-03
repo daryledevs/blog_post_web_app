@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const db_database_1 = __importDefault(require("@/database/db.database"));
 const async_wrapper_util_1 = __importDefault(require("@/utils/async-wrapper.util"));
 const user_repository_impl_1 = __importDefault(require("../user/user.repository.impl"));
+const kysely_1 = require("kysely");
 class AuthRepository {
     database;
     userRepository;
@@ -19,13 +20,36 @@ class AuthRepository {
         const { insertId } = await this.database
             .insertInto("users")
             .values(user)
-            .executeTakeFirstOrThrow();
-        return await this.userRepository.findUserById(Number(insertId));
+            .executeTakeFirst();
+        return await this.database
+            .selectFrom("users")
+            .select([
+            "id",
+            (0, kysely_1.sql) `BIN_TO_UUID(uuid)`.as("uuid"),
+            "username",
+            "email",
+            "password",
+            "roles",
+            "avatar_url",
+            "first_name",
+            "last_name",
+            "birthday",
+            "age",
+            "created_at",
+        ])
+            .where("id", "=", insertId)
+            .executeTakeFirst();
     });
     findResetTokenById = this.wrap.repoWrap(async (token_id) => {
         return await this.database
             .selectFrom("reset_password_token")
-            .selectAll()
+            .select([
+            "id",
+            (0, kysely_1.sql) `BIN_TO_UUID(uuid)`.as("uuid"),
+            "encrypted",
+            "user_id",
+            "created_at",
+        ])
             .where("id", "=", token_id)
             .executeTakeFirst();
     });

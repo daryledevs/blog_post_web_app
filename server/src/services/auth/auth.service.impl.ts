@@ -2,7 +2,7 @@ import bcrypt                                           from "bcrypt";
 import sendEmail                                        from "@/libraries/nodemailer/send-email.lib";
 import CryptoUtil                                       from "@/libraries/crypto/crypto.lib";
 import AsyncWrapper                                     from "@/utils/async-wrapper.util";
-import { NewUsers }                                     from "@/types/table.types";
+import { NewUsers, SelectUsers }                                     from "@/types/table.types";
 import IEAuthRepository                                 from "@/repositories/auth/auth.repository";
 import IEUserRepository                                 from "@/repositories/user/user.repository";
 import ApiErrorException                                from "@/exceptions/api.exception";
@@ -20,7 +20,9 @@ class AuthService implements IEAuthService {
   }
 
   public register = this.wrap.serviceWrap(
-    async (data: NewUsers): Promise<string> => {
+    async (
+      data: NewUsers
+    ): Promise<{ message: string, user: SelectUsers | undefined }> => {
       const { email, username, password } = data;
       const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 
@@ -44,8 +46,8 @@ class AuthService implements IEAuthService {
       if (userByUsername) throw ApiErrorException.HTTP409Error("Username already exists");
         
       // Save the user to the database
-      await this.authRepository.createUser({ ...data, password: hashPassword });
-      return "Registration is successful";
+      const user = await this.authRepository.createUser({ ...data, password: hashPassword });
+      return { message: "User created successfully", user };
     }
   );
 
