@@ -1,4 +1,4 @@
-import { NewPosts, SelectLikes, SelectPosts, UpdatePosts } from "@/types/table.types";
+import { NewPosts, SelectPosts, UpdatePosts } from "@/types/table.types";
 
 interface IEPostService {
   getPostByUuid: (uuid: string | undefined) => Promise<SelectPosts | undefined>;
@@ -12,12 +12,6 @@ interface IEPostService {
   updatePostByUuid: (uuid: string | undefined, post: UpdatePosts | undefined) => Promise<string | undefined>;
 
   deletePostByUuid: (uuid: string | undefined) => Promise<string>;
-
-  getPostLikesCountByUuid: (uuid: string | undefined) => Promise<number>;
-
-  getUserLikeStatusForPostByUuid: (user_uuid: string | undefined, post_uuid: string | undefined) => Promise<SelectLikes | undefined>;
-
-  toggleUserLikeForPost: (user_uuid: string | undefined, post_uuid: string | undefined) => Promise<string>;
 }
 
 export default IEPostService;

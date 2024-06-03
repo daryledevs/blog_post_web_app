@@ -98,58 +98,6 @@ class PostService {
         await this.postRepository.deletePostById(post.id);
         return "Post deleted successfully";
     });
-    getPostLikesCountByUuid = this.wrap.serviceWrap(async (uuid) => {
-        // check if the arguments is provided
-        if (!uuid)
-            throw api_exception_1.default.HTTP400Error("No arguments provided");
-        // check if the post_id is provided
-        const post = await this.postRepository.findPostsByPostId(uuid);
-        if (!post)
-            throw api_exception_1.default.HTTP404Error("Post not found");
-        // get the total likes for the post
-        return await this.postRepository.findPostsLikeCount(post.id);
-    });
-    getUserLikeStatusForPostByUuid = this.wrap.serviceWrap(async (user_uuid, post_uuid) => {
-        // check if the arguments is provided
-        if (!user_uuid || !post_uuid) {
-            throw api_exception_1.default.HTTP400Error("No arguments provided");
-        }
-        // If the user is not found, return an error
-        const user = await this.userRepository.findUserById(user_uuid);
-        if (!user)
-            throw api_exception_1.default.HTTP404Error("User not found");
-        // If the post is not found, return an error
-        const post = await this.postRepository.findPostsByPostId(post_uuid);
-        if (!post)
-            throw api_exception_1.default.HTTP404Error("Post not found");
-        // If the post is not found, return an error
-        return await this.postRepository.isUserLikePost(user.id, post.id);
-    });
-    toggleUserLikeForPost = this.wrap.serviceWrap(async (user_uuid, post_uuid) => {
-        // check if the arguments is provided
-        if (!user_uuid || !post_uuid) {
-            throw api_exception_1.default.HTTP400Error("No arguments provided");
-        }
-        // If the user is not found, return an error
-        const user = await this.userRepository.findUserById(user_uuid);
-        if (!user)
-            throw api_exception_1.default.HTTP404Error("User not found");
-        // If the post is not found, return an error
-        const post = await this.postRepository.findPostsByPostId(post_uuid);
-        if (!post)
-            throw api_exception_1.default.HTTP404Error("Post not found");
-        // Check to see if the user already likes the post.
-        const like = await this.postRepository.isUserLikePost(user.id, post.id);
-        // If the user hasn't liked the post yet, then create or insert.
-        if (!like) {
-            const data = { user_id: user.id, post_id: post.id };
-            await this.postRepository.likeUsersPostById(data);
-            return "Like added successfully";
-        }
-        // If the user has already liked the post, then delete or remove.
-        await this.postRepository.dislikeUsersPostById(like.id);
-        return "Like removed successfully";
-    });
 }
 ;
 exports.default = PostService;
