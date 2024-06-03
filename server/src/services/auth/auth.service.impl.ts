@@ -47,7 +47,7 @@ class AuthService implements IEAuthService {
         
       // Save the user to the database
       const user = await this.authRepository.createUser({ ...data, password: hashPassword });
-      return { message: "User created successfully", user };
+      return { message: "Registration is successful", user };
     }
   );
 

@@ -42,11 +42,21 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
     });
     (0, vitest_1.describe)("Register (Create a new user)", async () => {
         (0, vitest_1.test)("Register should be successful", async () => {
-            userRepository.findUserByEmail = vitest_1.vi.fn().mockResolvedValue(null);
-            userRepository.findUserByUsername = vitest_1.vi.fn().mockResolvedValue(null);
-            authRepository.createUser = vitest_1.vi.fn();
+            const expectedResult = {
+                message: "Registration is successful",
+                user: newUser,
+            };
+            userRepository.findUserByEmail = vitest_1.vi
+                .fn()
+                .mockResolvedValue(null);
+            userRepository.findUserByUsername = vitest_1.vi
+                .fn()
+                .mockResolvedValue(null);
+            authRepository.createUser = vitest_1.vi
+                .fn()
+                .mockResolvedValue(newUser);
             const result = await authService.register(newUser);
-            (0, vitest_1.expect)(result).toBe("Registration is successful");
+            (0, vitest_1.expect)(result).toStrictEqual(expectedResult);
             (0, vitest_1.expect)(userRepository.findUserByEmail).toHaveBeenCalledWith(newUser.email);
             (0, vitest_1.expect)(userRepository.findUserByUsername).toHaveBeenCalledWith(newUser.username);
             (0, vitest_1.expect)(authRepository.createUser).toHaveBeenCalledWith(vitest_1.expect.objectContaining({

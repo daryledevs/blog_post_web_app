@@ -60,12 +60,25 @@ describe("AuthService", () => {
   
   describe("Register (Create a new user)", async () => {
     test("Register should be successful", async () => {
-      userRepository.findUserByEmail = vi.fn().mockResolvedValue(null);
-      userRepository.findUserByUsername = vi.fn().mockResolvedValue(null);
-      authRepository.createUser = vi.fn();
-      
+      const expectedResult = {
+        message: "Registration is successful",
+        user: newUser,
+      };
+
+      userRepository.findUserByEmail = vi
+        .fn()
+        .mockResolvedValue(null);
+
+      userRepository.findUserByUsername = vi
+        .fn()
+        .mockResolvedValue(null);
+
+      authRepository.createUser = vi
+        .fn()
+        .mockResolvedValue(newUser);
+        
       const result = await authService.register(newUser);
-      expect(result).toBe("Registration is successful");
+      expect(result).toStrictEqual(expectedResult);
 
       expect(userRepository.findUserByEmail).toHaveBeenCalledWith(
         newUser.email

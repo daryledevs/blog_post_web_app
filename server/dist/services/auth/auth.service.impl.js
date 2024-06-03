@@ -60,7 +60,7 @@ class AuthService {
             throw api_exception_1.default.HTTP409Error("Username already exists");
         // Save the user to the database
         const user = await this.authRepository.createUser({ ...data, password: hashPassword });
-        return { message: "User created successfully", user };
+        return { message: "Registration is successful", user };
     });
     login = this.wrap.serviceWrap(async (userCredential, password) => {
         // Check if the user exists in the database
