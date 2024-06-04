@@ -37,6 +37,7 @@
   "dependencies": {
     "bcrypt": "^5.1.0",
     "body-parser": "^1.20.1",
+    "class-transformer": "^0.5.1",
     "cloudinary": "^1.36.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -55,6 +56,7 @@
     "mysql2": "^3.9.2",
     "nanoid": "^3.3.6",
     "nodemailer": "^6.9.3",
+    "reflect-metadata": "^0.2.2",
     "rimraf": "^5.0.5",
     "socket.io": "^4.6.1",
     "supertest": "^6.3.4",
