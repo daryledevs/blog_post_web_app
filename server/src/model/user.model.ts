@@ -1,32 +1,21 @@
 import { NewUsers, SelectUsers } from "@/types/table.types";
 
 class User {
-  private id: number;
-  private uuid: any;
-  private username: string;
-  private email: string;
-  private password: string;
-  private first_name: string | null;
-  private last_name: string | null;
-  private age: number | null;
-  private roles: string | null;
-  private avatar_url: string | null;
-  private birthday: string | null;
-  private created_at: Date | null;
+  private id!: number;
+  private uuid!: any;
+  private username!: string;
+  private email!: string;
+  private password!: string;
+  private first_name!: string | null;
+  private last_name!: string | null;
+  private age!: number | null;
+  private roles!: string | null;
+  private avatar_url!: string | null;
+  private birthday!: string | null;
+  private created_at!: Date | null;
 
-  constructor(user: SelectUsers) {
-    this.id = user.id;
-    this.uuid = user.uuid;
-    this.username = user.username;
-    this.email = user.email;
-    this.password = user.password;
-    this.first_name = user.first_name;
-    this.last_name = user.last_name;
-    this.age = user.age;
-    this.roles = user.roles;
-    this.avatar_url = user.avatar_url;
-    this.birthday = user.birthday;
-    this.created_at = user.created_at;
+  constructor(user: Partial<SelectUsers>) {
+    Object.assign(this, user);
   }
 
   save(): NewUsers {
@@ -44,109 +33,95 @@ class User {
     };
   }
 
+  // Getters
+
   getId(): number {
     return this.id;
-  }
-
-  setId(id: number): void {
-    this.id = id;
   }
 
   getUuid(): any {
     return this.uuid;
   }
-
-  setUuid(uuid: any): void {
-    this.uuid = uuid;
-  }
-
+  
   getUsername(): string {
     return this.username;
-  }
-
-  setUsername(username: string): void {
-    this.username = username;
   }
 
   getEmail(): string {
     return this.email;
   }
 
-  setEmail(email: string): void {
-    this.email = email;
-  }
-
-  getPassword(): string {
-    throw new Error("Password access is restricted");
-  }
-
-  setPassword(password: string): void {
-    this.password = password;
-  }
-
-  getFirstName(): string | null {
-    return this.first_name;
-  }
-
-  setFirstName(first_name: string | null): void {
-    this.first_name = first_name;
-  }
-
-  getLastName(): string | null {
-    return this.last_name;
-  }
-
-  setLastName(last_name: string | null): void {
-    this.last_name = last_name;
-  }
-
-  getFullName(): string {
-    return `${this.first_name} ${this.last_name}`;
-  }
-
-  setFullName(first_name: string, last_name: string): void {
-    this.first_name = first_name;
-    this.last_name = last_name;
-  }
-
-  getAge(): number | null {
-    return this.age;
-  }
-
-  setAge(age: number | null): void {
-    this.age = age;
-  }
-
-  getRoles(): string | null {
+  getRoles(): string | null | undefined {
     return this.roles;
   }
 
-  setRoles(roles: string | null): void {
-    this.roles = roles;
+  getPassword(): string {
+    throw new Error("Password is restricted");
   }
 
-  getAvatarUrl(): string | null {
+  getFirstName(): string | null | undefined {
+    return this.first_name;
+  }
+
+  getLastName(): string | null | undefined {
+    return this.last_name;
+  }
+
+  getAge(): number | null | undefined {
+    return this.age;
+  }
+
+  getAvatar(): string | null | undefined {
     return this.avatar_url;
   }
 
-  setAvatarUrl(avatar_url: string | null): void {
-    this.avatar_url = avatar_url;
-  }
-
-  getBirthday(): string | null {
+  getBirthday(): string | null | undefined {
     return this.birthday;
   }
 
-  setBirthday(birthday: string | null): void {
-    this.birthday = birthday;
-  }
-
-  getCreatedAt(): Date | null {
+  getCreatedAt(): Date | null | undefined {
     return this.created_at;
   }
 
-  setCreatedAt(created_at: Date | null): void {
-    this.created_at = created_at;
+  // Setters
+  setUsername(value: string) {
+    this.username = value;
+  }
+
+  setEmail(value: string) {
+    this.email = value;
+  }
+
+  setPassword(value: string) {
+    this.password = value;
+  }
+
+  setRoles(value: string | null) {
+    this.roles = value;
+  }
+
+  setFirstName(value: string | null) {
+    this.first_name = value;
+  }
+
+  setLastName(value: string | null) {
+    this.last_name = value;
+  }
+
+  setAge(value: number | null) {
+    this.age = value;
+  }
+
+  setAvatar(value: string | null) {
+    this.avatar_url = value;
+  }
+
+  setBirthday(value: string | null) {
+    this.birthday = value;
+  }
+
+  setCreatedAt(value: Date | null) {
+    this.created_at = value;
   }
 }
 
