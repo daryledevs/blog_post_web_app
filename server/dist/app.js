@@ -26,10 +26,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+require("reflect-metadata");
 const cors_1 = __importDefault(require("cors"));
 const morgan_1 = __importDefault(require("morgan"));
 const express_1 = __importDefault(require("express"));
 const path_util_1 = __importDefault(require("./utils/path.util"));
+const validator_middleware_1 = __importDefault(require("./middleware/validator.middleware"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const auth_router_1 = __importDefault(require("./routers/auth.router"));
 const user_router_1 = __importDefault(require("./routers/user.router"));
@@ -50,12 +52,14 @@ app.use(body_parser_1.default.json());
 app.use((0, cookie_parser_1.default)());
 app.use(cookie_options_middleware_1.default);
 app.use((0, cors_1.default)(cors_option_config_1.default));
+app.use(body_parser_1.default.urlencoded({ extended: true }));
+app.use(validator_middleware_1.default);
 app.use(token_handler_middleware_1.default);
 app.set("views", path_util_1.default); // Set the views directory
 app.set('view engine', 'ejs'); // Set EJS as the template engine
 app.use((0, morgan_1.default)("tiny"));
 // Routes
-app.use(`${API}/`, auth_router_1.default);
+app.use(`${API}/auth`, auth_router_1.default);
 app.use(`${API}/chats`, chat_router_1.default);
 app.use(`${API}/users`, user_router_1.default);
 app.use(`${API}/posts`, post_router_1.default);

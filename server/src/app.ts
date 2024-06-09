@@ -1,7 +1,9 @@
+import 'reflect-metadata';
 import cors          from "cors";
 import morgan        from "morgan";
 import express       from "express";
 import rootPath      from "./utils/path.util";
+import validator    from './middleware/validator.middleware';
 import bodyParser    from "body-parser";
 import authRoutes    from "./routers/auth.router";
 import userRoutes    from './routers/user.router';
@@ -24,13 +26,15 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(cookieOptions);
 app.use(cors(corsOptions));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(validator)  ;
 app.use(tokenHandler);
 app.set("views", rootPath); // Set the views directory
 app.set('view engine', 'ejs'); // Set EJS as the template engine
 app.use(morgan("tiny"));
 
 // Routes
-app.use(`${API}/`, authRoutes);
+app.use(`${API}/auth`, authRoutes);
 app.use(`${API}/chats`, chatRoutes);
 app.use(`${API}/users`, userRoutes);
 app.use(`${API}/posts`, postRouter);

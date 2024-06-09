@@ -1,9 +1,11 @@
 const routeException = (path: any) => {
-  if (path === "/api/v1/register") return true;
-  if (path === "/api/v1/login") return true;
-  if (path === "/api/v1/forgot-password") return true;
-  if (path === "/api/v1/logout") return true;
-  return false;
+  const paths = [
+    "/api/v1/auth/register",
+    "/api/v1/auth/login",
+    "/api/v1/auth/forgot-password",
+    "/api/v1/auth/logout",
+  ];
+  return paths.includes(path);
 };
 
 export default routeException;
