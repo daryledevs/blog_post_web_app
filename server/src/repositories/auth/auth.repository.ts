@@ -1,7 +1,13 @@
-import { NewResetPasswordToken, NewUsers, SelectResetPasswordToken, SelectUsers } from "@/types/table.types";
+import {
+  NewResetPasswordToken,
+  NewUsers,
+  SelectResetPasswordToken,
+}           from "@/types/table.types";
+import User from "@/model/user.model";
+
 
 interface IEAuthRepository {
-  createUser: (user: NewUsers) => Promise<SelectUsers | undefined>;
+  createUser: (user: NewUsers) => Promise<User | undefined>;
 
   findResetTokenById: (token_id: number) => Promise<SelectResetPasswordToken | undefined>;
 

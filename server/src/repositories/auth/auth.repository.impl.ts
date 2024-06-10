@@ -1,34 +1,30 @@
 import {
+  SelectResetPasswordToken, 
   NewResetPasswordToken,
-  NewUsers,
-  SelectResetPasswordToken,
   SelectUsers,
-}                      from "@/types/table.types";
-import db              from "@/database/db.database";
-import { DB }          from "@/types/schema.types";
-import AsyncWrapper    from "@/utils/async-wrapper.util";
-import UserRepository  from "../user/user.repository.impl";
-import IAuthRepository from "./auth.repository";
-import { Kysely, sql } from "kysely";
+  NewUsers,
+}                       from "@/types/table.types";
+import db               from "@/database/db.database";
+import User             from "@/model/user.model";
+import { DB }           from "@/types/schema.types";
+import AsyncWrapper     from "@/utils/async-wrapper.util";
+import { Kysely, sql }  from "kysely";
+import IEAuthRepository from "./auth.repository";
 
-class AuthRepository implements IAuthRepository {
+class AuthRepository implements IEAuthRepository {
   private database: Kysely<DB>;
-  private userRepository: UserRepository;
   private wrap: AsyncWrapper = new AsyncWrapper();
 
-  constructor() {
-    this.database = db;
-    this.userRepository = new UserRepository();
-  };
+  constructor() { this.database = db; };
 
   public createUser = this.wrap.repoWrap(
-    async (user: NewUsers): Promise<SelectUsers | undefined> => {
+    async (user: NewUsers): Promise<User | undefined> => {
       const { insertId } = await this.database
         .insertInto("users")
         .values(user)
         .executeTakeFirst();
 
-      return await this.database
+      const newUser = await this.database
         .selectFrom("users")
         .select([
           "id",
@@ -46,6 +42,8 @@ class AuthRepository implements IAuthRepository {
         ])
         .where("id", "=", insertId as any)
         .executeTakeFirst();
+      
+      return this.userClass(newUser);
     }
   );
 
@@ -80,6 +78,12 @@ class AuthRepository implements IAuthRepository {
         .deleteFrom("reset_password_token")
         .where("id", "=", token_id)
         .execute();
+    }
+  );
+
+  private userClass = this.wrap.repoWrap(
+    async (user: SelectUsers): Promise<User | undefined> => {
+      return user ? new User(user) : undefined;
     }
   );
 };
