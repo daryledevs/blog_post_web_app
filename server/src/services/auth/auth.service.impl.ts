@@ -1,11 +1,13 @@
+import User                                             from "@/model/user.model";
 import bcrypt                                           from "bcrypt";
+import UserDto                                          from "@/dto/user.dto";
 import sendEmail                                        from "@/libraries/nodemailer/send-email.lib";
 import CryptoUtil                                       from "@/libraries/crypto/crypto.lib";
 import AsyncWrapper                                     from "@/utils/async-wrapper.util";
-import { NewUsers, SelectUsers }                                     from "@/types/table.types";
 import IEAuthRepository                                 from "@/repositories/auth/auth.repository";
 import IEUserRepository                                 from "@/repositories/user/user.repository";
 import ApiErrorException                                from "@/exceptions/api.exception";
+import { plainToInstance }                              from "class-transformer";
 import AuthTokensUtil, { Expiration, TokenSecret }      from "@/utils/auth-token.util";
 import IEAuthService, { IResetPasswordForm, LoginType } from "./auth.service";
 
@@ -14,40 +16,53 @@ class AuthService implements IEAuthService {
   private userRepository: IEUserRepository;
   private wrap = new AsyncWrapper();
 
-  constructor(authRepository: IEAuthRepository, userRepository: IEUserRepository) {
+  constructor(
+    authRepository: IEAuthRepository,
+    userRepository: IEUserRepository
+  ) {
     this.authRepository = authRepository;
     this.userRepository = userRepository;
   }
 
   public register = this.wrap.serviceWrap(
     async (
-      data: NewUsers
-    ): Promise<{ message: string, user: SelectUsers | undefined }> => {
-      const { email, username, password } = data;
-      const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
+      userDto: UserDto
+    ): Promise<{ message: string; user: UserDto | undefined }> => {
+      // check to see if the user is already in the database.
+      const email = await this.userRepository.findUserByEmail(
+        userDto.getEmail()
+      );
 
-      // Check if the user has provided all the required fields
-      if (!email || !username || !password) {
-        throw ApiErrorException.HTTP400Error("No arguments provided");
-      }
+      // if the email is already in the exists, return an error
+      if (email) throw ApiErrorException.HTTP409Error("Email already exists");
 
-      // Check if the password is less than 6 characters
-      if (password.length <= 5) {
-        throw ApiErrorException.HTTP400Error(
-          "Password must be at least 6 characters"
-        );
-      }
+      // check to see if the username is already in the database.
+      const username = await this.userRepository.findUserByUsername(
+        userDto.getUsername()
+      );
 
-      // Check to see if the user is already in the database.
-      const userByEmail = await this.userRepository.findUserByEmail(email);
-      if (userByEmail) throw ApiErrorException.HTTP409Error("Email already exists");
+      // if the username is already in the database, return an error
+      if (username) throw ApiErrorException.HTTP409Error("Username already exists");
+      
+      const hashPassword = bcrypt.hashSync(
+        userDto.getPassword(),
+        bcrypt.genSaltSync(10)
+      );
 
-      const userByUsername = await this.userRepository.findUserByUsername(username);
-      if (userByUsername) throw ApiErrorException.HTTP409Error("Username already exists");
-        
+      userDto.setPassword(hashPassword);
+
+      const userInstance = plainToInstance(User, userDto);
+      const newUser = userInstance.save();
+
       // Save the user to the database
-      const user = await this.authRepository.createUser({ ...data, password: hashPassword });
-      return { message: "Registration is successful", user };
+      const user = await this.authRepository.createUser(newUser);
+      if (!user) throw ApiErrorException.HTTP400Error("User not created");
+
+      const newUserDto = plainToInstance(UserDto, user, {
+        excludeExtraneousValues: true,
+      });
+
+      return { message: "Registration is successful", user: newUserDto };
     }
   );
 
@@ -62,9 +77,11 @@ class AuthService implements IEAuthService {
       if (!user) throw ApiErrorException.HTTP404Error("User not found");
       // Check if the password is correct
       const isPasswordMatch = bcrypt.compareSync(password, user.password);
-      
+
       // If the password is incorrect, return an error
-      if (!isPasswordMatch) throw ApiErrorException.HTTP401Error("Invalid password");
+      if (!isPasswordMatch) {
+        throw ApiErrorException.HTTP401Error("Invalid password");
+      }
 
       const args = {
         accessToken: {
@@ -100,8 +117,8 @@ class AuthService implements IEAuthService {
 
       const args = {
         payload: {
-          email: data.email,
-          user_id: user.id as any,
+          email: user.email,
+          user_id: user.id,
         },
         secret: TokenSecret.RESET_SECRET,
         expiration: Expiration.RESET_TOKEN_EXPIRATION,
@@ -121,7 +138,7 @@ class AuthService implements IEAuthService {
       });
 
       // Send reset password email
-      sendEmail(data.email, "Reset Password", encodedToken);
+      sendEmail(user.email, "Reset Password", encodedToken);
       return "Token sent to your email";
     }
   );
@@ -151,9 +168,12 @@ class AuthService implements IEAuthService {
         .HTTP400Error("Password does not match");
 
       // Check if the password is less than 6 characters
-      if (passwordLength) throw ApiErrorException
-        .HTTP400Error("Password must be at least 6 characters");
-
+      if (passwordLength) {
+        throw ApiErrorException.HTTP400Error(
+          "Password must be at least 6 characters"
+        );
+      }
+        
       // Decrypt the token
       const decodedTokenId: any = decodeURIComponent(tokenId);
       const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
@@ -163,7 +183,9 @@ class AuthService implements IEAuthService {
       if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
       // Update the user's password and delete the reset password token from the database.
-      await this.userRepository.updateUserById(user_id, { password: hashPassword });
+      await this.userRepository.updateUserById(user_id, {
+        password: hashPassword,
+      });
       await this.authRepository.deleteResetToken(decodedTokenId);
 
       // add here confirmation email to the user that the password has been reset.

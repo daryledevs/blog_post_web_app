@@ -26,11 +26,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const user_model_1 = __importDefault(require("@/model/user.model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const user_dto_1 = __importDefault(require("@/dto/user.dto"));
 const send_email_lib_1 = __importDefault(require("@/libraries/nodemailer/send-email.lib"));
 const crypto_lib_1 = __importDefault(require("@/libraries/crypto/crypto.lib"));
 const async_wrapper_util_1 = __importDefault(require("@/utils/async-wrapper.util"));
 const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
+const class_transformer_1 = require("class-transformer");
 const auth_token_util_1 = __importStar(require("@/utils/auth-token.util"));
 class AuthService {
     authRepository;
@@ -40,27 +43,29 @@ class AuthService {
         this.authRepository = authRepository;
         this.userRepository = userRepository;
     }
-    register = this.wrap.serviceWrap(async (data) => {
-        const { email, username, password } = data;
-        const hashPassword = bcrypt_1.default.hashSync(password, bcrypt_1.default.genSaltSync(10));
-        // Check if the user has provided all the required fields
-        if (!email || !username || !password) {
-            throw api_exception_1.default.HTTP400Error("No arguments provided");
-        }
-        // Check if the password is less than 6 characters
-        if (password.length <= 5) {
-            throw api_exception_1.default.HTTP400Error("Password must be at least 6 characters");
-        }
-        // Check to see if the user is already in the database.
-        const userByEmail = await this.userRepository.findUserByEmail(email);
-        if (userByEmail)
+    register = this.wrap.serviceWrap(async (userDto) => {
+        // check to see if the user is already in the database.
+        const email = await this.userRepository.findUserByEmail(userDto.getEmail());
+        // if the email is already in the exists, return an error
+        if (email)
             throw api_exception_1.default.HTTP409Error("Email already exists");
-        const userByUsername = await this.userRepository.findUserByUsername(username);
-        if (userByUsername)
+        // check to see if the username is already in the database.
+        const username = await this.userRepository.findUserByUsername(userDto.getUsername());
+        // if the username is already in the database, return an error
+        if (username)
             throw api_exception_1.default.HTTP409Error("Username already exists");
+        const hashPassword = bcrypt_1.default.hashSync(userDto.getPassword(), bcrypt_1.default.genSaltSync(10));
+        userDto.setPassword(hashPassword);
+        const userInstance = (0, class_transformer_1.plainToInstance)(user_model_1.default, userDto);
+        const newUser = userInstance.save();
         // Save the user to the database
-        const user = await this.authRepository.createUser({ ...data, password: hashPassword });
-        return { message: "Registration is successful", user };
+        const user = await this.authRepository.createUser(newUser);
+        if (!user)
+            throw api_exception_1.default.HTTP400Error("User not created");
+        const newUserDto = (0, class_transformer_1.plainToInstance)(user_dto_1.default, user, {
+            excludeExtraneousValues: true,
+        });
+        return { message: "Registration is successful", user: newUserDto };
     });
     login = this.wrap.serviceWrap(async (userCredential, password) => {
         // Check if the user exists in the database
@@ -71,8 +76,9 @@ class AuthService {
         // Check if the password is correct
         const isPasswordMatch = bcrypt_1.default.compareSync(password, user.password);
         // If the password is incorrect, return an error
-        if (!isPasswordMatch)
+        if (!isPasswordMatch) {
             throw api_exception_1.default.HTTP401Error("Invalid password");
+        }
         const args = {
             accessToken: {
                 payload: { uuid: user.uuid, roles: user.roles },
@@ -101,7 +107,7 @@ class AuthService {
             throw api_exception_1.default.HTTP404Error("User not found");
         const args = {
             payload: {
-                email: data.email,
+                email: user.email,
                 user_id: user.id,
             },
             secret: auth_token_util_1.TokenSecret.RESET_SECRET,
@@ -118,7 +124,7 @@ class AuthService {
             encrypted: encryptedToken,
         });
         // Send reset password email
-        (0, send_email_lib_1.default)(data.email, "Reset Password", encodedToken);
+        (0, send_email_lib_1.default)(user.email, "Reset Password", encodedToken);
         return "Token sent to your email";
     });
     resetPasswordForm = this.wrap.serviceWrap(async (tokenId) => {
@@ -140,9 +146,9 @@ class AuthService {
             throw api_exception_1.default
                 .HTTP400Error("Password does not match");
         // Check if the password is less than 6 characters
-        if (passwordLength)
-            throw api_exception_1.default
-                .HTTP400Error("Password must be at least 6 characters");
+        if (passwordLength) {
+            throw api_exception_1.default.HTTP400Error("Password must be at least 6 characters");
+        }
         // Decrypt the token
         const decodedTokenId = decodeURIComponent(tokenId);
         const hashPassword = bcrypt_1.default.hashSync(password, bcrypt_1.default.genSaltSync(10));
@@ -151,7 +157,9 @@ class AuthService {
         if (!user)
             throw api_exception_1.default.HTTP404Error("User not found");
         // Update the user's password and delete the reset password token from the database.
-        await this.userRepository.updateUserById(user_id, { password: hashPassword });
+        await this.userRepository.updateUserById(user_id, {
+            password: hashPassword,
+        });
         await this.authRepository.deleteResetToken(decodedTokenId);
         // add here confirmation email to the user that the password has been reset.
         return "Reset password successfully";

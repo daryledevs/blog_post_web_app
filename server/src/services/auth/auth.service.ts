@@ -1,4 +1,4 @@
-import { NewUsers } from "@/types/table.types";
+import UserDto from "@/dto/user.dto";
 
 export type LoginType = {
   message: string;
@@ -16,15 +16,15 @@ export type IResetPasswordForm = {
 };
 
 interface IEAuthService {
-  register: (data: NewUsers) => Promise<string>;
+  register: (userDto: UserDto) => Promise<{ message: string; user: UserDto | undefined }>;
 
   login: (userCredential: string, password: string) => Promise<LoginType>;
 
   forgotPassword: (email: string) => Promise<string>;
-  
+
   resetPasswordForm: (tokenId: string) => Promise<IResetPasswordForm>;
 
-  resetPassword: (data:any) => Promise<string>;
+  resetPassword: (data: any) => Promise<string>;
 };
 
 export default IEAuthService;
