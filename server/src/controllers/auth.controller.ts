@@ -1,22 +1,25 @@
+import UserDto                             from "@/dto/user.dto";
 import * as dotenv                         from "dotenv";
-import AuthService                         from "@/services/auth/auth.service.impl";
 import AsyncWrapper                        from "@/utils/async-wrapper.util";
+import IEAuthService                       from "@/services/auth/auth.service";
+import { plainToInstance }                 from "class-transformer";
 import { NextFunction, Request, Response } from "express";
 dotenv.config();
 
 class AuthController {
-  private authService: AuthService;
+  private authService: IEAuthService;
   private wrap: AsyncWrapper = new AsyncWrapper();
 
-  constructor(authService: AuthService) {
+  constructor(authService: IEAuthService) {
     this.authService = authService;
   }
 
   public register = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
       const { cookieOptions, ...rest } = req.body;
-      const result = await this.authService.register(rest);
-      res.status(201).send({ message: result });
+      const userDto = plainToInstance(UserDto, rest as object);
+      const result = await this.authService.register(userDto);
+      res.status(201).send(result);
     }
   );
 

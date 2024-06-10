@@ -26,8 +26,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const user_dto_1 = __importDefault(require("@/dto/user.dto"));
 const dotenv = __importStar(require("dotenv"));
 const async_wrapper_util_1 = __importDefault(require("@/utils/async-wrapper.util"));
+const class_transformer_1 = require("class-transformer");
 dotenv.config();
 class AuthController {
     authService;
@@ -37,8 +39,9 @@ class AuthController {
     }
     register = this.wrap.apiWrap(async (req, res, next) => {
         const { cookieOptions, ...rest } = req.body;
-        const result = await this.authService.register(rest);
-        res.status(201).send({ message: result });
+        const userDto = (0, class_transformer_1.plainToInstance)(user_dto_1.default, rest);
+        const result = await this.authService.register(userDto);
+        res.status(201).send(result);
     });
     login = this.wrap.apiWrap(async (req, res, next) => {
         const { userCredential, password } = req.body;
