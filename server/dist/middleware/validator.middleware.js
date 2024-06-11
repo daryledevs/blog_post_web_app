@@ -16,7 +16,9 @@ const validator = async (req, res, next) => {
         const dtoInstance = (0, class_transformer_1.plainToInstance)(dtoClass, req.body);
         const errors = await (0, class_validator_1.validate)(dtoInstance);
         if (errors.length > 0) {
-            const errorsArr = errors.map((error) => Object.values(error.constraints || {}).join(", "));
+            const errorsArr = Object.assign({}, ...errors.map((error) => ({
+                [error.property]: Object.values(error.constraints || {}).join(", ")
+            })));
             return next(new validation_exception_1.default(errorsArr));
         }
         ;

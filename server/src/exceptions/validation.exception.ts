@@ -1,9 +1,13 @@
 import BaseError, { HttpStatusCode } from "./base-error.exception";
 
-class ValidationException extends BaseError {
-  public readonly errors: string[];
+export type ErrorConstraintsType = {
+  [property: string]: string;
+}
 
-  constructor(errors: string[]) {
+class ValidationException extends BaseError {
+  public readonly errors: ErrorConstraintsType;
+
+  constructor(errors: ErrorConstraintsType) {
     super(
       "BAD REQUEST",
       HttpStatusCode.BAD_REQUEST,

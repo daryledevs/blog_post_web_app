@@ -18,10 +18,10 @@ const validator: RequestHandler = async (
     const errors: ValidationError[] = await validate(dtoInstance);
 
     if (errors.length > 0) {
-      const errorsArr = errors.map((error: ValidationError) =>
-        Object.values(error.constraints || {}).join(", ")
-      );
-
+      const errorsArr = Object.assign({}, ...errors.map((error: ValidationError) => ({
+        [error.property]: Object.values(error.constraints || {}).join(", ")
+      })));
+      
       return next(new ValidationException(errorsArr));
     };
 
