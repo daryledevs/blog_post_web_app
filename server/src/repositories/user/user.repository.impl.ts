@@ -1,9 +1,11 @@
-import db                           from "@/database/db.database";
-import { DB }                       from "@/types/schema.types";
-import AsyncWrapper                 from "@/utils/async-wrapper.util";
-import { Kysely, sql }              from "kysely";
-import IUserRepository              from "./user.repository";
-import { SelectUsers, UpdateUsers } from "@/types/table.types";
+import db                            from "@/database/db.database";
+import User                          from "@/model/user.model";
+import { DB }                        from "@/types/schema.types";
+import AsyncWrapper                  from "@/utils/async-wrapper.util";
+import IUserRepository               from "./user.repository";
+import { plainToInstance }           from "class-transformer";
+import { SelectUsers, UpdateUsers }  from "@/types/table.types";
+import { Kysely, UpdateResult, sql } from "kysely";
 
 class UserRepository implements IUserRepository {
   private database: Kysely<DB>;
@@ -12,8 +14,8 @@ class UserRepository implements IUserRepository {
   constructor() { this.database = db; };
 
   public findUserById = this.wrap.repoWrap(
-    async (uuid: string): Promise<SelectUsers | undefined> => {
-      return await this.database
+    async (uuid: string): Promise<User | undefined> => {
+      const user = await this.database
         .selectFrom("users")
         .select([
           "id",
@@ -29,14 +31,16 @@ class UserRepository implements IUserRepository {
           "age",
           "created_at",
         ])
-        .where("uuid", "=", sql`UUID_TO_BIN(${uuid})` as any)
+        .where("uuid", "=", sql`UUID_TO_BIN(${uuid})`)
         .executeTakeFirst();
+
+      return this.userClass(user);
     }
   );
 
   public findUserByUsername = this.wrap.repoWrap(
-    async (username: string): Promise<SelectUsers | undefined> => {
-      return await this.database
+    async (username: string): Promise<User | undefined> => {
+      const user = await this.database
         .selectFrom("users")
         .select([
           "id",
@@ -55,12 +59,14 @@ class UserRepository implements IUserRepository {
         .select([sql`BIN_TO_UUID(uuid)`.as("uuid")])
         .where("username", "like", username + "%")
         .executeTakeFirst();
+
+      return this.userClass(user);
     }
   );
 
   public searchUsersByQuery = this.wrap.repoWrap(
-    async (search: string): Promise<SelectUsers[]> => {
-      return await this.database
+    async (search: string): Promise<User[]> => {
+      const users = await this.database
         .selectFrom("users")
         .select([
           "id",
@@ -94,12 +100,14 @@ class UserRepository implements IUserRepository {
           ])
         )
         .execute();
+
+      return users.map((user) => plainToInstance(User, user));
     }
   );
 
   public findUserByEmail = this.wrap.repoWrap(
-    async (email: string): Promise<SelectUsers | undefined> => {
-      return await this.database
+    async (email: string): Promise<User | undefined> => {
+      const user = await this.database
         .selectFrom("users")
         .select([
           "id",
@@ -117,12 +125,14 @@ class UserRepository implements IUserRepository {
         ])
         .where("email", "=", email)
         .executeTakeFirst();
+
+      return this.userClass(user);
     }
   );
 
   public findUserByCredentials = this.wrap.repoWrap(
-    async (userCredential: string): Promise<SelectUsers | undefined> => {
-      return await this.database
+    async (userCredential: string): Promise<User | undefined> => {
+      const user = await this.database
         .selectFrom("users")
         .select([
           "id",
@@ -145,16 +155,20 @@ class UserRepository implements IUserRepository {
           ])
         )
         .executeTakeFirst();
+
+      return this.userClass(user);
     }
   );
 
   public updateUserById = this.wrap.repoWrap(
-    async (uuid: string, user: UpdateUsers): Promise<UpdateUsers> => {
-      return (await this.database
+    async (uuid: string, user: UpdateUsers): Promise<User | undefined> => {
+      const updatedUser = await this.database
         .updateTable("users")
         .set(user)
         .where("uuid", "=", uuid)
-        .executeTakeFirstOrThrow()) as UpdateUsers;
+        .executeTakeFirstOrThrow();
+
+      return this.userClass(updatedUser);
     }
   );
 
@@ -166,6 +180,12 @@ class UserRepository implements IUserRepository {
         .execute();
     }
   );
+
+  private userClass = (
+    user: SelectUsers | UpdateResult | undefined
+  ): User | undefined => {
+    return user ? plainToInstance(User, user) : undefined;
+  };
 };
 
 export default UserRepository;

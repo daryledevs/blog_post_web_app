@@ -1,17 +1,18 @@
-import { SelectUsers, UpdateUsers } from "@/types/table.types";
+import User            from "@/model/user.model";
+import { UpdateUsers } from "@/types/table.types";
 
 interface IEUserRepository {
-  findUserById: (uuid: string) => Promise<SelectUsers | undefined>;
+  findUserById: (uuid: string) => Promise<User | undefined>;
 
-  findUserByUsername: (username: string) => Promise<SelectUsers | undefined>;
+  findUserByUsername: (username: string) => Promise<User | undefined>;
 
-  searchUsersByQuery: (search: string) => Promise<SelectUsers[]>;
+  searchUsersByQuery: (search: string) => Promise<User[]>;
 
-  findUserByEmail: (email: string) => Promise<SelectUsers | undefined>;
+  findUserByEmail: (email: string) => Promise<User | undefined>;
 
-  findUserByCredentials: (userCredential: string) =>  Promise<SelectUsers | undefined>;
-  
-  updateUserById: (uuid: string, user: UpdateUsers) => Promise<UpdateUsers>;
+  findUserByCredentials: (userCredential: string) => Promise<User | undefined>;
+
+  updateUserById: (uuid: string, user: UpdateUsers) => Promise<User>;
 
   deleteUserById: (uuid: string) => Promise<void>;
 };

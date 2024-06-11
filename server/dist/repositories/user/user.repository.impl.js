@@ -4,7 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_database_1 = __importDefault(require("@/database/db.database"));
+const user_model_1 = __importDefault(require("@/model/user.model"));
 const async_wrapper_util_1 = __importDefault(require("@/utils/async-wrapper.util"));
+const class_transformer_1 = require("class-transformer");
 const kysely_1 = require("kysely");
 class UserRepository {
     database;
@@ -12,7 +14,7 @@ class UserRepository {
     constructor() { this.database = db_database_1.default; }
     ;
     findUserById = this.wrap.repoWrap(async (uuid) => {
-        return await this.database
+        const user = await this.database
             .selectFrom("users")
             .select([
             "id",
@@ -30,9 +32,10 @@ class UserRepository {
         ])
             .where("uuid", "=", (0, kysely_1.sql) `UUID_TO_BIN(${uuid})`)
             .executeTakeFirst();
+        return this.userClass(user);
     });
     findUserByUsername = this.wrap.repoWrap(async (username) => {
-        return await this.database
+        const user = await this.database
             .selectFrom("users")
             .select([
             "id",
@@ -51,9 +54,10 @@ class UserRepository {
             .select([(0, kysely_1.sql) `BIN_TO_UUID(uuid)`.as("uuid")])
             .where("username", "like", username + "%")
             .executeTakeFirst();
+        return this.userClass(user);
     });
     searchUsersByQuery = this.wrap.repoWrap(async (search) => {
-        return await this.database
+        const users = await this.database
             .selectFrom("users")
             .select([
             "id",
@@ -81,9 +85,10 @@ class UserRepository {
               `, "like", search + "%"),
         ]))
             .execute();
+        return users.map((user) => (0, class_transformer_1.plainToInstance)(user_model_1.default, user));
     });
     findUserByEmail = this.wrap.repoWrap(async (email) => {
-        return await this.database
+        const user = await this.database
             .selectFrom("users")
             .select([
             "id",
@@ -101,9 +106,10 @@ class UserRepository {
         ])
             .where("email", "=", email)
             .executeTakeFirst();
+        return this.userClass(user);
     });
     findUserByCredentials = this.wrap.repoWrap(async (userCredential) => {
-        return await this.database
+        const user = await this.database
             .selectFrom("users")
             .select([
             "id",
@@ -124,13 +130,15 @@ class UserRepository {
             eb("username", "=", userCredential),
         ]))
             .executeTakeFirst();
+        return this.userClass(user);
     });
     updateUserById = this.wrap.repoWrap(async (uuid, user) => {
-        return (await this.database
+        const updatedUser = await this.database
             .updateTable("users")
             .set(user)
             .where("uuid", "=", uuid)
-            .executeTakeFirstOrThrow());
+            .executeTakeFirstOrThrow();
+        return this.userClass(updatedUser);
     });
     deleteUserById = this.wrap.repoWrap(async (uuid) => {
         await this.database
@@ -138,6 +146,9 @@ class UserRepository {
             .where("uuid", "=", uuid)
             .execute();
     });
+    userClass = (user) => {
+        return user ? (0, class_transformer_1.plainToInstance)(user_model_1.default, user) : undefined;
+    };
 }
 ;
 exports.default = UserRepository;
