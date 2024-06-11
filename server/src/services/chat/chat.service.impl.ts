@@ -32,7 +32,7 @@ class ChatServices implements IEChatService {
 
       // Return the chat history
       return await this.chatRepository.findAllConversationByUserId(
-        user.id,
+        user.getId(),
         listId
       );
     }
@@ -87,19 +87,19 @@ class ChatServices implements IEChatService {
       } else {
         // if conversation_id is not provided, fetch the conversation by the member IDs
         conversation = await this.chatRepository.findOneConversationByMembersId(
-          [sender.id, receiver.id]
+          [sender.getId(), receiver.getId()]
         );
       }
 
       // determine the conversation ID, creating a new conversation if necessary
       const newConversationId = conversation
         ? conversation.id
-        : await this.createConversation(sender.id, receiver.id);
+        : await this.createConversation(sender.getId(), receiver.getId());
 
       // save the new message in the chat repository
       await this.chatRepository.saveNewMessage({
         conversation_id: newConversationId,
-        sender_id: sender.id,
+        sender_id: sender.getId(),
         text_message,
       });
 

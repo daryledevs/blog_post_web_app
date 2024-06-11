@@ -117,8 +117,8 @@ class AuthService implements IEAuthService {
 
       const args = {
         payload: {
-          email: user.email,
-          user_id: user.id,
+          email: user.getEmail(),
+          user_id: user.getId(),
         },
         secret: TokenSecret.RESET_SECRET,
         expiration: Expiration.RESET_TOKEN_EXPIRATION,
@@ -133,12 +133,12 @@ class AuthService implements IEAuthService {
 
       // Save token to the database
       await this.authRepository.saveResetToken({
-        user_id: user.id,
+        user_id: user.getId(),
         encrypted: encryptedToken,
       });
 
       // Send reset password email
-      sendEmail(user.email, "Reset Password", encodedToken);
+      sendEmail(user.getEmail(), "Reset Password", encodedToken);
       return "Token sent to your email";
     }
   );

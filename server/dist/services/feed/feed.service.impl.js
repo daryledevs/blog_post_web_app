@@ -26,7 +26,7 @@ class FeedService {
         if (!user)
             throw api_exception_1.default.HTTP404Error("User not found");
         // Return the user feed
-        return await this.feedRepository.getUserFeed(user.id, post_ids);
+        return await this.feedRepository.getUserFeed(user.getId(), post_ids);
     });
     getExploreFeed = this.wrap.serviceWrap(async (user_id) => {
         // If no arguments are provided, return an error
@@ -37,7 +37,7 @@ class FeedService {
         if (!user)
             throw api_exception_1.default.HTTP404Error("User not found");
         // Return the explore feed
-        return await this.feedRepository.getExploreFeed(user.id);
+        return await this.feedRepository.getExploreFeed(user.getId());
     });
 }
 ;

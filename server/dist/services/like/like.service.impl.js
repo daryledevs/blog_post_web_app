@@ -40,7 +40,7 @@ class LikeService {
         if (!post)
             throw api_exception_1.default.HTTP404Error("Post not found");
         // If the post is not found, return an error
-        return await this.likeRepository.isUserLikePost(user.id, post.id);
+        return await this.likeRepository.isUserLikePost(user.getId(), post.id);
     });
     toggleUserLikeForPost = this.wrap.serviceWrap(async (user_uuid, post_uuid) => {
         // check if the arguments is provided
@@ -56,10 +56,10 @@ class LikeService {
         if (!post)
             throw api_exception_1.default.HTTP404Error("Post not found");
         // Check to see if the user already likes the post.
-        const like = await this.likeRepository.isUserLikePost(user.id, post.id);
+        const like = await this.likeRepository.isUserLikePost(user.getId(), post.id);
         // If the user hasn't liked the post yet, then create or insert.
         if (!like) {
-            const data = { user_id: user.id, post_id: post.id };
+            const data = { user_id: user.getId(), post_id: post.id };
             await this.likeRepository.likeUsersPostById(data);
             return "Like added successfully";
         }

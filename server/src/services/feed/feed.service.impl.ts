@@ -32,7 +32,7 @@ class FeedService implements IEFeedService {
       if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
       // Return the user feed
-      return await this.feedRepository.getUserFeed(user.id, post_ids);
+      return await this.feedRepository.getUserFeed(user.getId(), post_ids);
     }
   );
 
@@ -46,7 +46,7 @@ class FeedService implements IEFeedService {
       if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
       // Return the explore feed
-      return await this.feedRepository.getExploreFeed(user.id);
+      return await this.feedRepository.getExploreFeed(user.getId());
     }
   );
 };

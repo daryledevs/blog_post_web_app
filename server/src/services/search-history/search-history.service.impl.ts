@@ -7,11 +7,11 @@ import IESearchHistoryRepository from "@/repositories/search-history/search-hist
 
 class SearchHistoryService implements IESearchHistoryService {
   private wrap: AsyncWrapper = new AsyncWrapper();
-  private userRepository: IEUserRepository;
+  private userRepository:          IEUserRepository;
   private searchHistoryRepository: IESearchHistoryRepository;
 
   constructor(
-    userRepository: IEUserRepository,
+    userRepository:          IEUserRepository,
     searchHistoryRepository: IESearchHistoryRepository
   ) {
     this.userRepository = userRepository;
@@ -32,7 +32,9 @@ class SearchHistoryService implements IESearchHistoryService {
       if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
       // search the user by search query
-      return await this.searchHistoryRepository.findSearchHistoryById(user.id);
+      return await this.searchHistoryRepository.findSearchHistoryById(
+        user.getId()
+      );
     }
   );
 
@@ -55,13 +57,13 @@ class SearchHistoryService implements IESearchHistoryService {
       if (!searchUser) throw ApiErrorException.HTTP404Error("Search user not found");
 
       const isExist = await this.searchHistoryRepository
-        .findUsersSearchByUsersId(user.id, searchUser.id);
+        .findUsersSearchByUsersId(user.getId(), searchUser.getId());
 
       if (isExist) return "Search user already saved";
 
       await this.searchHistoryRepository.saveUsersSearch(
-        user.id,
-        searchUser.id
+        user.getId(),
+        searchUser.getId()
       );
 
       return "Search user saved successfully";

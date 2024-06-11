@@ -21,7 +21,7 @@ class FollowService {
         const user = await this.userRepository.findUserById(uuid);
         if (!user)
             throw api_exception_1.default.HTTP404Error("User not found");
-        return await this.followRepository.findUserFollowStatsById(user.id);
+        return await this.followRepository.findUserFollowStatsById(user.getId());
     });
     getFollowerFollowingLists = this.wrap.serviceWrap(async (uuid, fetch, listsId) => {
         // If no arguments are provided, return an error
@@ -34,9 +34,9 @@ class FollowService {
         const listIdsToExclude = listsId?.length ? listsId : [0];
         switch (fetch) {
             case "followers":
-                return this.getFollowers(user.id, listIdsToExclude);
+                return this.getFollowers(user.getId(), listIdsToExclude);
             case "following":
-                return this.getFollowing(user.id, listIdsToExclude);
+                return this.getFollowing(user.getId(), listIdsToExclude);
             default:
                 throw api_exception_1.default.HTTP400Error("Invalid fetch parameter");
         }
@@ -55,8 +55,8 @@ class FollowService {
         if (!otherUser)
             throw api_exception_1.default.HTTP404Error("User not found");
         const args = {
-            follower_id: user.id,
-            followed_id: otherUser.id,
+            follower_id: user.getId(),
+            followed_id: otherUser.getId(),
         };
         // Check if the user is already following the other user
         const isExist = await this.followRepository.isUserFollowing(args);

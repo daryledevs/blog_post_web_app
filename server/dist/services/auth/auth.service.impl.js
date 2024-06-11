@@ -107,8 +107,8 @@ class AuthService {
             throw api_exception_1.default.HTTP404Error("User not found");
         const args = {
             payload: {
-                email: user.email,
-                user_id: user.id,
+                email: user.getEmail(),
+                user_id: user.getId(),
             },
             secret: auth_token_util_1.TokenSecret.RESET_SECRET,
             expiration: auth_token_util_1.Expiration.RESET_TOKEN_EXPIRATION,
@@ -120,11 +120,11 @@ class AuthService {
         const encodedToken = encodeURIComponent(shortToken);
         // Save token to the database
         await this.authRepository.saveResetToken({
-            user_id: user.id,
+            user_id: user.getId(),
             encrypted: encryptedToken,
         });
         // Send reset password email
-        (0, send_email_lib_1.default)(user.email, "Reset Password", encodedToken);
+        (0, send_email_lib_1.default)(user.getEmail(), "Reset Password", encodedToken);
         return "Token sent to your email";
     });
     resetPasswordForm = this.wrap.serviceWrap(async (tokenId) => {

@@ -23,7 +23,7 @@ class SearchHistoryService {
         if (!user)
             throw api_exception_1.default.HTTP404Error("User not found");
         // search the user by search query
-        return await this.searchHistoryRepository.findSearchHistoryById(user.id);
+        return await this.searchHistoryRepository.findSearchHistoryById(user.getId());
     });
     saveUsersSearch = this.wrap.serviceWrap(async (searcher_uuid, search_uuid) => {
         // If no parameters are provided, return an error
@@ -39,10 +39,10 @@ class SearchHistoryService {
         if (!searchUser)
             throw api_exception_1.default.HTTP404Error("Search user not found");
         const isExist = await this.searchHistoryRepository
-            .findUsersSearchByUsersId(user.id, searchUser.id);
+            .findUsersSearchByUsersId(user.getId(), searchUser.getId());
         if (isExist)
             return "Search user already saved";
-        await this.searchHistoryRepository.saveUsersSearch(user.id, searchUser.id);
+        await this.searchHistoryRepository.saveUsersSearch(user.getId(), searchUser.getId());
         return "Search user saved successfully";
     });
     removeRecentSearchesById = this.wrap.serviceWrap(async (uuid) => {

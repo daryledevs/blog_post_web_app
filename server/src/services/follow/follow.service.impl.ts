@@ -28,7 +28,7 @@ class FollowService implements IEFollowService {
       const user = await this.userRepository.findUserById(uuid);
       if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
-      return await this.followRepository.findUserFollowStatsById(user.id);
+      return await this.followRepository.findUserFollowStatsById(user.getId());
     }
   );
 
@@ -49,9 +49,9 @@ class FollowService implements IEFollowService {
 
       switch (fetch) {
         case "followers":
-          return this.getFollowers(user.id, listIdsToExclude);
+          return this.getFollowers(user.getId(), listIdsToExclude);
         case "following":
-          return this.getFollowing(user.id, listIdsToExclude);
+          return this.getFollowing(user.getId(), listIdsToExclude);
         default:
           throw ApiErrorException.HTTP400Error("Invalid fetch parameter");
       }
@@ -74,8 +74,8 @@ class FollowService implements IEFollowService {
       if (!otherUser) throw ApiErrorException.HTTP404Error("User not found");
 
       const args = {
-        follower_id: user.id,
-        followed_id: otherUser.id,
+        follower_id: user.getId(),
+        followed_id: otherUser.getId(),
       };
 
       // Check if the user is already following the other user

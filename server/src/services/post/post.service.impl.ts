@@ -51,7 +51,7 @@ class PostService implements IEPostService {
       if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
       // get the posts for the user
-      return await this.postRepository.findAllPostsByUserId(user.id);
+      return await this.postRepository.findAllPostsByUserId(user.getId());
     }
   );
 
@@ -65,7 +65,7 @@ class PostService implements IEPostService {
       if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
       // get the total posts for the user
-      return await this.postRepository.findUserTotalPostsByUserId(user.id);
+      return await this.postRepository.findUserTotalPostsByUserId(user.getId());
     }
   );
 
@@ -91,7 +91,7 @@ class PostService implements IEPostService {
       // create a new post
       await this.postRepository.createNewPost({
         ...post,
-        user_id: user.id,
+        user_id: user.getId(),
         image_id,
         image_url,
       });

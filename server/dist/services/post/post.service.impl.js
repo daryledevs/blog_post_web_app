@@ -36,7 +36,7 @@ class PostService {
         if (!user)
             throw api_exception_1.default.HTTP404Error("User not found");
         // get the posts for the user
-        return await this.postRepository.findAllPostsByUserId(user.id);
+        return await this.postRepository.findAllPostsByUserId(user.getId());
     });
     geTotalPostsByUsersUuid = this.wrap.serviceWrap(async (user_uuid) => {
         // check if the user_uuid is provided
@@ -47,7 +47,7 @@ class PostService {
         if (!user)
             throw api_exception_1.default.HTTP404Error("User not found");
         // get the total posts for the user
-        return await this.postRepository.findUserTotalPostsByUserId(user.id);
+        return await this.postRepository.findUserTotalPostsByUserId(user.getId());
     });
     createNewPost = this.wrap.serviceWrap(async (post, file) => {
         // check if the image is uploaded
@@ -65,7 +65,7 @@ class PostService {
         // create a new post
         await this.postRepository.createNewPost({
             ...post,
-            user_id: user.id,
+            user_id: user.getId(),
             image_id,
             image_url,
         });
