@@ -1,8 +1,11 @@
-import AsyncWrapper                 from "@/utils/async-wrapper.util";
-import IEUserService                from "./user.service";
-import IEUserRepository             from "@/repositories/user/user.repository";
-import ApiErrorException            from "@/exceptions/api.exception";
-import { SelectUsers, UpdateUsers } from "@/types/table.types";
+import User                from "@/model/user.model";
+import UserDto             from "@/dto/user.dto";
+import AsyncWrapper        from "@/utils/async-wrapper.util";
+import IEUserService       from "./user.service";
+import { UpdateUsers }     from "@/types/table.types";
+import IEUserRepository    from "@/repositories/user/user.repository";
+import ApiErrorException   from "@/exceptions/api.exception";
+import { plainToInstance } from "class-transformer";
 
 class UserService implements IEUserService {
   private wrap: AsyncWrapper = new AsyncWrapper();
@@ -13,61 +16,59 @@ class UserService implements IEUserService {
   }
 
   public getUserById = this.wrap.serviceWrap(
-    async (uuid: string): Promise<SelectUsers | undefined> => {
+    async (uuid: string): Promise<UserDto | undefined> => {
       // If no parameters are provided, return an error
       if (!uuid) throw ApiErrorException.HTTP400Error("No arguments provided");
 
-      // search the user by user_id
-      const data = await this.userRepository.findUserById(uuid);
+      // search the user by id, return an error if the user is not found
+      const user = await this.userRepository.findUserById(uuid);
+      if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
-      // If the user is not found, return an error
-      if (!data) throw ApiErrorException.HTTP404Error("User not found");
-      return data;
+      return this.userDtoClass(user);
     }
   );
 
   public getUserByUsername = this.wrap.serviceWrap(
-    async (username: string): Promise<SelectUsers | undefined> => {
+    async (username: string): Promise<UserDto | undefined> => {
       // If no parameters are provided, return an error
-      if (!username) throw ApiErrorException.HTTP400Error("No arguments provided");
+      if (!username)
+        throw ApiErrorException.HTTP400Error("No arguments provided");
 
-      // search the user by username
-      const data = await this.userRepository.findUserByUsername(username);
+      // search the user by username, return an error if the user is not found
+      const user = await this.userRepository.findUserByUsername(username);
+      if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
-      // If the user is not found, return an error
-      if (!data) throw ApiErrorException.HTTP404Error("User not found");
-
-      return data;
+      return this.userDtoClass(user);
     }
   );
 
   public getUserByEmail = this.wrap.serviceWrap(
-    async (email: string): Promise<SelectUsers | undefined> => {
+    async (email: string): Promise<UserDto | undefined> => {
       // If no parameters are provided, return an error
       if (!email) throw ApiErrorException.HTTP400Error("No arguments provided");
 
-      // search the user by email
-      const data = await this.userRepository.findUserByEmail(email);
+      // search the user by email, return an error if the user is not found
+      const user = await this.userRepository.findUserByEmail(email);
+      if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
-      // If the user is not found, return an error
-      if (!data) throw ApiErrorException.HTTP404Error("User not found");
-
-      return data;
+      return this.userDtoClass(user);
     }
   );
 
   public updateUserById = this.wrap.serviceWrap(
-    async (uuid: string, user: UpdateUsers): Promise<UpdateUsers> => {
+    async (uuid: string, data: UpdateUsers): Promise<UserDto | undefined> => {
       // If no parameters are provided, return an error
       if (!uuid) throw ApiErrorException.HTTP400Error("No arguments provided");
 
-      // search the user by email
-      const data = await this.userRepository.findUserById(uuid);
+      // search the user by email, return an error if the user is not found
+      const user = await this.userRepository.findUserById(uuid);
+      if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
-      // If the user is not found, return an error
-      if (!data) throw ApiErrorException.HTTP404Error("User not found");
+      const updatedUser = await this.userRepository.updateUserById(uuid, data);
+      if (!updatedUser)
+        throw ApiErrorException.HTTP500Error("Failed to update user");
 
-      return await this.userRepository.updateUserById(uuid, user);
+      return this.userDtoClass(user);
     }
   );
 
@@ -76,11 +77,9 @@ class UserService implements IEUserService {
       // If no parameters are provided, return an error
       if (!uuid) throw ApiErrorException.HTTP400Error("No arguments provided");
 
-      // search the user by email
-      const data = await this.userRepository.findUserById(uuid);
-
-      // If the user is not found, return an error
-      if (!data) throw ApiErrorException.HTTP404Error("User not found");
+      // search the user by email, return an error if the user is not found
+      const user = await this.userRepository.findUserById(uuid);
+      if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
       await this.userRepository.deleteUserById(uuid);
       return "User deleted successfully";
@@ -88,14 +87,20 @@ class UserService implements IEUserService {
   );
 
   public searchUserByFields = this.wrap.serviceWrap(
-    async (search: string): Promise<SelectUsers[]> => {
+    async (search: string): Promise<UserDto[]> => {
       // If no parameters are provided, return an error
-      if (!search) throw ApiErrorException.HTTP400Error("No arguments provided");
+      if (!search)
+        throw ApiErrorException.HTTP400Error("No arguments provided");
 
       // search the user by search query
-      return await this.userRepository.searchUsersByQuery(search);
+      const searches = await this.userRepository.searchUsersByQuery(search);
+      return searches.map((user) => plainToInstance(UserDto, user));
     }
   );
+
+  private userDtoClass = (user: User | undefined): UserDto | undefined => {
+    return user ? plainToInstance(UserDto, user) : undefined;
+  };
 }
 
 export default UserService;

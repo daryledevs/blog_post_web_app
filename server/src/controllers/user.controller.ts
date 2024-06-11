@@ -1,19 +1,19 @@
+import UserDto                             from "@/dto/user.dto";
 import AsyncWrapper                        from "@/utils/async-wrapper.util";
 import IEUserService                       from "@/services/user/user.service";
-import { SelectUsers }                     from "@/types/table.types";
 import IEFollowService                     from "@/services/follow/follow.service";
 import IESearchHistoryService              from "@/services/search-history/search-history.service";
 import { NextFunction, Request, Response } from "express";
 
 class UsersController {
-  private userService: IEUserService;
-  private followService: IEFollowService;
+  private userService:          IEUserService;
+  private followService:        IEFollowService;
   private searchHistoryService: IESearchHistoryService;
   private wrap: AsyncWrapper = new AsyncWrapper();
 
   constructor(
-    userService: IEUserService,
-    followService: IEFollowService,
+    userService:          IEUserService,
+    followService:        IEFollowService,
     searchHistoryService: IESearchHistoryService
   ) {
     this.userService = userService;
@@ -23,7 +23,7 @@ class UsersController {
 
   public getUserData = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      let user: SelectUsers | undefined;
+      let user: UserDto | undefined;
       const uuid = req.body.uuid;
       const person  = req.query.person || "";
 
@@ -31,7 +31,7 @@ class UsersController {
         user = await this.userService.getUserByUsername(person as string);
       } else {
         user = await this.userService.getUserById(uuid);
-      }
+      };
 
       res.status(200).send({ user });
     }
@@ -63,17 +63,17 @@ class UsersController {
 
   public getFollowerFollowingLists = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const id = req.params.id;
+      const id      = req.params.id;
       const fetch   = req.query.fetch;
       const listsId = req.body.listsId;
 
-      const users = await this.followService.getFollowerFollowingLists(
+      const stats = await this.followService.getFollowerFollowingLists(
         id,
         fetch as string,
         listsId
       );
 
-      res.status(200).send(users);
+      res.status(200).send(stats);
     }
   );
 
@@ -107,12 +107,12 @@ class UsersController {
       const searcher_uuid = req.params.searcher_uuid;
       const search_uuid   = req.params.search_uuid;
 
-      const message = await this.searchHistoryService.saveUsersSearch(
+      const messages = await this.searchHistoryService.saveUsersSearch(
         searcher_uuid,
         search_uuid
       );
 
-      res.status(200).send(message);
+      res.status(200).send(messages);
     }
   );
 

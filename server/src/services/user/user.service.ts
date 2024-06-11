@@ -1,15 +1,17 @@
-import { SelectUsers, UpdateUsers } from "@/types/table.types";
+
+import UserDto         from "@/dto/user.dto";
+import { UpdateUsers } from "@/types/table.types";
 
 interface IEUserService {
-  getUserById(uuid: string): Promise<SelectUsers | undefined>;
+  getUserById(uuid: string): Promise<UserDto | undefined>;
 
-  getUserByUsername(person: string): Promise<SelectUsers | undefined>;
+  getUserByUsername(person: string): Promise<UserDto | undefined>;
 
-  getUserByEmail(email: string): Promise<SelectUsers | undefined>;
-  
-  searchUserByFields(search: string): Promise<SelectUsers[]>;
+  getUserByEmail(email: string): Promise<UserDto | undefined>;
 
-  updateUserById(uuid: string, user: UpdateUsers): Promise<UpdateUsers>;
+  searchUserByFields(search: string): Promise<UserDto[]>;
+
+  updateUserById(uuid: string, user: UpdateUsers): Promise<UserDto | undefined>;
 
   deleteUserById(uuid: string | undefined): Promise<string | undefined>;
 };

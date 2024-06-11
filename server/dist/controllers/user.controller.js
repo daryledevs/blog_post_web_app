@@ -24,6 +24,7 @@ class UsersController {
         else {
             user = await this.userService.getUserById(uuid);
         }
+        ;
         res.status(200).send({ user });
     });
     searchUsersByQuery = this.wrap.apiWrap(async (req, res, next) => {
@@ -45,8 +46,8 @@ class UsersController {
         const id = req.params.id;
         const fetch = req.query.fetch;
         const listsId = req.body.listsId;
-        const users = await this.followService.getFollowerFollowingLists(id, fetch, listsId);
-        res.status(200).send(users);
+        const stats = await this.followService.getFollowerFollowingLists(id, fetch, listsId);
+        res.status(200).send(stats);
     });
     toggleFollow = this.wrap.apiWrap(async (req, res, next) => {
         const follower_uuid = req.params.follower_uuid;
@@ -63,8 +64,8 @@ class UsersController {
     saveRecentSearches = this.wrap.apiWrap(async (req, res, next) => {
         const searcher_uuid = req.params.searcher_uuid;
         const search_uuid = req.params.search_uuid;
-        const message = await this.searchHistoryService.saveUsersSearch(searcher_uuid, search_uuid);
-        res.status(200).send(message);
+        const messages = await this.searchHistoryService.saveUsersSearch(searcher_uuid, search_uuid);
+        res.status(200).send(messages);
     });
     removeRecentSearches = this.wrap.apiWrap(async (req, res, next) => {
         const uuid = req.params.uuid;
