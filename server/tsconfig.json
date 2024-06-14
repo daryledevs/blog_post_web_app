@@ -17,6 +17,7 @@
     "lib": ["ES2022"],
     "types": ["vitest/globals"],
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
 
     /* Strictness */
     "strict": true,
