@@ -1,11 +1,11 @@
-import { SelectSearches } from "@/types/table.types";
+import SearchHistory from "@/model/search-history.model";
 
 interface IESearchHistoryRepository {
-  findUsersSearchById: (uuid: string) => Promise<SelectSearches | undefined>;
+  findUsersSearchById: (uuid: string) => Promise<SearchHistory | undefined>;
 
-  findSearchHistoryById: (searcher_id: number) => Promise<SelectSearches[] | undefined>;
+  findSearchHistoryById: (searcher_id: number) => Promise<SearchHistory[]>;
 
-  findUsersSearchByUsersId: (searcher_id: number, search_id: number) => Promise<SelectSearches | undefined>;
+  findUsersSearchByUsersId: (searcher_id: number, search_id: number) => Promise<SearchHistory | undefined>;
 
   saveUsersSearch: (searcher_id: number, search_id: number) => Promise<void>;
 

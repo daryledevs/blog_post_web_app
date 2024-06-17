@@ -1,47 +1,65 @@
+import SearchHistory, {
+  IESearchHistoryData,
+}                                from "@/model/search-history.model";
 import db                        from "@/database/db.database";
 import { DB }                    from "@/types/schema.types";
 import AsyncWrapper              from "@/utils/async-wrapper.util";
 import { Kysely, sql }           from "kysely";
-import { SelectSearches }        from "@/types/table.types";
+import { plainToInstance }       from "class-transformer";
 import IESearchHistoryRepository from "./search-history.repository";
 
 class SearchHistoryRepository implements IESearchHistoryRepository {
   private database: Kysely<DB>;
   private wrap: AsyncWrapper = new AsyncWrapper();
 
-  constructor() { this.database = db; };
+  constructor() { this.database = db; }
 
   public findUsersSearchById = this.wrap.repoWrap(
-    async (uuid: string): Promise<SelectSearches | undefined> => {
-      return await this.database
-        .selectFrom("search_history")
+    async (uuid: string): Promise<SearchHistory | undefined> => {
+      const search: IESearchHistoryData | undefined = await this.database
+        .selectFrom("search_history as sh")
+        .leftJoin("users as u", "u.id", "sh.searched_id")
         .select([
-          "id",
-          sql`BIN_TO_UUID(uuid)`.as("uuid"),
-          "searched_id",
-          "searcher_id",
-          "created_at",
+          "sh.id",
+          sql`BIN_TO_UUID(sh.uuid)`.as("uuid"),
+          "sh.searcher_id",
+          "sh.searched_id",
+          sql`BIN_TO_UUID(u.uuid)`.as("user_uuid"),
+          "u.username",
+          "u.first_name",
+          "u.last_name",
+          "u.avatar_url",
+          "sh.created_at",
         ])
         .where("uuid", "=", uuid)
         .executeTakeFirst();
+
+      return this.plainToModel(search);
     }
   );
 
   public findSearchHistoryById = this.wrap.repoWrap(
-    async (searcher_id: number): Promise<SelectSearches[] | undefined> => {
-      return await this.database
-        .selectFrom("search_history")
+    async (searcher_id: number): Promise<SearchHistory[]> => {
+      const searches: IESearchHistoryData[] = await this.database
+        .selectFrom("search_history as sh")
+        .leftJoin("users as u", "u.id", "sh.searched_id")
         .select([
-          "id",
-          sql`BIN_TO_UUID(uuid)`.as("uuid"),
-          "searched_id",
-          "searcher_id",
-          "created_at",
+          "sh.id",
+          sql`BIN_TO_UUID(sh.uuid)`.as("uuid"),
+          "sh.searcher_id",
+          "sh.searched_id",
+          sql`BIN_TO_UUID(u.uuid)`.as("user_uuid"),
+          "u.username",
+          "u.first_name",
+          "u.last_name",
+          "u.avatar_url",
+          "sh.created_at",
         ])
-        .innerJoin("users", "users.id", "search_history.searched_id")
-        .where("search_history.searcher_id", "=", searcher_id)
+        .where("sh.searcher_id", "=", searcher_id)
         .limit(30)
         .execute();
+
+      return plainToInstance(SearchHistory, searches);
     }
   );
 
@@ -49,23 +67,31 @@ class SearchHistoryRepository implements IESearchHistoryRepository {
     async (
       searcher_id: number,
       searched_id: number
-    ): Promise<SelectSearches | undefined> => {
-      return await this.database
-        .selectFrom("search_history")
+    ): Promise<SearchHistory | undefined> => {
+      const search: IESearchHistoryData | undefined = await this.database
+        .selectFrom("search_history as sh")
+        .leftJoin("users as u", "u.id", "sh.searched_id")
         .select([
-          "id",
-          sql`BIN_TO_UUID(uuid)`.as("uuid"),
-          "searched_id",
-          "searcher_id",
-          "created_at",
+          "sh.id",
+          sql`BIN_TO_UUID(sh.uuid)`.as("uuid"),
+          "sh.searcher_id",
+          "sh.searched_id",
+          sql`BIN_TO_UUID(u.uuid)`.as("user_uuid"),
+          "u.username",
+          "u.first_name",
+          "u.last_name",
+          "u.avatar_url",
+          "sh.created_at",
         ])
         .where((eb) =>
           eb.and([
-            eb("searcher_id", "=", searcher_id),
-            eb("searched_id", "=", searched_id),
+            eb("sh.searcher_id", "=", searcher_id),
+            eb("sh.searched_id", "=", searched_id),
           ])
         )
         .executeTakeFirst();
+
+      return this.plainToModel(search);
     }
   );
 
@@ -73,7 +99,7 @@ class SearchHistoryRepository implements IESearchHistoryRepository {
     async (searcher_id: number, searched_id: number): Promise<void> => {
       await this.database
         .insertInto("search_history")
-        .values({ searcher_id, searched_id, uuid: "" })
+        .values({ searcher_id, searched_id })
         .execute();
     }
   );
@@ -86,6 +112,12 @@ class SearchHistoryRepository implements IESearchHistoryRepository {
         .execute();
     }
   );
+
+  private plainToModel = (
+    search: IESearchHistoryData | undefined
+  ): SearchHistory | undefined => {
+    return search ? plainToInstance(SearchHistory, search) : undefined;
+  };
 };
 
 export default SearchHistoryRepository;
