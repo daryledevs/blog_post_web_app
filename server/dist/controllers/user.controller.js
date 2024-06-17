@@ -59,13 +59,13 @@ class UsersController {
         const searcher_uuid = req.params.searcher_uuid;
         const searches = await this.searchHistoryService
             .getUsersSearchHistoryById(searcher_uuid);
-        res.status(200).send(searches);
+        res.status(200).send({ searches });
     });
     saveRecentSearches = this.wrap.apiWrap(async (req, res, next) => {
         const searcher_uuid = req.params.searcher_uuid;
-        const search_uuid = req.params.search_uuid;
-        const messages = await this.searchHistoryService.saveUsersSearch(searcher_uuid, search_uuid);
-        res.status(200).send(messages);
+        const searched_uuid = req.params.searched_uuid;
+        const messages = await this.searchHistoryService.saveUsersSearch(searcher_uuid, searched_uuid);
+        res.status(200).send({ messages });
     });
     removeRecentSearches = this.wrap.apiWrap(async (req, res, next) => {
         const uuid = req.params.uuid;

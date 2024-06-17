@@ -98,21 +98,21 @@ class UsersController {
       const searches = await this.searchHistoryService
         .getUsersSearchHistoryById(searcher_uuid);
 
-      res.status(200).send(searches);
+      res.status(200).send({ searches });
     }
   );
 
   public saveRecentSearches = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
       const searcher_uuid = req.params.searcher_uuid;
-      const search_uuid   = req.params.search_uuid;
+      const searched_uuid = req.params.searched_uuid;
 
       const messages = await this.searchHistoryService.saveUsersSearch(
         searcher_uuid,
-        search_uuid
+        searched_uuid
       );
 
-      res.status(200).send(messages);
+      res.status(200).send({ messages });
     }
   );
 
