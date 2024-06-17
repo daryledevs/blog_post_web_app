@@ -1,7 +1,7 @@
-import { SelectSearches } from "@/types/table.types";
+import SearchHistoryDto from "@/dto/search-history.dto";
 
 interface IESearchHistoryService {
-  getUsersSearchHistoryById(searcher_uuid: string | undefined): Promise<SelectSearches[] | undefined>;
+  getUsersSearchHistoryById(searcher_uuid: string | undefined): Promise<SearchHistoryDto[]>;
 
   saveUsersSearch(searcher_uuid: string | undefined, search_uuid: string | undefined): Promise<string>;
 
