@@ -25,10 +25,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const base_error_exception_1 = __importStar(require("./base-error.exception"));
 class ValidationException extends base_error_exception_1.default {
-    errors;
-    constructor(errors) {
-        super("BAD REQUEST", base_error_exception_1.HttpStatusCode.BAD_REQUEST, "Validation errors occurred", true);
-        this.errors = errors;
+    constructor(error) {
+        super("BAD REQUEST", base_error_exception_1.HttpStatusCode.BAD_REQUEST, "Validation errors occurred", true, error);
     }
 }
 exports.default = ValidationException;
