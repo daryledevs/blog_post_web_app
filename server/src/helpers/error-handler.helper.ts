@@ -5,10 +5,10 @@ import { ErrorRequestHandler } from "express";
 
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   if (err instanceof ValidationException) {
-    const { name, httpCode, message, isOperational, errors } = err;
+    const { name, httpCode, message, isOperational, error } = err;
     return res
       .status(httpCode)
-      .send({ name, isOperational, message, errors: errors });
+      .send({ httpCode, name, isOperational, message, errors: error });
   }
 
   if (err instanceof DatabaseException) {
@@ -19,7 +19,7 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
     const { name, httpCode, message, isOperational, error } = err;
     return res
       .status(httpCode)
-      .send({ name, isOperational, message, stack: error?.stack });
+      .send({ httpCode, name, isOperational, message, stack: error?.stack });
   }
 
   // Default error handling
