@@ -32,7 +32,7 @@ class UserRepository {
         ])
             .where("uuid", "=", (0, kysely_1.sql) `UUID_TO_BIN(${uuid})`)
             .executeTakeFirst();
-        return this.userClass(user);
+        return this.plainToModel(user);
     });
     findUserByUsername = this.wrap.repoWrap(async (username) => {
         const user = await this.database
@@ -54,7 +54,7 @@ class UserRepository {
             .select([(0, kysely_1.sql) `BIN_TO_UUID(uuid)`.as("uuid")])
             .where("username", "like", username + "%")
             .executeTakeFirst();
-        return this.userClass(user);
+        return this.plainToModel(user);
     });
     searchUsersByQuery = this.wrap.repoWrap(async (search) => {
         const users = await this.database
@@ -106,7 +106,7 @@ class UserRepository {
         ])
             .where("email", "=", email)
             .executeTakeFirst();
-        return this.userClass(user);
+        return this.plainToModel(user);
     });
     findUserByCredentials = this.wrap.repoWrap(async (userCredential) => {
         const user = await this.database
@@ -130,7 +130,7 @@ class UserRepository {
             eb("username", "=", userCredential),
         ]))
             .executeTakeFirst();
-        return this.userClass(user);
+        return this.plainToModel(user);
     });
     updateUserById = this.wrap.repoWrap(async (uuid, user) => {
         const updatedUser = await this.database
@@ -138,7 +138,7 @@ class UserRepository {
             .set(user)
             .where("uuid", "=", uuid)
             .executeTakeFirstOrThrow();
-        return this.userClass(updatedUser);
+        return this.plainToModel(updatedUser);
     });
     deleteUserById = this.wrap.repoWrap(async (uuid) => {
         await this.database
@@ -146,7 +146,7 @@ class UserRepository {
             .where("uuid", "=", uuid)
             .execute();
     });
-    userClass = (user) => {
+    plainToModel = (user) => {
         return user ? (0, class_transformer_1.plainToInstance)(user_model_1.default, user) : undefined;
     };
 }

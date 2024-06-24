@@ -34,7 +34,7 @@ class UserRepository implements IUserRepository {
         .where("uuid", "=", sql`UUID_TO_BIN(${uuid})`)
         .executeTakeFirst();
 
-      return this.userClass(user);
+      return this.plainToModel(user);
     }
   );
 
@@ -60,7 +60,7 @@ class UserRepository implements IUserRepository {
         .where("username", "like", username + "%")
         .executeTakeFirst();
 
-      return this.userClass(user);
+      return this.plainToModel(user);
     }
   );
 
@@ -126,7 +126,7 @@ class UserRepository implements IUserRepository {
         .where("email", "=", email)
         .executeTakeFirst();
 
-      return this.userClass(user);
+      return this.plainToModel(user);
     }
   );
 
@@ -156,7 +156,7 @@ class UserRepository implements IUserRepository {
         )
         .executeTakeFirst();
 
-      return this.userClass(user);
+      return this.plainToModel(user);
     }
   );
 
@@ -168,7 +168,7 @@ class UserRepository implements IUserRepository {
         .where("uuid", "=", uuid)
         .executeTakeFirstOrThrow();
 
-      return this.userClass(updatedUser);
+      return this.plainToModel(updatedUser);
     }
   );
 
@@ -181,7 +181,7 @@ class UserRepository implements IUserRepository {
     }
   );
 
-  private userClass = (
+  private plainToModel = (
     user: SelectUsers | UpdateResult | undefined
   ): User | undefined => {
     return user ? plainToInstance(User, user) : undefined;
