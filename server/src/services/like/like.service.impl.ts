@@ -32,7 +32,7 @@ class LikeService implements IELikeService {
       if (!post) throw ApiErrorException.HTTP404Error("Post not found");
 
       // get the total likes for the post
-      return await this.likeRepository.findPostsLikeCount(post.id);
+      return await this.likeRepository.findPostsLikeCount(post.getId());
     }
   );
 
@@ -55,7 +55,7 @@ class LikeService implements IELikeService {
       if (!post) throw ApiErrorException.HTTP404Error("Post not found");
 
       // If the post is not found, return an error
-      return await this.likeRepository.isUserLikePost(user.getId(), post.id);
+      return await this.likeRepository.isUserLikePost(user.getId(), post.getId());
     }
   );
 
@@ -78,11 +78,11 @@ class LikeService implements IELikeService {
       if (!post) throw ApiErrorException.HTTP404Error("Post not found");
 
       // Check to see if the user already likes the post.
-      const like = await this.likeRepository.isUserLikePost(user.getId(), post.id);
+      const like = await this.likeRepository.isUserLikePost(user.getId(), post.getId());
 
       // If the user hasn't liked the post yet, then create or insert.
       if (!like) {
-        const data = { user_id: user.getId(), post_id: post.id };
+        const data = { user_id: user.getId(), post_id: post.getId() };
         await this.likeRepository.likeUsersPostById(data);
         return "Like added successfully";
       }
