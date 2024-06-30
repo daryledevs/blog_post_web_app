@@ -104,7 +104,7 @@ __decorate([
 __decorate([
     (0, class_transformer_1.Expose)(),
     (0, class_validator_1.IsNotEmpty)({ message: "UUID is required" }),
-    (0, class_validator_1.IsUUID)(4, { message: "Invalid search's UUID version" }),
+    (0, class_validator_1.IsUUID)(4, { message: "invalid search's UUID version" }),
     __metadata("design:type", Object)
 ], SearchHistoryDto.prototype, "uuid", void 0);
 __decorate([
@@ -117,13 +117,13 @@ __decorate([
 ], SearchHistoryDto.prototype, "searched_id", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
-    (0, class_validator_1.IsUUID)(4, { message: "Invalid user's UUID version" }),
+    (0, class_validator_1.IsUUID)(4, { message: "invalid user's UUID version" }),
     __metadata("design:type", String)
 ], SearchHistoryDto.prototype, "user_uuid", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
-    (0, class_validator_1.IsNotEmpty)({ message: "Username is required" }),
-    (0, class_validator_1.IsString)({ message: "Username must be a string" }),
+    (0, class_validator_1.IsNotEmpty)({ message: "username is required" }),
+    (0, class_validator_1.IsString)({ message: "username must be a string" }),
     __metadata("design:type", String)
 ], SearchHistoryDto.prototype, "username", void 0);
 __decorate([

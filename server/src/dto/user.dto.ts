@@ -17,20 +17,20 @@ class UserDto {
   private uuid!: string;
 
   @Expose()
-  @Length(5, 30, { message: "Username must be between 5 and 30 characters" })
+  @Length(5, 30, { message: "username must be between 5 and 30 characters" })
   private username!: string;
 
   @Expose()
-  @IsEmail({}, { message: "Invalid email" })
+  @IsEmail({}, { message: "invalid email" })
   private email!: string;
 
   @Exclude({ toPlainOnly: true })
-  @Length(6, 100, { message: "Password must be at least 6 characters" })
+  @Length(6, 100, { message: "password must be at least 6 characters" })
   private password!: string;
 
   @Expose()
   @IsString({ message: "Roles must be a string" })
-  @IsIn(["user", "admin"], { message: "Invalid role" })
+  @IsIn(["user", "admin"], { message: "invalid role" })
   private roles: string | null | undefined;
 
   @Expose()

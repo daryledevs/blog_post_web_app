@@ -6,24 +6,24 @@ class LikeDto {
   private id: number;
 
   @Expose()
-  @IsNotEmpty({ message: "User's UUID is required" })
-  @IsUUID(4, { message: "Invalid search's UUID version" })
+  @IsNotEmpty({ message: "UUID is required" })
+  @IsUUID(4, { message: "invalid search's UUID version" })
   private uuid: any;
 
   @Exclude({ toPlainOnly: true })
   private post_id: number;
 
   @Expose()
-  @IsNotEmpty({ message: "User's UUID is required" })
-  @IsUUID(4, { message: "Invalid search's UUID version" })
+  @IsNotEmpty({ message: "post's UUID is required" })
+  @IsUUID(4, { message: "invalid search's UUID version" })
   private post_uuid: any;
 
   @Exclude({ toPlainOnly: true })
   private user_id: number;
 
   @Exclude()
-  @IsNotEmpty({ message: "User's UUID is required" })
-  @IsUUID(4, { message: "Invalid search's UUID version" })
+  @IsNotEmpty({ message: "user's UUID is required" })
+  @IsUUID(4, { message: "invalid search's UUID version" })
   private user_uuid: any;
 
   @Expose()

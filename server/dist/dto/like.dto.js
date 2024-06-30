@@ -79,8 +79,8 @@ __decorate([
 ], LikeDto.prototype, "id", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
-    (0, class_validator_1.IsNotEmpty)({ message: "User's UUID is required" }),
-    (0, class_validator_1.IsUUID)(4, { message: "Invalid search's UUID version" }),
+    (0, class_validator_1.IsNotEmpty)({ message: "UUID is required" }),
+    (0, class_validator_1.IsUUID)(4, { message: "invalid search's UUID version" }),
     __metadata("design:type", Object)
 ], LikeDto.prototype, "uuid", void 0);
 __decorate([
@@ -89,8 +89,8 @@ __decorate([
 ], LikeDto.prototype, "post_id", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
-    (0, class_validator_1.IsNotEmpty)({ message: "User's UUID is required" }),
-    (0, class_validator_1.IsUUID)(4, { message: "Invalid search's UUID version" }),
+    (0, class_validator_1.IsNotEmpty)({ message: "post's UUID is required" }),
+    (0, class_validator_1.IsUUID)(4, { message: "invalid search's UUID version" }),
     __metadata("design:type", Object)
 ], LikeDto.prototype, "post_uuid", void 0);
 __decorate([
@@ -99,8 +99,8 @@ __decorate([
 ], LikeDto.prototype, "user_id", void 0);
 __decorate([
     (0, class_transformer_1.Exclude)(),
-    (0, class_validator_1.IsNotEmpty)({ message: "User's UUID is required" }),
-    (0, class_validator_1.IsUUID)(4, { message: "Invalid search's UUID version" }),
+    (0, class_validator_1.IsNotEmpty)({ message: "user's UUID is required" }),
+    (0, class_validator_1.IsUUID)(4, { message: "invalid search's UUID version" }),
     __metadata("design:type", Object)
 ], LikeDto.prototype, "user_uuid", void 0);
 __decorate([

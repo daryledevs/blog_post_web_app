@@ -112,23 +112,23 @@ __decorate([
 ], UserDto.prototype, "uuid", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
-    (0, class_validator_1.Length)(5, 30, { message: "Username must be between 5 and 30 characters" }),
+    (0, class_validator_1.Length)(5, 30, { message: "username must be between 5 and 30 characters" }),
     __metadata("design:type", String)
 ], UserDto.prototype, "username", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
-    (0, class_validator_1.IsEmail)({}, { message: "Invalid email" }),
+    (0, class_validator_1.IsEmail)({}, { message: "invalid email" }),
     __metadata("design:type", String)
 ], UserDto.prototype, "email", void 0);
 __decorate([
     (0, class_transformer_1.Exclude)({ toPlainOnly: true }),
-    (0, class_validator_1.Length)(6, 100, { message: "Password must be at least 6 characters" }),
+    (0, class_validator_1.Length)(6, 100, { message: "password must be at least 6 characters" }),
     __metadata("design:type", String)
 ], UserDto.prototype, "password", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
     (0, class_validator_1.IsString)({ message: "Roles must be a string" }),
-    (0, class_validator_1.IsIn)(["user", "admin"], { message: "Invalid role" }),
+    (0, class_validator_1.IsIn)(["user", "admin"], { message: "invalid role" }),
     __metadata("design:type", Object)
 ], UserDto.prototype, "roles", void 0);
 __decorate([

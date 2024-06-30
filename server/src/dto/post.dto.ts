@@ -7,15 +7,15 @@ class PostDto {
 
   @Expose()
   @IsNotEmpty({ message: "UUID is required" })
-  @IsUUID(4, { message: "Invalid search's UUID version" })
+  @IsUUID(4, { message: "invalid search's UUID version" })
   private uuid: any;
 
   @Expose()
-  @IsNotEmpty({ message: "Image ID is required" })
+  @IsNotEmpty({ message: "image ID is required" })
   private image_id: string;
 
   @Expose()
-  @IsNotEmpty({ message: "Image URL is required" })
+  @IsNotEmpty({ message: "image URL is required" })
   private image_url: string | null;
 
   @Exclude({ toPlainOnly: true })

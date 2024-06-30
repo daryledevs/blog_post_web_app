@@ -88,17 +88,17 @@ __decorate([
 __decorate([
     (0, class_transformer_1.Expose)(),
     (0, class_validator_1.IsNotEmpty)({ message: "UUID is required" }),
-    (0, class_validator_1.IsUUID)(4, { message: "Invalid search's UUID version" }),
+    (0, class_validator_1.IsUUID)(4, { message: "invalid search's UUID version" }),
     __metadata("design:type", Object)
 ], PostDto.prototype, "uuid", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
-    (0, class_validator_1.IsNotEmpty)({ message: "Image ID is required" }),
+    (0, class_validator_1.IsNotEmpty)({ message: "image ID is required" }),
     __metadata("design:type", String)
 ], PostDto.prototype, "image_id", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
-    (0, class_validator_1.IsNotEmpty)({ message: "Image URL is required" }),
+    (0, class_validator_1.IsNotEmpty)({ message: "image URL is required" }),
     __metadata("design:type", Object)
 ], PostDto.prototype, "image_url", void 0);
 __decorate([

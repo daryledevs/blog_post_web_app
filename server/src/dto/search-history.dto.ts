@@ -7,7 +7,7 @@ class SearchHistoryDto {
 
   @Expose()
   @IsNotEmpty({ message: "UUID is required" })
-  @IsUUID(4, { message: "Invalid search's UUID version" })
+  @IsUUID(4, { message: "invalid search's UUID version" })
   private uuid: any;
 
   @Exclude({ toPlainOnly: true })
@@ -17,12 +17,12 @@ class SearchHistoryDto {
   private searched_id: number;
 
   @Expose()
-  @IsUUID(4, { message: "Invalid user's UUID version" })
+  @IsUUID(4, { message: "invalid user's UUID version" })
   private user_uuid: string;
 
   @Expose()
-  @IsNotEmpty({ message: "Username is required" })
-  @IsString({ message: "Username must be a string" })
+  @IsNotEmpty({ message: "username is required" })
+  @IsString({ message: "username must be a string" })
   private username: string;
 
   @Expose()
