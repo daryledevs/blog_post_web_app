@@ -1,9 +1,10 @@
-import { NewPosts, SelectPosts, UpdatePosts } from "@/types/table.types";
+import PostDto                   from "@/dto/post.dto";
+import { NewPosts, UpdatePosts } from "@/types/table.types";
 
 interface IEPostService {
-  getPostByUuid: (uuid: string | undefined) => Promise<SelectPosts | undefined>;
+  getPostByUuid: (uuid: string | undefined) => Promise<PostDto | undefined>;
 
-  getAllPostsByUsersUuid: (user_uuid: string | undefined) => Promise<SelectPosts[]>;
+  getAllPostsByUsersUuid: (user_uuid: string | undefined) => Promise<PostDto[]>;
 
   geTotalPostsByUsersUuid: (user_uuid: string | undefined) => Promise<string | number | bigint>;
 

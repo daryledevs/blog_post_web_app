@@ -4,17 +4,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_database_1 = __importDefault(require("@/database/db.database"));
+const post_model_1 = __importDefault(require("@/model/post.model"));
 const cloudinary_1 = __importDefault(require("cloudinary"));
 const async_wrapper_util_1 = __importDefault(require("@/utils/async-wrapper.util"));
 const kysely_1 = require("kysely");
 const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
+const class_transformer_1 = require("class-transformer");
 class PostRepository {
     database;
     wrap = new async_wrapper_util_1.default();
     constructor() { this.database = db_database_1.default; }
     ;
     findPostsByPostId = this.wrap.repoWrap(async (uuid) => {
-        return this.database
+        const data = await this.database
             .selectFrom("posts")
             .select([
             "id",
@@ -28,9 +30,10 @@ class PostRepository {
         ])
             .where("uuid", "=", uuid)
             .executeTakeFirst();
+        return this.plainToModel(data);
     });
     findAllPostsByUserId = this.wrap.repoWrap(async (user_id) => {
-        return await this.database
+        const data = await this.database
             .selectFrom("posts")
             .innerJoin("users", "posts.user_id", "users.id")
             .leftJoin("likes", "posts.id", "likes.post_id")
@@ -52,6 +55,7 @@ class PostRepository {
             .orderBy("posts.created_at", "desc")
             .groupBy("posts.id")
             .execute();
+        return (0, class_transformer_1.plainToInstance)(post_model_1.default, data);
     });
     findUserTotalPostsByUserId = this.wrap.repoWrap(async (user_id) => {
         const query = this.database
@@ -64,10 +68,7 @@ class PostRepository {
         return count;
     });
     createNewPost = this.wrap.repoWrap(async (post) => {
-        await this.database
-            .insertInto("posts")
-            .values(post)
-            .execute();
+        await this.database.insertInto("posts").values(post).execute();
     });
     editPostByPostId = this.wrap.repoWrap(async (uuid, post) => {
         await this.database
@@ -93,6 +94,9 @@ class PostRepository {
             .where("id", "=", post_id)
             .executeTakeFirst();
     });
+    plainToModel = (post) => {
+        return post ? (0, class_transformer_1.plainToInstance)(post_model_1.default, post) : undefined;
+    };
 }
 ;
 exports.default = PostRepository;

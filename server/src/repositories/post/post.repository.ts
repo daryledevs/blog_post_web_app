@@ -1,9 +1,10 @@
-import { NewPosts, SelectPosts, UpdatePosts } from "@/types/table.types";
+import Post from "@/model/post.model";
+import { NewPosts, UpdatePosts } from "@/types/table.types";
 
 interface IEPostRepository {
-  findPostsByPostId: (uuid: string) => Promise<SelectPosts | undefined>;
+  findPostsByPostId: (uuid: string) => Promise<Post | undefined>;
 
-  findAllPostsByUserId: (user_id: number) => Promise<SelectPosts[]>;
+  findAllPostsByUserId: (user_id: number) => Promise<Post[]>;
 
   findUserTotalPostsByUserId: (user_id: number) => Promise<string | number | bigint>;
 

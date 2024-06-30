@@ -3,9 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const post_dto_1 = __importDefault(require("@/dto/post.dto"));
 const path_1 = require("path");
 const async_wrapper_util_1 = __importDefault(require("@/utils/async-wrapper.util"));
 const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
+const class_transformer_1 = require("class-transformer");
 class PostService {
     postRepository;
     userRepository;
@@ -25,7 +27,7 @@ class PostService {
         if (!post)
             throw api_exception_1.default.HTTP404Error("Post not found");
         // return the post
-        return post;
+        return (0, class_transformer_1.plainToInstance)(post_dto_1.default, post, { excludeExtraneousValues: true });
     });
     getAllPostsByUsersUuid = this.wrap.serviceWrap(async (user_uuid) => {
         // check if the user_uuid is provided
@@ -36,7 +38,8 @@ class PostService {
         if (!user)
             throw api_exception_1.default.HTTP404Error("User not found");
         // get the posts for the user
-        return await this.postRepository.findAllPostsByUserId(user.getId());
+        const posts = await this.postRepository.findAllPostsByUserId(user.getId());
+        return (0, class_transformer_1.plainToInstance)(post_dto_1.default, posts, { excludeExtraneousValues: true });
     });
     geTotalPostsByUsersUuid = this.wrap.serviceWrap(async (user_uuid) => {
         // check if the user_uuid is provided
@@ -95,7 +98,7 @@ class PostService {
         if (!post)
             throw api_exception_1.default.HTTP404Error("Post not found");
         // delete the post
-        await this.postRepository.deletePostById(post.id);
+        await this.postRepository.deletePostById(post.getId());
         return "Post deleted successfully";
     });
 }

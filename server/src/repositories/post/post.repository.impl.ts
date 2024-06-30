@@ -2,14 +2,16 @@ import {
   NewPosts,
   SelectPosts,
   UpdatePosts,
-}                        from "@/types/table.types";
-import db                from "@/database/db.database";
-import { DB }            from "@/types/schema.types";
-import cloudinary        from "cloudinary";
-import AsyncWrapper      from "@/utils/async-wrapper.util";
-import { Kysely, sql }   from "kysely";
-import IEPostRepository  from "./post.repository";
-import ApiErrorException from "@/exceptions/api.exception";
+}                          from "@/types/table.types";
+import db                  from "@/database/db.database";
+import Post                from "@/model/post.model";
+import { DB }              from "@/types/schema.types";
+import cloudinary          from "cloudinary";
+import AsyncWrapper        from "@/utils/async-wrapper.util";
+import { Kysely, sql }     from "kysely";
+import IEPostRepository    from "./post.repository";
+import ApiErrorException   from "@/exceptions/api.exception";
+import { plainToInstance } from "class-transformer";
 
 class PostRepository implements IEPostRepository {
   private database: Kysely<DB>;
@@ -18,8 +20,8 @@ class PostRepository implements IEPostRepository {
   constructor() { this.database = db; };
 
   public findPostsByPostId = this.wrap.repoWrap(
-    async (uuid: string): Promise<SelectPosts | undefined> => {
-      return this.database
+    async (uuid: string): Promise<Post | undefined> => {
+      const data = await this.database
         .selectFrom("posts")
         .select([
           "id",
@@ -33,12 +35,14 @@ class PostRepository implements IEPostRepository {
         ])
         .where("uuid", "=", uuid)
         .executeTakeFirst();
+
+      return this.plainToModel(data);
     }
   );
 
   public findAllPostsByUserId = this.wrap.repoWrap(
-    async (user_id: number): Promise<SelectPosts[]> => {
-      return await this.database
+    async (user_id: number): Promise<Post[]> => {
+      const data = await this.database
         .selectFrom("posts")
         .innerJoin("users", "posts.user_id", "users.id")
         .leftJoin("likes", "posts.id", "likes.post_id")
@@ -60,6 +64,8 @@ class PostRepository implements IEPostRepository {
         .orderBy("posts.created_at", "desc")
         .groupBy("posts.id")
         .execute();
+
+      return plainToInstance(Post, data);
     }
   );
 
@@ -80,10 +86,7 @@ class PostRepository implements IEPostRepository {
 
   public createNewPost = this.wrap.repoWrap(
     async (post: NewPosts): Promise<void> => {
-      await this.database
-        .insertInto("posts")
-        .values(post)
-        .execute();
+      await this.database.insertInto("posts").values(post).execute();
     }
   );
 
@@ -119,6 +122,12 @@ class PostRepository implements IEPostRepository {
         .executeTakeFirst();
     }
   );
+
+  private plainToModel = (
+    post: SelectPosts | undefined
+  ): Post | undefined => {
+    return post ? plainToInstance(Post, post) : undefined;
+  };
 };
 
 export default PostRepository;

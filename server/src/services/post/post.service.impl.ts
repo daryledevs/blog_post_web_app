@@ -1,15 +1,16 @@
 import {
   NewPosts,
-  SelectPosts,
   UpdatePosts,
-}                        from "@/types/table.types";
-import { join }          from "path";
-import AsyncWrapper      from "@/utils/async-wrapper.util";
-import IEPostService     from "./post.service";
-import IEPostRepository  from "@/repositories/post/post.repository";
-import IEUserRepository  from "@/repositories/user/user.repository";
-import ApiErrorException from "@/exceptions/api.exception";
-import CloudinaryService from "@/libraries/cloudinary/cloudinary-service.lib";
+}                          from "@/types/table.types";
+import PostDto             from "@/dto/post.dto";
+import { join }            from "path";
+import AsyncWrapper        from "@/utils/async-wrapper.util";
+import IEPostService       from "./post.service";
+import IEPostRepository    from "@/repositories/post/post.repository";
+import IEUserRepository    from "@/repositories/user/user.repository";
+import ApiErrorException   from "@/exceptions/api.exception";
+import CloudinaryService   from "@/libraries/cloudinary/cloudinary-service.lib";
+import { plainToInstance } from "class-transformer";
 
 class PostService implements IEPostService {
   private postRepository: IEPostRepository;
@@ -20,7 +21,7 @@ class PostService implements IEPostService {
   constructor(
     postRepository: IEPostRepository,
     userRepository: IEUserRepository,
-    cloudinary: CloudinaryService
+    cloudinary:     CloudinaryService
   ) {
     this.postRepository = postRepository;
     this.userRepository = userRepository;
@@ -28,7 +29,7 @@ class PostService implements IEPostService {
   }
 
   public getPostByUuid = this.wrap.serviceWrap(
-    async (uuid: string | undefined): Promise<SelectPosts | undefined> => {
+    async (uuid: string | undefined): Promise<PostDto | undefined> => {
       // check if the post_id is provided
       if (!uuid) throw ApiErrorException.HTTP400Error("No arguments provided");
 
@@ -37,21 +38,26 @@ class PostService implements IEPostService {
       if (!post) throw ApiErrorException.HTTP404Error("Post not found");
 
       // return the post
-      return post;
+      return plainToInstance(PostDto, post, { excludeExtraneousValues: true });
     }
   );
 
   public getAllPostsByUsersUuid = this.wrap.serviceWrap(
-    async (user_uuid: string): Promise<SelectPosts[]> => {
+    async (user_uuid: string): Promise<PostDto[]> => {
       // check if the user_uuid is provided
-      if (!user_uuid) throw ApiErrorException.HTTP400Error("No arguments provided");
+      if (!user_uuid)
+        throw ApiErrorException.HTTP400Error("No arguments provided");
 
       // if the user is not found, return an error
       const user = await this.userRepository.findUserById(user_uuid);
       if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
       // get the posts for the user
-      return await this.postRepository.findAllPostsByUserId(user.getId());
+      const posts = await this.postRepository.findAllPostsByUserId(
+        user.getId()
+      );
+
+      return plainToInstance(PostDto, posts, { excludeExtraneousValues: true });
     }
   );
 
@@ -84,9 +90,8 @@ class PostService implements IEPostService {
       if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
       const path = join(file.destination, file.filename);
-      
-      const { image_id, image_url } =
-        await this.cloudinary.uploadAndDeleteLocal(path);
+
+      const { image_id, image_url } = await this.cloudinary.uploadAndDeleteLocal(path);
 
       // create a new post
       await this.postRepository.createNewPost({
@@ -130,12 +135,11 @@ class PostService implements IEPostService {
       if (!post) throw ApiErrorException.HTTP404Error("Post not found");
 
       // delete the post
-      await this.postRepository.deletePostById(post.id);
+      await this.postRepository.deletePostById(post.getId());
 
       return "Post deleted successfully";
     }
   );
-
 };
 
 export default PostService;
