@@ -1,10 +1,11 @@
-import AsyncWrapper      from "@/utils/async-wrapper.util";
-import IELikeService     from "./like.service";
-import { SelectLikes }   from "@/types/table.types";
-import IEUserRepository  from "@/repositories/user/user.repository";
-import IELikeRepository  from "@/repositories/like/like.repository";
-import IEPostRepository  from "@/repositories/post/post.repository";
-import ApiErrorException from "@/exceptions/api.exception";
+import LikeDto             from "@/dto/like.dto";
+import AsyncWrapper        from "@/utils/async-wrapper.util";
+import IELikeService       from "./like.service";
+import IEUserRepository    from "@/repositories/user/user.repository";
+import IELikeRepository    from "@/repositories/like/like.repository";
+import IEPostRepository    from "@/repositories/post/post.repository";
+import ApiErrorException   from "@/exceptions/api.exception";
+import { plainToInstance } from "class-transformer";
 
 class LikeService implements IELikeService {
   private likeRepository: IELikeRepository;
@@ -40,7 +41,7 @@ class LikeService implements IELikeService {
     async (
       user_uuid: string | undefined,
       post_uuid: string | undefined
-    ): Promise<SelectLikes | undefined> => {
+    ): Promise<LikeDto | undefined> => {
       // check if the arguments is provided
       if (!user_uuid || !post_uuid) {
         throw ApiErrorException.HTTP400Error("No arguments provided");
@@ -55,7 +56,12 @@ class LikeService implements IELikeService {
       if (!post) throw ApiErrorException.HTTP404Error("Post not found");
 
       // If the post is not found, return an error
-      return await this.likeRepository.isUserLikePost(user.getId(), post.getId());
+      const likes = await this.likeRepository.isUserLikePost(
+        user.getId(),
+        post.getId()
+      );
+
+      return plainToInstance(LikeDto, likes);
     }
   );
 
@@ -88,7 +94,7 @@ class LikeService implements IELikeService {
       }
 
       // If the user has already liked the post, then delete or remove.
-      await this.likeRepository.dislikeUsersPostById(like.id);
+      await this.likeRepository.dislikeUsersPostById(like.getId());
       return "Like removed successfully";
     }
   );

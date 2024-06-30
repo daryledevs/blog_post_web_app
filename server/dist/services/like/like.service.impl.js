@@ -3,8 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const like_dto_1 = __importDefault(require("@/dto/like.dto"));
 const async_wrapper_util_1 = __importDefault(require("@/utils/async-wrapper.util"));
 const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
+const class_transformer_1 = require("class-transformer");
 class LikeService {
     likeRepository;
     postRepository;
@@ -40,7 +42,8 @@ class LikeService {
         if (!post)
             throw api_exception_1.default.HTTP404Error("Post not found");
         // If the post is not found, return an error
-        return await this.likeRepository.isUserLikePost(user.getId(), post.getId());
+        const likes = await this.likeRepository.isUserLikePost(user.getId(), post.getId());
+        return (0, class_transformer_1.plainToInstance)(like_dto_1.default, likes);
     });
     toggleUserLikeForPost = this.wrap.serviceWrap(async (user_uuid, post_uuid) => {
         // check if the arguments is provided
@@ -64,7 +67,7 @@ class LikeService {
             return "Like added successfully";
         }
         // If the user has already liked the post, then delete or remove.
-        await this.likeRepository.dislikeUsersPostById(like.id);
+        await this.likeRepository.dislikeUsersPostById(like.getId());
         return "Like removed successfully";
     });
 }
