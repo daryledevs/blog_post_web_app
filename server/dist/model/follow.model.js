@@ -1,46 +1,46 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Follow {
-    followed_id;
-    followed_uuid;
-    follower_id;
-    follower_uuid;
+    username;
+    first_name;
+    last_name;
+    avatar_url;
     created_at;
-    constructor(followed_id, followed_uuid, follower_id, follower_uuid, created_at) {
-        this.followed_id = followed_id;
-        this.followed_uuid = followed_uuid;
-        this.follower_id = follower_id;
-        this.follower_uuid = follower_uuid;
+    constructor(username, created_at, first_name, last_name, avatar_url) {
+        this.username = username;
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.avatar_url = avatar_url;
         this.created_at = created_at;
     }
     // getters
-    getFollowedId() {
-        return this.followed_id;
+    getUsername() {
+        return this.username;
     }
-    getFollowedUuid() {
-        return this.followed_uuid;
+    getFirstName() {
+        return this.first_name || null;
     }
-    getFollowerId() {
-        return this.follower_id;
+    getLastName() {
+        return this.last_name || null;
     }
-    getFollowerUuid() {
-        return this.follower_uuid;
+    getAvatarUrl() {
+        return this.avatar_url || null;
     }
     getCreatedAt() {
         return this.created_at;
     }
     // setters
-    setFollowedId(followed_id) {
-        this.followed_id = followed_id;
+    setUsername(username) {
+        this.username = username;
     }
-    setFollowedUuid(followed_uuid) {
-        this.followed_uuid = followed_uuid;
+    setFirstName(first_name) {
+        this.first_name = first_name;
     }
-    setFollowerId(follower_id) {
-        this.follower_id = follower_id;
+    setLastName(last_name) {
+        this.last_name = last_name;
     }
-    setFollowerUuid(follower_uuid) {
-        this.follower_uuid = follower_uuid;
+    setAvatarUrl(avatar_url) {
+        this.avatar_url = avatar_url;
     }
     setCreatedAt(created_at) {
         this.created_at = created_at;
