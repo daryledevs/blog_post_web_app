@@ -4,7 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_database_1 = __importDefault(require("@/database/db.database"));
+const kysely_1 = require("kysely");
 const async_wrapper_util_1 = __importDefault(require("@/utils/async-wrapper.util"));
+const class_transformer_1 = require("class-transformer");
+const follower_model_1 = __importDefault(require("@/model/follower.model"));
+const following_model_1 = __importDefault(require("@/model/following.model"));
 class FollowRepository {
     database;
     wrap = new async_wrapper_util_1.default();
@@ -33,28 +37,46 @@ class FollowRepository {
         return { followers, following };
     });
     findAllFollowersById = this.wrap.repoWrap(async (id, listsId) => {
-        return await this.database
+        const data = await this.database
             .selectFrom("followers")
-            .innerJoin("users", "followers.follower_id", "users.id")
+            .leftJoin("users", "followers.follower_id", "users.id")
+            .select([
+            "followers.follower_id",
+            (0, kysely_1.sql) `BIN_TO_UUID(users.uuid)`.as("follower_uuid"),
+            "users.username",
+            "users.first_name",
+            "users.last_name",
+            "users.avatar_url",
+            "followers.created_at",
+        ])
             .where((eb) => eb.and([
             eb("followers.followed_id", "=", id),
             eb("followers.follower_id", "not in", listsId),
         ]))
-            .selectAll()
             .limit(10)
             .execute();
+        return (0, class_transformer_1.plainToInstance)(follower_model_1.default, data);
     });
     findAllFollowingById = this.wrap.repoWrap(async (id, listsId) => {
-        return await this.database
+        const data = await this.database
             .selectFrom("followers")
-            .innerJoin("users", "followers.followed_id", "users.id")
+            .leftJoin("users", "followers.followed_id", "users.id")
+            .select([
+            "followers.followed_id",
+            (0, kysely_1.sql) `BIN_TO_UUID(users.uuid)`.as("followed_uuid"),
+            "users.username",
+            "users.first_name",
+            "users.last_name",
+            "users.avatar_url",
+            "followers.created_at",
+        ])
             .where((eb) => eb.and([
             eb("followers.follower_id", "=", id),
             eb("followers.followed_id", "not in", listsId),
         ]))
-            .selectAll()
             .limit(10)
             .execute();
+        return (0, class_transformer_1.plainToInstance)(following_model_1.default, data);
     });
     isUserFollowing = this.wrap.repoWrap(async (identifier) => {
         const result = await this.database
@@ -68,10 +90,7 @@ class FollowRepository {
         return !!result;
     });
     followUser = this.wrap.repoWrap(async (identifier) => {
-        await this.database
-            .insertInto("followers")
-            .values(identifier)
-            .execute();
+        await this.database.insertInto("followers").values(identifier).execute();
     });
     unfollowUser = this.wrap.repoWrap(async (identifier) => {
         await this.database

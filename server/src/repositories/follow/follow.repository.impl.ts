@@ -1,9 +1,12 @@
 import db                                      from "@/database/db.database";
 import { DB }                                  from "@/types/schema.types";
-import { Kysely }                              from "kysely";
+import { Kysely, sql }                              from "kysely";
 import AsyncWrapper                            from "@/utils/async-wrapper.util";
-import { NewFollowers, SelectFollowers }       from "@/types/table.types";
+import { NewFollowers }       from "@/types/table.types";
 import IEFollowRepository, { FollowStatsType } from "./follow.repository";
+import { plainToInstance } from "class-transformer";
+import Follower from "@/model/follower.model";
+import Following from "@/model/following.model";
 
 class FollowRepository implements IEFollowRepository {
   private database: Kysely<DB>;
@@ -43,36 +46,56 @@ class FollowRepository implements IEFollowRepository {
   );
 
   public findAllFollowersById = this.wrap.repoWrap(
-    async (id: number, listsId: number[]): Promise<SelectFollowers[]> => {
-      return await this.database
+    async (id: number, listsId: number[]): Promise<Follower[]> => {
+      const data = await this.database
         .selectFrom("followers")
-        .innerJoin("users", "followers.follower_id", "users.id")
+        .leftJoin("users", "followers.follower_id", "users.id")
+        .select([
+          "followers.follower_id",
+          sql`BIN_TO_UUID(users.uuid)`.as("follower_uuid"),
+          "users.username",
+          "users.first_name",
+          "users.last_name",
+          "users.avatar_url",
+          "followers.created_at",
+        ])
         .where((eb) =>
           eb.and([
             eb("followers.followed_id", "=", id),
             eb("followers.follower_id", "not in", listsId),
           ])
         )
-        .selectAll()
         .limit(10)
         .execute();
+
+      return plainToInstance(Follower, data);
     }
   );
 
   public findAllFollowingById = this.wrap.repoWrap(
-    async (id: number, listsId: number[]): Promise<SelectFollowers[]> => {
-      return await this.database
+    async (id: number, listsId: number[]): Promise<Following[]> => {
+      const data = await this.database
         .selectFrom("followers")
-        .innerJoin("users", "followers.followed_id", "users.id")
+        .leftJoin("users", "followers.followed_id", "users.id")
+        .select([
+          "followers.followed_id",
+          sql`BIN_TO_UUID(users.uuid)`.as("followed_uuid"),
+          "users.username",
+          "users.first_name",
+          "users.last_name",
+          "users.avatar_url",
+          "followers.created_at",
+        ])
         .where((eb) =>
           eb.and([
             eb("followers.follower_id", "=", id),
             eb("followers.followed_id", "not in", listsId),
           ])
         )
-        .selectAll()
         .limit(10)
         .execute();
+
+      return plainToInstance(Following, data);
     }
   );
 
@@ -95,10 +118,7 @@ class FollowRepository implements IEFollowRepository {
 
   public followUser = this.wrap.repoWrap(
     async (identifier: NewFollowers): Promise<void> => {
-      await this.database
-        .insertInto("followers")
-        .values(identifier)
-        .execute();
+      await this.database.insertInto("followers").values(identifier).execute();
     }
   );
 
