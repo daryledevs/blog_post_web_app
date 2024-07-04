@@ -12,65 +12,74 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
 class FollowDto {
-    followed_id;
-    followed_uuid;
-    follower_id;
-    follower_uuid;
+    username;
+    first_name;
+    last_name;
+    avatar_url;
     created_at;
-    constructor(followed_id, followed_uuid, follower_id, follower_uuid, created_at) {
-        this.followed_id = followed_id;
-        this.followed_uuid = followed_uuid;
-        this.follower_id = follower_id;
-        this.follower_uuid = follower_uuid;
+    constructor(username, created_at, first_name, last_name, avatar_url) {
+        this.username = username;
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.avatar_url = avatar_url;
         this.created_at = created_at;
     }
     // getters
-    getFollowedId() {
-        return this.followed_id;
+    getUsername() {
+        return this.username;
     }
-    getFollowedUuid() {
-        return this.followed_uuid;
+    getFirstName() {
+        return this.first_name || null;
     }
-    getFollowerId() {
-        return this.follower_id;
+    getLastName() {
+        return this.last_name || null;
     }
-    getFollowerUuid() {
-        return this.follower_uuid;
+    getAvatarUrl() {
+        return this.avatar_url || null;
     }
     getCreatedAt() {
         return this.created_at;
     }
     // setters
-    setFollowedId(followed_id) {
-        this.followed_id = followed_id;
+    setUsername(username) {
+        this.username = username;
     }
-    setFollowerId(follower_id) {
-        this.follower_id = follower_id;
+    setFirstName(first_name) {
+        this.first_name = first_name;
+    }
+    setLastName(last_name) {
+        this.last_name = last_name;
+    }
+    setAvatarUrl(avatar_url) {
+        this.avatar_url = avatar_url;
     }
     setCreatedAt(created_at) {
         this.created_at = created_at;
     }
 }
 __decorate([
-    (0, class_transformer_1.Exclude)({ toPlainOnly: true }),
-    __metadata("design:type", Number)
-], FollowDto.prototype, "followed_id", void 0);
+    (0, class_transformer_1.Expose)(),
+    (0, class_validator_1.IsNotEmpty)({ message: "username is required" }),
+    __metadata("design:type", String)
+], FollowDto.prototype, "username", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
-    (0, class_validator_1.IsNotEmpty)({ message: "followed UUID is required" }),
-    (0, class_validator_1.IsUUID)(4, { message: "invalid UUID" }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)({ message: "first name must be a string" }),
     __metadata("design:type", Object)
-], FollowDto.prototype, "followed_uuid", void 0);
-__decorate([
-    (0, class_transformer_1.Exclude)({ toPlainOnly: true }),
-    __metadata("design:type", Number)
-], FollowDto.prototype, "follower_id", void 0);
+], FollowDto.prototype, "first_name", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
-    (0, class_validator_1.IsNotEmpty)({ message: "follower UUID is required" }),
-    (0, class_validator_1.IsUUID)(4, { message: "invalid UUID" }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)({ message: "last name must be a string" }),
     __metadata("design:type", Object)
-], FollowDto.prototype, "follower_uuid", void 0);
+], FollowDto.prototype, "last_name", void 0);
+__decorate([
+    (0, class_transformer_1.Expose)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)({ message: "avatar url must be a string" }),
+    __metadata("design:type", Object)
+], FollowDto.prototype, "avatar_url", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
     __metadata("design:type", Object)

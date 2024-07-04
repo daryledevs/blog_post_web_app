@@ -1,55 +1,58 @@
-import { Exclude, Expose }    from "class-transformer";
-import { IsNotEmpty, IsUUID } from "class-validator";
+import { Expose }                           from "class-transformer";
+import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 class FollowDto {
-  @Exclude({ toPlainOnly: true })
-  private followed_id: number;
+  @Expose()
+  @IsNotEmpty({ message: "username is required" })
+  private username: string;
 
   @Expose()
-  @IsNotEmpty({ message: "followed UUID is required" })
-  @IsUUID(4, { message: "invalid UUID" })
-  private followed_uuid: any;
-
-  @Exclude({ toPlainOnly: true })
-  private follower_id: number;
+  @IsOptional()
+  @IsString({ message: "first name must be a string" })
+  private first_name?: string | null;
 
   @Expose()
-  @IsNotEmpty({ message: "follower UUID is required" })
-  @IsUUID(4, { message: "invalid UUID" })
-  private follower_uuid: any;
+  @IsOptional()
+  @IsString({ message: "last name must be a string" })
+  private last_name?: string | null;
+
+  @Expose()
+  @IsOptional()
+  @IsString({ message: "avatar url must be a string" })
+  private avatar_url?: string | null;
 
   @Expose()
   private created_at: Date | null;
 
   constructor(
-    followed_id: number,
-    followed_uuid: any,
-    follower_id: number,
-    follower_uuid: any,
-    created_at: Date | null
+    username: string,
+    created_at: Date | null,
+    first_name?: string | null,
+    last_name?: string | null,
+    avatar_url?: string | null,
   ) {
-    this.followed_id = followed_id;
-    this.followed_uuid = followed_uuid;
-    this.follower_id = follower_id;
-    this.follower_uuid = follower_uuid;
+    this.username = username;
+    this.first_name = first_name;
+    this.last_name = last_name;
+    this.avatar_url = avatar_url;
     this.created_at = created_at;
   }
 
   // getters
-  public getFollowedId(): number {
-    return this.followed_id;
+  public getUsername(): string {
+    return this.username;
   }
 
-  public getFollowedUuid(): any {
-    return this.followed_uuid;
+  public getFirstName(): string | null {
+    return this.first_name || null;
   }
 
-  public getFollowerId(): number {
-    return this.follower_id;
+  public getLastName(): string | null {
+    return this.last_name || null;
   }
 
-  public getFollowerUuid(): any {
-    return this.follower_uuid;
+  public getAvatarUrl(): string | null{
+    return this.avatar_url || null;
   }
 
   public getCreatedAt(): Date | null {
@@ -57,12 +60,20 @@ class FollowDto {
   }
 
   // setters
-  public setFollowedId(followed_id: number): void {
-    this.followed_id = followed_id;
+  public setUsername(username: string): void {
+    this.username = username;
   }
 
-  public setFollowerId(follower_id: number): void {
-    this.follower_id = follower_id;
+  public setFirstName(first_name: string | null): void {
+    this.first_name = first_name;
+  }
+
+  public setLastName(last_name: string | null): void {
+    this.last_name = last_name;
+  }
+
+  public setAvatarUrl(avatar_url: string | null): void {
+    this.avatar_url = avatar_url;
   }
 
   public setCreatedAt(created_at: Date | null): void {
