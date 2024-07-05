@@ -1,4 +1,6 @@
-import { NewFollowers, SelectFollowers } from "@/types/table.types";
+import Follower         from "@/model/follower.model";
+import Following        from "@/model/following.model";
+import { NewFollowers } from "@/types/table.types";
 
 export type FollowStatsType = {
   followers: number;
@@ -8,9 +10,9 @@ export type FollowStatsType = {
 interface IEFollowRepository {
   findUserFollowStatsById: (id: number) => Promise<FollowStatsType>;
 
-  findAllFollowersById: (id: number, listsId: number[]) => Promise<SelectFollowers[]>;
+  findAllFollowersById: (id: number, listsId: number[]) => Promise<Follower[]>;
 
-  findAllFollowingById: (id: number, listsId: number[]) => Promise<SelectFollowers[]>;
+  findAllFollowingById: (id: number, listsId: number[]) => Promise<Following[]>;
 
   isUserFollowing: (identifier: NewFollowers) => Promise<boolean>;
 
