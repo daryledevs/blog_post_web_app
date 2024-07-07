@@ -43,7 +43,9 @@ class LikeService {
             throw api_exception_1.default.HTTP404Error("Post not found");
         // If the post is not found, return an error
         const likes = await this.likeRepository.isUserLikePost(user.getId(), post.getId());
-        return (0, class_transformer_1.plainToInstance)(like_dto_1.default, likes);
+        return (0, class_transformer_1.plainToInstance)(like_dto_1.default, likes, {
+            excludeExtraneousValues: true,
+        });
     });
     toggleUserLikeForPost = this.wrap.serviceWrap(async (user_uuid, post_uuid) => {
         // check if the arguments is provided

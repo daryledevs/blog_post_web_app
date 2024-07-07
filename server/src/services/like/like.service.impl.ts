@@ -61,7 +61,9 @@ class LikeService implements IELikeService {
         post.getId()
       );
 
-      return plainToInstance(LikeDto, likes);
+      return plainToInstance(LikeDto, likes, {
+        excludeExtraneousValues: true,
+      });
     }
   );
 

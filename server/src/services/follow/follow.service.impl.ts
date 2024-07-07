@@ -54,10 +54,16 @@ class FollowService implements IEFollowService {
       switch (fetch) {
         case "followers":
           const followers = await this.getFollowers(user.getId(), listIdsToExclude);
-          return plainToInstance(FollowerDto, followers);
+          return plainToInstance(FollowerDto, followers, {
+            excludeExtraneousValues: true,
+          });
+
         case "following":
           const following = await this.getFollowing(user.getId(), listIdsToExclude);
-          return plainToInstance(FollowingDto, following);
+          return plainToInstance(FollowingDto, following, {
+            excludeExtraneousValues: true,
+          });
+          
         default:
           throw ApiErrorException.HTTP400Error("Invalid fetch parameter");
       }

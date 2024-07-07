@@ -38,10 +38,14 @@ class FollowService {
         switch (fetch) {
             case "followers":
                 const followers = await this.getFollowers(user.getId(), listIdsToExclude);
-                return (0, class_transformer_1.plainToInstance)(follower_dto_1.default, followers);
+                return (0, class_transformer_1.plainToInstance)(follower_dto_1.default, followers, {
+                    excludeExtraneousValues: true,
+                });
             case "following":
                 const following = await this.getFollowing(user.getId(), listIdsToExclude);
-                return (0, class_transformer_1.plainToInstance)(following_dto_1.default, following);
+                return (0, class_transformer_1.plainToInstance)(following_dto_1.default, following, {
+                    excludeExtraneousValues: true,
+                });
             default:
                 throw api_exception_1.default.HTTP400Error("Invalid fetch parameter");
         }
