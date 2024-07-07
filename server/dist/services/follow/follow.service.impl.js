@@ -3,8 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const follower_dto_1 = __importDefault(require("@/dto/follower.dto"));
+const following_dto_1 = __importDefault(require("@/dto/following.dto"));
 const async_wrapper_util_1 = __importDefault(require("@/utils/async-wrapper.util"));
 const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
+const class_transformer_1 = require("class-transformer");
 class FollowService {
     userRepository;
     followRepository;
@@ -34,9 +37,11 @@ class FollowService {
         const listIdsToExclude = listsId?.length ? listsId : [0];
         switch (fetch) {
             case "followers":
-                return this.getFollowers(user.getId(), listIdsToExclude);
+                const followers = await this.getFollowers(user.getId(), listIdsToExclude);
+                return (0, class_transformer_1.plainToInstance)(follower_dto_1.default, followers);
             case "following":
-                return this.getFollowing(user.getId(), listIdsToExclude);
+                const following = await this.getFollowing(user.getId(), listIdsToExclude);
+                return (0, class_transformer_1.plainToInstance)(following_dto_1.default, following);
             default:
                 throw api_exception_1.default.HTTP400Error("Invalid fetch parameter");
         }

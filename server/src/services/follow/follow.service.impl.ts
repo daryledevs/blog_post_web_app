@@ -1,10 +1,14 @@
+import Follower            from "@/model/follower.model";
+import Following           from "@/model/following.model";
+import FollowerDto         from "@/dto/follower.dto";
+import FollowingDto        from "@/dto/following.dto";
 import AsyncWrapper        from "@/utils/async-wrapper.util";
 import IEUserRepository    from "@/repositories/user/user.repository";
 import IEFollowService     from "./follow.service";
 import ApiErrorException   from "@/exceptions/api.exception";
 import IEFollowRepository  from "@/repositories/follow/follow.repository";
-import { SelectFollowers } from "@/types/table.types";
 import { FollowStatsType } from "@/repositories/follow/follow.repository";
+import { plainToInstance } from "class-transformer";
 
 class FollowService implements IEFollowService {
   private userRepository: IEUserRepository;
@@ -34,10 +38,10 @@ class FollowService implements IEFollowService {
 
   public getFollowerFollowingLists = this.wrap.serviceWrap(
     async (
-      uuid: string,
+      uuid: string | undefined,
       fetch: string,
       listsId: number[]
-    ): Promise<SelectFollowers[]> => {
+    ): Promise<FollowerDto[] | FollowingDto[]> => {
       // If no arguments are provided, return an error
       if (!uuid) throw ApiErrorException.HTTP400Error("No arguments provided");
 
@@ -49,9 +53,11 @@ class FollowService implements IEFollowService {
 
       switch (fetch) {
         case "followers":
-          return this.getFollowers(user.getId(), listIdsToExclude);
+          const followers = await this.getFollowers(user.getId(), listIdsToExclude);
+          return plainToInstance(FollowerDto, followers);
         case "following":
-          return this.getFollowing(user.getId(), listIdsToExclude);
+          const following = await this.getFollowing(user.getId(), listIdsToExclude);
+          return plainToInstance(FollowingDto, following);
         default:
           throw ApiErrorException.HTTP400Error("Invalid fetch parameter");
       }
@@ -94,13 +100,13 @@ class FollowService implements IEFollowService {
   );
 
   private getFollowers = this.wrap.serviceWrap(
-    async (id: number, lists: number[]): Promise<SelectFollowers[]> => {
+    async (id: number, lists: number[]): Promise<Follower[]> => {
       return await this.followRepository.findAllFollowersById(id, lists);
     }
   );
 
   private getFollowing = this.wrap.serviceWrap(
-    async (id: number, lists: number[]): Promise<SelectFollowers[]> => {
+    async (id: number, lists: number[]): Promise<Following[]> => {
       return await this.followRepository.findAllFollowingById(id, lists);
     }
   );
