@@ -7,6 +7,7 @@ const db_database_1 = __importDefault(require("@/database/db.database"));
 const user_model_1 = __importDefault(require("@/model/user.model"));
 const async_wrapper_util_1 = __importDefault(require("@/utils/async-wrapper.util"));
 const kysely_1 = require("kysely");
+const class_transformer_1 = require("class-transformer");
 class AuthRepository {
     database;
     wrap = new async_wrapper_util_1.default();
@@ -35,7 +36,7 @@ class AuthRepository {
         ])
             .where("id", "=", insertId)
             .executeTakeFirst();
-        return this.userClass(newUser);
+        return this.plainToClass(newUser);
     });
     findResetTokenById = this.wrap.repoWrap(async (token_id) => {
         return await this.database
@@ -62,8 +63,8 @@ class AuthRepository {
             .where("id", "=", token_id)
             .execute();
     });
-    userClass = this.wrap.repoWrap(async (user) => {
-        return user ? new user_model_1.default(user) : undefined;
+    plainToClass = this.wrap.repoWrap(async (user) => {
+        return user ? (0, class_transformer_1.plainToInstance)(user_model_1.default, user) : undefined;
     });
 }
 ;

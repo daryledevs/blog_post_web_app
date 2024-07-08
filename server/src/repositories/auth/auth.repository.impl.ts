@@ -10,6 +10,7 @@ import { DB }           from "@/types/schema.types";
 import AsyncWrapper     from "@/utils/async-wrapper.util";
 import { Kysely, sql }  from "kysely";
 import IEAuthRepository from "./auth.repository";
+import { plainToInstance } from "class-transformer";
 
 class AuthRepository implements IEAuthRepository {
   private database: Kysely<DB>;
@@ -43,7 +44,7 @@ class AuthRepository implements IEAuthRepository {
         .where("id", "=", insertId as any)
         .executeTakeFirst();
       
-      return this.userClass(newUser);
+      return this.plainToClass(newUser);
     }
   );
 
@@ -81,9 +82,9 @@ class AuthRepository implements IEAuthRepository {
     }
   );
 
-  private userClass = this.wrap.repoWrap(
+  private plainToClass = this.wrap.repoWrap(
     async (user: SelectUsers): Promise<User | undefined> => {
-      return user ? new User(user) : undefined;
+      return user ? plainToInstance(User, user) : undefined;
     }
   );
 };

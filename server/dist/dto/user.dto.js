@@ -24,8 +24,19 @@ class UserDto {
     avatar_url;
     birthday;
     created_at;
-    constructor(user) {
-        Object.assign(this, user);
+    constructor(id, uuid, username, email, password, first_name, last_name, age, roles, avatar_url, birthday, created_at) {
+        this.id = id;
+        this.uuid = uuid;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.age = age;
+        this.roles = roles;
+        this.avatar_url = avatar_url;
+        this.birthday = birthday;
+        this.created_at = created_at;
     }
     // Getters
     getId() {

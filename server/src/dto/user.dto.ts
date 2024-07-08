@@ -6,7 +6,6 @@ import {
   IsOptional,
   IsIn,
 }                          from "class-validator";
-import { SelectUsers }     from "@/types/table.types";
 import { Exclude, Expose } from "class-transformer";
 
 class UserDto {
@@ -62,19 +61,43 @@ class UserDto {
   @IsOptional()
   private created_at: Date | null | undefined;
 
-  constructor(user: Partial<SelectUsers>) {
-    Object.assign(this, user);
+  constructor(
+    id: number,
+    uuid: any,
+    username: string,
+    email: string,
+    password: string,
+    first_name: string | null,
+    last_name: string | null,
+    age: number | null,
+    roles: string | null,
+    avatar_url: string | null,
+    birthday: string | null,
+    created_at: Date | null
+  ) {
+    this.id = id;
+    this.uuid = uuid;
+    this.username = username;
+    this.email = email;
+    this.password = password;
+    this.first_name = first_name;
+    this.last_name = last_name;
+    this.age = age;
+    this.roles = roles;
+    this.avatar_url = avatar_url;
+    this.birthday = birthday;
+    this.created_at = created_at;
   }
 
   // Getters
   getId(): number {
     return this.id;
   }
-  
+
   getUuid(): string {
     return this.uuid;
   }
-  
+
   getUsername(): string {
     return this.username;
   }
@@ -123,7 +146,7 @@ class UserDto {
   setUuid(value: string) {
     this.uuid = value;
   }
-  
+
   setUsername(value: string) {
     this.username = value;
   }
