@@ -1,9 +1,9 @@
 import app              from "./app";
-import { pool }         from "./database/db.database";
+import { pool }         from "./infrastructure/database/db.database";
 import { Server }       from "socket.io";
 import * as dotenv      from "dotenv";
 import socketConfig     from "./config/socket.config";
-import SocketService    from "./libraries/socket/socket.lib";
+import SocketService    from "./application/libs/socket-service.lib";
 import { createServer } from "http";
 dotenv.config();
 

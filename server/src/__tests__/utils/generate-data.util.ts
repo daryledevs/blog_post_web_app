@@ -7,7 +7,7 @@ import {
   SelectPosts,
   SelectSearches,
   SelectUsers,
-}                from "@/types/table.types";
+}                from "@/domain/types/table.types";
 import { faker } from "@faker-js/faker";
 
 class GenerateMockData {

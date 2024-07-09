@@ -1,15 +1,15 @@
 import { join }                                              from "path";
 import { faker }                                             from "@faker-js/faker";
 import { Readable }                                          from "stream";
-import PostService                                           from "@/services/post/post.service.impl";
-import IEPostService                                         from "@/services/post/post.service";
-import UserRepository                                        from "@/repositories/user/user.repository.impl";
-import PostRepository                                        from "@/repositories/post/post.repository.impl";
-import IEPostRepository                                      from "@/repositories/post/post.repository";
-import IEUserRepository                                      from "@/repositories/user/user.repository";
-import GenerateMockData                                      from "../../utils/generate-data.util";
-import ApiErrorException                                     from "@/exceptions/api.exception";
-import CloudinaryService                                     from "@/libraries/cloudinary/cloudinary-service.lib";
+import PostService                                           from "@/application/services/post/post.service.impl";
+import IEPostService                                         from "@/application/services/post/post.service";
+import UserRepository                                        from "@/infrastructure/repositories/user.repository.impl";
+import PostRepository                                        from "@/infrastructure/repositories/post.repository.impl";
+import IEPostRepository                                      from "@/domain/repositories/post.repository";
+import IEUserRepository                                      from "@/domain/repositories/user.repository";
+import GenerateMockData                                      from "@/__tests__/utils/generate-data.util";
+import ApiErrorException                                     from "@/application/exceptions/api.exception";
+import CloudinaryService                                     from "@/application/libs/cloudinary-service.lib";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 
 vi.mock("@/repositories/feed/feed.repository.impl");

@@ -6,11 +6,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const vitest_1 = require("vitest");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const faker_1 = require("@faker-js/faker");
-const auth_service_impl_1 = __importDefault(require("@/services/auth/auth.service.impl"));
-const user_repository_impl_1 = __importDefault(require("@/repositories/user/user.repository.impl"));
-const auth_repository_impl_1 = __importDefault(require("@/repositories/auth/auth.repository.impl"));
+const auth_service_impl_1 = __importDefault(require("@/application/services/auth/auth.service.impl"));
+const user_repository_impl_1 = __importDefault(require("@/infrastructure/repositories/user.repository.impl"));
+const auth_repository_impl_1 = __importDefault(require("@/infrastructure/repositories/auth.repository.impl"));
 const generate_data_util_1 = __importDefault(require("../../utils/generate-data.util"));
-const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
+const api_exception_1 = __importDefault(require("@/application/exceptions/api.exception"));
 vitest_1.vi.mock("@/repositories/auth/auth.repository.impl");
 vitest_1.vi.mock("@/repositories/user/user.repository.impl");
 (0, vitest_1.describe)("AuthService", () => {

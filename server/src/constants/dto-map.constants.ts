@@ -1,4 +1,4 @@
-import UserDto from "@/dto/user.dto";
+import UserDto from "@/domain/dto/user.dto";
 
 const dtoMap: { [key: string]: any | undefined } = {
   auth: {

@@ -1,12 +1,12 @@
-import UserRepository                                        from "@/repositories/user/user.repository.impl";
-import GenerateMockData                                      from "../../utils/generate-data.util";
-import IEUserRepository                                      from "@/repositories/user/user.repository";
-import ApiErrorException                                     from "@/exceptions/api.exception";
-import SearchHistoryService                                  from "@/services/search-history/search-history.service.impl";
-import IESearchHistoryService                                from "@/services/search-history/search-history.service";
-import SearchHistoryRepository                               from "@/repositories/search-history/search-history.repository.impl";
-import IESearchHistoryRepository                             from "@/repositories/search-history/search-history.repository";
-import { SelectSearches, SelectUsers }                       from "@/types/table.types";
+import UserRepository                                        from "@/infrastructure/repositories/user.repository.impl";
+import GenerateMockData                                      from "@/__tests__/utils/generate-data.util";
+import IEUserRepository                                      from "@/domain/repositories/user.repository";
+import ApiErrorException                                     from "@/application/exceptions/api.exception";
+import SearchHistoryService                                  from "@/application/services/search-history/search-history.service.impl";
+import IESearchHistoryService                                from "@/application/services/search-history/search-history.service";
+import SearchHistoryRepository                               from "@/infrastructure/repositories/search-history.repository.impl";
+import IESearchHistoryRepository                             from "@/domain/repositories/search-history.repository";
+import { SelectSearches, SelectUsers }                       from "@/domain/types/table.types";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 
 

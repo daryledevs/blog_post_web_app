@@ -1,11 +1,11 @@
-import ChatServices                                          from "@/services/chat/chat.service.impl";
-import IEChatService                                         from "@/services/chat/chat.service";
-import UserRepository                                        from "@/repositories/user/user.repository.impl";
-import ChatsRepository                                       from "@/repositories/chat/chat.repository.impl";
-import GenerateMockData                                      from "../../utils/generate-data.util";
-import IEChatRepository                                      from "@/repositories/chat/chat.repository";
-import IEUserRepository                                      from "@/repositories/user/user.repository";
-import ApiErrorException                                     from "@/exceptions/api.exception";
+import ChatServices                                          from "@/application/services/chat/chat.service.impl";
+import IEChatService                                         from "@/application/services/chat/chat.service";
+import UserRepository                                        from "@/infrastructure/repositories/user.repository.impl";
+import ChatsRepository                                       from "@/infrastructure/repositories/chat.repository.impl";
+import GenerateMockData                                      from "@/__tests__/utils/generate-data.util";
+import IEChatRepository                                      from "@/domain/repositories/chat.repository";
+import IEUserRepository                                      from "@/domain/repositories/user.repository";
+import ApiErrorException                                     from "@/application/exceptions/api.exception";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 
 vi.mock("@/repositories/user/user.repository.impl");

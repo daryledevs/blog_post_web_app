@@ -3,11 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const chat_service_impl_1 = __importDefault(require("@/services/chat/chat.service.impl"));
-const user_repository_impl_1 = __importDefault(require("@/repositories/user/user.repository.impl"));
-const chat_repository_impl_1 = __importDefault(require("@/repositories/chat/chat.repository.impl"));
-const generate_data_util_1 = __importDefault(require("../../utils/generate-data.util"));
-const api_exception_1 = __importDefault(require("@/exceptions/api.exception"));
+const chat_service_impl_1 = __importDefault(require("@/application/services/chat/chat.service.impl"));
+const user_repository_impl_1 = __importDefault(require("@/infrastructure/repositories/user.repository.impl"));
+const chat_repository_impl_1 = __importDefault(require("@/infrastructure/repositories/chat.repository.impl"));
+const generate_data_util_1 = __importDefault(require("@/__tests__/utils/generate-data.util"));
+const api_exception_1 = __importDefault(require("@/application/exceptions/api.exception"));
 const vitest_1 = require("vitest");
 vitest_1.vi.mock("@/repositories/user/user.repository.impl");
 vitest_1.vi.mock("@/repositories/chat/chat.repository.impl");

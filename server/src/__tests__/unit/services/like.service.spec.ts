@@ -1,14 +1,14 @@
-import LikeService                                           from "@/services/like/like.service.impl";
-import IELikeService                                         from "@/services/like/like.service";
-import LikeRepository                                        from "@/repositories/like/like.repository.impl";
-import UserRepository                                        from "@/repositories/user/user.repository.impl";
-import PostRepository                                        from "@/repositories/post/post.repository.impl";
-import IEPostRepository                                      from "@/repositories/post/post.repository";
-import IEUserRepository                                      from "@/repositories/user/user.repository";
-import IELikeRepository                                      from "@/repositories/like/like.repository";
-import GenerateMockData                                      from "../../utils/generate-data.util";
-import ApiErrorException                                     from "@/exceptions/api.exception";
-import CloudinaryService                                     from "@/libraries/cloudinary/cloudinary-service.lib";
+import LikeService                                           from "@/application/services/like/like.service.impl";
+import IELikeService                                         from "@/application/services/like/like.service";
+import LikeRepository                                        from "@/infrastructure/repositories/like.repository.impl";
+import UserRepository                                        from "@/infrastructure/repositories/user.repository.impl";
+import PostRepository                                        from "@/infrastructure/repositories/post.repository.impl";
+import IEPostRepository                                      from "@/domain/repositories/post.repository";
+import IEUserRepository                                      from "@/domain/repositories/user.repository";
+import IELikeRepository                                      from "@/domain/repositories/like.repository";
+import GenerateMockData                                      from "@/__tests__/utils/generate-data.util";
+import ApiErrorException                                     from "@/application/exceptions/api.exception";
+import CloudinaryService                                     from "@/application/libs/cloudinary-service.lib";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 
 vi.mock("@/repositories/feed/feed.repository.impl");

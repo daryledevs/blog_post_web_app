@@ -8,11 +8,11 @@ import {
 } from "vitest";
 import bcrypt            from "bcrypt";
 import { faker }         from "@faker-js/faker";
-import AuthService       from "@/services/auth/auth.service.impl";
-import UserRepository    from "@/repositories/user/user.repository.impl";
-import AuthRepository    from "@/repositories/auth/auth.repository.impl";
+import AuthService       from "@/application/services/auth/auth.service.impl";
+import UserRepository    from "@/infrastructure/repositories/user.repository.impl";
+import AuthRepository    from "@/infrastructure/repositories/auth.repository.impl";
 import GenerateMockData  from "../../utils/generate-data.util";
-import ApiErrorException from "@/exceptions/api.exception";
+import ApiErrorException from "@/application/exceptions/api.exception";
 
 vi.mock("@/repositories/auth/auth.repository.impl");
 

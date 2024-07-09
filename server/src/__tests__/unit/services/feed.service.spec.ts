@@ -1,12 +1,12 @@
 
-import FeedService                                           from "@/services/feed/feed.service.impl";
-import IEFeedService                                         from "@/services/feed/feed.service";
-import FeedRepository                                        from "@/repositories/feed/feed.repository.impl";
-import UserRepository                                        from "@/repositories/user/user.repository.impl";
-import IEUserRepository                                      from "@/repositories/user/user.repository";
-import IEFeedRepository                                      from "@/repositories/feed/feed.repository";
-import GenerateMockData                                      from "../../utils/generate-data.util";
-import ApiErrorException                                     from "@/exceptions/api.exception";
+import FeedService                                           from "@/application/services/feed/feed.service.impl";
+import IEFeedService                                         from "@/application/services/feed/feed.service";
+import FeedRepository                                        from "@/infrastructure/repositories/feed.repository.impl";
+import UserRepository                                        from "@/infrastructure/repositories/user.repository.impl";
+import IEUserRepository                                      from "@/domain/repositories/user.repository";
+import IEFeedRepository                                      from "@/domain/repositories/feed.repository";
+import GenerateMockData                                      from "@/__tests__/utils/generate-data.util";
+import ApiErrorException                                     from "@/application/exceptions/api.exception";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 
 vi.mock("@/repositories/feed/feed.repository.impl");

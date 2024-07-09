@@ -1,12 +1,12 @@
-import UserRepository                                        from "@/repositories/user/user.repository.impl";
-import FollowService                                         from "@/services/follow/follow.service.impl";
-import IEFollowService                                       from "@/services/follow/follow.service";
-import FollowRepository                                      from "@/repositories/follow/follow.repository.impl";
-import GenerateMockData                                      from "../../utils/generate-data.util";
-import IEUserRepository                                      from "@/repositories/user/user.repository";
-import ApiErrorException                                     from "@/exceptions/api.exception";
-import IEFollowRepository                                    from "@/repositories/follow/follow.repository";
-import { SelectFollowers, SelectUsers }                      from "@/types/table.types";
+import UserRepository                                        from "@/infrastructure/repositories/user.repository.impl";
+import FollowService                                         from "@/application/services/follow/follow.service.impl";
+import IEFollowService                                       from "@/application/services/follow/follow.service";
+import FollowRepository                                      from "@/infrastructure/repositories/follow.repository.impl";
+import GenerateMockData                                      from "@/__tests__/utils/generate-data.util";
+import IEUserRepository                                      from "@/domain/repositories/user.repository";
+import ApiErrorException                                     from "@/application/exceptions/api.exception";
+import IEFollowRepository                                    from "@/domain/repositories/follow.repository";
+import { SelectFollowers, SelectUsers }                      from "@/domain/types/table.types";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 
 vi.mock("@/repositories/user/user.repository.impl");
