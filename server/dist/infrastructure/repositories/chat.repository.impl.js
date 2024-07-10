@@ -39,6 +39,7 @@ class ChatsRepository {
             eb("c.uuid", "not in", uuidToBin),
         ]))
             .select([
+            (0, kysely_1.sql) `BIN_TO_UUID(user.uuid)`.as("user_uuid"),
             "user.username",
             "user.first_name",
             "user.last_name",
@@ -55,6 +56,7 @@ class ChatsRepository {
             (0, kysely_1.sql) `BIN_TO_UUID(u.uuid)`.as("uuid"),
             "conversation_id",
             "sender_id",
+            (0, kysely_1.sql) `BIN_TO_UUID(sender.uuid)`.as("sender_uuid"),
             "text_message",
             "time_sent",
         ])
@@ -101,6 +103,7 @@ class ChatsRepository {
             (0, kysely_1.sql) `BIN_TO_BINARY(uuid)`.as("uuid"),
             "conversation_id",
             "sender_id",
+            (0, kysely_1.sql) `BIN_TO_UUID(user.uuid)`.as("user_uuid"),
             "text_message",
             "time_sent",
         ])

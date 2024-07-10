@@ -14,8 +14,9 @@ export interface MessageDataType {
 };
 
 export type ChatHistoryType = {
-  id: number,
-  uuid: any,
+  id: number;
+  uuid: any;
+  user_uuid: any;
   username: string | null;
   first_name: string | null;
   last_name: string | null;
