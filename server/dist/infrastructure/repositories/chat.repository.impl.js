@@ -13,12 +13,12 @@ const class_transformer_1 = require("class-transformer");
 class ChatsRepository {
     database;
     wrap = new async_wrapper_util_1.default();
-    constructor() {
-        this.database = db_database_1.default;
-    }
+    constructor() { this.database = db_database_1.default; }
+    ;
+    // this returns a list of the history of people who have communicated
     findAllConversationByUserId = this.wrap.repoWrap(async (user_id, conversation_uuids) => {
         const uuidToBin = (0, uuid_to_bin_1.default)(conversation_uuids);
-        const chats = await this.database
+        const conversations = await this.database
             .selectFrom("conversations as c")
             .select(["c.id", (0, kysely_1.sql) `BIN_TO_UUID(c.uuid)`.as("uuid")])
             .leftJoin((eb) => eb
@@ -49,16 +49,20 @@ class ChatsRepository {
             "user.avatar_url",
         ])
             .execute();
-        return (0, class_transformer_1.plainToInstance)(chat_model_1.default, chats);
+        return (0, class_transformer_1.plainToInstance)(conversation_model_1.default, conversations);
     });
+    // this return lists of messages 
     findAllMessagesById = this.wrap.repoWrap(async (conversation_id, message_uuids) => {
         const uuidsToBin = (0, uuid_to_bin_1.default)(message_uuids);
         const chats = await this.database
             .selectFrom("messages")
+            .leftJoin("conversations as c", "messages.conversation_id", "c.id")
             .select([
             "id",
             (0, kysely_1.sql) `BIN_TO_UUID(u.uuid)`.as("uuid"),
             "conversation_id",
+            (0, kysely_1.sql) `BIN_TO_UUID(c.uuid)`.as("conversation_uuid"),
+            (0, kysely_1.sql) `BIN_TO_UUID(u.uuid)`.as("uuid"),
             "sender_id",
             (0, kysely_1.sql) `BIN_TO_UUID(sender.uuid)`.as("sender_uuid"),
             "text_message",
@@ -102,6 +106,7 @@ class ChatsRepository {
             .executeTakeFirst();
         return (0, class_transformer_1.plainToInstance)(conversation_model_1.default, conversation);
     });
+    // never used
     findOneMessageById = this.wrap.repoWrap(async (uuid) => {
         const chat = await this.database
             .selectFrom("messages")

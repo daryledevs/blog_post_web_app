@@ -17,18 +17,17 @@ class ChatsRepository implements IEChatRepository {
   private database: Kysely<DB>;
   private wrap: AsyncWrapper = new AsyncWrapper();
 
-  constructor() {
-    this.database = db;
-  }
+  constructor() { this.database = db; };
 
+  // this returns a list of the history of people who have communicated
   public findAllConversationByUserId = this.wrap.repoWrap(
     async (
       user_id: number,
       conversation_uuids: string[]
-    ): Promise<Chat[]> => {
+    ): Promise<Conversation[]> => {
       const uuidToBin = sqlUuidsToBin(conversation_uuids);
 
-      const chats = await this.database
+      const conversations = await this.database
         .selectFrom("conversations as c")
         .select(["c.id", sql`BIN_TO_UUID(c.uuid)`.as("uuid")])
         .leftJoin(
@@ -71,10 +70,11 @@ class ChatsRepository implements IEChatRepository {
         ])
         .execute();
 
-      return plainToInstance(Chat, chats);
+      return plainToInstance(Conversation, conversations);
     }
   );
 
+  // this return lists of messages 
   public findAllMessagesById = this.wrap.repoWrap(
     async (
       conversation_id: number,
@@ -84,10 +84,17 @@ class ChatsRepository implements IEChatRepository {
 
       const chats = await this.database
         .selectFrom("messages")
+        .leftJoin(
+          "conversations as c",
+          "messages.conversation_id",
+          "c.id"
+        )
         .select([
           "id",
           sql`BIN_TO_UUID(u.uuid)`.as("uuid"),
           "conversation_id",
+          sql`BIN_TO_UUID(c.uuid)`.as("conversation_uuid"),
+          sql`BIN_TO_UUID(u.uuid)`.as("uuid"),
           "sender_id",
           sql`BIN_TO_UUID(sender.uuid)`.as("sender_uuid"),
           "text_message",
@@ -152,6 +159,7 @@ class ChatsRepository implements IEChatRepository {
     }
   );
 
+  // never used
   public findOneMessageById = this.wrap.repoWrap(
     async (uuid: string): Promise<Chat | undefined> => {
       const chat =  await this.database
