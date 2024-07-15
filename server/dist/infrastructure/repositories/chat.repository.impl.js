@@ -4,9 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_database_1 = __importDefault(require("@/infrastructure/database/db.database"));
+const chat_model_1 = __importDefault(require("@/domain/models/chat.model"));
+const conversation_model_1 = __importDefault(require("@/domain/models/conversation.model"));
 const async_wrapper_util_1 = __importDefault(require("@/application/utils/async-wrapper.util"));
 const uuid_to_bin_1 = __importDefault(require("@/application/utils/uuid-to-bin"));
 const kysely_1 = require("kysely");
+const class_transformer_1 = require("class-transformer");
 class ChatsRepository {
     database;
     wrap = new async_wrapper_util_1.default();
@@ -15,7 +18,7 @@ class ChatsRepository {
     }
     findAllConversationByUserId = this.wrap.repoWrap(async (user_id, conversation_uuids) => {
         const uuidToBin = (0, uuid_to_bin_1.default)(conversation_uuids);
-        return await this.database
+        const chats = await this.database
             .selectFrom("conversations as c")
             .select(["c.id", (0, kysely_1.sql) `BIN_TO_UUID(c.uuid)`.as("uuid")])
             .leftJoin((eb) => eb
@@ -46,10 +49,11 @@ class ChatsRepository {
             "user.avatar_url",
         ])
             .execute();
+        return (0, class_transformer_1.plainToInstance)(chat_model_1.default, chats);
     });
     findAllMessagesById = this.wrap.repoWrap(async (conversation_id, message_uuids) => {
         const uuidsToBin = (0, uuid_to_bin_1.default)(message_uuids);
-        return await this.database
+        const chats = await this.database
             .selectFrom("messages")
             .select([
             "id",
@@ -67,16 +71,18 @@ class ChatsRepository {
             .limit(30)
             .orderBy("messages.id", "desc")
             .execute();
+        return (0, class_transformer_1.plainToInstance)(chat_model_1.default, chats);
     });
     findOneConversationById = this.wrap.repoWrap(async (uuid) => {
-        return await this.database
+        const conversation = await this.database
             .selectFrom("conversations")
             .select(["id", (0, kysely_1.sql) `BIN_TO_BINARY(uuid)`.as("uuid"), "created_at"])
             .where("uuid", "=", (0, kysely_1.sql) `UUID_TO_BIN(${uuid})`)
             .executeTakeFirst();
+        return (0, class_transformer_1.plainToInstance)(conversation_model_1.default, conversation);
     });
     findOneConversationByMembersId = this.wrap.repoWrap(async (member_id) => {
-        return await this.database
+        const conversation = await this.database
             .selectFrom("conversations as c")
             .select(["c.id", (0, kysely_1.sql) `BIN_TO_BINARY(c.uuid)`.as("uuid"), "c.created_at"])
             .leftJoin((eb) => eb
@@ -94,9 +100,10 @@ class ChatsRepository {
             .as("u"), (join) => join.onRef("u.id", "=", "cm.user_id"))
             .where("u.id", "in", member_id)
             .executeTakeFirst();
+        return (0, class_transformer_1.plainToInstance)(conversation_model_1.default, conversation);
     });
     findOneMessageById = this.wrap.repoWrap(async (uuid) => {
-        return await this.database
+        const chat = await this.database
             .selectFrom("messages")
             .select([
             "id",
@@ -109,6 +116,7 @@ class ChatsRepository {
         ])
             .where("uuid", "=", (0, kysely_1.sql) `UUID_TO_BIN(${uuid})`)
             .executeTakeFirst();
+        return (0, class_transformer_1.plainToInstance)(chat_model_1.default, chat);
     });
     saveNewConversation = this.wrap.repoWrap(async (conversation) => {
         const { insertId } = await this.database

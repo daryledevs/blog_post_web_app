@@ -2,15 +2,16 @@ import {
   NewChatMembers,
   NewConversations,
   NewMessages,
-  SelectConversations,
-  SelectMessages,
-}                                            from "@/domain/types/table.types";
-import db                                    from "@/infrastructure/database/db.database";
-import { DB }                                from "@/domain/types/schema.types";
-import AsyncWrapper                          from "@/application/utils/async-wrapper.util";
-import sqlUuidsToBin                         from "@/application/utils/uuid-to-bin";
-import { Kysely, sql }                       from "kysely";
-import IEChatRepository, { ChatHistoryType } from "@/domain/repositories/chat.repository";
+}                          from "@/domain/types/table.types";
+import db                  from "@/infrastructure/database/db.database";
+import Chat                from "@/domain/models/chat.model";
+import { DB }              from "@/domain/types/schema.types";
+import Conversation        from "@/domain/models/conversation.model";
+import AsyncWrapper        from "@/application/utils/async-wrapper.util";
+import sqlUuidsToBin       from "@/application/utils/uuid-to-bin";
+import { Kysely, sql }     from "kysely";
+import IEChatRepository    from "@/domain/repositories/chat.repository";
+import { plainToInstance } from "class-transformer";
 
 class ChatsRepository implements IEChatRepository {
   private database: Kysely<DB>;
@@ -24,10 +25,10 @@ class ChatsRepository implements IEChatRepository {
     async (
       user_id: number,
       conversation_uuids: string[]
-    ): Promise<ChatHistoryType[]> => {
+    ): Promise<Chat[]> => {
       const uuidToBin = sqlUuidsToBin(conversation_uuids);
 
-      return await this.database
+      const chats = await this.database
         .selectFrom("conversations as c")
         .select(["c.id", sql`BIN_TO_UUID(c.uuid)`.as("uuid")])
         .leftJoin(
@@ -69,6 +70,8 @@ class ChatsRepository implements IEChatRepository {
           "user.avatar_url",
         ])
         .execute();
+
+      return plainToInstance(Chat, chats);
     }
   );
 
@@ -76,10 +79,10 @@ class ChatsRepository implements IEChatRepository {
     async (
       conversation_id: number,
       message_uuids: string[]
-    ): Promise<SelectMessages[]> => {
+    ): Promise<Chat[]> => {
       const uuidsToBin = sqlUuidsToBin(message_uuids);
 
-      return await this.database
+      const chats = await this.database
         .selectFrom("messages")
         .select([
           "id",
@@ -99,22 +102,26 @@ class ChatsRepository implements IEChatRepository {
         .limit(30)
         .orderBy("messages.id", "desc")
         .execute();
+
+      return plainToInstance(Chat, chats);
     }
   );
 
   public findOneConversationById = this.wrap.repoWrap(
-    async (uuid: string): Promise<SelectConversations | undefined> => {
-      return await this.database
+    async (uuid: string): Promise<Conversation | undefined> => {
+      const conversation = await this.database
         .selectFrom("conversations")
         .select(["id", sql`BIN_TO_BINARY(uuid)`.as("uuid"), "created_at"])
         .where("uuid", "=", sql`UUID_TO_BIN(${uuid})`)
         .executeTakeFirst();
+
+      return plainToInstance(Conversation, conversation);  
     }
   );
 
   public findOneConversationByMembersId = this.wrap.repoWrap(
-    async (member_id: number[]): Promise<SelectConversations | undefined> => {
-      return await this.database
+    async (member_id: number[]): Promise<Conversation | undefined> => {
+      const conversation = await this.database
         .selectFrom("conversations as c")
         .select(["c.id", sql`BIN_TO_BINARY(c.uuid)`.as("uuid"), "c.created_at"])
         .leftJoin(
@@ -140,12 +147,14 @@ class ChatsRepository implements IEChatRepository {
         )
         .where("u.id", "in", member_id)
         .executeTakeFirst();
+
+      return plainToInstance(Conversation, conversation);
     }
   );
 
   public findOneMessageById = this.wrap.repoWrap(
-    async (uuid: string): Promise<SelectMessages | undefined> => {
-      return await this.database
+    async (uuid: string): Promise<Chat | undefined> => {
+      const chat =  await this.database
         .selectFrom("messages")
         .select([
           "id",
@@ -158,6 +167,8 @@ class ChatsRepository implements IEChatRepository {
         ])
         .where("uuid", "=", sql`UUID_TO_BIN(${uuid})`)
         .executeTakeFirst();
+
+      return plainToInstance(Chat, chat);
     }
   );
 

@@ -2,9 +2,9 @@ import {
   NewChatMembers,
   NewConversations,
   NewMessages,
-  SelectConversations,
-  SelectMessages,
-} from "@/domain/types/table.types";
+}                   from "@/domain/types/table.types";
+import Chat         from "../models/chat.model";
+import Conversation from "../models/conversation.model";
 
 export interface MessageDataType {
   conversation_id: string;
@@ -13,26 +13,16 @@ export interface MessageDataType {
   text_message: string;
 };
 
-export type ChatHistoryType = {
-  id: number;
-  uuid: any;
-  user_uuid: any;
-  username: string | null;
-  first_name: string | null;
-  last_name: string | null;
-  avatar_url: string | null;
-};
-
 interface IEChatRepository {
-  findAllConversationByUserId: (user_id: number, conversations: number[]) => Promise<ChatHistoryType[]>;
+  findAllConversationByUserId: (user_id: number, conversations: number[]) => Promise<Chat[]>;
 
-  findAllMessagesById: (conversation_id: number, ids: number[] | number) => Promise<SelectMessages[]>;
+  findAllMessagesById: (conversation_id: number, ids: number[] | number) => Promise<Chat[]>;
 
-  findOneConversationById: (uuid: string) => Promise<SelectConversations | undefined>;
+  findOneConversationById: (uuid: string) => Promise<Conversation | undefined>;
 
-  findOneConversationByMembersId: (member_id: number[]) => Promise<SelectConversations | undefined>;
+  findOneConversationByMembersId: (member_id: number[]) => Promise<Conversation | undefined>;
 
-  findOneMessageById: (uuid: string) => Promise<SelectMessages | undefined>;
+  findOneMessageById: (uuid: string) => Promise<Chat | undefined>;
 
   saveNewConversation: (conversation: NewConversations) => Promise<number | bigint | undefined>;
 
