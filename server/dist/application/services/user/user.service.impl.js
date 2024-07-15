@@ -76,7 +76,11 @@ class UserService {
         return searches.map((user) => (0, class_transformer_1.plainToInstance)(user_dto_1.default, user));
     });
     userDtoClass = (user) => {
-        return user ? (0, class_transformer_1.plainToInstance)(user_dto_1.default, user) : undefined;
+        return user
+            ? (0, class_transformer_1.plainToInstance)(user_dto_1.default, user, {
+                excludeExtraneousValues: true,
+            })
+            : undefined;
     };
 }
 exports.default = UserService;

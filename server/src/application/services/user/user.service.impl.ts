@@ -99,7 +99,11 @@ class UserService implements IEUserService {
   );
 
   private userDtoClass = (user: User | undefined): UserDto | undefined => {
-    return user ? plainToInstance(UserDto, user) : undefined;
+    return user
+      ? plainToInstance(UserDto, user, {
+          excludeExtraneousValues: true,
+        })
+      : undefined;
   };
 }
 
