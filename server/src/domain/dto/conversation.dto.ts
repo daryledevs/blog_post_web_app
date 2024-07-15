@@ -1,6 +1,8 @@
+
+import UserDetailsDto      from "./user-details.dto";
 import { Exclude, Expose } from "class-transformer";
 
-class ConversationDto {
+class ConversationDto extends UserDetailsDto {
   @Exclude({ toPlainOnly: true })
   private id: number;
 
@@ -10,7 +12,16 @@ class ConversationDto {
   @Expose()
   private created_at: Date | null;
 
-  constructor(id: number, uuid: any, created_at?: Date | null) {
+  constructor(
+    id: number,
+    uuid: any,
+    username: string,
+    created_at: Date | null,
+    first_name?: string | null,
+    last_name?: string | null,
+    avatar_url?: string | null,
+  ) {
+    super(username, first_name, last_name, avatar_url);
     this.id = id;
     this.uuid = uuid;
     this.created_at = created_at || null;

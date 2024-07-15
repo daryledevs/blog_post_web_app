@@ -1,21 +1,22 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-class Chat {
+const user_details_model_1 = __importDefault(require("./user-details.model"));
+class Chat extends user_details_model_1.default {
     id;
     uuid;
+    conversation_id;
+    conversation_uuid;
     user_uuid;
-    username;
-    first_name;
-    last_name;
-    avatar_url;
-    constructor(id, uuid, user_uuid, username, first_name, last_name, avatar_url) {
+    constructor(id, uuid, conversation_id, conversation_uuid, user_uuid, username, first_name, last_name, avatar_url, age, birthday) {
+        super(username, first_name, last_name, avatar_url, age, birthday);
         this.id = id;
         this.uuid = uuid;
+        this.conversation_id = conversation_id;
+        this.conversation_uuid = conversation_uuid;
         this.user_uuid = user_uuid;
-        this.username = username;
-        this.first_name = first_name;
-        this.last_name = last_name;
-        this.avatar_url = avatar_url;
     }
     // getters
     getId() {
@@ -24,20 +25,14 @@ class Chat {
     getUuid() {
         return this.uuid;
     }
+    getConversationId() {
+        return this.conversation_id;
+    }
+    getConversationUuid() {
+        return this.conversation_uuid;
+    }
     getUserUuid() {
         return this.user_uuid;
-    }
-    getUsername() {
-        return this.username;
-    }
-    getFirstName() {
-        return this.first_name;
-    }
-    getLastName() {
-        return this.last_name;
-    }
-    getAvatarUrl() {
-        return this.avatar_url;
     }
     // setters
     setId(id) {
@@ -46,11 +41,14 @@ class Chat {
     setUuid(uuid) {
         this.uuid = uuid;
     }
+    setConversationId(conversation_id) {
+        this.conversation_id = conversation_id;
+    }
+    setConversationUuid(conversation_uuid) {
+        this.conversation_uuid = conversation_uuid;
+    }
     setUserUuid(user_uuid) {
         this.user_uuid = user_uuid;
-    }
-    setUsername(username) {
-        this.username = username;
     }
     setFirstName(first_name) {
         this.first_name = first_name;

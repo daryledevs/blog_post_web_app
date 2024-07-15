@@ -1,8 +1,8 @@
-import FollowDto              from "./follow.dto";
+import UserDetailsDto         from "./user-details.dto";
 import { Exclude, Expose }    from "class-transformer";
 import { IsNotEmpty, IsUUID } from "class-validator";
 
-class FollowingDto extends FollowDto {
+class FollowingDto extends UserDetailsDto {
   @Exclude({ toPlainOnly: true })
   private followed_id: number;
 
@@ -14,13 +14,12 @@ class FollowingDto extends FollowDto {
   constructor(
     followed_id: number,
     followed_uuid: any,
-    created_at: Date | null,
     username: string,
     first_name?: string | null,
     last_name?: string | null,
     avatar_url?: string | null
   ) {
-    super(username, created_at, first_name, last_name, avatar_url);
+    super(username, first_name, last_name, avatar_url);
     this.followed_id = followed_id;
     this.followed_uuid = followed_uuid;
   }

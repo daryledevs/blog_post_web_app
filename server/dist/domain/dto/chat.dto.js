@@ -14,14 +14,18 @@ const class_validator_1 = require("class-validator");
 class ChatDto {
     id;
     uuid;
+    conversation_id;
+    conversation_uuid;
     user_uuid;
     username;
     first_name;
     last_name;
     avatar_url;
-    constructor(id, uuid, user_uuid, username, first_name, last_name, avatar_url) {
+    constructor(id, uuid, conversation_id, conversation_uuid, user_uuid, username, first_name, last_name, avatar_url) {
         this.id = id;
         this.uuid = uuid;
+        this.conversation_id = conversation_id;
+        this.conversation_uuid = conversation_uuid;
         this.user_uuid = user_uuid;
         this.username = username;
         this.first_name = first_name || null;
@@ -34,6 +38,12 @@ class ChatDto {
     }
     getUuid() {
         return this.uuid;
+    }
+    getConversationId() {
+        return this.conversation_id;
+    }
+    getConversationUuid() {
+        return this.conversation_uuid;
     }
     getUserUuid() {
         return this.user_uuid;
@@ -56,6 +66,12 @@ class ChatDto {
     }
     setUuid(uuid) {
         this.uuid = uuid;
+    }
+    setConversationId(conversation_id) {
+        this.conversation_id = conversation_id;
+    }
+    setConversationUuid(conversation_uuid) {
+        this.conversation_uuid = conversation_uuid;
     }
     setUserUuid(user_uuid) {
         this.user_uuid = user_uuid;
@@ -83,6 +99,16 @@ __decorate([
     (0, class_validator_1.IsUUID)(4, { message: "invalid UUID" }),
     __metadata("design:type", Object)
 ], ChatDto.prototype, "uuid", void 0);
+__decorate([
+    (0, class_transformer_1.Exclude)({ toPlainOnly: true }),
+    __metadata("design:type", Number)
+], ChatDto.prototype, "conversation_id", void 0);
+__decorate([
+    (0, class_transformer_1.Expose)(),
+    (0, class_validator_1.IsNotEmpty)({ message: "conversation UUID is required" }),
+    (0, class_validator_1.IsUUID)(4, { message: "invalid UUID" }),
+    __metadata("design:type", Object)
+], ChatDto.prototype, "conversation_uuid", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
     (0, class_validator_1.IsNotEmpty)({ message: "user UUID is required" }),

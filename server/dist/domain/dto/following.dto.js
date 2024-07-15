@@ -12,14 +12,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const follow_dto_1 = __importDefault(require("./follow.dto"));
+const user_details_dto_1 = __importDefault(require("./user-details.dto"));
 const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
-class FollowingDto extends follow_dto_1.default {
+class FollowingDto extends user_details_dto_1.default {
     followed_id;
     followed_uuid;
-    constructor(followed_id, followed_uuid, created_at, username, first_name, last_name, avatar_url) {
-        super(username, created_at, first_name, last_name, avatar_url);
+    constructor(followed_id, followed_uuid, username, first_name, last_name, avatar_url) {
+        super(username, first_name, last_name, avatar_url);
         this.followed_id = followed_id;
         this.followed_uuid = followed_uuid;
     }

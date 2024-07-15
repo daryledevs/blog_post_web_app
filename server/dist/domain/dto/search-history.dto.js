@@ -8,30 +8,27 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const user_details_dto_1 = __importDefault(require("./user-details.dto"));
 const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
-class SearchHistoryDto {
+class SearchHistoryDto extends user_details_dto_1.default {
     id;
     uuid;
     searcher_id;
     searched_id;
     user_uuid;
-    username;
-    first_name;
-    last_name;
-    avatar_url;
     created_at;
     constructor(id, uuid, searcher_id, searched_id, user_uuid, username, created_at, first_name, last_name, avatar_url) {
+        super(username, first_name, last_name, avatar_url);
         this.id = id;
         this.uuid = uuid;
         this.searcher_id = searcher_id;
         this.searched_id = searched_id;
         this.user_uuid = user_uuid;
-        this.username = username;
-        this.first_name = first_name;
-        this.last_name = last_name;
-        this.avatar_url = avatar_url;
         this.created_at = created_at;
     }
     // Getters
@@ -49,18 +46,6 @@ class SearchHistoryDto {
     }
     getUserUuid() {
         return this.user_uuid;
-    }
-    getUsername() {
-        return this.username;
-    }
-    getFirstName() {
-        return this.first_name;
-    }
-    getLastName() {
-        return this.last_name;
-    }
-    getAvatar() {
-        return this.avatar_url;
     }
     getCreatedAt() {
         return this.created_at;
@@ -80,18 +65,6 @@ class SearchHistoryDto {
     }
     setUserUuid(user_uuid) {
         this.user_uuid = user_uuid;
-    }
-    setUsername(username) {
-        this.username = username;
-    }
-    setFirstName(first_name) {
-        this.first_name = first_name;
-    }
-    setLastName(last_name) {
-        this.last_name = last_name;
-    }
-    setAvatarUrl(avatar_url) {
-        this.avatar_url = avatar_url;
     }
     setCreatedAt(created_at) {
         this.created_at = created_at;
@@ -120,24 +93,6 @@ __decorate([
     (0, class_validator_1.IsUUID)(4, { message: "invalid user's UUID version" }),
     __metadata("design:type", String)
 ], SearchHistoryDto.prototype, "user_uuid", void 0);
-__decorate([
-    (0, class_transformer_1.Expose)(),
-    (0, class_validator_1.IsNotEmpty)({ message: "username is required" }),
-    (0, class_validator_1.IsString)({ message: "username must be a string" }),
-    __metadata("design:type", String)
-], SearchHistoryDto.prototype, "username", void 0);
-__decorate([
-    (0, class_transformer_1.Expose)(),
-    __metadata("design:type", Object)
-], SearchHistoryDto.prototype, "first_name", void 0);
-__decorate([
-    (0, class_transformer_1.Expose)(),
-    __metadata("design:type", Object)
-], SearchHistoryDto.prototype, "last_name", void 0);
-__decorate([
-    (0, class_transformer_1.Expose)(),
-    __metadata("design:type", Object)
-], SearchHistoryDto.prototype, "avatar_url", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
     (0, class_validator_1.IsOptional)(),

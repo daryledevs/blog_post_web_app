@@ -1,17 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-class Follow {
+class UserDetails {
     username;
     first_name;
     last_name;
     avatar_url;
-    created_at;
-    constructor(username, created_at, first_name, last_name, avatar_url) {
+    age;
+    birthday;
+    constructor(username, first_name, last_name, avatar_url, age, birthday) {
         this.username = username;
         this.first_name = first_name;
         this.last_name = last_name;
         this.avatar_url = avatar_url;
-        this.created_at = created_at;
+        this.age = age;
+        this.birthday = birthday;
     }
     // getters
     getUsername() {
@@ -26,8 +28,11 @@ class Follow {
     getAvatarUrl() {
         return this.avatar_url || null;
     }
-    getCreatedAt() {
-        return this.created_at;
+    getAge() {
+        return this.age || null;
+    }
+    getBirthday() {
+        return this.birthday || null;
     }
     // setters
     setUsername(username) {
@@ -42,8 +47,11 @@ class Follow {
     setAvatarUrl(avatar_url) {
         this.avatar_url = avatar_url;
     }
-    setCreatedAt(created_at) {
-        this.created_at = created_at;
+    setAge(age) {
+        this.age = age;
+    }
+    setBirthday(birthday) {
+        this.birthday = birthday;
     }
 }
-exports.default = Follow;
+exports.default = UserDetails;

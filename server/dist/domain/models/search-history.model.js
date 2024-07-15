@@ -1,17 +1,19 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-class SearchHistory {
+const user_details_model_1 = __importDefault(require("./user-details.model"));
+class SearchHistory extends user_details_model_1.default {
     id;
     uuid;
     searcher_id;
     searched_id;
     user_uuid;
-    username;
-    first_name;
-    last_name;
-    avatar_url;
+    ;
     created_at;
     constructor(id, uuid, searcher_id, searched_id, user_uuid, username, created_at, first_name, last_name, avatar_url) {
+        super(username, first_name, last_name, avatar_url);
         this.id = id;
         this.uuid = uuid;
         this.searcher_id = searcher_id;
@@ -45,18 +47,6 @@ class SearchHistory {
     getUserUuid() {
         return this.user_uuid;
     }
-    getUsername() {
-        return this.username;
-    }
-    getFirstName() {
-        return this.first_name;
-    }
-    getLastName() {
-        return this.last_name;
-    }
-    getAvatar() {
-        return this.avatar_url;
-    }
     getCreatedAt() {
         return this.created_at;
     }
@@ -75,18 +65,6 @@ class SearchHistory {
     }
     setUserUuid(user_uuid) {
         this.user_uuid = user_uuid;
-    }
-    setUsername(username) {
-        this.username = username;
-    }
-    setFirstName(first_name) {
-        this.first_name = first_name;
-    }
-    setLastName(last_name) {
-        this.last_name = last_name;
-    }
-    setAvatarUrl(avatar_url) {
-        this.avatar_url = avatar_url;
     }
     setCreatedAt(created_at) {
         this.created_at = created_at;

@@ -1,30 +1,23 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-class User {
+const user_details_model_1 = __importDefault(require("./user-details.model"));
+class User extends user_details_model_1.default {
     id;
     uuid;
-    username;
     email;
     password;
-    first_name;
-    last_name;
-    age;
     roles;
-    avatar_url;
-    birthday;
     created_at;
     constructor(id, uuid, username, email, password, first_name, last_name, age, roles, avatar_url, birthday, created_at) {
+        super(username, first_name, last_name, avatar_url, age, birthday);
         this.id = id;
         this.uuid = uuid;
-        this.username = username;
         this.email = email;
         this.password = password;
-        this.first_name = first_name;
-        this.last_name = last_name;
-        this.age = age;
         this.roles = roles;
-        this.avatar_url = avatar_url;
-        this.birthday = birthday;
         this.created_at = created_at;
     }
     save() {
@@ -41,15 +34,12 @@ class User {
             created_at: this.created_at,
         };
     }
-    // Getters
+    // getters
     getId() {
         return this.id;
     }
     getUuid() {
         return this.uuid;
-    }
-    getUsername() {
-        return this.username;
     }
     getEmail() {
         return this.email;
@@ -60,28 +50,10 @@ class User {
     getPassword() {
         throw new Error("Password is restricted");
     }
-    getFirstName() {
-        return this.first_name;
-    }
-    getLastName() {
-        return this.last_name;
-    }
-    getAge() {
-        return this.age;
-    }
-    getAvatar() {
-        return this.avatar_url;
-    }
-    getBirthday() {
-        return this.birthday;
-    }
     getCreatedAt() {
         return this.created_at;
     }
-    // Setters
-    setUsername(value) {
-        this.username = value;
-    }
+    // setters
     setEmail(value) {
         this.email = value;
     }
@@ -90,21 +62,6 @@ class User {
     }
     setRoles(value) {
         this.roles = value;
-    }
-    setFirstName(value) {
-        this.first_name = value;
-    }
-    setLastName(value) {
-        this.last_name = value;
-    }
-    setAge(value) {
-        this.age = value;
-    }
-    setAvatar(value) {
-        this.avatar_url = value;
-    }
-    setBirthday(value) {
-        this.birthday = value;
     }
     setCreatedAt(value) {
         this.created_at = value;

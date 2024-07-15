@@ -1,7 +1,7 @@
 import { Expose }                           from "class-transformer";
 import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
-class FollowDto {
+class UserDetailsDto {
   @Expose()
   @IsNotEmpty({ message: "username is required" })
   private username: string;
@@ -21,12 +21,8 @@ class FollowDto {
   @IsString({ message: "avatar url must be a string" })
   private avatar_url?: string | null;
 
-  @Expose()
-  private created_at: Date | null;
-
   constructor(
     username: string,
-    created_at: Date | null,
     first_name?: string | null,
     last_name?: string | null,
     avatar_url?: string | null,
@@ -35,7 +31,6 @@ class FollowDto {
     this.first_name = first_name;
     this.last_name = last_name;
     this.avatar_url = avatar_url;
-    this.created_at = created_at;
   }
 
   // getters
@@ -55,10 +50,6 @@ class FollowDto {
     return this.avatar_url || null;
   }
 
-  public getCreatedAt(): Date | null {
-    return this.created_at;
-  }
-
   // setters
   public setUsername(username: string): void {
     this.username = username;
@@ -76,9 +67,6 @@ class FollowDto {
     this.avatar_url = avatar_url;
   }
 
-  public setCreatedAt(created_at: Date | null): void {
-    this.created_at = created_at;
-  }
 }
 
-export default FollowDto;
+export default UserDetailsDto;

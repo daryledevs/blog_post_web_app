@@ -8,34 +8,27 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const class_validator_1 = require("class-validator");
+const user_details_model_1 = __importDefault(require("../models/user-details.model"));
 const class_transformer_1 = require("class-transformer");
-class UserDto {
+const class_validator_1 = require("class-validator");
+class UserDto extends user_details_model_1.default {
     id;
     uuid;
-    username;
     email;
     password;
     roles;
-    first_name;
-    last_name;
-    age;
-    avatar_url;
-    birthday;
     created_at;
     constructor(id, uuid, username, email, password, first_name, last_name, age, roles, avatar_url, birthday, created_at) {
+        super(username, first_name, last_name, avatar_url, age, birthday);
         this.id = id;
         this.uuid = uuid;
-        this.username = username;
         this.email = email;
         this.password = password;
-        this.first_name = first_name;
-        this.last_name = last_name;
-        this.age = age;
         this.roles = roles;
-        this.avatar_url = avatar_url;
-        this.birthday = birthday;
         this.created_at = created_at;
     }
     // Getters
@@ -57,20 +50,8 @@ class UserDto {
     getPassword() {
         return this.password;
     }
-    getFirstName() {
-        return this.first_name;
-    }
-    getLastName() {
-        return this.last_name;
-    }
-    getAge() {
-        return this.age;
-    }
     getAvatar() {
         return this.avatar_url;
-    }
-    getBirthday() {
-        return this.birthday;
     }
     getCreatedAt() {
         return this.created_at;
@@ -123,11 +104,6 @@ __decorate([
 ], UserDto.prototype, "uuid", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
-    (0, class_validator_1.Length)(5, 30, { message: "username must be between 5 and 30 characters" }),
-    __metadata("design:type", String)
-], UserDto.prototype, "username", void 0);
-__decorate([
-    (0, class_transformer_1.Expose)(),
     (0, class_validator_1.IsEmail)({}, { message: "invalid email" }),
     __metadata("design:type", String)
 ], UserDto.prototype, "email", void 0);
@@ -142,36 +118,6 @@ __decorate([
     (0, class_validator_1.IsIn)(["user", "admin"], { message: "invalid role" }),
     __metadata("design:type", Object)
 ], UserDto.prototype, "roles", void 0);
-__decorate([
-    (0, class_transformer_1.Expose)(),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)({ message: "First name must be a string" }),
-    __metadata("design:type", Object)
-], UserDto.prototype, "first_name", void 0);
-__decorate([
-    (0, class_transformer_1.Expose)(),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)({ message: "Last name must be a string" }),
-    __metadata("design:type", Object)
-], UserDto.prototype, "last_name", void 0);
-__decorate([
-    (0, class_transformer_1.Expose)(),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsInt)({ message: "Age must be a number" }),
-    __metadata("design:type", Object)
-], UserDto.prototype, "age", void 0);
-__decorate([
-    (0, class_transformer_1.Expose)(),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)({ message: "Avatar url must be a string" }),
-    __metadata("design:type", Object)
-], UserDto.prototype, "avatar_url", void 0);
-__decorate([
-    (0, class_transformer_1.Expose)(),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)({ message: "Birthday must be a string" }),
-    __metadata("design:type", Object)
-], UserDto.prototype, "birthday", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
     (0, class_validator_1.IsOptional)(),

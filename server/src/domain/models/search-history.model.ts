@@ -1,3 +1,4 @@
+import UserDetails     from "./user-details.model";
 import { NewSearches } from "@/domain/types/table.types";
 
 export interface IESearchHistoryData {
@@ -13,16 +14,12 @@ export interface IESearchHistoryData {
   created_at: Date | null;
 }
 
-class SearchHistory {
+class SearchHistory extends UserDetails {
   private id: number;
   private uuid: any;
   private searcher_id: number;
   private searched_id: number;
-  private user_uuid: string;
-  private username: string;
-  private first_name?: string | null | undefined;
-  private last_name?: string | null | undefined;
-  private avatar_url?: string | null | undefined;
+  private user_uuid: string;;
   private created_at: Date | null;
 
   constructor(
@@ -37,6 +34,7 @@ class SearchHistory {
     last_name?: string | null | undefined,
     avatar_url?: string | null | undefined,
   ) {
+    super(username, first_name, last_name, avatar_url);
     this.id = id;
     this.uuid = uuid;
     this.searcher_id = searcher_id;
@@ -57,84 +55,52 @@ class SearchHistory {
   }
 
   // Getters
-  getId(): number {
+  public getId(): number {
     return this.id;
   }
 
-  getUuid(): any {
+  public getUuid(): any {
     return this.uuid;
   }
 
-  getSearcherId(): number {
+  public getSearcherId(): number {
     return this.searcher_id;
   }
 
-  getSearchedId(): number {
+  public getSearchedId(): number {
     return this.searched_id;
   }
 
-  getUserUuid(): string {
+  public getUserUuid(): string {
     return this.user_uuid;
   }
 
-  getUsername(): string {
-    return this.username;
-  }
-
-  getFirstName(): string | null | undefined {
-    return this.first_name;
-  }
-
-  getLastName(): string | null | undefined {
-    return this.last_name;
-  }
-
-  getAvatar(): string | null | undefined {
-    return this.avatar_url;
-  }
-
-  getCreatedAt(): Date | null {
+  public getCreatedAt(): Date | null {
     return this.created_at;
   }
 
   // Setters
-  setId(id: number): void {
+  public setId(id: number): void {
     this.id = id;
   }
 
-  setUuid(uuid: any): void {
+  public setUuid(uuid: any): void {
     this.uuid = uuid;
   }
 
-  setSearcherId(searcher_id: number): void {
+  public setSearcherId(searcher_id: number): void {
     this.searcher_id = searcher_id;
   }
 
-  setSearchedId(searched_id: number): void {
+  public setSearchedId(searched_id: number): void {
     this.searched_id = searched_id;
   }
 
-  setUserUuid(user_uuid: string): void {
+  public setUserUuid(user_uuid: string): void {
     this.user_uuid = user_uuid;
   }
 
-  setUsername(username: string): void {
-    this.username = username;
-  }
-
-  setFirstName(first_name: string): void {
-    this.first_name = first_name;
-  }
-
-  setLastName(last_name: string): void {
-    this.last_name = last_name;
-  }
-
-  setAvatarUrl(avatar_url: string): void {
-    this.avatar_url = avatar_url;
-  }
-
-  setCreatedAt(created_at: Date | null): void {
+  public setCreatedAt(created_at: Date | null): void {
     this.created_at = created_at;
   }
 }

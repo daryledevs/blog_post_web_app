@@ -1,22 +1,25 @@
-class Follow {
-  private username: string;
-  private first_name?: string | null;
-  private last_name?: string | null;
-  private avatar_url?: string | null;
-  private created_at: Date | null;
+class UserDetails {
+  protected username: string;
+  protected first_name?: string | null;
+  protected last_name?: string | null;
+  protected avatar_url?: string | null;
+  protected age?: number | null;
+  protected birthday?: string | null;
 
   constructor(
     username: string,
-    created_at: Date | null,
     first_name?: string | null,
     last_name?: string | null,
-    avatar_url?: string | null
+    avatar_url?: string | null,
+    age?: number | null,
+    birthday?: string | null
   ) {
     this.username = username;
     this.first_name = first_name;
     this.last_name = last_name;
     this.avatar_url = avatar_url;
-    this.created_at = created_at;
+    this.age = age;
+    this.birthday = birthday;
   }
 
   // getters
@@ -36,8 +39,12 @@ class Follow {
     return this.avatar_url || null;
   }
 
-  public getCreatedAt(): Date | null {
-    return this.created_at;
+  public getAge(): number | null {
+    return this.age || null;
+  }
+
+  public getBirthday(): string | null {
+    return this.birthday || null;
   }
 
   // setters
@@ -57,9 +64,13 @@ class Follow {
     this.avatar_url = avatar_url;
   }
 
-  public setCreatedAt(created_at: Date | null): void {
-    this.created_at = created_at;
+  public setAge(age: number | null): void {
+    this.age = age;
+  }
+
+  public setBirthday(birthday: string | null): void {
+    this.birthday = birthday;
   }
 }
 
-export default Follow;
+export default UserDetails;

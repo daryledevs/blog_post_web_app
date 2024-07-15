@@ -1,61 +1,27 @@
-import {
-  IsInt,
-  Length,
-  IsEmail,
-  IsString,
-  IsOptional,
-  IsIn,
-}                          from "class-validator";
-import { Exclude, Expose } from "class-transformer";
 
-class UserDto {
+import UserDetails                                     from "../models/user-details.model";
+import { Exclude, Expose }                             from "class-transformer";
+import { Length, IsEmail, IsString, IsOptional, IsIn } from "class-validator";
+
+class UserDto extends UserDetails {
   @Exclude({ toPlainOnly: true })
-  private id!: number;
+  private id: number;
 
   @Expose()
-  private uuid!: string;
-
-  @Expose()
-  @Length(5, 30, { message: "username must be between 5 and 30 characters" })
-  private username!: string;
+  private uuid: string;
 
   @Expose()
   @IsEmail({}, { message: "invalid email" })
-  private email!: string;
+  private email: string;
 
   @Exclude({ toPlainOnly: true })
   @Length(6, 100, { message: "password must be at least 6 characters" })
-  private password!: string;
+  private password: string;
 
   @Expose()
   @IsString({ message: "Roles must be a string" })
   @IsIn(["user", "admin"], { message: "invalid role" })
   private roles: string | null | undefined;
-
-  @Expose()
-  @IsOptional()
-  @IsString({ message: "First name must be a string" })
-  private first_name: string | null | undefined;
-
-  @Expose()
-  @IsOptional()
-  @IsString({ message: "Last name must be a string" })
-  private last_name: string | null | undefined;
-
-  @Expose()
-  @IsOptional()
-  @IsInt({ message: "Age must be a number" })
-  private age: number | null | undefined;
-
-  @Expose()
-  @IsOptional()
-  @IsString({ message: "Avatar url must be a string" })
-  private avatar_url: string | null | undefined;
-
-  @Expose()
-  @IsOptional()
-  @IsString({ message: "Birthday must be a string" })
-  private birthday: string | null | undefined;
 
   @Expose()
   @IsOptional()
@@ -75,17 +41,12 @@ class UserDto {
     birthday: string | null,
     created_at: Date | null
   ) {
+    super(username, first_name, last_name, avatar_url, age, birthday);
     this.id = id;
     this.uuid = uuid;
-    this.username = username;
     this.email = email;
     this.password = password;
-    this.first_name = first_name;
-    this.last_name = last_name;
-    this.age = age;
     this.roles = roles;
-    this.avatar_url = avatar_url;
-    this.birthday = birthday;
     this.created_at = created_at;
   }
 
@@ -114,24 +75,8 @@ class UserDto {
     return this.password;
   }
 
-  getFirstName(): string | null | undefined {
-    return this.first_name;
-  }
-
-  getLastName(): string | null | undefined {
-    return this.last_name;
-  }
-
-  getAge(): number | null | undefined {
-    return this.age;
-  }
-
   getAvatar(): string | null | undefined {
     return this.avatar_url;
-  }
-
-  getBirthday(): string | null | undefined {
-    return this.birthday;
   }
 
   getCreatedAt(): Date | null | undefined {

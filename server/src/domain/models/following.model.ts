@@ -1,8 +1,9 @@
-import Follow from "./follow.model";
+import UserDetails from "./user-details.model";
 
-class Following extends Follow {
+class Following extends UserDetails {
   private followed_id: number;
   private followed_uuid: any;
+  private created_at: Date | null;
 
   constructor(
     followed_id: number,
@@ -11,11 +12,12 @@ class Following extends Follow {
     username: string,
     first_name?: string | null,
     last_name?: string | null,
-    avatar_url?: string | null
+    avatar_url?: string | null,
   ) {
-    super(username, created_at, first_name, last_name, avatar_url);
+    super(username, first_name, last_name, avatar_url);
     this.followed_id = followed_id;
     this.followed_uuid = followed_uuid;
+    this.created_at = created_at;
   }
 
   // getters
@@ -27,6 +29,10 @@ class Following extends Follow {
     return this.followed_uuid;
   }
 
+  public getCreatedAt(): Date | null {
+    return this.created_at;
+  }
+
   // setters
   public setFollowedId(followed_id: number): void {
     this.followed_id = followed_id;
@@ -34,6 +40,10 @@ class Following extends Follow {
 
   public setFollowedUuid(followed_uuid: any): void {
     this.followed_uuid = followed_uuid;
+  }
+
+  public setCreatedAt(created_at: Date | null): void {
+    this.created_at = created_at;
   }
 }
 

@@ -8,13 +8,18 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const user_details_dto_1 = __importDefault(require("./user-details.dto"));
 const class_transformer_1 = require("class-transformer");
-class ConversationDto {
+class ConversationDto extends user_details_dto_1.default {
     id;
     uuid;
     created_at;
-    constructor(id, uuid, created_at) {
+    constructor(id, uuid, username, created_at, first_name, last_name, avatar_url) {
+        super(username, first_name, last_name, avatar_url);
         this.id = id;
         this.uuid = uuid;
         this.created_at = created_at || null;

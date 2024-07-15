@@ -1,7 +1,8 @@
-import { Exclude, Expose }                                  from "class-transformer";
-import { IsDate, IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
+import UserDetailsDto                             from "./user-details.dto";
+import { Exclude, Expose }                        from "class-transformer";
+import { IsDate, IsNotEmpty, IsOptional, IsUUID } from "class-validator";
 
-class SearchHistoryDto {
+class SearchHistoryDto extends UserDetailsDto {
   @Exclude({ toPlainOnly: true })
   private id: number;
 
@@ -21,20 +22,6 @@ class SearchHistoryDto {
   private user_uuid: string;
 
   @Expose()
-  @IsNotEmpty({ message: "username is required" })
-  @IsString({ message: "username must be a string" })
-  private username: string;
-
-  @Expose()
-  private first_name?: string | null | undefined;
-
-  @Expose()
-  private last_name?: string | null | undefined;
-
-  @Expose()
-  private avatar_url?: string | null | undefined;
-
-  @Expose()
   @IsOptional()
   @IsDate({ message: "Created at must be a valid date" })
   private created_at: Date | null;
@@ -51,15 +38,12 @@ class SearchHistoryDto {
     last_name?: string | null | undefined,
     avatar_url?: string | null | undefined
   ) {
+    super(username, first_name, last_name, avatar_url);
     this.id = id;
     this.uuid = uuid;
     this.searcher_id = searcher_id;
     this.searched_id = searched_id;
     this.user_uuid = user_uuid;
-    this.username = username;
-    this.first_name = first_name;
-    this.last_name = last_name;
-    this.avatar_url = avatar_url;
     this.created_at = created_at;
   }
 
@@ -82,22 +66,6 @@ class SearchHistoryDto {
 
   getUserUuid(): any {
     return this.user_uuid;
-  }
-
-  getUsername(): string | null | undefined {
-    return this.username;
-  }
-
-  getFirstName(): string | null | undefined {
-    return this.first_name;
-  }
-
-  getLastName(): string | null | undefined {
-    return this.last_name;
-  }
-
-  getAvatar(): string | null | undefined {
-    return this.avatar_url;
   }
 
   getCreatedAt(): Date | null {
@@ -123,22 +91,6 @@ class SearchHistoryDto {
 
   setUserUuid(user_uuid: string): void {
     this.user_uuid = user_uuid;
-  }
-
-  setUsername(username: string): void {
-    this.username = username;
-  }
-
-  setFirstName(first_name: string | undefined): void {
-    this.first_name = first_name;
-  }
-
-  setLastName(last_name: string | undefined): void {
-    this.last_name = last_name;
-  }
-
-  setAvatarUrl(avatar_url: string | undefined): void {
-    this.avatar_url = avatar_url;
   }
 
   setCreatedAt(created_at: Date | null): void {

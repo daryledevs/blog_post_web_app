@@ -1,4 +1,4 @@
-import { Exclude, Expose } from "class-transformer";
+import { Exclude, Expose }    from "class-transformer";
 import { IsNotEmpty, IsUUID } from "class-validator";
 
 class ChatDto {
@@ -9,6 +9,14 @@ class ChatDto {
   @IsNotEmpty({ message: "follower UUID is required" })
   @IsUUID(4, { message: "invalid UUID" })
   private uuid: any;
+
+  @Exclude({ toPlainOnly: true })
+  private conversation_id: number;
+
+  @Expose()
+  @IsNotEmpty({ message: "conversation UUID is required" })
+  @IsUUID(4, { message: "invalid UUID" })
+  private conversation_uuid: any;
 
   @Expose()
   @IsNotEmpty({ message: "user UUID is required" })
@@ -31,6 +39,8 @@ class ChatDto {
   constructor(
     id: number,
     uuid: any,
+    conversation_id: number,
+    conversation_uuid: any,
     user_uuid: any,
     username: string | null,
     first_name?: string | null,
@@ -39,6 +49,8 @@ class ChatDto {
   ) {
     this.id = id;
     this.uuid = uuid;
+    this.conversation_id = conversation_id;
+    this.conversation_uuid = conversation_uuid;
     this.user_uuid = user_uuid;
     this.username = username;
     this.first_name = first_name || null;
@@ -53,6 +65,14 @@ class ChatDto {
 
   getUuid(): any {
     return this.uuid;
+  }
+
+  getConversationId(): number {
+    return this.conversation_id;
+  }
+
+  getConversationUuid(): any {
+    return this.conversation_uuid;
   }
 
   getUserUuid(): any {
@@ -82,6 +102,14 @@ class ChatDto {
 
   setUuid(uuid: any) {
     this.uuid = uuid;
+  }
+
+  setConversationId(conversation_id: number) {
+    this.conversation_id = conversation_id;
+  }
+
+  setConversationUuid(conversation_uuid: any) {
+    this.conversation_uuid = conversation_uuid;
   }
 
   setUserUuid(user_uuid: any) {
