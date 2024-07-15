@@ -1,8 +1,8 @@
+import { PersonType }          from "./types";
+import { IESidebarState }      from "@/redux/slices/sidebarSlice";
+import { SerializedError }     from "@reduxjs/toolkit";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/dist/query";
-import { PersonType } from "./types";
-import { SerializedError } from "@reduxjs/toolkit";
 import { IEConversationState } from "@/redux/slices/messageSlice";
-import { IESidebarState } from "@/redux/slices/sidebarSlice";
 
 interface IEPost {
   post_id: number;
@@ -18,8 +18,7 @@ interface IEPost {
 }
 
 interface IEUserState {
-  [key: string]: any;
-  user_id: number;
+  uuid: any;
   avatar_url: string;
   first_name: string;
   last_name: string;
@@ -28,7 +27,6 @@ interface IEUserState {
   roles: string;
   age: number;
   birthday: string;
-  fetch_status: FetchBaseQueryError | SerializedError;
 }
 interface IEConversation extends PersonType {
   conversation_id: number;

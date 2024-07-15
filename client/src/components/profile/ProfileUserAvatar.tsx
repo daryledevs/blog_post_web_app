@@ -1,12 +1,11 @@
-import avatar           from "@/assets/images/avatar.png"
-import { ProfileProps } from "@/interfaces/types";
+import avatar from "@/assets/images/avatar.png"
 
-function ProfileUserAvatar({ user }: ProfileProps) {
+function ProfileUserAvatar({ avatar_url }: { avatar_url: string | undefined }) {
   return (
     <div className="profile-user-avatar">
       <img
-        src={user.avatar_url ? user.avatar_url : avatar}
         alt="user avatar"
+        src={avatar_url ? avatar_url : avatar}
       />
     </div>
   );

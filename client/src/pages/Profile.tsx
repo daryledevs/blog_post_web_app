@@ -15,15 +15,14 @@ function Profile() {
   const { data, isLoading } = useGetUserDataQuery({ person: username || "" });
 
   const postDataApi = useGetUserPostQuery(
-    { user_id: data?.user.user_id },
+    { user_id: data?.user?.uuid },
     { skip: !data?.user }
   );
 
   if (
     isLoading || 
-    postDataApi.isLoading || 
-    !data || 
-    !postDataApi.data
+    postDataApi.isLoading ||
+    !data
   ) return null;
 
   return (
@@ -31,9 +30,9 @@ function Profile() {
       <Outlet />
       <div className="profile">
         <div className="profile__container">
-          <ProfileHeader user={data.user} />
-          <ProfileUserInfo user={data.user} />
-          <Gallery posts={postDataApi.data} />
+          <ProfileHeader />
+          <ProfileUserInfo />
+          <Gallery posts={postDataApi?.data?.posts} />
         </div>
       </div>
     </React.Fragment>

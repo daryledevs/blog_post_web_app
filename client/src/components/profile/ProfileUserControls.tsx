@@ -1,10 +1,9 @@
-import { ProfileProps } from '@/interfaces/types'
 import ProfileUserControlsActions from './ProfileUserControlsActions';
 
-function ProfileUserControls({ user }: ProfileProps) {
+function ProfileUserControls({ username } : { username: string | undefined }) {
   return (
     <div className="profile-user-controls">
-      <p>{user?.username}</p>
+      <p>{username}</p>
       <ProfileUserControlsActions />
     </div>
   );

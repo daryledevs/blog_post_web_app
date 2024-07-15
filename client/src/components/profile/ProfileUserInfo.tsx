@@ -1,18 +1,26 @@
-import ProfileUserStats      from './ProfileUserStats';
-import ProfileUserAvatar     from './ProfileUserAvatar';
-import { ProfileProps }      from '@/interfaces/types';
-import ProfileUserControls   from './ProfileUserControls';
-import ProfileUserInfoFooter from './ProfileUserInfoFooter';
+import { useParams }           from 'react-router-dom';
+import ProfileUserStats        from './ProfileUserStats';
+import ProfileUserAvatar       from './ProfileUserAvatar';
+import ProfileUserControls     from './ProfileUserControls';
+import ProfileUserInfoFooter   from './ProfileUserInfoFooter';
+import { useGetUserDataQuery } from '@/redux/api/userApi';
 
-function ProfileUserInfo({ user }: ProfileProps) {
+function ProfileUserInfo() {
+  const { username } = useParams();
+  const { data, isLoading } = useGetUserDataQuery({ person: username || "" });
+  const user = data?.user;
+
+  if (isLoading) return null;
+
   return (
     <div className="profile-user-info">
       <div className="profile-user-info-header">
-        <ProfileUserAvatar user={user} />
+        <ProfileUserAvatar avatar_url={user?.avatar_url} />
         <div className="profile-user-info-controls">
-          <ProfileUserControls user={user} />
+          <ProfileUserControls username={user?.username} />
           <ProfileUserStats
-            user={user}
+            user_id={user?.uuid}
+            username={user?.username}
             className="profile-user-stats-md"
           />
         </div>

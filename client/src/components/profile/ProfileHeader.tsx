@@ -1,9 +1,13 @@
-import { ProfileProps } from "@/interfaces/types";
+import { useParams }           from "react-router-dom";
+import { useGetUserDataQuery } from "@/redux/api/userApi";
 
-function ProfileHeader({ user }: ProfileProps) {
+function ProfileHeader() {
+  const { username } = useParams();
+  const { data } = useGetUserDataQuery({ person: username || "" });
+
   return (
     <div className="profile-header">
-      <p>{user.username}</p>
+      <p>{data?.user?.username}</p>
     </div>
   );
 }
