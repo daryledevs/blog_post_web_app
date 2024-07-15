@@ -29,7 +29,7 @@ function Explore() {
     isError: isExploreApiError,
     error: exploreApiError,
     isSuccess: isExploreApiSuccess,
-  } = useGetExploreFeedQuery(userApiData?.user?.user_id, {
+  } = useGetExploreFeedQuery(userApiData?.user?.uuid, {
     skip: !isUserApiSuccess,
   });
 
