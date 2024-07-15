@@ -34,7 +34,7 @@ class ChatServices {
         if (!data)
             throw api_exception_1.default.HTTP404Error("Chat not found");
         // Return the chat messages
-        return await this.chatRepository.findAllMessagesById(data.id, listId);
+        return await this.chatRepository.findAllMessagesById(data.getId(), listId);
     });
     newMessageAndConversation = this.wrap.serviceWrap(async (messageData) => {
         // destructure the necessary properties from messageData
@@ -64,7 +64,7 @@ class ChatServices {
         }
         // determine the conversation ID, creating a new conversation if necessary
         const newConversationId = conversation
-            ? conversation.id
+            ? conversation.getId()
             : await this.createConversation(sender.getId(), receiver.getId());
         // save the new message in the chat repository
         await this.chatRepository.saveNewMessage({
@@ -92,7 +92,7 @@ class ChatServices {
         if (!conversation)
             throw api_exception_1.default.HTTP404Error("Conversation not found");
         // Return the deleted conversation
-        await this.chatRepository.deleteConversationById(conversation.id);
+        await this.chatRepository.deleteConversationById(conversation.getId());
         return "Conversation deleted successfully";
     });
 }

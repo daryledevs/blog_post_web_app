@@ -1,12 +1,11 @@
 import IEChatRepository, {
-  ChatHistoryType,
   MessageDataType,
-}                         from "@/domain/repositories/chat.repository";
-import IEChatService      from "./chat.service";
-import AsyncWrapper       from "@/application/utils/async-wrapper.util";
-import IEUserRepository   from "@/domain/repositories/user.repository";
-import ApiErrorException  from "@/application/exceptions/api.exception";
-import { SelectMessages } from "@/domain/types/table.types";
+}                        from "@/domain/repositories/chat.repository";
+import Chat              from "@/domain/models/chat.model";
+import AsyncWrapper      from "@/application/utils/async-wrapper.util";
+import IEChatService     from "./chat.service";
+import IEUserRepository  from "@/domain/repositories/user.repository";
+import ApiErrorException from "@/application/exceptions/api.exception";
 
 class ChatServices implements IEChatService {
   private chatRepository: IEChatRepository;
@@ -22,7 +21,7 @@ class ChatServices implements IEChatService {
   }
 
   public getChatHistory = this.wrap.serviceWrap(
-    async (uuid: string | undefined, listId: number[]): Promise<ChatHistoryType[]> => {
+    async (uuid: string | undefined, listId: number[]): Promise<Chat[]> => {
       // If no user id is provided, return an error
       if (!uuid) throw ApiErrorException.HTTP400Error("No arguments provided");
 
@@ -39,7 +38,7 @@ class ChatServices implements IEChatService {
   );
 
   public getChatMessages = this.wrap.serviceWrap(
-    async (uuid: string | undefined, listId: number[]): Promise<SelectMessages[]> => {
+    async (uuid: string | undefined, listId: number[]): Promise<Chat[]> => {
       // If no chat id is provided, return an error
       if (!uuid) throw ApiErrorException.HTTP400Error("No arguments provided");
 
@@ -50,7 +49,7 @@ class ChatServices implements IEChatService {
       if (!data) throw ApiErrorException.HTTP404Error("Chat not found");
 
       // Return the chat messages
-      return await this.chatRepository.findAllMessagesById(data.id, listId);
+      return await this.chatRepository.findAllMessagesById(data.getId(), listId);
     }
   );
 
@@ -93,7 +92,7 @@ class ChatServices implements IEChatService {
 
       // determine the conversation ID, creating a new conversation if necessary
       const newConversationId = conversation
-        ? conversation.id
+        ? conversation.getId()
         : await this.createConversation(sender.getId(), receiver.getId());
 
       // save the new message in the chat repository
@@ -136,7 +135,7 @@ class ChatServices implements IEChatService {
       if (!conversation) throw ApiErrorException.HTTP404Error("Conversation not found");
 
       // Return the deleted conversation
-      await this.chatRepository.deleteConversationById(conversation.id);
+      await this.chatRepository.deleteConversationById(conversation.getId());
       return "Conversation deleted successfully";
     }
   );
