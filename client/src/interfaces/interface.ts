@@ -29,9 +29,8 @@ interface IEUserState {
   birthday: string;
 }
 interface IEConversation extends PersonType {
-  conversation_id: number;
-  user_one_id: number;
-  user_two_id: number;
+  uuid: any;
+  created_at?: Date | null;
 }
 
 interface IEChatMessage {

@@ -24,7 +24,9 @@ function NewMessageCard({ user }: { user: IEUserState }) {
   useEffect(() => {
     if (!recipients?.length) return;
     setIsRecipient(
-      recipients.some((item: any) => item.user_id === user.user_id)
+      recipients.some(
+        (recipient) => recipient.uuid === user.uuid
+      )
     );
   }, [recipients]);
 
@@ -36,7 +38,7 @@ function NewMessageCard({ user }: { user: IEUserState }) {
       onClick={() => newMessageHandler(user)}
     >
       <UserAvatar
-        avatar_url={user?.avatar}
+        avatar_url={user?.avatar_url}
         className="new-message-card-avatar"
       />
       <NewMessageCardDetails user={user} />

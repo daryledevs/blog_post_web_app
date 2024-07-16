@@ -3,14 +3,14 @@ import {
   selectMessage,
   setNewMessageTrigger,
   setOpenConversation,
-}                                         from "../../redux/slices/messageSlice";
+}                                         from "@/redux/slices/messageSlice";
 import BaseModal                          from "./BaseModal";
 import WrapperModal                       from "./WrapperModal";
 import Button                             from "../components/element/Button";
 import Recipients                         from "../components/new-message-modal/recipient/Recipients";
 import NewMessageLists                    from "../components/new-message-modal/NewMessageLists";
 import NewMessageHeader                   from "../components/new-message-modal/NewMessageHeader";
-import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
+import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 
 function NewMessage() {
   const dispatch = useAppDispatch();
@@ -22,8 +22,7 @@ function NewMessage() {
   function newChatHandler() {
     const isUserInConversation = recipients.some((recipient) =>
       openConversation.some(
-        (conversationParticipant) =>
-          recipient.user_id === conversationParticipant.user_id
+        (conversation) => recipient?.uuid === conversation?.uuid
       )
     );
     dispatch(resetRecipients({}));
