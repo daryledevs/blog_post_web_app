@@ -2,10 +2,10 @@ import React, { useEffect } from "react";
 import SearchBarUserList    from "./SearchBarUserList";
 
 import {
-  useDeleteRecentSearchUserMutation,
-  useGetRecentSearchUserQuery,
+  useDelUsersSearchMutation,
+  useGetSearchesUserQuery,
   useGetUserDataQuery,
-  useSaveRecentSearchUserMutation,
+  useSaveUsersSearchMutation,
   useSearchUsersQuery,
 } from "@/redux/api/userApi";
 
@@ -25,17 +25,17 @@ function SearchBarBody({
   const [
     saveRecentSearch, 
     saveRecentSearchApi
-  ] = useSaveRecentSearchUserMutation();
+  ] = useSaveUsersSearchMutation();
   
   const [
     deleteRecentSearch, 
     deleteRecentSearchApi
-  ] = useDeleteRecentSearchUserMutation();
+  ] = useDelUsersSearchMutation();
 
   const user = userApiData?.data?.user;
-  const recentSearchesDataApi = useGetRecentSearchUserQuery(
-    { user_id: user.user_id },
-    { skip: !user.user_id }
+  const recentSearchesDataApi = useGetSearchesUserQuery(
+    { user_id: user?.uuid },
+    { skip: !user?.uuid }
   );
 
   const recentSearches = recentSearchesDataApi?.data?.users;
