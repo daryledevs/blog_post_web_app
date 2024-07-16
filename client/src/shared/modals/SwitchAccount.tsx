@@ -16,7 +16,7 @@ function SwitchAccount() {
   useEffect(() => {
     function handleEscapeKey(event: KeyboardEvent) {
       if (messages.switchAccountTrigger && event.code === "Escape") {
-        dispatch(setSwitchAccountTrigger());
+        dispatch(setSwitchAccountTrigger({}));
       }
     }
 
@@ -33,16 +33,16 @@ function SwitchAccount() {
           <p>Switch Account</p>
           <img
             src={closeModal}
-            onClick={() => dispatch(setSwitchAccountTrigger())}
+            onClick={() => dispatch(setSwitchAccountTrigger({}))}
             alt=""
           />
         </div>
         <div className="switch-account__existing-account">
           <img
-            src={user.avatar_url ? user.avatar_url : avatar}
+            src={user?.avatar_url ? user.avatar_url : avatar}
             alt=""
           />
-          {user.username}
+          {user?.username}
         </div>
         <div className="switch-account__footer">
           <p>Login into an Existing Account</p>
