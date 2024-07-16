@@ -4,33 +4,43 @@ import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 class UserDetailsDto {
   @Expose()
   @IsNotEmpty({ message: "username is required" })
-  private username: string;
+  protected username: string;
 
   @Expose()
   @IsOptional()
   @IsString({ message: "first name must be a string" })
-  private first_name?: string | null;
+  protected first_name?: string | null;
 
   @Expose()
   @IsOptional()
   @IsString({ message: "last name must be a string" })
-  private last_name?: string | null;
+  protected last_name?: string | null;
 
   @Expose()
   @IsOptional()
   @IsString({ message: "avatar url must be a string" })
-  private avatar_url?: string | null;
+  protected avatar_url?: string | null;
+
+  @Expose()
+  protected age?: number | null;
+
+  @Expose()
+  protected birthday?: string | null;
 
   constructor(
     username: string,
     first_name?: string | null,
     last_name?: string | null,
     avatar_url?: string | null,
+    age?: number | null,
+    birthday?: string | null
   ) {
     this.username = username;
     this.first_name = first_name;
     this.last_name = last_name;
     this.avatar_url = avatar_url;
+    this.age = age;
+    this.birthday = birthday;
   }
 
   // getters
@@ -46,7 +56,7 @@ class UserDetailsDto {
     return this.last_name || null;
   }
 
-  public getAvatarUrl(): string | null{
+  public getAvatarUrl(): string | null {
     return this.avatar_url || null;
   }
 
@@ -66,7 +76,6 @@ class UserDetailsDto {
   public setAvatarUrl(avatar_url: string | null): void {
     this.avatar_url = avatar_url;
   }
-
 }
 
 export default UserDetailsDto;

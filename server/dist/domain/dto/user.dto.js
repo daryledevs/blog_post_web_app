@@ -12,10 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const user_details_model_1 = __importDefault(require("../models/user-details.model"));
+const user_details_dto_1 = __importDefault(require("./user-details.dto"));
 const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
-class UserDto extends user_details_model_1.default {
+class UserDto extends user_details_dto_1.default {
     id;
     uuid;
     email;
@@ -38,9 +38,6 @@ class UserDto extends user_details_model_1.default {
     getUuid() {
         return this.uuid;
     }
-    getUsername() {
-        return this.username;
-    }
     getEmail() {
         return this.email;
     }
@@ -49,9 +46,6 @@ class UserDto extends user_details_model_1.default {
     }
     getPassword() {
         return this.password;
-    }
-    getAvatar() {
-        return this.avatar_url;
     }
     getCreatedAt() {
         return this.created_at;
@@ -74,21 +68,6 @@ class UserDto extends user_details_model_1.default {
     }
     setRoles(value) {
         this.roles = value;
-    }
-    setFirstName(value) {
-        this.first_name = value;
-    }
-    setLastName(value) {
-        this.last_name = value;
-    }
-    setAge(value) {
-        this.age = value;
-    }
-    setAvatar(value) {
-        this.avatar_url = value;
-    }
-    setBirthday(value) {
-        this.birthday = value;
     }
     setCreatedAt(value) {
         this.created_at = value;

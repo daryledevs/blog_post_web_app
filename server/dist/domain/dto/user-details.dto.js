@@ -16,11 +16,15 @@ class UserDetailsDto {
     first_name;
     last_name;
     avatar_url;
-    constructor(username, first_name, last_name, avatar_url) {
+    age;
+    birthday;
+    constructor(username, first_name, last_name, avatar_url, age, birthday) {
         this.username = username;
         this.first_name = first_name;
         this.last_name = last_name;
         this.avatar_url = avatar_url;
+        this.age = age;
+        this.birthday = birthday;
     }
     // getters
     getUsername() {
@@ -72,4 +76,12 @@ __decorate([
     (0, class_validator_1.IsString)({ message: "avatar url must be a string" }),
     __metadata("design:type", Object)
 ], UserDetailsDto.prototype, "avatar_url", void 0);
+__decorate([
+    (0, class_transformer_1.Expose)(),
+    __metadata("design:type", Object)
+], UserDetailsDto.prototype, "age", void 0);
+__decorate([
+    (0, class_transformer_1.Expose)(),
+    __metadata("design:type", Object)
+], UserDetailsDto.prototype, "birthday", void 0);
 exports.default = UserDetailsDto;

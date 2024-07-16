@@ -1,9 +1,8 @@
-
-import UserDetails                                     from "../models/user-details.model";
-import { Exclude, Expose }                             from "class-transformer";
+import UserDetailsDto from "./user-details.dto";
+import { Exclude, Expose } from "class-transformer";
 import { Length, IsEmail, IsString, IsOptional, IsIn } from "class-validator";
 
-class UserDto extends UserDetails {
+class UserDto extends UserDetailsDto {
   @Exclude({ toPlainOnly: true })
   private id: number;
 
@@ -59,10 +58,6 @@ class UserDto extends UserDetails {
     return this.uuid;
   }
 
-  getUsername(): string {
-    return this.username;
-  }
-
   getEmail(): string {
     return this.email;
   }
@@ -73,10 +68,6 @@ class UserDto extends UserDetails {
 
   getPassword(): string {
     return this.password;
-  }
-
-  getAvatar(): string | null | undefined {
-    return this.avatar_url;
   }
 
   getCreatedAt(): Date | null | undefined {
@@ -106,26 +97,6 @@ class UserDto extends UserDetails {
 
   setRoles(value: string | null) {
     this.roles = value;
-  }
-
-  setFirstName(value: string | null) {
-    this.first_name = value;
-  }
-
-  setLastName(value: string | null) {
-    this.last_name = value;
-  }
-
-  setAge(value: number | null) {
-    this.age = value;
-  }
-
-  setAvatar(value: string | null) {
-    this.avatar_url = value;
-  }
-
-  setBirthday(value: string | null) {
-    this.birthday = value;
   }
 
   setCreatedAt(value: Date | null) {
