@@ -11,14 +11,12 @@ const userApi = baseApi.injectEndpoints({
       }),
     }),
     // search users
-    searchUsers: build.query<any, { searcher_id: string; searched_id: string }>(
-      {
-        query: ({ searcher_id, searched_id }) => ({
-          url: `/users/${searcher_id}/searches/${searched_id}`,
-          method: "GET",
-        }),
-      }
-    ),
+    searchUsers: build.query<any, { search: string }>({
+      query: ({ search }) => ({
+        url: `/users/search?search=${search}`,
+        method: "GET",
+      }),
+    }),
     // get recent search user
     getSearchesUser: build.query<any, { user_id: number }>({
       query: ({ user_id }) => ({
@@ -26,17 +24,17 @@ const userApi = baseApi.injectEndpoints({
         method: "GET",
       }),
     }),
-    // save recent search user
+    // save search user
     saveUsersSearch: build.mutation<
       any,
-      { user_id: number; searched_id: number }
+      { searcher_id: string; searched_id: string }
     >({
-      query: ({ user_id, searched_id }) => ({
-        url: `/users/${user_id}/recent-searches/${searched_id}`,
+      query: ({ searcher_id, searched_id }) => ({
+        url: `/users/${searcher_id}/searches/${searched_id}`,
         method: "POST",
       }),
     }),
-    // delete recent search user
+    // delete search user
     delUsersSearch: build.mutation<any, { id: string }>({
       query: ({ id }) => ({
         url: `/users/${id}/searches`,
