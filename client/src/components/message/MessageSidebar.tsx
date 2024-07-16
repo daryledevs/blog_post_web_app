@@ -1,16 +1,13 @@
 import {
   useGetUserConversationsMutation,
   useSendNewMessagesMutation,
-}                    from "@/redux/api/chatApi";
-import { useEffect } from "react";
-import ChatHeader    from "./chat-header/ChatHeader";
-import ChatHistory   from "./chat-history/ChatHistory";
+}                      from "@/redux/api/chatApi";
+import { useEffect }   from "react";
+import { IEUserState } from "@/interfaces/interface";
+import ChatHeader      from "./chat-header/ChatHeader";
+import ChatHistory     from "./chat-history/ChatHistory";
 
-type MessageSidebarProps = {
-  user: any;
-};
-
-function MessageSidebar({ user }: MessageSidebarProps) {
+function MessageSidebar({ user }: { user: IEUserState }) {
   const [getUsersConversations, chatHistory] =
     useGetUserConversationsMutation();
 
@@ -20,7 +17,7 @@ function MessageSidebar({ user }: MessageSidebarProps) {
 
   useEffect(() => {
     getUsersConversations({
-      user_id: user.user_id,
+      user_id: user?.uuid,
       conversations: [],
     });
   }, [sendMessages]);
