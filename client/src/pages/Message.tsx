@@ -27,7 +27,7 @@ function Message({ socketService }: { socketService: SocketService | null }) {
       <SwitchAccount />
       <div className="message">
         <div className="message__container">
-          <MessageSidebar user={userApiData.data.user} />
+          <MessageSidebar user={userApiData.data?.user} />
           <MessageChatBox socketService={socketService} />
         </div>
       </div>

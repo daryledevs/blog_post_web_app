@@ -10,7 +10,7 @@ function NewMessageHeader() {
       <img
         alt=""
         src={closeModal}
-        onClick={() => dispatch(setNewMessageTrigger())}
+        onClick={() => dispatch(setNewMessageTrigger({}))}
       />
     </div>
   );

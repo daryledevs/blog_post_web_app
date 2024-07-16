@@ -1,4 +1,16 @@
-function PicturesHoverCard({ picture, alt, className, count }: any) {
+export interface PicturesHoverCardProps {
+  picture: any;
+  alt: string;
+  className: string;
+  count: number;
+}
+
+function PicturesHoverCard({
+  picture,
+  alt,
+  className,
+  count,
+}: PicturesHoverCardProps) {
   return (
     <div className="pictures-hover-card">
       <img
