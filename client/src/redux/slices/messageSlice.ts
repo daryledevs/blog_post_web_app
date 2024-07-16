@@ -3,11 +3,11 @@ import {
   IEConversation,
   IEReduxState,
   IEUserState,
-} from "../../interfaces/interface";
+} from "@/interfaces/interface";
 
 export interface IEConversationState {
   openConversation: IEConversation[];
-  recipients: IEConversation[] | IEUserState[];
+  recipients: IEUserState[];
   search: string;
   newMessageTrigger: boolean;
   switchAccountTrigger: boolean;
