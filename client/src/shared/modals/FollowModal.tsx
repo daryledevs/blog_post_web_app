@@ -21,7 +21,7 @@ function FollowModal() {
 
   useEffect(() => {
     if (userApiData.isLoading) return;
-    const { user_id } = userApiData.data?.user;
+    const user_id = userApiData.data?.user?.uuid;
     fetchFollowsLists({ user_id: user_id, fetch: pathType, listsId: 0 });
   }, [userApiData.data]);
 
@@ -32,7 +32,7 @@ function FollowModal() {
         <div className="follow-modal__list-container">
           <FollowLists
             path={pathType}
-            follower_id={userApiData?.data?.user?.user_id}
+            follower_id={userApiData?.data?.user?.uuid}
             isLoading={isLoading}
             lists={follows?.lists}
             removedUsers={removedUsers}
