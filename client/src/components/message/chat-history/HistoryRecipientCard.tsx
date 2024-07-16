@@ -13,13 +13,13 @@ function HistoryRecipientCard({ chat }: { chat: IEConversation }) {
   const dispatch = useAppDispatch();
 
   const className =
-    openConversation[0]?.conversation_id === chat.conversation_id
+    openConversation[0]?.uuid === chat.uuid
       ? "history-recipient-card-active"
       : "";
 
   return (
     <div
-      key={chat.conversation_id}
+      key={chat.uuid}
       className={`history-recipient-card ${className}`}
       onClick={() => dispatch(setOpenConversation(chat))}
     >

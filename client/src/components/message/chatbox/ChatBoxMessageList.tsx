@@ -1,4 +1,4 @@
-import React from "react";
+import React                    from "react";
 import { selectMessage }        from "@/redux/slices/messageSlice";
 import { useAppSelector }       from "@/hooks/reduxHooks";
 import { useGetUserDataQuery }  from "@/redux/api/userApi";
@@ -23,7 +23,7 @@ function ChatBoxMessageList({
   const userDataApi = useGetUserDataQuery({ person: "" });
 
   const classNameChecker = (user_id: any) => {
-    return user_id === userDataApi?.data?.user.user_id ? "own" : "other";
+    return user_id === userDataApi?.data?.user?.uuid ? "own" : "other";
   };
 
   return (
@@ -46,7 +46,10 @@ function ChatBoxMessageList({
       ) : (
         <React.Fragment>
           {isLoading ? (
-            <div style={{ width: "100%", textAlign: "center" }}>Loading...</div>
+            <div style={{ 
+              width: "100%", 
+              textAlign: "center" 
+            }}>Loading...</div>
           ) : (
             <ChatBoxStartConversation username={username} />
           )}
