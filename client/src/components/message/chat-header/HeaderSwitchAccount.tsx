@@ -8,7 +8,7 @@ function HeaderSwitchAccount({ username }: { username: string }) {
   return (
     <div
       className="header-switch-account"
-      onClick={() => dispatch(setSwitchAccountTrigger())}
+      onClick={() => dispatch(setSwitchAccountTrigger({}))}
     >
       <p>{username}</p>
       <img

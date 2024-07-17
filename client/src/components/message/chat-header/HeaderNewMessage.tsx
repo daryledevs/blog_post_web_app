@@ -8,7 +8,7 @@ function HeaderNewMessage() {
     <img
       alt=""
       src={newMessage}
-      onClick={() => dispatch(setNewMessageTrigger())}
+      onClick={() => dispatch(setNewMessageTrigger({}))}
       className="header-new-message"
     />
   );
