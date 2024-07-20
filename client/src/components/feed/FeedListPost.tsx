@@ -7,6 +7,7 @@ type FeedListPostProps = {
 };
 
 function FeedListPost({ feeds, userFeedStatus }: FeedListPostProps) {
+  
   return (
     <React.Fragment>
       {feeds.feed.length ? (
@@ -17,7 +18,7 @@ function FeedListPost({ feeds, userFeedStatus }: FeedListPostProps) {
           />
         ))
       ) : (
-        userFeedStatus === "uninitialized" ? null : <>No Post To Show</> 
+        <p className="feed-list-post__no-post">No Post To Show</p>
       )}
     </React.Fragment>
   );

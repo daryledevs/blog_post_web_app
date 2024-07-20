@@ -1027,6 +1027,8 @@ button {
   height: 100%;
   flex: 1;
   overflow-y: scroll;
+  order: 1;
+  align-items: center;
 }
 .feed-container .img-loading {
   width: 30px;

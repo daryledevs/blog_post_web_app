@@ -48,7 +48,7 @@ const Feed = forwardRef((props: FeedProps, ref ) => {
             setHasShownLoading={setHasShownLoading}
           />
         ) : (
-          <React.Fragment>
+          <div className="feed-list">
             <FeedListPost
               feeds={feeds}
               userFeedStatus={userFeedApi.status}
@@ -57,7 +57,7 @@ const Feed = forwardRef((props: FeedProps, ref ) => {
               isLoading={userFeedApi.isLoading}
               className="img-loading"
             />
-          </React.Fragment>
+          </div>
         )}
       </div>
     );
