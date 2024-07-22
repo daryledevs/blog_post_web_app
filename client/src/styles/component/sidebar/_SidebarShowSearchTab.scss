@@ -44,7 +44,7 @@
   @include device($breakpoint-lg) {
     &.sidebar__show-search-tab {
       position: relative;
-      width: 15%;
+      width: 25%;
 
       @include sidebar-logo;
       @include sidebar-tab-lists;

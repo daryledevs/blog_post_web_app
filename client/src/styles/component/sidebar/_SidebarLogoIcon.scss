@@ -12,3 +12,11 @@
     display: none;  
   };
 };
+
+.sidebar-logo__icon-search-active {
+  display: none;
+  
+  @include device($breakpoint-xl) {
+    display: block;  
+  };
+}
