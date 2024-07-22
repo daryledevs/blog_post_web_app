@@ -1,5 +1,9 @@
 .search-bar__container {
-  flex: 1;
-  height: 100vh;
+  @include dimension(50vw, 100%);
+  max-width: 400px;
+  position: absolute;
+  z-index: 5;
+  left: 100%;
+  background-color: white;
   border-right: 1px solid #ccc;
-}
+} 

@@ -1,21 +1,46 @@
 .index__container{
   height: 100vh;  
   @include flexbox();
-
+  
   .index__sidebar {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    order: 2;
-
     @include device($breakpoint-md) {
       order: 1;
       width: 70px;
     }
 
-    @include device($breakpoint-xl) {
+    @include device($breakpoint-lg) {
       order: 1;
       width: 14vw;
+    }
+    .index__sidebar-container {
+      position: relative;
+      display: flex;
+      flex-direction: row;
+      order: 2;
+      z-index: 1;
+
+      @include device($breakpoint-md) {
+        order: 1;
+        width: 70px;
+      }
+
+      @include device($breakpoint-lg) {
+        order: 1;
+        width: 14vw;
+      }
+    }
+
+    .index__sidebar-search-bar-active {
+      position: relative;
+      display: flex;
+      flex-direction: row;
+      order: 2;
+      z-index: 1;
+
+      @include device($breakpoint-lg) {
+        order: 1;
+        width: 70px;
+      }
     }
   }
 

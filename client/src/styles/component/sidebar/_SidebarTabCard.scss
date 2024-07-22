@@ -1,7 +1,11 @@
 .sidebar-tab-card {
   @include flexbox(center, center, column);  
   @include dimension(100%, 100%);
-  padding: 5px;
+  padding: 10px;
+  
+  @include device($breakpoint-md) {
+    @include flexbox();  
+  };
 
   &:nth-child(n + 1) + :nth-child(-n + 2) {
     @include device($breakpoint-xs) {
@@ -14,21 +18,21 @@
   };
 
   div {
-    @include dimension(90%, 100%);
+    @include dimension(100%, 100%);
     @include flexbox(flex-start, center, row);    
     cursor: pointer;
     border-radius: 9px;
-
+    
     &:hover{
-      background-color: $background-light-grey-1;
+      background-color: $background-light-grey-1;  
     };
 
-    svg {
+    svg { 
       @include dimension(100%, 3.2vh);
       position: relative;
 
       @include device($breakpoint-xl) {
-        @include dimension(30%, 3.2vh);
+        @include dimension(43px, 25px);
       };
     };
   };
