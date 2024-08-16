@@ -18,6 +18,16 @@ class CloudinaryService {
 
     return { image_id: result.public_id, image_url: result.url };
   }
+
+  public deleteImage = async (image_id: string): Promise<any> => {
+    const status = await cloudinary.v2.uploader.destroy(image_id);
+
+    if (status.result !== "ok") {
+      throw new Error("Delete image failed");
+    }
+
+    return status;
+  }
 }
 
 export default CloudinaryService;

@@ -43,5 +43,12 @@ class CloudinaryService {
         });
         return { image_id: result.public_id, image_url: result.url };
     };
+    deleteImage = async (image_id) => {
+        const status = await cloudinary_1.default.v2.uploader.destroy(image_id);
+        if (status.result !== "ok") {
+            throw new Error("Delete image failed");
+        }
+        return status;
+    };
 }
 exports.default = CloudinaryService;
