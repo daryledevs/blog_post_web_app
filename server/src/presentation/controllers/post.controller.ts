@@ -1,7 +1,9 @@
+import PostDto                             from "@/domain/dto/post.dto";
 import * as dotenv                         from "dotenv";
 import AsyncWrapper                        from "@/application/utils/async-wrapper.util";
 import IEPostService                       from "@/application/services/post/post.service";
 import IELikeService                       from "@/application/services/like/like.service";
+import { plainToInstance }                 from "class-transformer";
 import { Response, Request, NextFunction } from "express";
 dotenv.config();
 
@@ -37,9 +39,12 @@ class PostsController {
 
       const files: Express.Multer.File[] =
         ((req.files as { [fieldname: string]: Express.Multer.File[] })
-          ?.img as Express.Multer.File[]) || null;
+          ?.imgs as Express.Multer.File[]) || null;
 
-      const data = await this.postService.createNewPost(files?.[0], rest);
+      const obj = { ...rest, files } as Object;
+      const postDto = plainToInstance(PostDto, obj);
+
+      const data = await this.postService.createNewPost(postDto);
       res.status(200).send({ message: data });
     }
   );
@@ -48,7 +53,10 @@ class PostsController {
     async (req: Request, res: Response, next: NextFunction) => {
       const uuid = req.params?.uuid;
       const { user_uuid, roles, cookieOptions, ...rest } = req.body;
-      const data = await this.postService.updatePostByUuid(uuid, rest);
+
+      const postDto = plainToInstance(PostDto, rest as Object);
+
+      const data = await this.postService.updatePostByUuid(uuid, postDto);
       res.status(200).send({ message: data });
     }
   );

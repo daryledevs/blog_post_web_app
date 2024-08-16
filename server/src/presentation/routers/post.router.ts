@@ -10,27 +10,35 @@ import CloudinaryService from "@/application/libs/cloudinary-service.lib";
 
 const router = express.Router();
 
+const cloudinaryService = new CloudinaryService();
+const postRepository = new PostsRepository(cloudinaryService);
+const likeRepository = new LikeRepository();
+
+const postService = new PostsService(
+  postRepository,
+  new UserRepository(),
+  cloudinaryService
+);
+
+const likeService = new LikeService(
+  likeRepository,
+  postRepository,
+  new UserRepository()
+);
+
 const controller: PostsController = new PostsController(
-  new PostsService(
-    new PostsRepository(),
-    new UserRepository(),
-    new CloudinaryService()
-  ),
-  new LikeService(
-    new LikeRepository(),
-    new PostsRepository(),
-    new UserRepository()
-  )
+  postService,
+  likeService
 );
 
 const uploadOption = uploadImage("./uploads/post");
-const option_field = [ { name: "img", maxCount: 1 }, { name: "imgs", maxCount: 7 } ];
+const option_field = [{ name: "imgs", maxCount: 7 } ];
 const middleware = uploadOption.fields(option_field)
 
 // post
 router.get("/by-user/:user_uuid",             controller.getUserPosts);
 router.get("/by-user/:user_uuid/stats",       controller.getUserTotalPosts);
-router.patch("/:uuid",                        controller.editPost);
+router.patch("/",                             controller.editPost);
 router.post("/", middleware,                  controller.newPost);
 router.delete("/:uuid",                       controller.deletePost);
 

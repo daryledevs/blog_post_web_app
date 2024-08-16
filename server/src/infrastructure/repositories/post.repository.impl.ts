@@ -12,12 +12,17 @@ import { Kysely, sql }     from "kysely";
 import IEPostRepository    from "@/domain/repositories/post.repository";
 import ApiErrorException   from "@/application/exceptions/api.exception";
 import { plainToInstance } from "class-transformer";
+import CloudinaryService from "@/application/libs/cloudinary-service.lib";
 
 class PostRepository implements IEPostRepository {
   private database: Kysely<DB>;
+  private cloudinary: CloudinaryService;
   private wrap: AsyncWrapper = new AsyncWrapper();
 
-  constructor() { this.database = db; };
+  constructor(cloudinary: CloudinaryService) {
+    this.database = db;
+    this.cloudinary = cloudinary;
+  }
 
   public findPostsByPostId = this.wrap.repoWrap(
     async (uuid: string): Promise<Post | undefined> => {
@@ -109,12 +114,7 @@ class PostRepository implements IEPostRepository {
         .executeTakeFirst()) as { image_id: string };
 
       // deletes the image associated with a user's post from the cloud storage
-      const status = await cloudinary.v2.uploader.destroy(image_id);
-
-      // throws an error if the image deletion was not successful
-      if (status.result !== "ok") {
-        throw ApiErrorException.HTTP400Error("Delete image failed");
-      }
+      await this.cloudinary.deleteImage(image_id);
 
       await this.database
         .deleteFrom("posts")
@@ -123,9 +123,7 @@ class PostRepository implements IEPostRepository {
     }
   );
 
-  private plainToModel = (
-    post: SelectPosts | undefined
-  ): Post | undefined => {
+  private plainToModel = (post: SelectPosts | undefined): Post | undefined => {
     return post ? plainToInstance(Post, post) : undefined;
   };
 };

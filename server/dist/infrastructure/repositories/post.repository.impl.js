@@ -5,16 +5,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_database_1 = __importDefault(require("@/infrastructure/database/db.database"));
 const post_model_1 = __importDefault(require("@/domain/models/post.model"));
-const cloudinary_1 = __importDefault(require("cloudinary"));
 const async_wrapper_util_1 = __importDefault(require("@/application/utils/async-wrapper.util"));
 const kysely_1 = require("kysely");
-const api_exception_1 = __importDefault(require("@/application/exceptions/api.exception"));
 const class_transformer_1 = require("class-transformer");
 class PostRepository {
     database;
+    cloudinary;
     wrap = new async_wrapper_util_1.default();
-    constructor() { this.database = db_database_1.default; }
-    ;
+    constructor(cloudinary) {
+        this.database = db_database_1.default;
+        this.cloudinary = cloudinary;
+    }
     findPostsByPostId = this.wrap.repoWrap(async (uuid) => {
         const data = await this.database
             .selectFrom("posts")
@@ -84,11 +85,7 @@ class PostRepository {
             .where("id", "=", post_id)
             .executeTakeFirst());
         // deletes the image associated with a user's post from the cloud storage
-        const status = await cloudinary_1.default.v2.uploader.destroy(image_id);
-        // throws an error if the image deletion was not successful
-        if (status.result !== "ok") {
-            throw api_exception_1.default.HTTP400Error("Delete image failed");
-        }
+        await this.cloudinary.deleteImage(image_id);
         await this.database
             .deleteFrom("posts")
             .where("id", "=", post_id)

@@ -26,8 +26,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const post_dto_1 = __importDefault(require("@/domain/dto/post.dto"));
 const dotenv = __importStar(require("dotenv"));
 const async_wrapper_util_1 = __importDefault(require("@/application/utils/async-wrapper.util"));
+const class_transformer_1 = require("class-transformer");
 dotenv.config();
 class PostsController {
     postService;
@@ -51,14 +53,17 @@ class PostsController {
     newPost = this.wrap.apiWrap(async (req, res, next) => {
         const { cookieOptions, ...rest } = req.body;
         const files = req.files
-            ?.img || null;
-        const data = await this.postService.createNewPost(files?.[0], rest);
+            ?.imgs || null;
+        const obj = { ...rest, files };
+        const postDto = (0, class_transformer_1.plainToInstance)(post_dto_1.default, obj);
+        const data = await this.postService.createNewPost(postDto);
         res.status(200).send({ message: data });
     });
     editPost = this.wrap.apiWrap(async (req, res, next) => {
         const uuid = req.params?.uuid;
         const { user_uuid, roles, cookieOptions, ...rest } = req.body;
-        const data = await this.postService.updatePostByUuid(uuid, rest);
+        const postDto = (0, class_transformer_1.plainToInstance)(post_dto_1.default, rest);
+        const data = await this.postService.updatePostByUuid(uuid, postDto);
         res.status(200).send({ message: data });
     });
     deletePost = this.wrap.apiWrap(async (req, res, next) => {

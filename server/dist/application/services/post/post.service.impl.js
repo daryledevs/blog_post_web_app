@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const post_model_1 = __importDefault(require("@/domain/models/post.model"));
 const post_dto_1 = __importDefault(require("@/domain/dto/post.dto"));
 const path_1 = require("path");
 const async_wrapper_util_1 = __importDefault(require("@/application/utils/async-wrapper.util"));
@@ -52,41 +53,53 @@ class PostService {
         // get the total posts for the user
         return await this.postRepository.findUserTotalPostsByUserId(user.getId());
     });
-    createNewPost = this.wrap.serviceWrap(async (post, file) => {
-        // check if the image is uploaded
-        if (!file)
+    createNewPost = this.wrap.serviceWrap(async (postDto) => {
+        const files = postDto.getFiles();
+        const user_uuid = postDto.getUserUuid();
+        if (!files.length) {
             throw api_exception_1.default.HTTP400Error("No image uploaded");
-        if (!post?.user_id)
+        }
+        if (!user_uuid) {
             throw api_exception_1.default.HTTP400Error("No arguments provided");
-        const user_uuid = post.user_id;
+        }
         // if the user is not found, return an error
         const user = await this.userRepository.findUserById(user_uuid);
         if (!user)
             throw api_exception_1.default.HTTP404Error("User not found");
-        const path = (0, path_1.join)(file.destination, file.filename);
+        const file = files?.[0];
+        const path = (0, path_1.join)(file?.destination ?? "", file?.filename ?? "");
+        if (!path)
+            throw api_exception_1.default.HTTP400Error("Error on image uploaded");
         const { image_id, image_url } = await this.cloudinary.uploadAndDeleteLocal(path);
-        // create a new post
-        await this.postRepository.createNewPost({
-            ...post,
-            user_id: user.getId(),
-            image_id,
-            image_url,
-        });
+        postDto.setUserId(user.getId());
+        postDto.setImageId(image_id);
+        postDto.setImageUrl(image_url);
+        const post = (0, class_transformer_1.plainToInstance)(post_model_1.default, postDto);
+        // create a new post. If an error occurs, delete the image from cloudinary
+        try {
+            await this.postRepository.createNewPost(post.save());
+        }
+        catch (error) {
+            await this.cloudinary.deleteImage(image_id);
+            throw error;
+        }
         return "Post created successfully";
     });
-    updatePostByUuid = this.wrap.serviceWrap(async (uuid, post) => {
+    updatePostByUuid = this.wrap.serviceWrap(async (uuid, postDto) => {
         // check if the arguments is provided
-        if (!uuid)
+        if (!uuid) {
             throw api_exception_1.default.HTTP400Error("No arguments provided");
-        if (post.image_url) {
+        }
+        if (postDto.getImageUrl()) {
             throw api_exception_1.default.HTTP400Error("Image url is not allowed to be changed");
         }
         // if the post is not found, return an error
-        const data = await this.postRepository.findPostsByPostId(uuid);
-        if (!data)
+        const post = await this.postRepository.findPostsByPostId(uuid);
+        if (!post)
             throw api_exception_1.default.HTTP404Error("Post not found");
+        const updatedPost = (0, class_transformer_1.plainToInstance)(post_model_1.default, postDto);
         // edit the post
-        await this.postRepository.editPostByPostId(uuid, post);
+        await this.postRepository.editPostByPostId(uuid, updatedPost.save());
         return "Post edited successfully";
     });
     deletePostByUuid = this.wrap.serviceWrap(async (uuid) => {

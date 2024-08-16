@@ -1,7 +1,4 @@
-import {
-  NewPosts,
-  UpdatePosts,
-}                          from "@/domain/types/table.types";
+import Post                from "@/domain/models/post.model";
 import PostDto             from "@/domain/dto/post.dto";
 import { join }            from "path";
 import AsyncWrapper        from "@/application/utils/async-wrapper.util";
@@ -76,51 +73,67 @@ class PostService implements IEPostService {
   );
 
   public createNewPost = this.wrap.serviceWrap(
-    async (
-      post: NewPosts,
-      file: Express.Multer.File | null | undefined
-    ): Promise<string> => {
-      // check if the image is uploaded
-      if (!file) throw ApiErrorException.HTTP400Error("No image uploaded");
-      if (!post?.user_id) throw ApiErrorException.HTTP400Error("No arguments provided");
-      const user_uuid = post.user_id as unknown as string;
+    async (postDto: PostDto): Promise<string> => {
+      const files = postDto.getFiles();
+      const user_uuid = postDto.getUserUuid();
 
+      if (!files.length) {
+        throw ApiErrorException.HTTP400Error("No image uploaded");
+      }
+
+      if (!user_uuid) {
+        throw ApiErrorException.HTTP400Error("No arguments provided");
+      }
+      
       // if the user is not found, return an error
       const user = await this.userRepository.findUserById(user_uuid);
       if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
-      const path = join(file.destination, file.filename);
+      const file = files?.[0];
+      const path = join(file?.destination ?? "", file?.filename ?? "");
 
+      if (!path) throw ApiErrorException.HTTP400Error("Error on image uploaded");
       const { image_id, image_url } = await this.cloudinary.uploadAndDeleteLocal(path);
 
-      // create a new post
-      await this.postRepository.createNewPost({
-        ...post,
-        user_id: user.getId(),
-        image_id,
-        image_url,
-      });
+      postDto.setUserId(user.getId());
+      postDto.setImageId(image_id);
+      postDto.setImageUrl(image_url);
+
+      const post = plainToInstance(Post, postDto);
+
+      // create a new post. If an error occurs, delete the image from cloudinary
+      try {
+        await this.postRepository.createNewPost(post.save());
+      } catch (error) {
+        await this.cloudinary.deleteImage(image_id);
+        throw error;
+      }
 
       return "Post created successfully";
     }
   );
 
   public updatePostByUuid = this.wrap.serviceWrap(
-    async (uuid: string, post: UpdatePosts): Promise<string | undefined> => {
+    async (uuid: string, postDto: PostDto): Promise<string | undefined> => {
       // check if the arguments is provided
-      if (!uuid) throw ApiErrorException.HTTP400Error("No arguments provided");
-      if (post.image_url) {
+      if (!uuid) {
+        throw ApiErrorException.HTTP400Error("No arguments provided");
+      }
+
+      if (postDto.getImageUrl()) {
         throw ApiErrorException.HTTP400Error(
           "Image url is not allowed to be changed"
         );
       }
 
       // if the post is not found, return an error
-      const data = await this.postRepository.findPostsByPostId(uuid);
-      if (!data) throw ApiErrorException.HTTP404Error("Post not found");
+      const post = await this.postRepository.findPostsByPostId(uuid);
+      if (!post) throw ApiErrorException.HTTP404Error("Post not found");
+
+      const updatedPost = plainToInstance(Post, postDto);
 
       // edit the post
-      await this.postRepository.editPostByPostId(uuid, post);
+      await this.postRepository.editPostByPostId(uuid, updatedPost.save());
       return "Post edited successfully";
     }
   );

@@ -13,14 +13,19 @@ const post_controller_1 = __importDefault(require("@/presentation/controllers/po
 const post_repository_impl_1 = __importDefault(require("@/infrastructure/repositories/post.repository.impl"));
 const cloudinary_service_lib_1 = __importDefault(require("@/application/libs/cloudinary-service.lib"));
 const router = express_1.default.Router();
-const controller = new post_controller_1.default(new post_service_impl_1.default(new post_repository_impl_1.default(), new user_repository_impl_1.default(), new cloudinary_service_lib_1.default()), new like_service_impl_1.default(new like_repository_impl_1.default(), new post_repository_impl_1.default(), new user_repository_impl_1.default()));
+const cloudinaryService = new cloudinary_service_lib_1.default();
+const postRepository = new post_repository_impl_1.default(cloudinaryService);
+const likeRepository = new like_repository_impl_1.default();
+const postService = new post_service_impl_1.default(postRepository, new user_repository_impl_1.default(), cloudinaryService);
+const likeService = new like_service_impl_1.default(likeRepository, postRepository, new user_repository_impl_1.default());
+const controller = new post_controller_1.default(postService, likeService);
 const uploadOption = (0, multer_middleware_1.default)("./uploads/post");
-const option_field = [{ name: "img", maxCount: 1 }, { name: "imgs", maxCount: 7 }];
+const option_field = [{ name: "imgs", maxCount: 7 }];
 const middleware = uploadOption.fields(option_field);
 // post
 router.get("/by-user/:user_uuid", controller.getUserPosts);
 router.get("/by-user/:user_uuid/stats", controller.getUserTotalPosts);
-router.patch("/:uuid", controller.editPost);
+router.patch("/", controller.editPost);
 router.post("/", middleware, controller.newPost);
 router.delete("/:uuid", controller.deletePost);
 // likes
