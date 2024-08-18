@@ -4,7 +4,6 @@ import helmet        from "helmet";
 import morgan        from "morgan";
 import express       from "express";
 import rootPath      from "./application/utils/path.util";
-import validator     from './presentation/middlewares/validator.middleware';
 import bodyParser    from "body-parser";
 import authRoutes    from "./presentation/routers/auth.router";
 import userRoutes    from './presentation/routers/user.router';
@@ -35,7 +34,6 @@ app.use(cors(corsOptions));
 app.use(compression());
 app.use(bodyParser.json({ limit: "50kb" }));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(validator)  ;
 app.use(tokenHandler);
 app.set("views", rootPath); // Set the views directory
 app.set('view engine', 'ejs'); // Set EJS as the template engine

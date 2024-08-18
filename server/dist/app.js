@@ -32,7 +32,6 @@ const helmet_1 = __importDefault(require("helmet"));
 const morgan_1 = __importDefault(require("morgan"));
 const express_1 = __importDefault(require("express"));
 const path_util_1 = __importDefault(require("./application/utils/path.util"));
-const validator_middleware_1 = __importDefault(require("./presentation/middlewares/validator.middleware"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const auth_router_1 = __importDefault(require("./presentation/routers/auth.router"));
 const user_router_1 = __importDefault(require("./presentation/routers/user.router"));
@@ -61,7 +60,6 @@ app.use((0, cors_1.default)(cors_option_config_1.default));
 app.use((0, compression_1.default)());
 app.use(body_parser_1.default.json({ limit: "50kb" }));
 app.use(body_parser_1.default.urlencoded({ extended: true }));
-app.use(validator_middleware_1.default);
 app.use(token_handler_middleware_1.default);
 app.set("views", path_util_1.default); // Set the views directory
 app.set('view engine', 'ejs'); // Set EJS as the template engine
