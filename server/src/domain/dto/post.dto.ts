@@ -3,22 +3,22 @@ import { ArrayNotEmpty, IsNotEmpty, IsUUID, ValidateIf } from "class-validator";
 
 class PostDto {
   @Exclude({ toPlainOnly: true })
-  @ValidateIf((o) => o.files.length === 0)
+  @ValidateIf((o) => o.files?.length === 0)
   private id: number;
 
   @Expose()
-  @ValidateIf((o) => o.files.length === 0)
+  @ValidateIf((o) => o.files?.length === 0)
   @IsNotEmpty({ message: "UUID is required" })
   @IsUUID(4, { message: "invalid search's UUID version" })
   private uuid: any;
 
   @Expose()
-  @ValidateIf((o) => o.files.length === 0)
+  @ValidateIf((o) => o.files?.length === 0)
   @IsNotEmpty({ message: "image ID is required" })
   private image_id: string;
 
   @Expose()
-  @ValidateIf((o) => o.files.length === 0)
+  @ValidateIf((o) => o.files?.length === 0)
   @IsNotEmpty({ message: "image URL is required" })
   private image_url: string | null;
 

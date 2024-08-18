@@ -3,8 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const post_dto_1 = __importDefault(require("@/domain/dto/post.dto"));
 const express_1 = __importDefault(require("express"));
-const multer_middleware_1 = __importDefault(require("@/presentation/middlewares/multer.middleware"));
 const like_service_impl_1 = __importDefault(require("@/application/services/like/like.service.impl"));
 const post_service_impl_1 = __importDefault(require("@/application/services/post/post.service.impl"));
 const user_repository_impl_1 = __importDefault(require("@/infrastructure/repositories/user.repository.impl"));
@@ -12,21 +12,21 @@ const like_repository_impl_1 = __importDefault(require("@/infrastructure/reposit
 const post_controller_1 = __importDefault(require("@/presentation/controllers/post.controller"));
 const post_repository_impl_1 = __importDefault(require("@/infrastructure/repositories/post.repository.impl"));
 const cloudinary_service_lib_1 = __importDefault(require("@/application/libs/cloudinary-service.lib"));
+const upload_image_helper_1 = __importDefault(require("../helpers/upload-image.helper"));
+const validate_request_data_validation_1 = __importDefault(require("../validations/validate-request-data.validation"));
 const router = express_1.default.Router();
 const cloudinaryService = new cloudinary_service_lib_1.default();
 const postRepository = new post_repository_impl_1.default(cloudinaryService);
 const likeRepository = new like_repository_impl_1.default();
-const postService = new post_service_impl_1.default(postRepository, new user_repository_impl_1.default(), cloudinaryService);
-const likeService = new like_service_impl_1.default(likeRepository, postRepository, new user_repository_impl_1.default());
+const userRepository = new user_repository_impl_1.default();
+const postService = new post_service_impl_1.default(postRepository, userRepository, cloudinaryService);
+const likeService = new like_service_impl_1.default(likeRepository, postRepository, userRepository);
 const controller = new post_controller_1.default(postService, likeService);
-const uploadOption = (0, multer_middleware_1.default)("./uploads/post");
-const option_field = [{ name: "imgs", maxCount: 7 }];
-const middleware = uploadOption.fields(option_field);
 // post
 router.get("/by-user/:user_uuid", controller.getUserPosts);
 router.get("/by-user/:user_uuid/stats", controller.getUserTotalPosts);
-router.patch("/", controller.editPost);
-router.post("/", middleware, controller.newPost);
+router.patch("/", (0, validate_request_data_validation_1.default)(post_dto_1.default), controller.editPost);
+router.post("/", upload_image_helper_1.default, (0, validate_request_data_validation_1.default)(post_dto_1.default), controller.newPost);
 router.delete("/:uuid", controller.deletePost);
 // likes
 router.get("/:uuid/likes", controller.getLikesCountForPost);
