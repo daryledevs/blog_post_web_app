@@ -24,7 +24,11 @@ class AsyncWrapper {
     repoWrap = (fn) => {
         return (...args) => {
             return fn.apply(this, args).catch((error) => {
-                throw database_exception_1.default.error(error);
+                // if the error is a database error, throw a database exception
+                if (error.code) {
+                    throw database_exception_1.default.error(error);
+                }
+                throw error;
             });
         };
     };
