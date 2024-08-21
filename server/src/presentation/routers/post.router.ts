@@ -8,6 +8,7 @@ import PostsController     from "@/presentation/controllers/post.controller";
 import PostsRepository     from "@/infrastructure/repositories/post.repository.impl";
 import CloudinaryService   from "@/application/libs/cloudinary-service.lib";
 import uploadImageHelper   from "../helpers/upload-image.helper";
+import validateUUIDParams  from "../validations/validate-uuid-params.validation";
 import validateRequestData from "../validations/validate-request-data.validation";
 
 const router = express.Router();
@@ -34,18 +35,36 @@ const controller: PostsController = new PostsController(
   likeService
 );
 
-
 // post
-router.get("/by-user/:user_uuid",                controller.getUserPosts);
-router.get("/by-user/:user_uuid/stats",          controller.getUserTotalPosts);
-router.patch("/", validateRequestData(PostDto),   controller.editPost);
-router.post("/", uploadImageHelper, validateRequestData(PostDto), controller.newPost);
-router.delete("/:uuid",                          controller.deletePost);
+router
+  .route("/by-user/:user_uuid")
+  .get(validateUUIDParams("user_uuid"), controller.getUserPosts);
+
+router
+  .route("/by-user/:user_uuid/stats")
+  .get(validateUUIDParams("user_uuid"), controller.getUserTotalPosts);
+
+router
+  .route("/")
+  .all(uploadImageHelper, validateRequestData(PostDto))
+  .post(controller.newPost)
+  .patch(controller.editPost);
+
+router
+  .route("/:uuid")
+  .all(validateUUIDParams("uuid"))
+  .get(controller.getPostByUuid)
+  .delete(controller.deletePost);
 
 // likes
-router.get("/:uuid/likes",                       controller.getLikesCountForPost);
-router.get("/:uuid/by-user/:user_uuid/likes",    controller.checkUserLikeStatusForPost);
-router.put("/:uuid/by-user/:user_uuid/likes",    controller.toggleUserLikeForPost);
+router
+  .route("/:uuid/likes")
+  .get(validateUUIDParams("uuid"), controller.getLikesCountForPost);
 
+router
+  .route("/:uuid/by-user/:user_uuid/likes")
+  .all(validateUUIDParams(["uuid", "user_uuid"]))
+  .get(controller.checkUserLikeStatusForPost)
+  .put(controller.toggleUserLikeForPost);
 
 export default router;

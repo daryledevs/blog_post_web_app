@@ -13,6 +13,7 @@ const post_controller_1 = __importDefault(require("@/presentation/controllers/po
 const post_repository_impl_1 = __importDefault(require("@/infrastructure/repositories/post.repository.impl"));
 const cloudinary_service_lib_1 = __importDefault(require("@/application/libs/cloudinary-service.lib"));
 const upload_image_helper_1 = __importDefault(require("../helpers/upload-image.helper"));
+const validate_uuid_params_validation_1 = __importDefault(require("../validations/validate-uuid-params.validation"));
 const validate_request_data_validation_1 = __importDefault(require("../validations/validate-request-data.validation"));
 const router = express_1.default.Router();
 const cloudinaryService = new cloudinary_service_lib_1.default();
@@ -23,13 +24,29 @@ const postService = new post_service_impl_1.default(postRepository, userReposito
 const likeService = new like_service_impl_1.default(likeRepository, postRepository, userRepository);
 const controller = new post_controller_1.default(postService, likeService);
 // post
-router.get("/by-user/:user_uuid", controller.getUserPosts);
-router.get("/by-user/:user_uuid/stats", controller.getUserTotalPosts);
-router.patch("/", (0, validate_request_data_validation_1.default)(post_dto_1.default), controller.editPost);
-router.post("/", upload_image_helper_1.default, (0, validate_request_data_validation_1.default)(post_dto_1.default), controller.newPost);
-router.delete("/:uuid", controller.deletePost);
+router
+    .route("/by-user/:user_uuid")
+    .get((0, validate_uuid_params_validation_1.default)("user_uuid"), controller.getUserPosts);
+router
+    .route("/by-user/:user_uuid/stats")
+    .get((0, validate_uuid_params_validation_1.default)("user_uuid"), controller.getUserTotalPosts);
+router
+    .route("/")
+    .all(upload_image_helper_1.default, (0, validate_request_data_validation_1.default)(post_dto_1.default))
+    .post(controller.newPost)
+    .patch(controller.editPost);
+router
+    .route("/:uuid")
+    .all((0, validate_uuid_params_validation_1.default)("uuid"))
+    .get(controller.getPostByUuid)
+    .delete(controller.deletePost);
 // likes
-router.get("/:uuid/likes", controller.getLikesCountForPost);
-router.get("/:uuid/by-user/:user_uuid/likes", controller.checkUserLikeStatusForPost);
-router.put("/:uuid/by-user/:user_uuid/likes", controller.toggleUserLikeForPost);
+router
+    .route("/:uuid/likes")
+    .get((0, validate_uuid_params_validation_1.default)("uuid"), controller.getLikesCountForPost);
+router
+    .route("/:uuid/by-user/:user_uuid/likes")
+    .all((0, validate_uuid_params_validation_1.default)(["uuid", "user_uuid"]))
+    .get(controller.checkUserLikeStatusForPost)
+    .put(controller.toggleUserLikeForPost);
 exports.default = router;
