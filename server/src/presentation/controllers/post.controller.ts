@@ -15,11 +15,19 @@ class PostsController {
   constructor(postService: IEPostService, likeService: IELikeService) {
     this.postService = postService;
     this.likeService = likeService;
-  };
+  }
+
+  public getPostByUuid = this.wrap.apiWrap(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const uuid = req.params?.uuid!;
+      const data = await this.postService.getPostByUuid(uuid);
+      res.status(200).send({ post: data });
+    }
+  );
 
   public getUserPosts = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const user_uuid = req.params?.user_uuid;
+      const user_uuid = req.params?.user_uuid!;
       const data = await this.postService.getAllPostsByUsersUuid(user_uuid);
       res.status(200).send({ post: data });
     }
@@ -27,7 +35,7 @@ class PostsController {
 
   public getUserTotalPosts = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const user_uuid = req.params?.user_uuid;
+      const user_uuid = req.params?.user_uuid!;
       const data = await this.postService.geTotalPostsByUsersUuid(user_uuid);
       res.status(200).send({ totalPost: data });
     }
@@ -35,7 +43,7 @@ class PostsController {
 
   public newPost = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { cookieOptions, ...rest } = req.body;
+      const { cookieOptions, tkn_user_uuid, roles, ...rest } = req.body;
 
       const files: Express.Multer.File[] =
         ((req.files as { [fieldname: string]: Express.Multer.File[] })
@@ -51,19 +59,18 @@ class PostsController {
 
   public editPost = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const uuid = req.params?.uuid;
-      const { user_uuid, roles, cookieOptions, ...rest } = req.body;
+      const { tkn_user_uuid, roles, cookieOptions, ...rest } = req.body;
 
       const postDto = plainToInstance(PostDto, rest as Object);
 
-      const data = await this.postService.updatePostByUuid(uuid, postDto);
+      const data = await this.postService.updatePostByUuid(postDto);
       res.status(200).send({ message: data });
     }
   );
 
   public deletePost = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const uuid = req.params?.uuid;
+      const uuid = req.params?.uuid!;
       const data = await this.postService.deletePostByUuid(uuid);
       res.status(200).send({ message: data });
     }
@@ -79,7 +86,7 @@ class PostsController {
 
   public checkUserLikeStatusForPost = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const user_uuid = req.params?.user_uuid;
+      const user_uuid = req.params?.user_uuid!;
       const post_uuid = req.params?.uuid;
 
       const data = await this.likeService.getUserLikeStatusForPostByUuid(
@@ -93,7 +100,7 @@ class PostsController {
 
   public toggleUserLikeForPost = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const user_uuid = req.params?.user_uuid;
+      const user_uuid = req.params?.user_uuid!;
       const post_uuid = req.params?.uuid;
 
       const data = await this.likeService.toggleUserLikeForPost(

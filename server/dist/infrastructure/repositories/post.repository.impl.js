@@ -29,7 +29,7 @@ class PostRepository {
             "privacy_level",
             "created_at",
         ])
-            .where("uuid", "=", uuid)
+            .where("uuid", "=", (0, kysely_1.sql) `UUID_TO_BIN(${uuid})`)
             .executeTakeFirst();
         return this.plainToModel(data);
     });
@@ -72,10 +72,11 @@ class PostRepository {
         await this.database.insertInto("posts").values(post).execute();
     });
     editPostByPostId = this.wrap.repoWrap(async (uuid, post) => {
+        console.log(post);
         await this.database
             .updateTable("posts")
             .set(post)
-            .where("uuid", "=", uuid)
+            .where("uuid", "=", (0, kysely_1.sql) `UUID_TO_BIN(${uuid})`)
             .executeTakeFirst();
     });
     deletePostById = this.wrap.repoWrap(async (post_id) => {

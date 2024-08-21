@@ -6,11 +6,9 @@ import {
 import db                  from "@/infrastructure/database/db.database";
 import Post                from "@/domain/models/post.model";
 import { DB }              from "@/domain/types/schema.types";
-import cloudinary          from "cloudinary";
 import AsyncWrapper        from "@/application/utils/async-wrapper.util";
 import { Kysely, sql }     from "kysely";
 import IEPostRepository    from "@/domain/repositories/post.repository";
-import ApiErrorException   from "@/application/exceptions/api.exception";
 import { plainToInstance } from "class-transformer";
 import CloudinaryService from "@/application/libs/cloudinary-service.lib";
 
@@ -38,7 +36,7 @@ class PostRepository implements IEPostRepository {
           "privacy_level",
           "created_at",
         ])
-        .where("uuid", "=", uuid)
+        .where("uuid", "=", sql`UUID_TO_BIN(${uuid})`)
         .executeTakeFirst();
 
       return this.plainToModel(data);
@@ -97,10 +95,11 @@ class PostRepository implements IEPostRepository {
 
   public editPostByPostId = this.wrap.repoWrap(
     async (uuid: string, post: UpdatePosts): Promise<void> => {
+      console.log(post)
       await this.database
         .updateTable("posts")
         .set(post)
-        .where("uuid", "=", uuid)
+        .where("uuid", "=", sql`UUID_TO_BIN(${uuid})`)
         .executeTakeFirst();
     }
   );
