@@ -1,36 +1,35 @@
 import { Exclude, Expose }    from "class-transformer";
-import { ArrayNotEmpty, IsNotEmpty, IsUUID, ValidateIf } from "class-validator";
+import {IsEmpty, IsNotEmpty, IsUUID, ValidateIf }  from "class-validator";
 
 class PostDto {
   @Exclude({ toPlainOnly: true })
-  @ValidateIf((o) => o.files?.length === 0)
+  @ValidateIf((o) => !o.files?.length)
   private id: number;
 
   @Expose()
-  @ValidateIf((o) => o.files?.length === 0)
-  @IsNotEmpty({ message: "UUID is required" })
-  @IsUUID(4, { message: "invalid search's UUID version" })
+  @ValidateIf((o) => !o.files?.length)
+  @IsUUID(4, { message: "invalid post's UUID" })
   private uuid: any;
 
-  @Expose()
-  @ValidateIf((o) => o.files?.length === 0)
-  @IsNotEmpty({ message: "image ID is required" })
+  @Exclude()
+  @ValidateIf((o) => !o.files?.length)
+  @IsEmpty({ message: "Image is not allowed to be changed" })
   private image_id: string;
 
   @Expose()
-  @ValidateIf((o) => o.files?.length === 0)
-  @IsNotEmpty({ message: "image URL is required" })
+  @ValidateIf((o) => !o.files?.length)
+  @IsEmpty({ message: "Image is not allowed to be changed" })
   private image_url: string | null;
 
   @Exclude({ toPlainOnly: true })
-  @ValidateIf((o) => !o.id || !o.uuid || !o.image_id || !o.image_url)
-  @ArrayNotEmpty({ message: "files are required" })
   private files: Express.Multer.File[];
 
   @Exclude({ toPlainOnly: true })
   private user_id: number;
 
   @Expose()
+  @ValidateIf((o) => o.files?.length)
+  @IsUUID(4, { message: "invalid user's UUID" })
   private user_uuid: any;
 
   @Expose()

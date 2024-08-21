@@ -99,32 +99,29 @@ class PostDto {
 }
 __decorate([
     (0, class_transformer_1.Exclude)({ toPlainOnly: true }),
-    (0, class_validator_1.ValidateIf)((o) => o.files?.length === 0),
+    (0, class_validator_1.ValidateIf)((o) => !o.files?.length),
     __metadata("design:type", Number)
 ], PostDto.prototype, "id", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
-    (0, class_validator_1.ValidateIf)((o) => o.files?.length === 0),
-    (0, class_validator_1.IsNotEmpty)({ message: "UUID is required" }),
-    (0, class_validator_1.IsUUID)(4, { message: "invalid search's UUID version" }),
+    (0, class_validator_1.ValidateIf)((o) => !o.files?.length),
+    (0, class_validator_1.IsUUID)(4, { message: "invalid post's UUID" }),
     __metadata("design:type", Object)
 ], PostDto.prototype, "uuid", void 0);
 __decorate([
-    (0, class_transformer_1.Expose)(),
-    (0, class_validator_1.ValidateIf)((o) => o.files?.length === 0),
-    (0, class_validator_1.IsNotEmpty)({ message: "image ID is required" }),
+    (0, class_transformer_1.Exclude)(),
+    (0, class_validator_1.ValidateIf)((o) => !o.files?.length),
+    (0, class_validator_1.IsEmpty)({ message: "Image is not allowed to be changed" }),
     __metadata("design:type", String)
 ], PostDto.prototype, "image_id", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
-    (0, class_validator_1.ValidateIf)((o) => o.files?.length === 0),
-    (0, class_validator_1.IsNotEmpty)({ message: "image URL is required" }),
+    (0, class_validator_1.ValidateIf)((o) => !o.files?.length),
+    (0, class_validator_1.IsEmpty)({ message: "Image is not allowed to be changed" }),
     __metadata("design:type", Object)
 ], PostDto.prototype, "image_url", void 0);
 __decorate([
     (0, class_transformer_1.Exclude)({ toPlainOnly: true }),
-    (0, class_validator_1.ValidateIf)((o) => !o.id || !o.uuid || !o.image_id || !o.image_url),
-    (0, class_validator_1.ArrayNotEmpty)({ message: "files are required" }),
     __metadata("design:type", Array)
 ], PostDto.prototype, "files", void 0);
 __decorate([
@@ -133,6 +130,8 @@ __decorate([
 ], PostDto.prototype, "user_id", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
+    (0, class_validator_1.ValidateIf)((o) => o.files?.length),
+    (0, class_validator_1.IsUUID)(4, { message: "invalid user's UUID" }),
     __metadata("design:type", Object)
 ], PostDto.prototype, "user_uuid", void 0);
 __decorate([
