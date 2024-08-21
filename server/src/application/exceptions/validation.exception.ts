@@ -23,7 +23,7 @@ export interface ResponseErrorType {
 
 
 class ValidationException extends BaseError {
-  constructor(error: ResponseErrorType) {
+  constructor(error: ResponseErrorType | string) {
     super(
       "BAD REQUEST",
       HttpStatusCode.BAD_REQUEST,
