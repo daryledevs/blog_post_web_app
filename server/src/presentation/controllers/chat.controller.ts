@@ -33,7 +33,7 @@ class ChatsController {
 
   public newMessageAndConversation = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { cookieOptions, user_id, roles, ...rest } = req.body;
+      const { cookieOptions, tkn_user_uuid, roles, ...rest } = req.body;
       const message = await this.chatsService.newMessageAndConversation(rest);
       res.status(200).send({ message });
     }

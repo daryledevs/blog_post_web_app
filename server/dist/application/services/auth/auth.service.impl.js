@@ -81,12 +81,12 @@ class AuthService {
         }
         const args = {
             accessToken: {
-                payload: { uuid: user.uuid, roles: user.roles },
+                payload: { tkn_user_uuid: user.uuid, roles: user.roles },
                 secret: auth_token_util_1.TokenSecret.ACCESS_SECRET,
                 expiration: auth_token_util_1.Expiration.ACCESS_TOKEN_EXPIRATION,
             },
             refreshToken: {
-                payload: { uuid: user.uuid, username: user.username },
+                payload: { tkn_user_uuid: user.uuid, username: user.username },
                 secret: auth_token_util_1.TokenSecret.REFRESH_SECRET,
                 expiration: auth_token_util_1.Expiration.REFRESH_TOKEN_EXPIRATION,
             },

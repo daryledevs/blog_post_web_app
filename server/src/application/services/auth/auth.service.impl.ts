@@ -85,13 +85,13 @@ class AuthService implements IEAuthService {
 
       const args = {
         accessToken: {
-          payload: { uuid: user.uuid, roles: user.roles },
+          payload: { tkn_user_uuid: user.uuid, roles: user.roles },
           secret: TokenSecret.ACCESS_SECRET,
           expiration: Expiration.ACCESS_TOKEN_EXPIRATION,
         },
 
         refreshToken: {
-          payload: { uuid: user.uuid, username: user.username },
+          payload: { tkn_user_uuid: user.uuid, username: user.username },
           secret: TokenSecret.REFRESH_SECRET,
           expiration: Expiration.REFRESH_TOKEN_EXPIRATION,
         },

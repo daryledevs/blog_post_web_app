@@ -61,7 +61,7 @@ const tokenHandler = async (req, res, next) => {
         else if (!isRefreshTokenInvalid && refreshError === "JsonWebTokenError") {
             return next(api_exception_1.default.HTTP401Error("Token is not valid"));
         }
-        const result = await userRepository.findUserById(refreshDecode.uuid);
+        const result = await userRepository.findUserById(refreshDecode.tkn_user_uuid);
         // if user is not found, return an error
         if (!result)
             return next(api_exception_1.default.HTTP404Error("User not found"));
@@ -71,11 +71,11 @@ const tokenHandler = async (req, res, next) => {
             // token options
             const payload = {
                 access: {
-                    uuid: accessDecode.uuid,
+                    tkn_user_uuid: accessDecode.tkn_user_uuid,
                     roles: accessDecode.roles,
                 },
                 refresh: {
-                    uuid: refreshDecode.uuid,
+                    tkn_user_uuid: refreshDecode.tkn_user_uuid,
                     username: refreshDecode.username,
                 },
             };
@@ -101,16 +101,16 @@ const tokenHandler = async (req, res, next) => {
         }
         // if the access token is not provided but refresh token is exists
         if (!accessToken) {
-            const { uuid, roles } = result;
+            const { uuid: tkn_user_uuid, roles } = result;
             const ACCESS_TOKEN = auth_token_util_1.default.generateToken({
-                payload: { uuid, roles },
+                payload: { tkn_user_uuid, roles },
                 secret: auth_token_util_1.TokenSecret.ACCESS_SECRET,
                 expiration: auth_token_util_1.Expiration.ACCESS_TOKEN_EXPIRATION,
             });
             return res.status(200).send({ accessToken: ACCESS_TOKEN });
         }
-        // if the access token is provided, decode the token and pass the uuid and roles to the next middleware
-        req.body.uuid = refreshDecode.uuid;
+        // if the access token is provided, decode the token and pass the tkn_user_uuid and roles to the next middleware
+        req.body.tkn_user_uuid = refreshDecode.tkn_user_uuid;
         req.body.roles = accessDecode.roles;
         next();
     }
