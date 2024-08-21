@@ -5,11 +5,6 @@ import { RequestHandler, Request, Response, NextFunction } from "express";
 
 /**
  * Middleware to validate incoming request data using a DTO (Data Transfer Object).
- * 
- * This function generates an Express request handler that validates the incoming request body,
- * and optionally any uploaded files, against the specified DTO class. If validation fails, 
- * it passes a validation exception to the next middleware. Otherwise, it proceeds with the next 
- * middleware or route handler.
  *
  * @template T - The type of the DTO class.
  * @param dto - The class constructor of the DTO to be used for validation.
@@ -46,8 +41,10 @@ function validateRequestData<T extends object>(dto: ClassConstructor<T>): Reques
     const files: Express.Multer.File[] =
       ((req.files as { [fieldname: string]: Express.Multer.File[] })
         ?.imgs as Express.Multer.File[]) || null;
-        
-    const body = files ? { ...req.body, files: files } : req.body;
+    
+    const { cookieOptions, tkn_user_uuid, roles, ...data } = req.body;
+    const body = files ? { ...data, files: files } : data;
+
     const dtoInstance = plainToInstance(dto, body);
     const errors = await validate(dtoInstance);
 

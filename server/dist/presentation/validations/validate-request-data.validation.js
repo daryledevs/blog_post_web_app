@@ -9,11 +9,6 @@ const validation_exception_1 = __importDefault(require("@/application/exceptions
 /**
  * Middleware to validate incoming request data using a DTO (Data Transfer Object).
  *
- * This function generates an Express request handler that validates the incoming request body,
- * and optionally any uploaded files, against the specified DTO class. If validation fails,
- * it passes a validation exception to the next middleware. Otherwise, it proceeds with the next
- * middleware or route handler.
- *
  * @template T - The type of the DTO class.
  * @param dto - The class constructor of the DTO to be used for validation.
  * @returns {RequestHandler} An Express request handler that validates the request data.
@@ -47,7 +42,8 @@ function validateRequestData(dto) {
     return async (req, res, next) => {
         const files = req.files
             ?.imgs || null;
-        const body = files ? { ...req.body, files: files } : req.body;
+        const { cookieOptions, tkn_user_uuid, roles, ...data } = req.body;
+        const body = files ? { ...data, files: files } : data;
         const dtoInstance = (0, class_transformer_1.plainToInstance)(dto, body);
         const errors = await (0, class_validator_1.validate)(dtoInstance);
         if (errors.length > 0) {
