@@ -26,10 +26,7 @@ class PostService implements IEPostService {
   }
 
   public getPostByUuid = this.wrap.serviceWrap(
-    async (uuid: string | undefined): Promise<PostDto | undefined> => {
-      // check if the post_id is provided
-      if (!uuid) throw ApiErrorException.HTTP400Error("No arguments provided");
-
+    async (uuid: string): Promise<PostDto | undefined> => {
       // if the post is not found, return an error
       const post = await this.postRepository.findPostsByPostId(uuid);
       if (!post) throw ApiErrorException.HTTP404Error("Post not found");
@@ -41,10 +38,6 @@ class PostService implements IEPostService {
 
   public getAllPostsByUsersUuid = this.wrap.serviceWrap(
     async (user_uuid: string): Promise<PostDto[]> => {
-      // check if the user_uuid is provided
-      if (!user_uuid)
-        throw ApiErrorException.HTTP400Error("No arguments provided");
-
       // if the user is not found, return an error
       const user = await this.userRepository.findUserById(user_uuid);
       if (!user) throw ApiErrorException.HTTP404Error("User not found");
@@ -60,9 +53,6 @@ class PostService implements IEPostService {
 
   public geTotalPostsByUsersUuid = this.wrap.serviceWrap(
     async (user_uuid: string): Promise<string | number | bigint> => {
-      // check if the user_uuid is provided
-      if (!user_uuid) throw ApiErrorException.HTTP400Error("No arguments provided");
-
       // if the user is not found, return an error
       const user = await this.userRepository.findUserById(user_uuid);
       if (!user) throw ApiErrorException.HTTP404Error("User not found");
@@ -74,25 +64,21 @@ class PostService implements IEPostService {
 
   public createNewPost = this.wrap.serviceWrap(
     async (postDto: PostDto): Promise<string> => {
-      const files = postDto.getFiles();
+      const [file] = postDto.getFiles() ?? [];
       const user_uuid = postDto.getUserUuid();
 
-      if (!files.length) {
-        throw ApiErrorException.HTTP400Error("No image uploaded");
-      }
+      const destination = file?.destination ?? "";
+      const filename = file?.filename ?? "";
+      const path = join(destination, filename);
 
-      if (!user_uuid) {
-        throw ApiErrorException.HTTP400Error("No arguments provided");
+      if (!path || path && path.replace(/\s+/g, "") === "") {
+        throw ApiErrorException.HTTP400Error("Error on image uploaded");
       }
-      
+        
       // if the user is not found, return an error
       const user = await this.userRepository.findUserById(user_uuid);
       if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
-      const file = files?.[0];
-      const path = join(file?.destination ?? "", file?.filename ?? "");
-
-      if (!path) throw ApiErrorException.HTTP400Error("Error on image uploaded");
       const { image_id, image_url } = await this.cloudinary.uploadAndDeleteLocal(path);
 
       postDto.setUserId(user.getId());
@@ -114,35 +100,29 @@ class PostService implements IEPostService {
   );
 
   public updatePostByUuid = this.wrap.serviceWrap(
-    async (uuid: string, postDto: PostDto): Promise<string | undefined> => {
-      // check if the arguments is provided
-      if (!uuid) {
-        throw ApiErrorException.HTTP400Error("No arguments provided");
-      }
-
-      if (postDto.getImageUrl()) {
-        throw ApiErrorException.HTTP400Error(
-          "Image url is not allowed to be changed"
-        );
-      }
+    async (postDto: PostDto): Promise<string | undefined> => {
 
       // if the post is not found, return an error
-      const post = await this.postRepository.findPostsByPostId(uuid);
+      const post = await this.postRepository.findPostsByPostId(postDto.getUuid());
       if (!post) throw ApiErrorException.HTTP404Error("Post not found");
 
       const updatedPost = plainToInstance(Post, postDto);
+      const data = updatedPost.save();
 
-      // edit the post
-      await this.postRepository.editPostByPostId(uuid, updatedPost.save());
+      Object.keys(data).forEach((key, index) => {
+        if((data as { [key: string]: any })[key] === undefined || null) {
+          delete (data as { [key: string]: any })[key];
+        }
+      });
+
+      // update the post
+      await this.postRepository.editPostByPostId(updatedPost.getUuid(), data);
       return "Post edited successfully";
     }
   );
 
   public deletePostByUuid = this.wrap.serviceWrap(
-    async (uuid: string | undefined): Promise<string> => {
-      // check if the arguments is provided
-      if (!uuid) throw ApiErrorException.HTTP400Error("No arguments provided");
-
+    async (uuid: string): Promise<string> => {
       // if the post is not found, return an error
       const post = await this.postRepository.findPostsByPostId(uuid);
       if (!post) throw ApiErrorException.HTTP404Error("Post not found");
