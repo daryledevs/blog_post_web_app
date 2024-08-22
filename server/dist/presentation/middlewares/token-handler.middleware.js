@@ -109,9 +109,6 @@ const tokenHandler = async (req, res, next) => {
             });
             return res.status(200).send({ accessToken: ACCESS_TOKEN });
         }
-        // if the access token is provided, decode the token and pass the tkn_user_uuid and roles to the next middleware
-        req.body.tkn_user_uuid = refreshDecode.tkn_user_uuid;
-        req.body.roles = accessDecode.roles;
         next();
     }
     catch (error) {

@@ -55,17 +55,17 @@ class PostsController {
         res.status(200).send({ totalPost: data });
     });
     newPost = this.wrap.apiWrap(async (req, res, next) => {
-        const { cookieOptions, tkn_user_uuid, roles, ...rest } = req.body;
+        const reqBody = req.body;
         const files = req.files
             ?.imgs || null;
-        const obj = { ...rest, files };
+        const obj = { ...reqBody, files };
         const postDto = (0, class_transformer_1.plainToInstance)(post_dto_1.default, obj);
         const data = await this.postService.createNewPost(postDto);
         res.status(200).send({ message: data });
     });
     editPost = this.wrap.apiWrap(async (req, res, next) => {
-        const { tkn_user_uuid, roles, cookieOptions, ...rest } = req.body;
-        const postDto = (0, class_transformer_1.plainToInstance)(post_dto_1.default, rest);
+        const reqBody = req.body;
+        const postDto = (0, class_transformer_1.plainToInstance)(post_dto_1.default, reqBody);
         const data = await this.postService.updatePostByUuid(postDto);
         res.status(200).send({ message: data });
     });

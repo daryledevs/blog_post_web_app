@@ -42,7 +42,7 @@ function validateRequestData<T extends object>(dto: ClassConstructor<T>): Reques
       ((req.files as { [fieldname: string]: Express.Multer.File[] })
         ?.imgs as Express.Multer.File[]) || null;
     
-    const { cookieOptions, tkn_user_uuid, roles, ...data } = req.body;
+    const data = req.body;
     const body = files ? { ...data, files: files } : data;
 
     const dtoInstance = plainToInstance(dto, body);

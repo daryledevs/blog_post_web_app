@@ -1,6 +1,7 @@
 import UserDto                             from "@/domain/dto/user.dto";
 import * as dotenv                         from "dotenv";
 import AsyncWrapper                        from "@/application/utils/async-wrapper.util";
+import cookieOptions                       from "@/config/cookie-options.config";
 import IEAuthService                       from "@/application/services/auth/auth.service";
 import { plainToInstance }                 from "class-transformer";
 import { NextFunction, Request, Response } from "express";
@@ -16,8 +17,8 @@ class AuthController {
 
   public register = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { cookieOptions, ...rest } = req.body;
-      const userDto = plainToInstance(UserDto, rest as object);
+      const data = req.body;
+      const userDto = plainToInstance(UserDto, data as object);
       const result = await this.authService.register(userDto);
       res.status(201).send(result);
     }
@@ -28,7 +29,7 @@ class AuthController {
       const { userCredential, password } = req.body;
       const result = await this.authService.login(userCredential, password);
       res
-        .cookie("REFRESH_TOKEN", result.refreshToken, req.body.cookieOptions)
+        .cookie("REFRESH_TOKEN", result.refreshToken, cookieOptions)
         .status(200)
         .send({ message: result.message, token: result.token });
     }
@@ -60,7 +61,7 @@ class AuthController {
       res
         .clearCookie("REFRESH_TOKEN", {
           sameSite: "none",
-          secure: req.body.cookieOptions.secure,
+          secure: cookieOptions.secure,
           httpOnly: true,
         })
         .status(200)

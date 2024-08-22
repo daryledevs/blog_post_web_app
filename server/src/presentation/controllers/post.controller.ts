@@ -43,13 +43,13 @@ class PostsController {
 
   public newPost = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { cookieOptions, tkn_user_uuid, roles, ...rest } = req.body;
+      const reqBody = req.body;
 
       const files: Express.Multer.File[] =
         ((req.files as { [fieldname: string]: Express.Multer.File[] })
           ?.imgs as Express.Multer.File[]) || null;
 
-      const obj = { ...rest, files } as Object;
+      const obj = { ...reqBody, files } as Object;
       const postDto = plainToInstance(PostDto, obj);
 
       const data = await this.postService.createNewPost(postDto);
@@ -59,9 +59,9 @@ class PostsController {
 
   public editPost = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { tkn_user_uuid, roles, cookieOptions, ...rest } = req.body;
+      const reqBody = req.body;
 
-      const postDto = plainToInstance(PostDto, rest as Object);
+      const postDto = plainToInstance(PostDto, reqBody as Object);
 
       const data = await this.postService.updatePostByUuid(postDto);
       res.status(200).send({ message: data });

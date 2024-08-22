@@ -29,6 +29,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const user_dto_1 = __importDefault(require("@/domain/dto/user.dto"));
 const dotenv = __importStar(require("dotenv"));
 const async_wrapper_util_1 = __importDefault(require("@/application/utils/async-wrapper.util"));
+const cookie_options_config_1 = __importDefault(require("@/config/cookie-options.config"));
 const class_transformer_1 = require("class-transformer");
 dotenv.config();
 class AuthController {
@@ -38,8 +39,8 @@ class AuthController {
         this.authService = authService;
     }
     register = this.wrap.apiWrap(async (req, res, next) => {
-        const { cookieOptions, ...rest } = req.body;
-        const userDto = (0, class_transformer_1.plainToInstance)(user_dto_1.default, rest);
+        const data = req.body;
+        const userDto = (0, class_transformer_1.plainToInstance)(user_dto_1.default, data);
         const result = await this.authService.register(userDto);
         res.status(201).send(result);
     });
@@ -47,7 +48,7 @@ class AuthController {
         const { userCredential, password } = req.body;
         const result = await this.authService.login(userCredential, password);
         res
-            .cookie("REFRESH_TOKEN", result.refreshToken, req.body.cookieOptions)
+            .cookie("REFRESH_TOKEN", result.refreshToken, cookie_options_config_1.default)
             .status(200)
             .send({ message: result.message, token: result.token });
     });
@@ -67,7 +68,7 @@ class AuthController {
         res
             .clearCookie("REFRESH_TOKEN", {
             sameSite: "none",
-            secure: req.body.cookieOptions.secure,
+            secure: cookie_options_config_1.default.secure,
             httpOnly: true,
         })
             .status(200)

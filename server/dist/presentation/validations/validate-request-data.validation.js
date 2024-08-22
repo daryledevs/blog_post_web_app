@@ -42,7 +42,7 @@ function validateRequestData(dto) {
     return async (req, res, next) => {
         const files = req.files
             ?.imgs || null;
-        const { cookieOptions, tkn_user_uuid, roles, ...data } = req.body;
+        const data = req.body;
         const body = files ? { ...data, files: files } : data;
         const dtoInstance = (0, class_transformer_1.plainToInstance)(dto, body);
         const errors = await (0, class_validator_1.validate)(dtoInstance);
