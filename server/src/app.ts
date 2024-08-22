@@ -18,7 +18,6 @@ import helmetConfig  from './config/helmet.config';
 import cookieParser  from 'cookie-parser';
 import errorHandler  from "./presentation/helpers/error-handler.helper";
 import tokenHandler  from "./presentation/middlewares/token-handler.middleware";
-import cookieOptions from "./presentation/middlewares/cookie-options.middleware";
 dotenv.config();
 
 const app = express();
@@ -29,7 +28,6 @@ app.use(helmet(helmetConfig));
 app.use(rateLimiter);
 app.use(bodyParser.json());
 app.use(cookieParser());
-app.use(cookieOptions);
 app.use(cors(corsOptions));
 app.use(compression());
 app.use(bodyParser.json({ limit: "50kb" }));
