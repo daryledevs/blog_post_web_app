@@ -38,11 +38,13 @@ const controller: PostsController = new PostsController(
 // post
 router
   .route("/by-user/:user_uuid")
-  .get(validateUUIDRequestParams("user_uuid"), controller.getUserPosts);
+  .all(validateUUIDRequestParams("user_uuid"))
+  .get(controller.getUserPosts);
 
 router
   .route("/by-user/:user_uuid/stats")
-  .get(validateUUIDRequestParams("user_uuid"), controller.getUserTotalPosts);
+  .all(validateUUIDRequestParams("user_uuid"))
+  .get(controller.getUserTotalPosts);
 
 router
   .route("/")
@@ -59,7 +61,8 @@ router
 // likes
 router
   .route("/:uuid/likes")
-  .get(validateUUIDRequestParams("uuid"), controller.getLikesCountForPost);
+  .all(validateUUIDRequestParams("uuid"))
+  .get(controller.getLikesCountForPost);
 
 router
   .route("/:uuid/by-user/:user_uuid/likes")

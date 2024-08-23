@@ -8,11 +8,39 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PasswordMatch = void 0;
 const class_validator_1 = require("class-validator");
+/**
+ * Custom validator to check if the password and confirm password fields match.
+ *
+ * @export
+ * @class PasswordMatch
+ * @implements {ValidatorConstraintInterface}
+ *
+ * @description
+ * Validates that the `confirmPassword` field matches the `password` field in a given object.
+ * Intended for use with DTOs that have both a password and confirmPassword property.
+ *
+ * @example
+ * // Apply the validator in a DTO
+ * @Validate(PasswordMatch)
+ * confirmPassword: string;
+ */
 let PasswordMatch = class PasswordMatch {
+    /**
+     * Validates that the `confirmPassword` field matches the `password` field.
+     *
+     * @param {string} confirmPassword - The confirm password field to validate.
+     * @param {ValidationArguments} args - Additional arguments for validation.
+     * @returns {boolean} - True if the password fields match, otherwise false.
+     */
     validate(confirmPassword, args) {
         const password = args.object.password;
         return password === confirmPassword;
     }
+    /**
+     * Default error message to return if validation fails.
+     *
+     * @returns {string} - Error message.
+     */
     defaultMessage() {
         return "Password and confirm password do not match";
     }

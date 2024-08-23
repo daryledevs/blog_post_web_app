@@ -26,10 +26,12 @@ const controller = new post_controller_1.default(postService, likeService);
 // post
 router
     .route("/by-user/:user_uuid")
-    .get((0, validate_uuid_params_validation_1.default)("user_uuid"), controller.getUserPosts);
+    .all((0, validate_uuid_params_validation_1.default)("user_uuid"))
+    .get(controller.getUserPosts);
 router
     .route("/by-user/:user_uuid/stats")
-    .get((0, validate_uuid_params_validation_1.default)("user_uuid"), controller.getUserTotalPosts);
+    .all((0, validate_uuid_params_validation_1.default)("user_uuid"))
+    .get(controller.getUserTotalPosts);
 router
     .route("/")
     .all(upload_image_helper_1.default, (0, validate_request_data_validation_1.default)(post_dto_1.default))
@@ -43,7 +45,8 @@ router
 // likes
 router
     .route("/:uuid/likes")
-    .get((0, validate_uuid_params_validation_1.default)("uuid"), controller.getLikesCountForPost);
+    .all((0, validate_uuid_params_validation_1.default)("uuid"))
+    .get(controller.getLikesCountForPost);
 router
     .route("/:uuid/by-user/:user_uuid/likes")
     .all((0, validate_uuid_params_validation_1.default)(["uuid", "user_uuid"]))

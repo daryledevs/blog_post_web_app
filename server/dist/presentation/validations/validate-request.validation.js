@@ -26,10 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  *
  * const validations = [
  *   param(args)
- *     .exists({
- *       checkFalsy: true,
- *       checkNull: true,
- *     })
+ *     .exists({ values: "falsy" })
  *     .isUUID(),
  * ];
  *
