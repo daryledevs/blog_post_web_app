@@ -15,22 +15,18 @@ const validate_request_validation_1 = __importDefault(require("./validate-reques
  * // Use the middleware in a route
  * router
  *   .route("/by-user/:user_uuid")
- *   .get(validateUUIDParams("user_uuid"), controller.getUserPosts);
+ *   .get(validateUUIDRequestParams("user_uuid"), controller.getUserPosts);
  *
  * @description
  * This middleware function generates validation chains for the specified parameter names, ensuring
  * that each parameter exists and is a valid UUID. The generated validation chains are then passed
  * to the `validateRequest` middleware function for processing.
  */
-const validateUUIDParams = (args) => {
-    const validations = [
+const validateUUIDRequestParams = (args) => {
+    return (0, validate_request_validation_1.default)([
         (0, express_validator_1.param)(args)
-            .exists({
-            checkFalsy: true,
-            checkNull: true,
-        })
+            .exists({ values: "falsy" })
             .isUUID(),
-    ];
-    return (0, validate_request_validation_1.default)(validations);
+    ]);
 };
-exports.default = validateUUIDParams;
+exports.default = validateUUIDRequestParams;

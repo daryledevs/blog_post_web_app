@@ -23,14 +23,11 @@ import { Request, Response, NextFunction, RequestHandler } from "express";
  * 
  * @example
  * // For reusable validation chains
- * const validateUUIDParams = (args: string | string[]): RequestHandler => {
+ * const validateUUIDRequestParams = (args: string | string[]): RequestHandler => {
  * 
  * const validations = [
  *   param(args)
- *     .exists({
- *       checkFalsy: true,
- *       checkNull: true,
- *     })
+ *     .exists({ values: "falsy" })
  *     .isUUID(),
  * ];
  *

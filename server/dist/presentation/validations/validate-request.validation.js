@@ -22,7 +22,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  *
  * @example
  * // For reusable validation chains
- * const validateUUIDParams = (args: string | string[]): RequestHandler => {
+ * const validateUUIDRequestParams = (args: string | string[]): RequestHandler => {
  *
  * const validations = [
  *   param(args)
