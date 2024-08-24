@@ -1,21 +1,48 @@
-import UserDetailsDto from "./user-details.dto";
+
+import {
+  IsEmail,
+  IsString,
+  IsOptional,
+  IsIn,
+  ValidateIf,
+  IsStrongPassword,
+  Validate,
+}                          from "class-validator";
+import PasswordMatch       from "@/presentation/validations/validate-password-match.validation";
+import UserDetailsDto      from "./user-details.dto";
 import { Exclude, Expose } from "class-transformer";
-import { Length, IsEmail, IsString, IsOptional, IsIn } from "class-validator";
+
 
 class UserDto extends UserDetailsDto {
   @Exclude({ toPlainOnly: true })
   private id: number;
 
-  @Expose()
+  @Expose({ toClassOnly: true })
   private uuid: string;
 
   @Expose()
+  @ValidateIf((o) => o.uuid === undefined || o.uuid === null || o.uuid === "")
   @IsEmail({}, { message: "invalid email" })
   private email: string;
 
   @Exclude({ toPlainOnly: true })
-  @Length(6, 100, { message: "password must be at least 6 characters" })
+  @ValidateIf((o) => o.password)
+  @IsStrongPassword(
+    {
+      minLength: 8,
+      minLowercase: 1,
+      minNumbers: 1,
+      minSymbols: 1,
+      minUppercase: 1,
+    },
+    { message: "Password too weak" }
+  )
   private password: string;
+
+  @Exclude({ toPlainOnly: true })
+  @ValidateIf((o) => o.password)
+  @Validate(PasswordMatch, ["password"])
+  private confirmPassword?: string | undefined;
 
   @Expose()
   @IsString({ message: "Roles must be a string" })
@@ -38,7 +65,8 @@ class UserDto extends UserDetailsDto {
     roles: string | null,
     avatar_url: string | null,
     birthday: string | null,
-    created_at: Date | null
+    created_at: Date | null,
+    confirmPassword?: string
   ) {
     super(username, first_name, last_name, avatar_url, age, birthday);
     this.id = id;
@@ -47,6 +75,7 @@ class UserDto extends UserDetailsDto {
     this.password = password;
     this.roles = roles;
     this.created_at = created_at;
+    this.confirmPassword = confirmPassword!;
   }
 
   // Getters
@@ -68,6 +97,10 @@ class UserDto extends UserDetailsDto {
 
   getPassword(): string {
     return this.password;
+  }
+
+  getConfirmPassword(): string | undefined {
+    return this.confirmPassword;
   }
 
   getCreatedAt(): Date | null | undefined {
@@ -93,6 +126,10 @@ class UserDto extends UserDetailsDto {
 
   setPassword(value: string) {
     this.password = value;
+  }
+
+  setConfirmPassword(value: string) {
+    this.confirmPassword = value;
   }
 
   setRoles(value: string | null) {

@@ -12,17 +12,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const class_validator_1 = require("class-validator");
+const validate_password_match_validation_1 = __importDefault(require("@/presentation/validations/validate-password-match.validation"));
 const user_details_dto_1 = __importDefault(require("./user-details.dto"));
 const class_transformer_1 = require("class-transformer");
-const class_validator_1 = require("class-validator");
 class UserDto extends user_details_dto_1.default {
     id;
     uuid;
     email;
     password;
+    confirmPassword;
     roles;
     created_at;
-    constructor(id, uuid, username, email, password, first_name, last_name, age, roles, avatar_url, birthday, created_at) {
+    constructor(id, uuid, username, email, password, first_name, last_name, age, roles, avatar_url, birthday, created_at, confirmPassword) {
         super(username, first_name, last_name, avatar_url, age, birthday);
         this.id = id;
         this.uuid = uuid;
@@ -30,6 +32,7 @@ class UserDto extends user_details_dto_1.default {
         this.password = password;
         this.roles = roles;
         this.created_at = created_at;
+        this.confirmPassword = confirmPassword;
     }
     // Getters
     getId() {
@@ -46,6 +49,9 @@ class UserDto extends user_details_dto_1.default {
     }
     getPassword() {
         return this.password;
+    }
+    getConfirmPassword() {
+        return this.confirmPassword;
     }
     getCreatedAt() {
         return this.created_at;
@@ -66,6 +72,9 @@ class UserDto extends user_details_dto_1.default {
     setPassword(value) {
         this.password = value;
     }
+    setConfirmPassword(value) {
+        this.confirmPassword = value;
+    }
     setRoles(value) {
         this.roles = value;
     }
@@ -78,19 +87,33 @@ __decorate([
     __metadata("design:type", Number)
 ], UserDto.prototype, "id", void 0);
 __decorate([
-    (0, class_transformer_1.Expose)(),
+    (0, class_transformer_1.Expose)({ toClassOnly: true }),
     __metadata("design:type", String)
 ], UserDto.prototype, "uuid", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
+    (0, class_validator_1.ValidateIf)((o) => o.uuid === undefined || o.uuid === null || o.uuid === ""),
     (0, class_validator_1.IsEmail)({}, { message: "invalid email" }),
     __metadata("design:type", String)
 ], UserDto.prototype, "email", void 0);
 __decorate([
     (0, class_transformer_1.Exclude)({ toPlainOnly: true }),
-    (0, class_validator_1.Length)(6, 100, { message: "password must be at least 6 characters" }),
+    (0, class_validator_1.ValidateIf)((o) => o.password),
+    (0, class_validator_1.IsStrongPassword)({
+        minLength: 8,
+        minLowercase: 1,
+        minNumbers: 1,
+        minSymbols: 1,
+        minUppercase: 1,
+    }, { message: "Password too weak" }),
     __metadata("design:type", String)
 ], UserDto.prototype, "password", void 0);
+__decorate([
+    (0, class_transformer_1.Exclude)({ toPlainOnly: true }),
+    (0, class_validator_1.ValidateIf)((o) => o.password),
+    (0, class_validator_1.Validate)(validate_password_match_validation_1.default, ["password"]),
+    __metadata("design:type", Object)
+], UserDto.prototype, "confirmPassword", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
     (0, class_validator_1.IsString)({ message: "Roles must be a string" }),
