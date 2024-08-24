@@ -16,7 +16,7 @@ class UsersController {
     }
     getUserData = this.wrap.apiWrap(async (req, res, next) => {
         let user;
-        const uuid = req.body.uuid;
+        const uuid = req.params.uuid;
         const person = req.query.person || "";
         if (person) {
             user = await this.userService.getUserByUsername(person);
@@ -33,9 +33,9 @@ class UsersController {
         res.status(200).send({ users });
     });
     deleteUser = this.wrap.apiWrap(async (req, res, next) => {
-        const id = req.params.id;
-        const message = await this.userService.deleteUserById(id);
-        res.status(200).send(message);
+        const uuid = req.params.uuid;
+        const message = await this.userService.deleteUserById(uuid);
+        res.status(200).send({ message });
     });
     getFollowStats = this.wrap.apiWrap(async (req, res, next) => {
         const uuid = req.params.uuid;
