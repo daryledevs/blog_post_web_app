@@ -14,7 +14,7 @@ interface IEUserRepository {
 
   updateUserById: (uuid: string, user: UpdateUsers) => Promise<User>;
 
-  deleteUserById: (uuid: string) => Promise<void>;
+  deleteUserById: (id: number) => Promise<void>;
 };
 
 export default IEUserRepository;

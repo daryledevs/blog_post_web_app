@@ -136,14 +136,14 @@ class UserRepository {
         const updatedUser = await this.database
             .updateTable("users")
             .set(user)
-            .where("uuid", "=", uuid)
+            .where("uuid", "=", (0, kysely_1.sql) `UUID_TO_BIN(${uuid})`)
             .executeTakeFirstOrThrow();
         return this.plainToModel(updatedUser);
     });
-    deleteUserById = this.wrap.repoWrap(async (uuid) => {
+    deleteUserById = this.wrap.repoWrap(async (id) => {
         await this.database
             .deleteFrom("users")
-            .where("uuid", "=", uuid)
+            .where("id", "=", id)
             .execute();
     });
     plainToModel = (user) => {

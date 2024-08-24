@@ -165,7 +165,7 @@ class UserRepository implements IUserRepository {
       const updatedUser = await this.database
         .updateTable("users")
         .set(user)
-        .where("uuid", "=", uuid)
+        .where("uuid", "=", sql`UUID_TO_BIN(${uuid})`)
         .executeTakeFirstOrThrow();
 
       return this.plainToModel(updatedUser);
@@ -173,10 +173,10 @@ class UserRepository implements IUserRepository {
   );
 
   public deleteUserById = this.wrap.repoWrap(
-    async (uuid: string): Promise<void> => {
+    async (id: number): Promise<void> => {
       await this.database
         .deleteFrom("users")
-        .where("uuid", "=", uuid)
+        .where("id", "=", id)
         .execute();
     }
   );
