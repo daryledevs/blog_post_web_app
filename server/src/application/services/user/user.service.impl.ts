@@ -17,9 +17,6 @@ class UserService implements IEUserService {
 
   public getUserById = this.wrap.serviceWrap(
     async (uuid: string): Promise<UserDto | undefined> => {
-      // If no parameters are provided, return an error
-      if (!uuid) throw ApiErrorException.HTTP400Error("No arguments provided");
-
       // search the user by id, return an error if the user is not found
       const user = await this.userRepository.findUserById(uuid);
       if (!user) throw ApiErrorException.HTTP404Error("User not found");
@@ -30,10 +27,6 @@ class UserService implements IEUserService {
 
   public getUserByUsername = this.wrap.serviceWrap(
     async (username: string): Promise<UserDto | undefined> => {
-      // If no parameters are provided, return an error
-      if (!username)
-        throw ApiErrorException.HTTP400Error("No arguments provided");
-
       // search the user by username, return an error if the user is not found
       const user = await this.userRepository.findUserByUsername(username);
       if (!user) throw ApiErrorException.HTTP404Error("User not found");
@@ -44,9 +37,6 @@ class UserService implements IEUserService {
 
   public getUserByEmail = this.wrap.serviceWrap(
     async (email: string): Promise<UserDto | undefined> => {
-      // If no parameters are provided, return an error
-      if (!email) throw ApiErrorException.HTTP400Error("No arguments provided");
-
       // search the user by email, return an error if the user is not found
       const user = await this.userRepository.findUserByEmail(email);
       if (!user) throw ApiErrorException.HTTP404Error("User not found");
@@ -57,9 +47,6 @@ class UserService implements IEUserService {
 
   public updateUserById = this.wrap.serviceWrap(
     async (uuid: string, data: UpdateUsers): Promise<UserDto | undefined> => {
-      // If no parameters are provided, return an error
-      if (!uuid) throw ApiErrorException.HTTP400Error("No arguments provided");
-
       // search the user by email, return an error if the user is not found
       const user = await this.userRepository.findUserById(uuid);
       if (!user) throw ApiErrorException.HTTP404Error("User not found");
@@ -74,14 +61,11 @@ class UserService implements IEUserService {
 
   public deleteUserById = this.wrap.serviceWrap(
     async (uuid: string): Promise<string | undefined> => {
-      // If no parameters are provided, return an error
-      if (!uuid) throw ApiErrorException.HTTP400Error("No arguments provided");
-
       // search the user by email, return an error if the user is not found
       const user = await this.userRepository.findUserById(uuid);
       if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
-      await this.userRepository.deleteUserById(uuid);
+      await this.userRepository.deleteUserById(user.getId());
       return "User deleted successfully";
     }
   );
@@ -99,11 +83,9 @@ class UserService implements IEUserService {
   );
 
   private userDtoClass = (user: User | undefined): UserDto | undefined => {
-    return user
-      ? plainToInstance(UserDto, user, {
-          excludeExtraneousValues: true,
-        })
-      : undefined;
+    return plainToInstance(UserDto, user, {
+      excludeExtraneousValues: true,
+    });
   };
 }
 

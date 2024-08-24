@@ -14,9 +14,6 @@ class UserService {
         this.userRepository = userRepository;
     }
     getUserById = this.wrap.serviceWrap(async (uuid) => {
-        // If no parameters are provided, return an error
-        if (!uuid)
-            throw api_exception_1.default.HTTP400Error("No arguments provided");
         // search the user by id, return an error if the user is not found
         const user = await this.userRepository.findUserById(uuid);
         if (!user)
@@ -24,9 +21,6 @@ class UserService {
         return this.userDtoClass(user);
     });
     getUserByUsername = this.wrap.serviceWrap(async (username) => {
-        // If no parameters are provided, return an error
-        if (!username)
-            throw api_exception_1.default.HTTP400Error("No arguments provided");
         // search the user by username, return an error if the user is not found
         const user = await this.userRepository.findUserByUsername(username);
         if (!user)
@@ -34,9 +28,6 @@ class UserService {
         return this.userDtoClass(user);
     });
     getUserByEmail = this.wrap.serviceWrap(async (email) => {
-        // If no parameters are provided, return an error
-        if (!email)
-            throw api_exception_1.default.HTTP400Error("No arguments provided");
         // search the user by email, return an error if the user is not found
         const user = await this.userRepository.findUserByEmail(email);
         if (!user)
@@ -44,9 +35,6 @@ class UserService {
         return this.userDtoClass(user);
     });
     updateUserById = this.wrap.serviceWrap(async (uuid, data) => {
-        // If no parameters are provided, return an error
-        if (!uuid)
-            throw api_exception_1.default.HTTP400Error("No arguments provided");
         // search the user by email, return an error if the user is not found
         const user = await this.userRepository.findUserById(uuid);
         if (!user)
@@ -57,14 +45,11 @@ class UserService {
         return this.userDtoClass(user);
     });
     deleteUserById = this.wrap.serviceWrap(async (uuid) => {
-        // If no parameters are provided, return an error
-        if (!uuid)
-            throw api_exception_1.default.HTTP400Error("No arguments provided");
         // search the user by email, return an error if the user is not found
         const user = await this.userRepository.findUserById(uuid);
         if (!user)
             throw api_exception_1.default.HTTP404Error("User not found");
-        await this.userRepository.deleteUserById(uuid);
+        await this.userRepository.deleteUserById(user.getId());
         return "User deleted successfully";
     });
     searchUserByFields = this.wrap.serviceWrap(async (search) => {
@@ -76,11 +61,9 @@ class UserService {
         return searches.map((user) => (0, class_transformer_1.plainToInstance)(user_dto_1.default, user));
     });
     userDtoClass = (user) => {
-        return user
-            ? (0, class_transformer_1.plainToInstance)(user_dto_1.default, user, {
-                excludeExtraneousValues: true,
-            })
-            : undefined;
+        return (0, class_transformer_1.plainToInstance)(user_dto_1.default, user, {
+            excludeExtraneousValues: true,
+        });
     };
 }
 exports.default = UserService;
