@@ -10,7 +10,7 @@ class EmailService {
       subject,
       html: `
         <p>Please click the following link to reset your password:</p>
-        <a href="http://localhost:5000/api/v1/reset-password-form?token=${token}">Reset Password</a>
+        <a href="http://localhost:5000/api/v1/auth/reset-password-form?token=${token}">Reset Password</a>
       `,
     };
 
