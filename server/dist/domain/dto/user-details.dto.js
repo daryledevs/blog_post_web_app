@@ -9,8 +9,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
+const class_transformer_1 = require("class-transformer");
 class UserDetailsDto {
     username;
     first_name;
@@ -56,6 +56,7 @@ class UserDetailsDto {
 __decorate([
     (0, class_transformer_1.Expose)(),
     (0, class_validator_1.IsNotEmpty)({ message: "username is required" }),
+    (0, class_validator_1.IsString)({ message: "username must be a string" }),
     __metadata("design:type", String)
 ], UserDetailsDto.prototype, "username", void 0);
 __decorate([
@@ -78,10 +79,19 @@ __decorate([
 ], UserDetailsDto.prototype, "avatar_url", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
+    (0, class_validator_1.IsNumber)({
+        allowNaN: false,
+        allowInfinity: false,
+        maxDecimalPlaces: 1,
+    }, { message: "age must be a number" }),
     __metadata("design:type", Object)
 ], UserDetailsDto.prototype, "age", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
+    (0, class_transformer_1.Type)(() => Date),
+    (0, class_validator_1.MaxDate)(() => new Date(), {
+        message: () => `maximal allowed date for date of birth is ${new Date().toDateString()}`,
+    }),
     __metadata("design:type", Object)
 ], UserDetailsDto.prototype, "birthday", void 0);
 exports.default = UserDetailsDto;

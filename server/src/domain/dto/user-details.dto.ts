@@ -1,9 +1,16 @@
-import { Expose }                           from "class-transformer";
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  MaxDate,
+}                       from "class-validator";
+import { Expose, Type } from "class-transformer";
 
 class UserDetailsDto {
   @Expose()
   @IsNotEmpty({ message: "username is required" })
+  @IsString({ message: "username must be a string" })
   protected username: string;
 
   @Expose()
@@ -22,9 +29,22 @@ class UserDetailsDto {
   protected avatar_url?: string | null;
 
   @Expose()
+  @IsNumber(
+    {
+      allowNaN: false,
+      allowInfinity: false,
+      maxDecimalPlaces: 1,
+    },
+    { message: "age must be a number" }
+  )
   protected age?: number | null;
 
   @Expose()
+  @Type(() => Date)
+  @MaxDate(() => new Date(), {
+    message: () =>
+      `maximal allowed date for date of birth is ${new Date().toDateString()}`,
+  })
   protected birthday?: string | null;
 
   constructor(
