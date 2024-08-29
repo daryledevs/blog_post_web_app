@@ -24,5 +24,5 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const basePath = __importStar(require("path"));
-const rootPath = basePath.resolve("./src/public/views");
+const rootPath = basePath.resolve("./src/presentation/public/views");
 exports.default = rootPath;

@@ -1,4 +1,4 @@
 import * as basePath from "path";
-const rootPath = basePath.resolve("./src/public/views");
+const rootPath = basePath.resolve("./src/presentation/public/views");
 export default rootPath;
 
