@@ -45,10 +45,10 @@ class AuthRepository {
             "id",
             (0, kysely_1.sql) `BIN_TO_UUID(uuid)`.as("uuid"),
             "encrypted",
-            "user_id",
+            "reference_token",
             "created_at",
         ])
-            .where("id", "=", token_id)
+            .where("reference_token", "=", token_id)
             .executeTakeFirst();
     });
     saveResetToken = this.wrap.repoWrap(async (token) => {
@@ -60,7 +60,7 @@ class AuthRepository {
     deleteResetToken = this.wrap.repoWrap(async (token_id) => {
         await this.database
             .deleteFrom("reset_password_token")
-            .where("id", "=", token_id)
+            .where("reference_token", "=", token_id)
             .execute();
     });
     plainToClass = this.wrap.repoWrap(async (user) => {

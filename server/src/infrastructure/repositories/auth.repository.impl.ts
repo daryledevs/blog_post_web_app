@@ -49,17 +49,17 @@ class AuthRepository implements IEAuthRepository {
   );
 
   public findResetTokenById = this.wrap.repoWrap(
-    async (token_id: number): Promise<SelectResetPasswordToken | undefined> => {
+    async (token_id: string): Promise<SelectResetPasswordToken | undefined> => {
       return await this.database
         .selectFrom("reset_password_token")
         .select([
           "id",
           sql`BIN_TO_UUID(uuid)`.as("uuid"),
           "encrypted",
-          "user_id",
+          "reference_token",
           "created_at",
         ])
-        .where("id", "=", token_id)
+        .where("reference_token", "=", token_id)
         .executeTakeFirst();
     }
   );
@@ -74,10 +74,10 @@ class AuthRepository implements IEAuthRepository {
   );
 
   public deleteResetToken = this.wrap.repoWrap(
-    async (token_id: number): Promise<void> => {
+    async (token_id: string): Promise<void> => {
       await this.database
         .deleteFrom("reset_password_token")
-        .where("id", "=", token_id)
+        .where("reference_token", "=", token_id)
         .execute();
     }
   );
