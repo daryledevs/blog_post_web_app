@@ -37,14 +37,15 @@ class AuthController {
 
   public forgotPassword = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const result = await this.authService.forgotPassword(req.body);
+      const result = await this.authService.forgotPassword(req.body?.email);
       res.status(200).send({ message: result });
     }
   );
 
   public resetPasswordForm = this.wrap.apiWrap(
     async (req: Request, res: Response, next: NextFunction) => {
-      const result = await this.authService.resetPasswordForm(req.body);
+      const query = req.query.token as string;
+      const result = await this.authService.resetPasswordForm(query);
       res.status(201).render(result.render, result.data);
     }
   );
