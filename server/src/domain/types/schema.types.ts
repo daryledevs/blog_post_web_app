@@ -64,7 +64,7 @@ export interface Posts {
 export interface ResetPasswordToken {
   id: Generated<number>;
   uuid: Generated<any>;
-  user_id: number;
+  reference_token: string;
   encrypted: string;
   created_at: Generated<Date | null>;
 }
