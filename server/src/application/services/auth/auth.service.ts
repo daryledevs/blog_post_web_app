@@ -8,10 +8,10 @@ export type LoginType = {
 
 export type IResetPasswordForm = {
   render: string;
-  data: { 
-    email: string; 
-    user_id: any; 
-    tokenId: string 
+  data: {
+    email: string;
+    user_uuid: any;
+    tokenId: string;
   };
 };
 

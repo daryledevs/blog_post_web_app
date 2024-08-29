@@ -29,21 +29,25 @@ class AuthService implements IEAuthService {
       userDto: UserDto
     ): Promise<{ message: string; user: UserDto | undefined }> => {
       // check to see if the user is already in the database.
-      const email = await this.userRepository.findUserByEmail(
+      const isEmailExist = await this.userRepository.findUserByEmail(
         userDto.getEmail()
       );
 
       // if the email is already in the exists, return an error
-      if (email) throw ApiErrorException.HTTP409Error("Email already exists");
+      if (isEmailExist) {
+        throw ApiErrorException.HTTP409Error("Email already exists");
+      }
 
       // check to see if the username is already in the database.
-      const username = await this.userRepository.findUserByUsername(
+      const isUsernameExist = await this.userRepository.findUserByUsername(
         userDto.getUsername()
       );
 
       // if the username is already in the database, return an error
-      if (username) throw ApiErrorException.HTTP409Error("Username already exists");
-      
+      if (isUsernameExist) {
+        throw ApiErrorException.HTTP409Error("Username already exists");
+      }
+
       const hashPassword = bcrypt.hashSync(
         userDto.getPassword(),
         bcrypt.genSaltSync(10)
@@ -56,7 +60,9 @@ class AuthService implements IEAuthService {
 
       // Save the user to the database
       const user = await this.authRepository.createUser(newUser);
-      if (!user) throw ApiErrorException.HTTP400Error("User not created");
+      if (!user) {
+        throw ApiErrorException.HTTP400Error("User not created");
+      }
 
       const newUserDto = plainToInstance(UserDto, user, {
         excludeExtraneousValues: true,
@@ -74,7 +80,10 @@ class AuthService implements IEAuthService {
       );
 
       // If the user does not exist, return an error
-      if (!user) throw ApiErrorException.HTTP404Error("User not found");
+      if (!user) {
+        throw ApiErrorException.HTTP404Error("User not found");
+      }
+
       // Check if the password is correct
       const isPasswordMatch = bcrypt.compareSync(password, user.password);
 
@@ -110,15 +119,17 @@ class AuthService implements IEAuthService {
   );
 
   public forgotPassword = this.wrap.serviceWrap(
-    async (data: any): Promise<string> => {
+    async (email: any): Promise<string> => {
+      const user = await this.userRepository.findUserByEmail(email);
       // If the user is not found, return an error
-      const user = await this.userRepository.findUserByEmail(data.email);
-      if (!user) throw ApiErrorException.HTTP404Error("User not found");
+      if (!user) {
+        throw ApiErrorException.HTTP404Error("User not found");
+      }
 
       const args = {
         payload: {
           email: user.getEmail(),
-          user_id: user.getId(),
+          user_uuid: user.getUuid(),
         },
         secret: TokenSecret.RESET_SECRET,
         expiration: Expiration.RESET_TOKEN_EXPIRATION,
@@ -133,7 +144,7 @@ class AuthService implements IEAuthService {
 
       // Save token to the database
       await this.authRepository.saveResetToken({
-        user_id: user.getId(),
+        reference_token: shortToken,
         encrypted: encryptedToken,
       });
 
@@ -150,6 +161,7 @@ class AuthService implements IEAuthService {
       // Check if the token (id) exists in the database.
       const data = await this.authRepository.findResetTokenById(decodedToken);
       if (!data) throw ApiErrorException.HTTP400Error("Invalid or expired token");
+        
       const decryptedToken = CryptoUtil.decryptData(data.encrypted as any);
 
       // then decrypt the code to check if it is still valid.
@@ -159,13 +171,25 @@ class AuthService implements IEAuthService {
 
   public resetPassword = this.wrap.serviceWrap(
     async (data: any): Promise<string> => {
-      const { tokenId, user_id, email, password, confirmPassword } = data;
+      const { reference_token, user_uuid, email, password, confirmPassword } = data;
       const isPasswordMismatch = password !== confirmPassword;
       const passwordLength = password.length <= 5;
 
+      if(!reference_token) {
+        throw ApiErrorException.HTTP400Error("Invalid or expired token");
+      }
+
+      if(!user_uuid) {
+        throw ApiErrorException.HTTP400Error("Missing user's UUID");
+      }
+
+      if(!password) {
+        throw ApiErrorException.HTTP400Error("Missing password");
+      } 
+
       // Check if the password and confirm password match
-      if (isPasswordMismatch) throw ApiErrorException
-        .HTTP400Error("Password does not match");
+      if (isPasswordMismatch)
+        throw ApiErrorException.HTTP400Error("Password does not match");
 
       // Check if the password is less than 6 characters
       if (passwordLength) {
@@ -173,20 +197,27 @@ class AuthService implements IEAuthService {
           "Password must be at least 6 characters"
         );
       }
-        
+
       // Decrypt the token
-      const decodedTokenId: any = decodeURIComponent(tokenId);
+      const decodedTokenId: any = decodeURIComponent(reference_token);
       const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 
+      const referenceTkn = await this.authRepository.findResetTokenById(decodedTokenId);
+
+      if(!referenceTkn) {
+        throw ApiErrorException.HTTP400Error("Token not found");
+      }
+
       // If the user is not found, return an error
-      const user = await this.userRepository.findUserById(user_id);
+      const user = await this.userRepository.findUserById(user_uuid);
       if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
       // Update the user's password and delete the reset password token from the database.
-      await this.userRepository.updateUserById(user_id, {
+      await this.userRepository.updateUserById(user_uuid, {
         password: hashPassword,
       });
-      await this.authRepository.deleteResetToken(decodedTokenId);
+
+      await this.authRepository.deleteResetToken(decodedTokenId)
 
       // add here confirmation email to the user that the password has been reset.
       return "Reset password successfully";
