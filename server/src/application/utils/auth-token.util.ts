@@ -62,12 +62,14 @@ class AuthTokensUtil {
         process.env.RESET_PWD_TKN_SECRET!,
         (error: any, decode: any) => {
           // Explicitly type 'decode' as 'any'
-          if (error)
+          if (error) {
             reject(ApiErrorException.HTTP400Error("Invalid or expired token"));
-          const { email, user_id } = decode as { email: any; user_id: any };
+          }
+            
+          const { email, user_uuid } = decode as { email: any; user_uuid: any };
           resolve({
             render: "resetPassword",
-            data: { email, user_id, tokenId },
+            data: { email, user_uuid, tokenId },
           });
         }
       );

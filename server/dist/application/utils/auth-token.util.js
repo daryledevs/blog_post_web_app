@@ -74,12 +74,13 @@ class AuthTokensUtil {
         return new Promise((resolve, reject) => {
             jsonwebtoken_1.default.verify(decryptedToken, process.env.RESET_PWD_TKN_SECRET, (error, decode) => {
                 // Explicitly type 'decode' as 'any'
-                if (error)
+                if (error) {
                     reject(api_exception_1.default.HTTP400Error("Invalid or expired token"));
-                const { email, user_id } = decode;
+                }
+                const { email, user_uuid } = decode;
                 resolve({
                     render: "resetPassword",
-                    data: { email, user_id, tokenId },
+                    data: { email, user_uuid, tokenId },
                 });
             });
         });
