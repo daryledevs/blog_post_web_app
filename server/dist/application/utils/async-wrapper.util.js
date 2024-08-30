@@ -6,31 +6,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const api_exception_1 = __importDefault(require("@/application/exceptions/api.exception"));
 const database_exception_1 = __importDefault(require("@/application/exceptions/database.exception"));
 class AsyncWrapper {
-    apiWrap = (cb) => {
-        return (req, res, next) => cb(req, res, next).catch((error) => {
-            if (error instanceof database_exception_1.default ||
-                error instanceof api_exception_1.default)
+    asyncErrorHandler = (cb) => {
+        return (req, res, next) => Promise.resolve(cb(req, res, next)).catch((error) => {
+            // if the error is a database error, throw a database exception
+            if (error.code) {
+                return next(database_exception_1.default.error(error));
+            }
+            // if the error is an API error, throw an API exception
+            if (error instanceof api_exception_1.default) {
                 return next(error);
+            }
+            // if the error is a general error, throw a internal server error exception
             next(api_exception_1.default.HTTP500Error("An unexpected error occurred", error));
         });
-    };
-    serviceWrap = (fn) => {
-        return (...args) => {
-            return fn.apply(this, args).catch((error) => {
-                throw error;
-            });
-        };
-    };
-    repoWrap = (fn) => {
-        return (...args) => {
-            return fn.apply(this, args).catch((error) => {
-                // if the error is a database error, throw a database exception
-                if (error.code) {
-                    throw database_exception_1.default.error(error);
-                }
-                throw error;
-            });
-        };
     };
 }
 ;
