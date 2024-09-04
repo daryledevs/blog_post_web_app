@@ -1,20 +1,15 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const async_wrapper_util_1 = __importDefault(require("@/application/utils/async-wrapper.util"));
 class UsersController {
     userService;
     followService;
     searchHistoryService;
-    wrap = new async_wrapper_util_1.default();
     constructor(userService, followService, searchHistoryService) {
         this.userService = userService;
         this.followService = followService;
         this.searchHistoryService = searchHistoryService;
     }
-    getUserData = this.wrap.apiWrap(async (req, res, next) => {
+    getUserData = async (req, res) => {
         let user;
         const uuid = req.params.uuid;
         const person = req.query.person || "";
@@ -24,55 +19,52 @@ class UsersController {
         else {
             user = await this.userService.getUserById(uuid);
         }
-        ;
         res.status(200).send({ user });
-    });
-    searchUsersByQuery = this.wrap.apiWrap(async (req, res, next) => {
+    };
+    searchUsersByQuery = async (req, res) => {
         const search = req.query.search;
         const users = await this.userService.searchUserByFields(search);
         res.status(200).send({ users });
-    });
-    deleteUser = this.wrap.apiWrap(async (req, res, next) => {
+    };
+    deleteUser = async (req, res) => {
         const uuid = req.params.uuid;
         const message = await this.userService.deleteUserById(uuid);
         res.status(200).send({ message });
-    });
-    getFollowStats = this.wrap.apiWrap(async (req, res, next) => {
+    };
+    getFollowStats = async (req, res) => {
         const uuid = req.params.uuid;
         const stats = await this.followService.getFollowStats(uuid);
         res.status(200).send(stats);
-    });
-    getFollowerFollowingLists = this.wrap.apiWrap(async (req, res, next) => {
+    };
+    getFollowerFollowingLists = async (req, res) => {
         const id = req.params.id;
         const fetch = req.query.fetch;
         const listsId = req.body.listsId;
         const stats = await this.followService.getFollowerFollowingLists(id, fetch, listsId);
         res.status(200).send(stats);
-    });
-    toggleFollow = this.wrap.apiWrap(async (req, res, next) => {
+    };
+    toggleFollow = async (req, res) => {
         const follower_uuid = req.params.follower_uuid;
         const followed_uuid = req.params.followed_uuid;
         const message = await this.followService.toggleFollow(follower_uuid, followed_uuid);
         res.status(200).send(message);
-    });
-    getSearchHistory = this.wrap.apiWrap(async (req, res, next) => {
+    };
+    getSearchHistory = async (req, res) => {
         const searcher_uuid = req.params.searcher_uuid;
-        const searches = await this.searchHistoryService
-            .getUsersSearchHistoryById(searcher_uuid);
+        const searches = await this.searchHistoryService.getUsersSearchHistoryById(searcher_uuid);
         res.status(200).send({ searches });
-    });
-    saveRecentSearches = this.wrap.apiWrap(async (req, res, next) => {
+    };
+    saveRecentSearches = async (req, res) => {
         const searcher_uuid = req.params.searcher_uuid;
         const searched_uuid = req.params.searched_uuid;
         const messages = await this.searchHistoryService.saveUsersSearch(searcher_uuid, searched_uuid);
         res.status(200).send({ messages });
-    });
-    removeRecentSearches = this.wrap.apiWrap(async (req, res, next) => {
+    };
+    removeRecentSearches = async (req, res) => {
         const uuid = req.params.uuid;
-        const message = await this.searchHistoryService
-            .removeRecentSearchesById(uuid);
+        const message = await this.searchHistoryService.removeRecentSearchesById(uuid);
         res.status(200).send(message);
-    });
+    };
 }
 ;
 exports.default = UsersController;

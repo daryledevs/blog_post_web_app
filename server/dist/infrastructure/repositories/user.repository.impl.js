@@ -5,15 +5,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_database_1 = __importDefault(require("@/infrastructure/database/db.database"));
 const user_model_1 = __importDefault(require("@/domain/models/user.model"));
-const async_wrapper_util_1 = __importDefault(require("@/application/utils/async-wrapper.util"));
 const class_transformer_1 = require("class-transformer");
 const kysely_1 = require("kysely");
 class UserRepository {
     database;
-    wrap = new async_wrapper_util_1.default();
     constructor() { this.database = db_database_1.default; }
-    ;
-    findUserById = this.wrap.repoWrap(async (uuid) => {
+    findUserById = async (uuid) => {
         const user = await this.database
             .selectFrom("users")
             .select([
@@ -33,8 +30,8 @@ class UserRepository {
             .where("uuid", "=", (0, kysely_1.sql) `UUID_TO_BIN(${uuid})`)
             .executeTakeFirst();
         return this.plainToModel(user);
-    });
-    findUserByUsername = this.wrap.repoWrap(async (username) => {
+    };
+    findUserByUsername = async (username) => {
         const user = await this.database
             .selectFrom("users")
             .select([
@@ -55,8 +52,8 @@ class UserRepository {
             .where("username", "like", username + "%")
             .executeTakeFirst();
         return this.plainToModel(user);
-    });
-    searchUsersByQuery = this.wrap.repoWrap(async (search) => {
+    };
+    searchUsersByQuery = async (search) => {
         const users = await this.database
             .selectFrom("users")
             .select([
@@ -86,8 +83,8 @@ class UserRepository {
         ]))
             .execute();
         return users.map((user) => (0, class_transformer_1.plainToInstance)(user_model_1.default, user));
-    });
-    findUserByEmail = this.wrap.repoWrap(async (email) => {
+    };
+    findUserByEmail = async (email) => {
         const user = await this.database
             .selectFrom("users")
             .select([
@@ -107,8 +104,8 @@ class UserRepository {
             .where("email", "=", email)
             .executeTakeFirst();
         return this.plainToModel(user);
-    });
-    findUserByCredentials = this.wrap.repoWrap(async (userCredential) => {
+    };
+    findUserByCredentials = async (userCredential) => {
         const user = await this.database
             .selectFrom("users")
             .select([
@@ -131,21 +128,18 @@ class UserRepository {
         ]))
             .executeTakeFirst();
         return this.plainToModel(user);
-    });
-    updateUserById = this.wrap.repoWrap(async (uuid, user) => {
+    };
+    updateUserById = async (uuid, user) => {
         const updatedUser = await this.database
             .updateTable("users")
             .set(user)
             .where("uuid", "=", (0, kysely_1.sql) `UUID_TO_BIN(${uuid})`)
             .executeTakeFirstOrThrow();
         return this.plainToModel(updatedUser);
-    });
-    deleteUserById = this.wrap.repoWrap(async (id) => {
-        await this.database
-            .deleteFrom("users")
-            .where("id", "=", id)
-            .execute();
-    });
+    };
+    deleteUserById = async (id) => {
+        await this.database.deleteFrom("users").where("id", "=", id).execute();
+    };
     plainToModel = (user) => {
         return user ? (0, class_transformer_1.plainToInstance)(user_model_1.default, user) : undefined;
     };

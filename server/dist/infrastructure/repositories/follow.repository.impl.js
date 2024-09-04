@@ -6,16 +6,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const db_database_1 = __importDefault(require("@/infrastructure/database/db.database"));
 const follower_model_1 = __importDefault(require("@/domain/models/follower.model"));
 const following_model_1 = __importDefault(require("@/domain/models/following.model"));
-const async_wrapper_util_1 = __importDefault(require("@/application/utils/async-wrapper.util"));
 const kysely_1 = require("kysely");
 const class_transformer_1 = require("class-transformer");
 class FollowRepository {
     database;
-    wrap = new async_wrapper_util_1.default();
     constructor() {
         this.database = db_database_1.default;
     }
-    findUserFollowStatsById = this.wrap.repoWrap(async (id) => {
+    findUserFollowStatsById = async (id) => {
         const queryFollowers = this.database
             .selectFrom("followers")
             .innerJoin("users", "followers.followed_id", "users.id")
@@ -35,8 +33,8 @@ class FollowRepository {
         ])
             .executeTakeFirstOrThrow();
         return { followers, following };
-    });
-    findAllFollowersById = this.wrap.repoWrap(async (id, listsId) => {
+    };
+    findAllFollowersById = async (id, listsId) => {
         const data = await this.database
             .selectFrom("followers")
             .leftJoin("users", "followers.follower_id", "users.id")
@@ -56,8 +54,8 @@ class FollowRepository {
             .limit(10)
             .execute();
         return (0, class_transformer_1.plainToInstance)(follower_model_1.default, data);
-    });
-    findAllFollowingById = this.wrap.repoWrap(async (id, listsId) => {
+    };
+    findAllFollowingById = async (id, listsId) => {
         const data = await this.database
             .selectFrom("followers")
             .leftJoin("users", "followers.followed_id", "users.id")
@@ -77,8 +75,8 @@ class FollowRepository {
             .limit(10)
             .execute();
         return (0, class_transformer_1.plainToInstance)(following_model_1.default, data);
-    });
-    isUserFollowing = this.wrap.repoWrap(async (identifier) => {
+    };
+    isUserFollowing = async (identifier) => {
         const result = await this.database
             .selectFrom("followers")
             .selectAll()
@@ -88,11 +86,11 @@ class FollowRepository {
         ]))
             .executeTakeFirst();
         return !!result;
-    });
-    followUser = this.wrap.repoWrap(async (identifier) => {
+    };
+    followUser = async (identifier) => {
         await this.database.insertInto("followers").values(identifier).execute();
-    });
-    unfollowUser = this.wrap.repoWrap(async (identifier) => {
+    };
+    unfollowUser = async (identifier) => {
         await this.database
             .deleteFrom("followers")
             .where((eb) => eb.and([
@@ -100,7 +98,7 @@ class FollowRepository {
             eb("followed_id", "=", identifier.followed_id),
         ]))
             .execute();
-    });
+    };
 }
 ;
 exports.default = FollowRepository;

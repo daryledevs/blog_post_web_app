@@ -5,18 +5,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const follower_dto_1 = __importDefault(require("@/domain/dto/follower.dto"));
 const following_dto_1 = __importDefault(require("@/domain/dto/following.dto"));
-const async_wrapper_util_1 = __importDefault(require("@/application/utils/async-wrapper.util"));
 const api_exception_1 = __importDefault(require("@/application/exceptions/api.exception"));
 const class_transformer_1 = require("class-transformer");
 class FollowService {
     userRepository;
     followRepository;
-    wrap = new async_wrapper_util_1.default();
     constructor(userRepository, followRepository) {
         this.userRepository = userRepository;
         this.followRepository = followRepository;
     }
-    getFollowStats = this.wrap.serviceWrap(async (uuid) => {
+    getFollowStats = async (uuid) => {
         // If no arguments are provided, return an error
         if (!uuid)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
@@ -25,8 +23,8 @@ class FollowService {
         if (!user)
             throw api_exception_1.default.HTTP404Error("User not found");
         return await this.followRepository.findUserFollowStatsById(user.getId());
-    });
-    getFollowerFollowingLists = this.wrap.serviceWrap(async (uuid, fetch, listsId) => {
+    };
+    getFollowerFollowingLists = async (uuid, fetch, listsId) => {
         // If no arguments are provided, return an error
         if (!uuid)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
@@ -49,8 +47,8 @@ class FollowService {
             default:
                 throw api_exception_1.default.HTTP400Error("Invalid fetch parameter");
         }
-    });
-    toggleFollow = this.wrap.serviceWrap(async (follower_uuid, followed_uuid) => {
+    };
+    toggleFollow = async (follower_uuid, followed_uuid) => {
         // If no arguments are provided, return an error
         if (!follower_uuid || !followed_uuid) {
             throw api_exception_1.default.HTTP400Error("No arguments provided");
@@ -77,13 +75,13 @@ class FollowService {
         // if there is no data in the database, create one
         await this.followRepository.followUser(args);
         return "User followed successfully";
-    });
-    getFollowers = this.wrap.serviceWrap(async (id, lists) => {
+    };
+    getFollowers = async (id, lists) => {
         return await this.followRepository.findAllFollowersById(id, lists);
-    });
-    getFollowing = this.wrap.serviceWrap(async (id, lists) => {
+    };
+    getFollowing = async (id, lists) => {
         return await this.followRepository.findAllFollowingById(id, lists);
-    });
+    };
 }
 ;
 exports.default = FollowService;

@@ -3,19 +3,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const async_wrapper_util_1 = __importDefault(require("@/application/utils/async-wrapper.util"));
 const search_history_dto_1 = __importDefault(require("@/domain/dto/search-history.dto"));
 const api_exception_1 = __importDefault(require("@/application/exceptions/api.exception"));
 const class_transformer_1 = require("class-transformer");
 class SearchHistoryService {
-    wrap = new async_wrapper_util_1.default();
     userRepository;
     searchHistoryRepository;
     constructor(userRepository, searchHistoryRepository) {
         this.userRepository = userRepository;
         this.searchHistoryRepository = searchHistoryRepository;
     }
-    getUsersSearchHistoryById = this.wrap.serviceWrap(async (searcher_uuid) => {
+    getUsersSearchHistoryById = async (searcher_uuid) => {
         // If no parameters are provided, return an error
         if (!searcher_uuid) {
             throw api_exception_1.default.HTTP400Error("No arguments provided");
@@ -30,8 +28,8 @@ class SearchHistoryService {
         return (0, class_transformer_1.plainToInstance)(search_history_dto_1.default, searches, {
             excludeExtraneousValues: true,
         });
-    });
-    saveUsersSearch = this.wrap.serviceWrap(async (searcher_uuid, search_uuid) => {
+    };
+    saveUsersSearch = async (searcher_uuid, search_uuid) => {
         // If no parameters are provided, return an error
         if (!searcher_uuid || !search_uuid) {
             throw api_exception_1.default.HTTP400Error("No arguments provided");
@@ -49,8 +47,8 @@ class SearchHistoryService {
             return "Search user already saved";
         await this.searchHistoryRepository.saveUsersSearch(user.getId(), searchUser.getId());
         return "Search user saved successfully";
-    });
-    removeRecentSearchesById = this.wrap.serviceWrap(async (uuid) => {
+    };
+    removeRecentSearchesById = async (uuid) => {
         // If no parameters are provided, return an error
         if (!uuid)
             throw api_exception_1.default.HTTP400Error("No arguments provided");
@@ -61,7 +59,7 @@ class SearchHistoryService {
             throw api_exception_1.default.HTTP404Error("Search user not found");
         await this.searchHistoryRepository.deleteUsersSearchById(search.getId());
         return "Search user deleted successfully";
-    });
+    };
 }
 ;
 exports.default = SearchHistoryService;
