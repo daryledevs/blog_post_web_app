@@ -1,4 +1,5 @@
 import express                   from "express";
+import AsyncWrapper              from "@/application/utils/async-wrapper.util";
 import UsersService              from "@/application/services/user/user.service.impl";
 import FollowService             from "@/application/services/follow/follow.service.impl";
 import UserRepository            from "@/infrastructure/repositories/user.repository.impl";
@@ -11,6 +12,7 @@ import validateUUIDRequestBody   from "../validations/validate-uuid-body.validat
 import validateUUIDRequestParams from "../validations/validate-uuid-params.validation";
 
 const router = express.Router();
+const wrap = new AsyncWrapper();
 
 const controller: UsersController = new UsersController(
   new UsersService(
@@ -30,47 +32,44 @@ const controller: UsersController = new UsersController(
 router
   .route("/:uuid")
   .all(validateUUIDRequestParams("uuid"))
-  .get(controller.getUserData)
-  .delete(controller.deleteUser);
+  .get(wrap.asyncErrorHandler(controller.getUserData))
+  .delete(wrap.asyncErrorHandler(controller.deleteUser));
   
 router
   .route("/search")
   .all(validateRequestQuery("search"))
-  .get(controller.searchUsersByQuery); 
+  .get(wrap.asyncErrorHandler(controller.searchUsersByQuery)); 
 
 // follow endpoints
 router
   .route("/:uuid/follow-stats")
   .all(validateUUIDRequestParams("uuid"))
-  .get(controller.getFollowStats);
+  .get(wrap.asyncErrorHandler(controller.getFollowStats));
 
 router
   .route("/:uuid/follow-lists")
-  .all(
-    validateUUIDRequestBody("listsId"),
-    validateUUIDRequestParams("uuid")
-  )
-  .post(controller.getFollowerFollowingLists);
+  .all(validateUUIDRequestBody("listsId"), validateUUIDRequestParams("uuid"))
+  .post(wrap.asyncErrorHandler(controller.getFollowerFollowingLists));
 
 router
   .route("/:follower_uuid/follow/:followed_uuid")
   .all(validateUUIDRequestParams(["follower_uuid", "followed_uuid"]))
-  .post(controller.toggleFollow);
+  .post(wrap.asyncErrorHandler(controller.toggleFollow));
 
 // search endpoints
 router
   .route("/:searcher_uuid/searches")
   .all(validateUUIDRequestParams("searcher_uuid"))
-  .get(controller.getSearchHistory);
+  .get(wrap.asyncErrorHandler(controller.getSearchHistory));
 
 router
   .route("/:searcher_uuid/searches/:searched_uuid")
   .all(validateUUIDRequestParams(["searcher_uuid", "searched_uuid"]))
-  .post(controller.saveRecentSearches);
+  .post(wrap.asyncErrorHandler(controller.saveRecentSearches));
 
 router
   .route("/:uuid/searches")
   .all(validateUUIDRequestParams("uuid"))
-  .delete(controller.removeRecentSearches);
+  .delete(wrap.asyncErrorHandler(controller.removeRecentSearches));
 
 export default router;
