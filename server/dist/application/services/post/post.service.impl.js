@@ -6,28 +6,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const post_model_1 = __importDefault(require("@/domain/models/post.model"));
 const post_dto_1 = __importDefault(require("@/domain/dto/post.dto"));
 const path_1 = require("path");
-const async_wrapper_util_1 = __importDefault(require("@/application/utils/async-wrapper.util"));
 const api_exception_1 = __importDefault(require("@/application/exceptions/api.exception"));
 const class_transformer_1 = require("class-transformer");
 class PostService {
     postRepository;
     userRepository;
     cloudinary;
-    wrap = new async_wrapper_util_1.default();
     constructor(postRepository, userRepository, cloudinary) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.cloudinary = cloudinary;
     }
-    getPostByUuid = this.wrap.serviceWrap(async (uuid) => {
+    getPostByUuid = async (uuid) => {
         // if the post is not found, return an error
         const post = await this.postRepository.findPostsByPostId(uuid);
         if (!post)
             throw api_exception_1.default.HTTP404Error("Post not found");
         // return the post
         return (0, class_transformer_1.plainToInstance)(post_dto_1.default, post, { excludeExtraneousValues: true });
-    });
-    getAllPostsByUsersUuid = this.wrap.serviceWrap(async (user_uuid) => {
+    };
+    getAllPostsByUsersUuid = async (user_uuid) => {
         // if the user is not found, return an error
         const user = await this.userRepository.findUserById(user_uuid);
         if (!user)
@@ -35,22 +33,22 @@ class PostService {
         // get the posts for the user
         const posts = await this.postRepository.findAllPostsByUserId(user.getId());
         return (0, class_transformer_1.plainToInstance)(post_dto_1.default, posts, { excludeExtraneousValues: true });
-    });
-    geTotalPostsByUsersUuid = this.wrap.serviceWrap(async (user_uuid) => {
+    };
+    geTotalPostsByUsersUuid = async (user_uuid) => {
         // if the user is not found, return an error
         const user = await this.userRepository.findUserById(user_uuid);
         if (!user)
             throw api_exception_1.default.HTTP404Error("User not found");
         // get the total posts for the user
         return await this.postRepository.findUserTotalPostsByUserId(user.getId());
-    });
-    createNewPost = this.wrap.serviceWrap(async (postDto) => {
+    };
+    createNewPost = async (postDto) => {
         const [file] = postDto.getFiles() ?? [];
         const user_uuid = postDto.getUserUuid();
         const destination = file?.destination ?? "";
         const filename = file?.filename ?? "";
         const path = (0, path_1.join)(destination, filename);
-        if (!path || path && path.replace(/\s+/g, "") === "") {
+        if (!path || (path && path.replace(/\s+/g, "") === "")) {
             throw api_exception_1.default.HTTP400Error("Error on image uploaded");
         }
         // if the user is not found, return an error
@@ -71,8 +69,8 @@ class PostService {
             throw error;
         }
         return "Post created successfully";
-    });
-    updatePostByUuid = this.wrap.serviceWrap(async (postDto) => {
+    };
+    updatePostByUuid = async (postDto) => {
         // if the post is not found, return an error
         const post = await this.postRepository.findPostsByPostId(postDto.getUuid());
         if (!post)
@@ -87,8 +85,8 @@ class PostService {
         // update the post
         await this.postRepository.editPostByPostId(updatedPost.getUuid(), data);
         return "Post edited successfully";
-    });
-    deletePostByUuid = this.wrap.serviceWrap(async (uuid) => {
+    };
+    deletePostByUuid = async (uuid) => {
         // if the post is not found, return an error
         const post = await this.postRepository.findPostsByPostId(uuid);
         if (!post)
@@ -96,7 +94,7 @@ class PostService {
         // delete the post
         await this.postRepository.deletePostById(post.getId());
         return "Post deleted successfully";
-    });
+    };
 }
 ;
 exports.default = PostService;

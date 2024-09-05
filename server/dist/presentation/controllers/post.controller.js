@@ -28,33 +28,31 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const post_dto_1 = __importDefault(require("@/domain/dto/post.dto"));
 const dotenv = __importStar(require("dotenv"));
-const async_wrapper_util_1 = __importDefault(require("@/application/utils/async-wrapper.util"));
 const class_transformer_1 = require("class-transformer");
 dotenv.config();
 class PostsController {
     postService;
     likeService;
-    wrap = new async_wrapper_util_1.default();
     constructor(postService, likeService) {
         this.postService = postService;
         this.likeService = likeService;
     }
-    getPostByUuid = this.wrap.apiWrap(async (req, res, next) => {
+    getPostByUuid = async (req, res) => {
         const uuid = req.params?.uuid;
         const data = await this.postService.getPostByUuid(uuid);
         res.status(200).send({ post: data });
-    });
-    getUserPosts = this.wrap.apiWrap(async (req, res, next) => {
+    };
+    getUserPosts = async (req, res) => {
         const user_uuid = req.params?.user_uuid;
         const data = await this.postService.getAllPostsByUsersUuid(user_uuid);
         res.status(200).send({ post: data });
-    });
-    getUserTotalPosts = this.wrap.apiWrap(async (req, res, next) => {
+    };
+    getUserTotalPosts = async (req, res) => {
         const user_uuid = req.params?.user_uuid;
         const data = await this.postService.geTotalPostsByUsersUuid(user_uuid);
         res.status(200).send({ totalPost: data });
-    });
-    newPost = this.wrap.apiWrap(async (req, res, next) => {
+    };
+    newPost = async (req, res) => {
         const reqBody = req.body;
         const files = req.files
             ?.imgs || null;
@@ -62,35 +60,35 @@ class PostsController {
         const postDto = (0, class_transformer_1.plainToInstance)(post_dto_1.default, obj);
         const data = await this.postService.createNewPost(postDto);
         res.status(200).send({ message: data });
-    });
-    editPost = this.wrap.apiWrap(async (req, res, next) => {
+    };
+    editPost = async (req, res) => {
         const reqBody = req.body;
         const postDto = (0, class_transformer_1.plainToInstance)(post_dto_1.default, reqBody);
         const data = await this.postService.updatePostByUuid(postDto);
         res.status(200).send({ message: data });
-    });
-    deletePost = this.wrap.apiWrap(async (req, res, next) => {
+    };
+    deletePost = async (req, res) => {
         const uuid = req.params?.uuid;
         const data = await this.postService.deletePostByUuid(uuid);
         res.status(200).send({ message: data });
-    });
-    getLikesCountForPost = this.wrap.apiWrap(async (req, res, next) => {
+    };
+    getLikesCountForPost = async (req, res) => {
         const uuid = req.params?.uuid;
         const data = await this.likeService.getPostLikesCountByUuid(uuid);
         res.status(200).send({ count: data });
-    });
-    checkUserLikeStatusForPost = this.wrap.apiWrap(async (req, res, next) => {
+    };
+    checkUserLikeStatusForPost = async (req, res) => {
         const user_uuid = req.params?.user_uuid;
         const post_uuid = req.params?.uuid;
         const data = await this.likeService.getUserLikeStatusForPostByUuid(user_uuid, post_uuid);
         res.status(200).send({ status: data ? true : false });
-    });
-    toggleUserLikeForPost = this.wrap.apiWrap(async (req, res, next) => {
+    };
+    toggleUserLikeForPost = async (req, res) => {
         const user_uuid = req.params?.user_uuid;
         const post_uuid = req.params?.uuid;
         const data = await this.likeService.toggleUserLikeForPost(user_uuid, post_uuid);
         return res.status(200).send({ message: data });
-    });
+    };
 }
 ;
 exports.default = PostsController;

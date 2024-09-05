@@ -2,7 +2,7 @@ import PostDto                   from "@/domain/dto/post.dto";
 import { NewPosts, UpdatePosts } from "@/domain/types/table.types";
 
 interface IEPostService {
-  getPostByUuid: (uuid: String) => Promise<PostDto | undefined>;
+  getPostByUuid: (uuid: string) => Promise<PostDto | undefined>;
 
   getAllPostsByUsersUuid: (user_uuid: string) => Promise<PostDto[]>;
 
@@ -10,7 +10,7 @@ interface IEPostService {
 
   createNewPost: (postDto: PostDto) => Promise<string>;
 
-  updatePostByUuid: (post: PostDto | undefined) => Promise<string | undefined>;
+  updatePostByUuid: (post: PostDto) => Promise<string | undefined>;
 
   deletePostByUuid: (uuid: string) => Promise<string>;
 }

@@ -5,18 +5,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_database_1 = __importDefault(require("@/infrastructure/database/db.database"));
 const post_model_1 = __importDefault(require("@/domain/models/post.model"));
-const async_wrapper_util_1 = __importDefault(require("@/application/utils/async-wrapper.util"));
 const kysely_1 = require("kysely");
 const class_transformer_1 = require("class-transformer");
 class PostRepository {
     database;
     cloudinary;
-    wrap = new async_wrapper_util_1.default();
     constructor(cloudinary) {
         this.database = db_database_1.default;
         this.cloudinary = cloudinary;
     }
-    findPostsByPostId = this.wrap.repoWrap(async (uuid) => {
+    findPostsByPostId = async (uuid) => {
         const data = await this.database
             .selectFrom("posts")
             .select([
@@ -32,8 +30,8 @@ class PostRepository {
             .where("uuid", "=", (0, kysely_1.sql) `UUID_TO_BIN(${uuid})`)
             .executeTakeFirst();
         return this.plainToModel(data);
-    });
-    findAllPostsByUserId = this.wrap.repoWrap(async (user_id) => {
+    };
+    findAllPostsByUserId = async (user_id) => {
         const data = await this.database
             .selectFrom("posts")
             .innerJoin("users", "posts.user_id", "users.id")
@@ -57,8 +55,8 @@ class PostRepository {
             .groupBy("posts.id")
             .execute();
         return (0, class_transformer_1.plainToInstance)(post_model_1.default, data);
-    });
-    findUserTotalPostsByUserId = this.wrap.repoWrap(async (user_id) => {
+    };
+    findUserTotalPostsByUserId = async (user_id) => {
         const query = this.database
             .selectFrom("posts")
             .select((eb) => eb.fn.count("posts.id").as("count"))
@@ -67,19 +65,19 @@ class PostRepository {
             .selectNoFrom((eb) => eb.fn.coalesce(query, eb.lit(0)).as("count"))
             .executeTakeFirstOrThrow();
         return count;
-    });
-    createNewPost = this.wrap.repoWrap(async (post) => {
+    };
+    createNewPost = async (post) => {
         await this.database.insertInto("posts").values(post).execute();
-    });
-    editPostByPostId = this.wrap.repoWrap(async (uuid, post) => {
+    };
+    editPostByPostId = async (uuid, post) => {
         console.log(post);
         await this.database
             .updateTable("posts")
             .set(post)
             .where("uuid", "=", (0, kysely_1.sql) `UUID_TO_BIN(${uuid})`)
             .executeTakeFirst();
-    });
-    deletePostById = this.wrap.repoWrap(async (post_id) => {
+    };
+    deletePostById = async (post_id) => {
         const { image_id } = (await this.database
             .selectFrom("posts")
             .select(["image_id"])
@@ -91,7 +89,7 @@ class PostRepository {
             .deleteFrom("posts")
             .where("id", "=", post_id)
             .executeTakeFirst();
-    });
+    };
     plainToModel = (post) => {
         return post ? (0, class_transformer_1.plainToInstance)(post_model_1.default, post) : undefined;
     };
