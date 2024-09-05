@@ -7,6 +7,7 @@ const post_dto_1 = __importDefault(require("@/domain/dto/post.dto"));
 const express_1 = __importDefault(require("express"));
 const like_service_impl_1 = __importDefault(require("@/application/services/like/like.service.impl"));
 const post_service_impl_1 = __importDefault(require("@/application/services/post/post.service.impl"));
+const async_wrapper_util_1 = __importDefault(require("@/application/utils/async-wrapper.util"));
 const user_repository_impl_1 = __importDefault(require("@/infrastructure/repositories/user.repository.impl"));
 const like_repository_impl_1 = __importDefault(require("@/infrastructure/repositories/like.repository.impl"));
 const post_controller_1 = __importDefault(require("@/presentation/controllers/post.controller"));
@@ -16,6 +17,7 @@ const upload_image_helper_1 = __importDefault(require("../helpers/upload-image.h
 const validate_request_data_validation_1 = __importDefault(require("../validations/validate-request-data.validation"));
 const validate_uuid_params_validation_1 = __importDefault(require("../validations/validate-uuid-params.validation"));
 const router = express_1.default.Router();
+const wrap = new async_wrapper_util_1.default();
 const cloudinaryService = new cloudinary_service_lib_1.default();
 const postRepository = new post_repository_impl_1.default(cloudinaryService);
 const likeRepository = new like_repository_impl_1.default();
@@ -27,29 +29,29 @@ const controller = new post_controller_1.default(postService, likeService);
 router
     .route("/by-user/:user_uuid")
     .all((0, validate_uuid_params_validation_1.default)("user_uuid"))
-    .get(controller.getUserPosts);
+    .get(wrap.asyncErrorHandler(controller.getUserPosts));
 router
     .route("/by-user/:user_uuid/stats")
     .all((0, validate_uuid_params_validation_1.default)("user_uuid"))
-    .get(controller.getUserTotalPosts);
+    .get(wrap.asyncErrorHandler(controller.getUserTotalPosts));
 router
     .route("/")
     .all(upload_image_helper_1.default, (0, validate_request_data_validation_1.default)(post_dto_1.default))
-    .post(controller.newPost)
-    .patch(controller.editPost);
+    .post(wrap.asyncErrorHandler(controller.newPost))
+    .patch(wrap.asyncErrorHandler(controller.editPost));
 router
     .route("/:uuid")
     .all((0, validate_uuid_params_validation_1.default)("uuid"))
-    .get(controller.getPostByUuid)
-    .delete(controller.deletePost);
+    .get(wrap.asyncErrorHandler(controller.getPostByUuid))
+    .delete(wrap.asyncErrorHandler(controller.deletePost));
 // likes
 router
     .route("/:uuid/likes")
     .all((0, validate_uuid_params_validation_1.default)("uuid"))
-    .get(controller.getLikesCountForPost);
+    .get(wrap.asyncErrorHandler(controller.getLikesCountForPost));
 router
     .route("/:uuid/by-user/:user_uuid/likes")
     .all((0, validate_uuid_params_validation_1.default)(["uuid", "user_uuid"]))
-    .get(controller.checkUserLikeStatusForPost)
-    .put(controller.toggleUserLikeForPost);
+    .get(wrap.asyncErrorHandler(controller.checkUserLikeStatusForPost))
+    .put(wrap.asyncErrorHandler(controller.toggleUserLikeForPost));
 exports.default = router;
