@@ -4,15 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_database_1 = __importDefault(require("@/infrastructure/database/db.database"));
-const async_wrapper_util_1 = __importDefault(require("@/application/utils/async-wrapper.util"));
 const uuid_to_bin_1 = __importDefault(require("@/application/utils/uuid-to-bin"));
 const kysely_1 = require("kysely");
 class FeedRepository {
     database;
-    wrap = new async_wrapper_util_1.default();
     constructor() { this.database = db_database_1.default; }
-    ;
-    getTotalFeed = this.wrap.repoWrap(async () => {
+    getTotalFeed = async () => {
         const query = this.database
             .selectFrom("posts")
             .select((eb) => eb.fn.countAll().as("count"))
@@ -21,8 +18,8 @@ class FeedRepository {
             .selectNoFrom((eb) => [eb.fn.coalesce(query, eb.lit(0)).as("count")])
             .executeTakeFirstOrThrow();
         return count;
-    });
-    getUserFeed = this.wrap.repoWrap(async (user_id, post_uuids) => {
+    };
+    getUserFeed = async (user_id, post_uuids) => {
         const postUuidsToBinQuery = (0, uuid_to_bin_1.default)(post_uuids);
         return await this.database
             .selectFrom("followers")
@@ -57,8 +54,8 @@ class FeedRepository {
             .orderBy((0, kysely_1.sql) `"RAND()"`)
             .limit(3)
             .execute();
-    });
-    getExploreFeed = this.wrap.repoWrap(async (user_id) => {
+    };
+    getExploreFeed = async (user_id) => {
         return await this.database
             .selectFrom("posts")
             .innerJoin("users", "users.id", "posts.user_id")
@@ -94,7 +91,7 @@ class FeedRepository {
             .orderBy((0, kysely_1.sql) `"RAND()"`)
             .limit(30)
             .execute();
-    });
+    };
 }
 ;
 exports.default = FeedRepository;
