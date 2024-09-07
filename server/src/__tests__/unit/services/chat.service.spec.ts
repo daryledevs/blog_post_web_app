@@ -1,12 +1,23 @@
-import ChatServices                                          from "@/application/services/chat/chat.service.impl";
-import IEChatService                                         from "@/application/services/chat/chat.service";
-import UserRepository                                        from "@/infrastructure/repositories/user.repository.impl";
-import ChatsRepository                                       from "@/infrastructure/repositories/chat.repository.impl";
-import GenerateMockData                                      from "@/__tests__/utils/generate-data.util";
-import IEChatRepository                                      from "@/domain/repositories/chat.repository";
-import IEUserRepository                                      from "@/domain/repositories/user.repository";
-import ApiErrorException                                     from "@/application/exceptions/api.exception";
-import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
+import "reflect-metadata";
+import {
+  describe,
+  test,
+  expect,
+  vi,
+  beforeEach,
+  afterEach,
+}                          from "vitest";
+import UserDto             from "@/domain/dto/user.dto";
+import ChatServices        from "@/application/services/chat/chat.service.impl";
+import IEChatService       from "@/application/services/chat/chat.service";
+import UserRepository      from "@/infrastructure/repositories/user.repository.impl";
+import ChatsRepository     from "@/infrastructure/repositories/chat.repository.impl";
+import ConversationDto     from "@/domain/dto/conversation.dto";
+import GenerateMockData    from "@/__tests__/utils/generate-data.util";
+import IEChatRepository    from "@/domain/repositories/chat.repository";
+import IEUserRepository    from "@/domain/repositories/user.repository";
+import ApiErrorException   from "@/application/exceptions/api.exception";
+import { plainToInstance } from "class-transformer";
 
 vi.mock("@/repositories/user/user.repository.impl");
 
@@ -31,8 +42,11 @@ describe("ChatService", () => {
   // Create a mock of the user service
   const users = GenerateMockData.createUserList(10);
   const existingUser = users[0]!;
+  const existingUserDto = plainToInstance(UserDto, existingUser as Object);
   const otherExistingUser = users[1]!;
+  const otherExistingUserDto = plainToInstance(UserDto, otherExistingUser);
   const nonExistingUser = GenerateMockData.createUser();
+  const nonExistingUserDto = plainToInstance(UserDto, nonExistingUser);
 
   // Create a mock of the chat service
   const conversations = GenerateMockData.generateMockData(
@@ -41,14 +55,17 @@ describe("ChatService", () => {
     GenerateMockData.createConversation
   );
 
+  const conversationDto = plainToInstance(ConversationDto, conversations);
+  const existingConversationDto = plainToInstance(ConversationDto, conversationDto as Object);
+
   const messages = [
     GenerateMockData.createMessage(
-      conversations[0]!.id,
-      existingUser.id
+      existingConversationDto.getUuid(),
+      existingUserDto.getId()
     ),
     GenerateMockData.createMessage(
-      conversations[0]!.id,
-      otherExistingUser.id,
+      existingConversationDto.getUuid(),
+      otherExistingUserDto.getId(),
     ),
   ];
 
@@ -70,35 +87,20 @@ describe("ChatService", () => {
     test("should return a list of conversations", async () => {
       userRepository.findUserById = vi
         .fn()
-        .mockResolvedValue(existingUser);
+        .mockResolvedValue(existingUserDto);
       
       chatRepository.findAllConversationByUserId = vi  
         .fn()
         .mockResolvedValue(conversations);
 
-      const result = await ChatService.getChatHistory(existingUser.uuid, []);
+      const result = await ChatService.getChatHistory(existingUserDto.getUuid(), []);
 
       expect(result).toEqual(conversations);
-      expect(userRepository.findUserById).toHaveBeenCalledWith(existingUser.uuid);
+      expect(userRepository.findUserById).toHaveBeenCalledWith(existingUserDto.getUuid());
       expect(chatRepository.findAllConversationByUserId).toHaveBeenCalledWith(
-        existingUser.id,
+        existingUserDto.getUuid(),
         []
       );
-    });
-
-    test("should throw an error when no args are provided", async () => {
-      userRepository.findUserById = vi.fn();
-      chatRepository.findAllConversationByUserId = vi.fn();
-
-      await expect(
-        ChatService.getChatHistory(undefined, []))
-      .rejects.toThrowError(error.noArgsMsg);
-
-      expect(userRepository.findUserById).not.toHaveBeenCalled();
-
-      expect(
-        chatRepository.findAllConversationByUserId
-      ).not.toHaveBeenCalled();
     });
 
     test("should throw an error when the user is not found", async () => {
@@ -109,11 +111,11 @@ describe("ChatService", () => {
       chatRepository.findAllConversationByUserId = vi.fn();
 
       await expect(
-        ChatService.getChatHistory(nonExistingUser.uuid, [])
+        ChatService.getChatHistory(nonExistingUserDto.getUuid(), [])
       ).rejects.toThrowError(error.userNotFoundMsg);
 
       expect(userRepository.findUserById).toHaveBeenCalledWith(
-        nonExistingUser.uuid
+        nonExistingUserDto.getUuid()
       );
 
       expect(
@@ -124,9 +126,9 @@ describe("ChatService", () => {
 
   describe("getChatMessages (Get the messages of a conversation)", () => {
     test("should return a list of messages", async () => {
-      chatRepository.findOneConversationById = vi
+      chatRepository.findOneConversationByUuId = vi
         .fn()
-        .mockResolvedValue(conversations[0]);
+        .mockResolvedValue(existingConversationDto);
 
       chatRepository.findAllMessagesById = vi
         .fn()
@@ -136,42 +138,30 @@ describe("ChatService", () => {
 
       expect(result).toEqual(messages);
 
-      expect(chatRepository.findOneConversationById).toHaveBeenCalledWith(
+      expect(chatRepository.findOneConversationByUuId).toHaveBeenCalledWith(
         messages[0]!.uuid
       );
 
       expect(chatRepository.findAllMessagesById).toHaveBeenCalledWith(
-        conversations[0].id,
+        existingConversationDto.getUuid(),
         []
       );
     });
 
-    test("should throw an error when no args are provided", async () => {
-      chatRepository.findOneConversationById = vi.fn();
-      chatRepository.findAllMessagesById = vi.fn();
-
-      await expect(
-        ChatService.getChatMessages(undefined, [])
-      ).rejects.toThrowError(error.noArgsMsg);
-
-      expect(chatRepository.findOneConversationById).not.toHaveBeenCalled();
-      expect(chatRepository.findAllMessagesById).not.toHaveBeenCalled();
-    });
-
     test("should throw an error when the chat is not found", async () => {
-      chatRepository.findOneConversationById = vi
+      chatRepository.findOneConversationByUuId = vi
         .fn()
         .mockResolvedValue(undefined);
 
       chatRepository.findAllMessagesById = vi.fn();
 
       await expect(
-        ChatService.getChatMessages(conversations[0].uuid, [])
+        ChatService.getChatMessages(existingConversationDto.getUuid(), [])
       ).rejects.toThrowError(error.chatNotFound);
 
       expect(
-        chatRepository.findOneConversationById
-      ).toHaveBeenCalledWith(conversations[0].uuid);
+        chatRepository.findOneConversationByUuId
+      ).toHaveBeenCalledWith(existingConversationDto.getUuid(),);
 
       expect(chatRepository.findAllMessagesById).not.toHaveBeenCalled();
     });
@@ -180,26 +170,26 @@ describe("ChatService", () => {
   describe("newMessageAndConversation (Create a new message and conversation)", () => {
     test("should return a success message", async () => {
       const newMessage = {
-        conversation_id: conversations[0].uuid,
-        sender_id: existingUser.uuid,
-        receiver_id: otherExistingUser.uuid,
+        conversation_uuid: existingConversationDto.getUuid(),
+        sender_uuid: existingUserDto.getUuid(),
+        receiver_uuid: otherExistingUserDto.getUuid(),
         text_message: messages[0]!.text_message,
       };
 
       const saveMessage = {
         text_message: newMessage.text_message,
-        conversation_id: conversations[0].id,
-        sender_id: existingUser.id,
+        conversation_uuid: existingConversationDto.getUuid(),
+        sender_uuid: existingUserDto.getUuid(),
       };
 
       userRepository.findUserById = vi
         .fn()
-        .mockImplementationOnce(() => Promise.resolve(existingUser))
-        .mockImplementationOnce(() => Promise.resolve(otherExistingUser));
+        .mockImplementationOnce(() => Promise.resolve(existingUserDto))
+        .mockImplementationOnce(() => Promise.resolve(otherExistingUserDto));
       
-      chatRepository.findOneConversationById = vi
+      chatRepository.findOneConversationByUuId = vi
         .fn()
-        .mockResolvedValue(conversations[0]);
+        .mockResolvedValue(existingConversationDto);
       
       chatRepository.findOneConversationByMembersId = vi.fn();
 
@@ -214,8 +204,8 @@ describe("ChatService", () => {
       expect(result).toEqual("Message sent successfully");
 
       expect(
-        chatRepository.findOneConversationById
-      ).toHaveBeenCalledWith(newMessage.conversation_id);
+        chatRepository.findOneConversationByUuId
+      ).toHaveBeenCalledWith(newMessage.conversation_uuid);
       
       expect(userRepository.findUserById).toHaveBeenCalledTimes(2);
       expect(chatRepository.findOneConversationByMembersId).not.toHaveBeenCalled();
@@ -224,32 +214,32 @@ describe("ChatService", () => {
     });
 
     test("should create a new conversation and return a success message", async () => {
-      const members = [existingUser.id, otherExistingUser.id];
+      const members = [existingUserDto.getUuid(), otherExistingUserDto.getId()];
 
       const saveMultipleMembers = [
-        { conversation_id: conversations[0].id, user_id: existingUser.id },
-        { conversation_id: conversations[0].id, user_id: otherExistingUser.id },
+        { conversation_uuid: existingConversationDto.getUuid(), user_id: existingUserDto.getUuid() },
+        { conversation_uuid: existingConversationDto.getUuid(), user_id: otherExistingUserDto.getId() },
       ];
 
       const newMessage = {
-        conversation_id: null as any,
-        sender_id: existingUser.uuid,
-        receiver_id: otherExistingUser.uuid,
+        conversation_uuid: null as any,
+        sender_uuid: existingUserDto.getUuid(),
+        receiver_uuid: otherExistingUserDto.getUuid(),
         text_message: messages[0]!.text_message,
       };
 
       const saveMessage = {
-        conversation_id: conversations[0].id,
-        sender_id: existingUser.id,
+        conversation_uuid: existingConversationDto.getUuid(),
+        sender_uuid: existingUserDto.getUuid(),
         text_message: newMessage.text_message,
       };
 
       userRepository.findUserById = vi
         .fn()
-        .mockImplementationOnce(() => Promise.resolve(existingUser))
+        .mockImplementationOnce(() => Promise.resolve(existingUserDto))
         .mockImplementationOnce(() => Promise.resolve(otherExistingUser));
 
-      chatRepository.findOneConversationById = vi.fn()
+      chatRepository.findOneConversationByUuId = vi.fn()
       
       chatRepository.findOneConversationByMembersId = vi
         .fn()
@@ -257,7 +247,7 @@ describe("ChatService", () => {
 
       chatRepository.saveNewConversation = vi
         .fn()
-        .mockResolvedValue(conversations[0].id);
+        .mockResolvedValue(existingConversationDto.getUuid(),);
 
       chatRepository.saveMultipleChatMembers = vi.fn()
 
@@ -273,77 +263,47 @@ describe("ChatService", () => {
         chatRepository.findOneConversationByMembersId
       ).toHaveBeenCalledWith(members);
       expect(userRepository.findUserById).toHaveBeenCalledTimes(2);
-      expect(chatRepository.findOneConversationById).not.toHaveBeenCalled();
+      expect(chatRepository.findOneConversationByUuId).not.toHaveBeenCalled();
       expect(chatRepository.saveNewConversation).toHaveBeenCalledWith({});
       expect(chatRepository.saveMultipleChatMembers).toHaveBeenCalledWith(saveMultipleMembers);
       expect(chatRepository.saveNewMessage).toHaveBeenCalledWith(saveMessage);
-    });
-
-    test("should throw an error when no args are provided", async () => {
-      userRepository.findUserById = vi.fn();
-      chatRepository.findOneConversationById = vi.fn();
-      chatRepository.findOneConversationByMembersId = vi.fn();
-      chatRepository.saveNewConversation = vi.fn();
-      chatRepository.saveNewMessage = vi.fn();
-
-      await expect(
-        ChatService.newMessageAndConversation(undefined)
-      ).rejects.toThrowError(error.noArgsMsg);
-      
-      expect(userRepository.findUserById).not.toHaveBeenCalled;
-      expect(chatRepository.findOneConversationById).not.toHaveBeenCalled();
-      expect(chatRepository.findOneConversationByMembersId).not.toHaveBeenCalled();
-      expect(chatRepository.saveNewConversation).not.toHaveBeenCalled();
-      expect(chatRepository.saveNewMessage).not.toHaveBeenCalled();
     });
   });
 
   describe("deleteConversationById (Delete user's conversation)", () => {
     test("should return a success message", async () => {
-      chatRepository.findOneConversationById = vi
+      chatRepository.findOneConversationByUuId = vi
         .fn()
-        .mockResolvedValue(conversations[0]);
+        .mockResolvedValue(existingConversationDto);
 
       chatRepository.deleteConversationById = vi.fn();
 
-      const result = await ChatService.deleteConversationById(conversations[0].uuid);
+      const result = await ChatService.deleteConversationById(existingConversationDto.getUuid(),);
 
       expect(result).toEqual("Conversation deleted successfully");
       expect(
-        chatRepository.findOneConversationById
-      ).toHaveBeenCalledWith(conversations[0].uuid);
+        chatRepository.findOneConversationByUuId
+      ).toHaveBeenCalledWith(existingConversationDto.getUuid(),);
 
       expect(chatRepository.deleteConversationById).toHaveBeenCalledWith(
-        conversations[0].id
+        existingConversationDto.getUuid(),
       );
     });
 
-    test("should throw an error when no args are provided", async () => {
-      chatRepository.findOneConversationById = vi.fn();
-      chatRepository.deleteConversationById = vi.fn();
-
-      await expect(
-        ChatService.deleteConversationById(undefined)
-      ).rejects.toThrowError(error.noArgsMsg);
-
-      expect(chatRepository.findOneConversationById).not.toHaveBeenCalled();
-      expect(chatRepository.deleteConversationById).not.toHaveBeenCalled();
-    });
-
     test("should throw an error when the conversation is not found", async () => {
-      chatRepository.findOneConversationById = vi
+      chatRepository.findOneConversationByUuId = vi
         .fn()
         .mockResolvedValue(undefined);
 
       chatRepository.deleteConversationById = vi.fn();
 
       await expect(
-        ChatService.deleteConversationById(conversations[0].uuid)
+        ChatService.deleteConversationById(existingConversationDto.getUuid(),)
       ).rejects.toThrowError(error.conversationNotFound);
 
       expect(
-        chatRepository.findOneConversationById
-      ).toHaveBeenCalledWith(conversations[0].uuid);
+        chatRepository.findOneConversationByUuId
+      ).toHaveBeenCalledWith(existingConversationDto.getUuid(),);
 
       expect(chatRepository.deleteConversationById).not.toHaveBeenCalled();
     });

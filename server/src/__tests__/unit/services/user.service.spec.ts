@@ -1,11 +1,19 @@
-import UserService                                           from "@/application/services/user/user.service.impl";
-import IEUserService                                         from "@/application/services/user/user.service";
-import UserRepository                                        from "@/infrastructure/repositories/user.repository.impl";
-import { SelectUsers }                                       from "@/domain/types/table.types";
-import IEUserRepository                                      from "@/infrastructure/repositories/user.repository.impl";
-import GenerateMockData                                      from "@/__tests__/utils/generate-data.util";
-import ApiErrorException                                     from "@/application/exceptions/api.exception";
-import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
+import "reflect-metadata";
+import {
+  describe,
+  test,
+  expect,
+  vi,
+  beforeEach,
+  afterEach,
+}                        from "vitest";
+import UserService       from "@/application/services/user/user.service.impl";
+import IEUserService     from "@/application/services/user/user.service";
+import UserRepository    from "@/infrastructure/repositories/user.repository.impl";
+import { SelectUsers }   from "@/domain/types/table.types";
+import IEUserRepository  from "@/infrastructure/repositories/user.repository.impl";
+import GenerateMockData  from "@/__tests__/utils/generate-data.util";
+import ApiErrorException from "@/application/exceptions/api.exception";
 
 vi.mock("@/repositories/user/user.repository.impl");
 

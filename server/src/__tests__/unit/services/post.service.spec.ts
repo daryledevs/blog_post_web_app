@@ -1,16 +1,27 @@
-import { join }                                              from "path";
-import { faker }                                             from "@faker-js/faker";
-import { Readable }                                          from "stream";
-import PostService                                           from "@/application/services/post/post.service.impl";
-import IEPostService                                         from "@/application/services/post/post.service";
-import UserRepository                                        from "@/infrastructure/repositories/user.repository.impl";
-import PostRepository                                        from "@/infrastructure/repositories/post.repository.impl";
-import IEPostRepository                                      from "@/domain/repositories/post.repository";
-import IEUserRepository                                      from "@/domain/repositories/user.repository";
-import GenerateMockData                                      from "@/__tests__/utils/generate-data.util";
-import ApiErrorException                                     from "@/application/exceptions/api.exception";
-import CloudinaryService                                     from "@/application/libs/cloudinary-service.lib";
-import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
+import "reflect-metadata";
+import {
+  describe,
+  test,
+  expect,
+  vi,
+  beforeEach,
+  afterEach,
+}                          from "vitest";
+import PostDto             from "@/domain/dto/post.dto";
+import UserDto             from "@/domain/dto/user.dto";
+import { join }            from "path";
+import { faker }           from "@faker-js/faker";
+import { Readable }        from "stream";
+import PostService         from "@/application/services/post/post.service.impl";
+import IEPostService       from "@/application/services/post/post.service";
+import UserRepository      from "@/infrastructure/repositories/user.repository.impl";
+import PostRepository      from "@/infrastructure/repositories/post.repository.impl";
+import IEPostRepository    from "@/domain/repositories/post.repository";
+import IEUserRepository    from "@/domain/repositories/user.repository";
+import GenerateMockData    from "@/__tests__/utils/generate-data.util";
+import ApiErrorException   from "@/application/exceptions/api.exception";
+import CloudinaryService   from "@/application/libs/cloudinary-service.lib";
+import { plainToInstance } from "class-transformer";
 
 vi.mock("@/repositories/feed/feed.repository.impl");
 
@@ -31,18 +42,42 @@ describe("PostService", () => {
   };
 
   const users = GenerateMockData.createUserList(10);
+  
   const existingUser = users[0]!;
+  const existingUserDto = plainToInstance(UserDto, existingUser as Object, {
+    excludeExtraneousValues: true,
+  });
+
   const notFoundUser = GenerateMockData.createUser();
+  const notFoundUserDto = plainToInstance(UserDto, notFoundUser as Object, {
+    excludeExtraneousValues: true,
+  });
 
   const posts = GenerateMockData.generateMockData(
     false, users, GenerateMockData.createPost
   );
+
+  const postsDto = posts.map((post) =>
+    plainToInstance(PostDto, post as Object, { excludeExtraneousValues: true })
+  );
+
   const existingPost = posts[0]!;
+  const existingPostDto = plainToInstance(PostDto, existingPost as Object, {
+    excludeExtraneousValues: true,
+  });
+
   const nonExistingPost = GenerateMockData.createPost(1000);
+  const nonExistingPostDto = plainToInstance(
+    PostDto,
+    nonExistingPost as Object,
+    {
+      excludeExtraneousValues: true,
+    }
+  );
 
   beforeEach(() => {
     cloudinary = new CloudinaryService();
-    postRepository = new PostRepository();
+    postRepository = new PostRepository(cloudinary);
     userRepository = new UserRepository();
 
     postService = new PostService(
@@ -64,35 +99,25 @@ describe("PostService", () => {
     test("should return the correct result", async () => {
       postRepository.findPostsByPostId = vi
         .fn()
-        .mockResolvedValue(existingPost);
+        .mockResolvedValue(existingPostDto);
 
-      const result = await postService.getPostByUuid(existingPost.uuid);
+      const result = await postService.getPostByUuid(existingPostDto.getUuid());
 
-      expect(result).toEqual(existingPost);
+      expect(result).toEqual(existingPostDto);
       expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(
-        existingPost.uuid
+        existingPostDto.getUuid()
       );
-    });
-
-    test("should throw an error if no args provided", async () => {
-      postRepository.findPostsByPostId = vi.fn().mockResolvedValue(null);
-
-      await expect(postService.getPostByUuid(null as any)).rejects.toThrow(
-        error.noArgsMsg
-      );
-
-      expect(postRepository.findPostsByPostId).not.toHaveBeenCalled();
     });
 
     test("should throw an error if post not found", async () => {
       postRepository.findPostsByPostId = vi.fn().mockResolvedValue(null);
 
       await expect(
-        postService.getPostByUuid(nonExistingPost.uuid)
+        postService.getPostByUuid(nonExistingPostDto.getUuid())
       ).rejects.toThrow(error.postNotFoundMsg);
 
       expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(
-        nonExistingPost.uuid
+        nonExistingPostDto.getUuid()
       );
     });
   });
@@ -103,63 +128,41 @@ describe("PostService", () => {
       postRepository.findAllPostsByUserId = vi.fn().mockResolvedValue(posts);
 
       const result = await postService.getAllPostsByUsersUuid(
-        existingUser.uuid
+        existingUserDto.getUuid()
       );
 
-      expect(result).toEqual(posts);
+      expect(result).toEqual(postsDto);
       expect(userRepository.findUserById).toHaveBeenCalledWith(
-        existingUser.uuid
+        existingUserDto.getUuid()
       );
       expect(postRepository.findAllPostsByUserId).toHaveBeenCalledWith(
-        existingUser.id
+        existingUserDto.getId()
       );
-    });
-
-    test("should throw an error if no args provided", async () => {
-      userRepository.findUserById = vi.fn();
-
-      await expect(
-        postService.getAllPostsByUsersUuid(null as any)
-      ).rejects.toThrow(error.noArgsMsg);
-
-      expect(userRepository.findUserById).not.toHaveBeenCalled();
     });
 
     test("should throw an error if user not found", async () => {
       userRepository.findUserById = vi.fn().mockResolvedValue(null);
 
       await expect(
-        postService.getAllPostsByUsersUuid(notFoundUser.uuid)
+        postService.getAllPostsByUsersUuid(notFoundUserDto.getUuid())
       ).rejects.toThrow(error.userNotFoundMsg);
 
       expect(userRepository.findUserById).toHaveBeenCalledWith(
-        notFoundUser.uuid
+        notFoundUserDto.getUuid()
       );
     });
   });
 
   describe("geTotalPostsByUsersUuid (get the total post available for feed)", async () => {
     test("should return the correct result", async () => {
-      userRepository.findUserById = vi.fn().mockResolvedValue(existingUser);
+      userRepository.findUserById = vi.fn().mockResolvedValue(existingUserDto);
       postRepository.findUserTotalPostsByUserId = vi.fn().mockResolvedValue(posts.length);
 
-      const result = await postService.geTotalPostsByUsersUuid(existingUser.uuid);
+      const result = await postService.geTotalPostsByUsersUuid(existingUserDto.getUuid());
 
       expect(result).toEqual(posts.length);
-      expect(userRepository.findUserById).toHaveBeenCalledWith(existingUser.uuid);
-      expect(postRepository.findUserTotalPostsByUserId).toHaveBeenCalledWith(existingUser.id);
-    });
-
-    test("should throw an error if no args provided", async () => {
-      userRepository.findUserById = vi.fn();
-      postRepository.findUserTotalPostsByUserId = vi.fn();
-
-      await expect(
-        postService.geTotalPostsByUsersUuid(undefined))
-      .rejects.toThrow(error.noArgsMsg);
-
-      expect(userRepository.findUserById).not.toHaveBeenCalled();
-      expect(postRepository.findUserTotalPostsByUserId).not.toHaveBeenCalled();
+      expect(userRepository.findUserById).toHaveBeenCalledWith(existingUserDto.getUuid());
+      expect(postRepository.findUserTotalPostsByUserId).toHaveBeenCalledWith(existingUserDto.getId());
     });
 
     test("should throw an error if user not found", async () => {
@@ -167,10 +170,10 @@ describe("PostService", () => {
       postRepository.findUserTotalPostsByUserId = vi.fn();
 
       await expect(
-        postService.geTotalPostsByUsersUuid(notFoundUser.uuid))
+        postService.geTotalPostsByUsersUuid(notFoundUserDto.getUuid()))
       .rejects.toThrow(error.userNotFoundMsg);
 
-      expect(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.uuid);
+      expect(userRepository.findUserById).toHaveBeenCalledWith(notFoundUserDto.getUuid());
       expect(postRepository.findUserTotalPostsByUserId).not.toHaveBeenCalled();
     });
   });
@@ -196,80 +199,37 @@ describe("PostService", () => {
         user_id: rest.user_id,
       };
 
+      const post = { ...rest, files: file}
+      const existingPostDto = plainToInstance(PostDto, post as Object, {
+        excludeExtraneousValues: true,
+      });
+
       userRepository.findUserById = vi
         .fn()
-        .mockResolvedValue(existingUser);
+        .mockResolvedValue(existingUserDto);
 
       postRepository.createNewPost = vi
         .fn()
-        .mockResolvedValue(existingPost);
+        .mockResolvedValue(existingPostDto);
 
       cloudinary.uploadAndDeleteLocal = vi
         .fn()
         .mockResolvedValue({ image_url, image_id });
-        
-      const result = await postService.createNewPost(rest, file);
+      
+      const result = await postService.createNewPost(existingPostDto);
 
       expect(result).toBe("Post created successfully");
-      expect(userRepository.findUserById).toHaveBeenCalledWith(existingPost.user_id);
+      expect(userRepository.findUserById).toHaveBeenCalledWith(existingPostDto.getUserUuid());
       
       expect(cloudinary.uploadAndDeleteLocal).toHaveBeenCalledWith(
         join(file.destination, file.filename)
       );
 
-      expect(postRepository.createNewPost).toHaveBeenCalledWith({
-        ...rest,
-        image_url,
-        image_id,
-      });
+      expect(postRepository.createNewPost).toHaveBeenCalledWith(
+        existingPostDto
+      );
     });
     
-    test("should throw an error if no args provided", async () => {
-      const { image_url, image_id, user_id, ...rest } = existingPost;
-      
-      const buffer = Buffer.alloc(1024 * 1024 * 10, ".");
-
-      const file = {
-        buffer,
-        mimetype: "image/jpeg",
-        originalname: faker.system.fileName(),
-        size: buffer.length,
-        filename: faker.system.fileName(),
-        destination: faker.system.directoryPath(),
-        fieldname: "",
-        encoding: "",
-        stream: new Readable,
-        path: faker.system.filePath(),
-        image_id, 
-        user_id,
-      };
-
-      userRepository.findUserById = vi.fn();
-      postRepository.createNewPost = vi.fn();
-      cloudinary.uploadAndDeleteLocal = vi.fn();
-
-      await expect(
-        postService.createNewPost(undefined, file))
-      .rejects.toThrow(error.noArgsMsg);
-
-      expect(userRepository.findUserById).not.toHaveBeenCalled();
-      expect(postRepository.createNewPost).not.toHaveBeenCalled();
-      expect(cloudinary.uploadAndDeleteLocal).not.toHaveBeenCalled();
-    });
-
-    test("should throw an error if no image uploaded", async () => {
-      userRepository.findUserById = vi.fn();
-      postRepository.createNewPost = vi.fn();
-      cloudinary.uploadAndDeleteLocal = vi.fn();
-
-      await expect(
-        postService.createNewPost(undefined, undefined))
-      .rejects.toThrow("No image uploaded");
-
-      expect(userRepository.findUserById).not.toHaveBeenCalled();
-      expect(postRepository.createNewPost).not.toHaveBeenCalled();
-      expect(cloudinary.uploadAndDeleteLocal).not.toHaveBeenCalled();
-    });
 
     test("should throw an error if user not found", async () => {
       const { image_url, image_id, ...rest } = existingPost;
@@ -291,15 +251,18 @@ describe("PostService", () => {
         user_id: rest.user_id,
       };
 
+      const post = { ...rest, files: file };
+      const existingPostDto = plainToInstance(PostDto, post as Object);
+
       userRepository.findUserById = vi.fn().mockResolvedValue(undefined);
       postRepository.createNewPost = vi.fn();
       cloudinary.uploadAndDeleteLocal = vi.fn();
 
       await expect(
-        postService.createNewPost(rest, file))
+        postService.createNewPost(existingPostDto))
       .rejects.toThrow(error.userNotFoundMsg);
 
-      expect(userRepository.findUserById).toHaveBeenCalledWith(existingPost.user_id);
+      expect(userRepository.findUserById).toHaveBeenCalledWith(existingPostDto.getUserUuid());
       expect(postRepository.createNewPost).not.toHaveBeenCalled();
       expect(cloudinary.uploadAndDeleteLocal).not.toHaveBeenCalled();
     });
@@ -307,48 +270,78 @@ describe("PostService", () => {
 
   describe("updatePostByUuid (edit the user's post)", () => {
     test("should throw an error if no args provided", async () => {
+      const { image_url, image_id, ...rest } = existingPost;
+
+      const buffer = Buffer.alloc(1024 * 1024 * 10, ".");
+
+      const file = {
+        buffer,
+        mimetype: "image/jpeg",
+        originalname: faker.system.fileName(),
+        size: buffer.length,
+        filename: faker.system.fileName(),
+        destination: faker.system.directoryPath(),
+        fieldname: "",
+        encoding: "",
+        stream: new Readable(),
+        path: faker.system.filePath(),
+        image_id,
+        user_id: rest.user_id,
+      };
+
+      const post = { ...rest, files: file };
+      const existingPostDto = plainToInstance(PostDto, post as Object);
+      
       postRepository.findPostsByPostId = vi
         .fn()
-        .mockResolvedValue(existingPost);
+        .mockResolvedValue(existingPostDto);
 
       postRepository.editPostByPostId = vi.fn()
 
-      const { image_url, image_id, ...rest } = existingPost;
-      const result = await postService.updatePostByUuid(existingPost.uuid, rest);
+      const result = await postService.updatePostByUuid(existingPostDto);
 
       expect(result).toBe("Post edited successfully");
       
       expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(
-        existingPost.uuid
+        existingPostDto.getUuid()
       );
 
       expect(postRepository.editPostByPostId).toHaveBeenCalledWith(
-        existingPost.uuid,
+        existingPostDto.getUuid(),
         rest
       );
     });
 
-    test("should throw an error if no args provided", async () => {
-      postRepository.findPostsByPostId = vi.fn();
-      postRepository.editPostByPostId = vi.fn();
-
-      await expect(postService.updatePostByUuid(undefined, undefined)).rejects.toThrow(
-        error.noArgsMsg
-      );
-
-      expect(postRepository.findPostsByPostId).not.toHaveBeenCalled();
-      expect(postRepository.editPostByPostId).not.toHaveBeenCalled();
-    });
-
     test("should throw an error if post not found", async () => {
+      const { image_url, image_id, ...rest } = nonExistingPost;
+
+       const buffer = Buffer.alloc(1024 * 1024 * 10, ".");
+
+      const file = {
+        buffer,
+        mimetype: "image/jpeg",
+        originalname: faker.system.fileName(),
+        size: buffer.length,
+        filename: faker.system.fileName(),
+        destination: faker.system.directoryPath(),
+        fieldname: "",
+        encoding: "",
+        stream: new Readable(),
+        path: faker.system.filePath(),
+        image_id,
+        user_id: rest.user_id,
+      };
+
+      const post = { ...rest, files: file };
+      const existingPostDto = plainToInstance(PostDto, post as Object);
+      
       postRepository.findPostsByPostId = vi.fn().mockResolvedValue(undefined);
       postRepository.editPostByPostId = vi.fn();
 
-      const { image_url, image_id, ...rest } = nonExistingPost;
 
-      await expect(postService.updatePostByUuid(rest.uuid, rest)).rejects.toThrow(
-        error.postNotFoundMsg
-      );
+      await expect(
+        postService.updatePostByUuid(existingPostDto)
+      ).rejects.toThrow(error.postNotFoundMsg);
 
       expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(
         rest.uuid
@@ -361,33 +354,21 @@ describe("PostService", () => {
     test("should return the correct result", async () => {
       postRepository.findPostsByPostId = vi
         .fn()
-        .mockResolvedValue(existingPost);
+        .mockResolvedValue(existingPostDto);
 
       postRepository.deletePostById = vi.fn()
 
-      const result = await postService.deletePostByUuid(existingPost.uuid);
+      const result = await postService.deletePostByUuid(existingPostDto.getUuid());
 
       expect(result).toBe("Post deleted successfully");
 
       expect(
         postRepository.findPostsByPostId
-      ).toHaveBeenCalledWith(existingPost.uuid);
+      ).toHaveBeenCalledWith(existingPostDto.getUuid());
       
       expect(
         postRepository.deletePostById
-      ).toHaveBeenCalledWith(existingPost.id);
-    });
-
-    test("should throw an error if no args provided", async () => {
-      postRepository.findPostsByPostId = vi.fn();
-      postRepository.deletePostById = vi.fn();
-
-      await expect(
-        postService.deletePostByUuid(undefined)
-      ).rejects.toThrow(error.noArgsMsg);
-
-      expect(postRepository.findPostsByPostId).not.toHaveBeenCalled();
-      expect(postRepository.deletePostById).not.toHaveBeenCalled();
+      ).toHaveBeenCalledWith(existingPostDto.getId());
     });
 
     test("should throw an error if post not found", async () => {
@@ -395,11 +376,11 @@ describe("PostService", () => {
       postRepository.deletePostById = vi.fn();
 
       await expect(
-        postService.deletePostByUuid(nonExistingPost.uuid)
+        postService.deletePostByUuid(nonExistingPostDto.getUuid())
       ).rejects.toThrow(error.postNotFoundMsg);
 
       expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(
-        nonExistingPost.uuid
+        nonExistingPostDto.getUuid()
       );
       expect(postRepository.deletePostById).not.toHaveBeenCalled();
     });

@@ -3,12 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+require("reflect-metadata");
+const vitest_1 = require("vitest");
 const user_repository_impl_1 = __importDefault(require("@/infrastructure/repositories/user.repository.impl"));
 const follow_service_impl_1 = __importDefault(require("@/application/services/follow/follow.service.impl"));
 const follow_repository_impl_1 = __importDefault(require("@/infrastructure/repositories/follow.repository.impl"));
 const generate_data_util_1 = __importDefault(require("@/__tests__/utils/generate-data.util"));
 const api_exception_1 = __importDefault(require("@/application/exceptions/api.exception"));
-const vitest_1 = require("vitest");
 vitest_1.vi.mock("@/repositories/user/user.repository.impl");
 vitest_1.vi.mock("@/repositories/follow/follow.repository.impl");
 (0, vitest_1.describe)('FollowService', () => {

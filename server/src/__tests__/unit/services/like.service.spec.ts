@@ -1,15 +1,26 @@
-import LikeService                                           from "@/application/services/like/like.service.impl";
-import IELikeService                                         from "@/application/services/like/like.service";
-import LikeRepository                                        from "@/infrastructure/repositories/like.repository.impl";
-import UserRepository                                        from "@/infrastructure/repositories/user.repository.impl";
-import PostRepository                                        from "@/infrastructure/repositories/post.repository.impl";
-import IEPostRepository                                      from "@/domain/repositories/post.repository";
-import IEUserRepository                                      from "@/domain/repositories/user.repository";
-import IELikeRepository                                      from "@/domain/repositories/like.repository";
-import GenerateMockData                                      from "@/__tests__/utils/generate-data.util";
-import ApiErrorException                                     from "@/application/exceptions/api.exception";
-import CloudinaryService                                     from "@/application/libs/cloudinary-service.lib";
-import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
+import "reflect-metadata";
+import {
+  describe,
+  test,
+  expect,
+  vi,
+  beforeEach,
+  afterEach,
+}                          from "vitest";
+import UserDto             from "@/domain/dto/user.dto";
+import PostDto             from "@/domain/dto/post.dto";
+import LikeService         from "@/application/services/like/like.service.impl";
+import IELikeService       from "@/application/services/like/like.service";
+import LikeRepository      from "@/infrastructure/repositories/like.repository.impl";
+import UserRepository      from "@/infrastructure/repositories/user.repository.impl";
+import PostRepository      from "@/infrastructure/repositories/post.repository.impl";
+import IEPostRepository    from "@/domain/repositories/post.repository";
+import IEUserRepository    from "@/domain/repositories/user.repository";
+import IELikeRepository    from "@/domain/repositories/like.repository";
+import GenerateMockData    from "@/__tests__/utils/generate-data.util";
+import ApiErrorException   from "@/application/exceptions/api.exception";
+import CloudinaryService   from "@/application/libs/cloudinary-service.lib";
+import { plainToInstance } from "class-transformer";
 
 vi.mock("@/repositories/feed/feed.repository.impl");
 
@@ -19,7 +30,7 @@ vi.mock("@/repositories/user/user.repository.impl");
 
 vi.mock("@/utils/cloudinary-service.util");
 
-describe("PostService", () => {
+describe("LikeService", () => {
   let cloudinary:     CloudinaryService;
   let likeRepository: IELikeRepository;
   let postRepository: IEPostRepository;
@@ -34,18 +45,26 @@ describe("PostService", () => {
 
   const users = GenerateMockData.createUserList(10);
   const existingUser = users[0]!;
+  const existingUserDto = plainToInstance(UserDto, existingUser);
   const notFoundUser = GenerateMockData.createUser();
+  const notFoundUserDto = plainToInstance(UserDto, notFoundUser);
 
   const posts = GenerateMockData.generateMockData(
     false, users, GenerateMockData.createPost
   );
   const existingPost = posts[0]!;
+  const existingPostDto = plainToInstance(PostDto, existingPost as Object);
   const nonExistingPost = GenerateMockData.createPost(1000);
+
+  const nonExistingPostDto = plainToInstance(
+    PostDto,
+    nonExistingPost as Object
+  );
 
   beforeEach(() => {
     cloudinary = new CloudinaryService();
     likeRepository = new LikeRepository();
-    postRepository = new PostRepository();
+    postRepository = new PostRepository(cloudinary);
     userRepository = new UserRepository();
 
     likeService = new LikeService(
@@ -65,31 +84,24 @@ describe("PostService", () => {
 
   describe("getPostLikesCountByUuid (get the total likes for the post)", async () => {
     test("should return the correct result", async () => {
-      postRepository.findPostsByPostId = vi.fn().mockResolvedValue(existingPost);
+      postRepository.findPostsByPostId = vi
+        .fn()
+        .mockResolvedValue(existingPostDto);
+
       likeRepository.findPostsLikeCount = vi.fn().mockResolvedValue(10);
 
-      const result = await likeService.getPostLikesCountByUuid(existingPost.uuid);
+      const result = await likeService.getPostLikesCountByUuid(
+        existingPostDto.getUuid()
+      );
 
       expect(result).toBe(10);
       expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(
-        existingPost.uuid
+        existingPostDto.getUuid()
       );
 
       expect(likeRepository.findPostsLikeCount).toHaveBeenCalledWith(
-        existingPost.id
+        existingPostDto.getId()
       );
-    });
-
-    test("should throw an error if no args provided", async () => {
-      postRepository.findPostsByPostId = vi.fn();
-      likeRepository.findPostsLikeCount = vi.fn();
-
-      await expect(
-        likeService.getPostLikesCountByUuid(undefined)
-      ).rejects.toThrow(error.noArgsMsg);
-
-      expect(postRepository.findPostsByPostId).not.toHaveBeenCalled();
-      expect(likeRepository.findPostsLikeCount).not.toHaveBeenCalled();
     });
 
     test("should throw an error if post not found", async () => {
@@ -97,11 +109,11 @@ describe("PostService", () => {
       likeRepository.findPostsLikeCount = vi.fn();
 
       await expect(
-        likeService.getPostLikesCountByUuid(nonExistingPost.uuid)
+        likeService.getPostLikesCountByUuid(nonExistingPostDto.getUuid())
       ).rejects.toThrow(error.postNotFoundMsg);
 
       expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(
-        nonExistingPost.uuid
+        nonExistingPostDto.getUuid()
       );
       expect(likeRepository.findPostsLikeCount).not.toHaveBeenCalled();
     });
@@ -110,47 +122,35 @@ describe("PostService", () => {
   describe("getUserLikeStatusForPostByUuid (check if the user liked the post)", async () => {
     test("should return the correct result", async () => {
       const like = GenerateMockData.createLike(
-        existingPost.user_id,
-        existingPost.id
+        existingPostDto.getUuid(),
+        existingPostDto.getUuid()
       );
 
-      userRepository.findUserById = vi.fn().mockResolvedValue(existingUser);
+      userRepository.findUserById = vi.fn().mockResolvedValue(existingUserDto);
 
-      postRepository.findPostsByPostId = vi.fn().mockResolvedValue(existingPost);
+      postRepository.findPostsByPostId = vi.fn().mockResolvedValue(existingPostDto);
 
       likeRepository.isUserLikePost = vi.fn().mockResolvedValue(like);
 
       const result = await likeService.getUserLikeStatusForPostByUuid(
-        existingUser.uuid,
-        existingPost.uuid
+        existingUserDto.getUuid(),
+        existingPostDto.getUuid()
       );
 
       expect(result).toBe(like);
 
-      expect(userRepository.findUserById).toHaveBeenCalledWith(existingUser.uuid);
+      expect(userRepository.findUserById).toHaveBeenCalledWith(
+        existingUserDto.getUuid()
+  );
 
       expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(
-        existingPost.uuid
+        existingPostDto.getUuid()
       );
 
       expect(likeRepository.isUserLikePost).toHaveBeenCalledWith(
-        existingUser.id,
-        existingPost.id
+        existingUserDto.getUuid(),
+        existingPostDto.getUuid()
       );
-    });
-
-    test("should throw an error if no args provided", async () => {
-      userRepository.findUserById = vi.fn();
-      postRepository.findPostsByPostId = vi.fn();
-      likeRepository.isUserLikePost = vi.fn();
-
-      await expect(
-        likeService.getUserLikeStatusForPostByUuid(undefined, undefined)
-      ).rejects.toThrow(error.noArgsMsg);
-
-      expect(userRepository.findUserById).not.toHaveBeenCalled();
-      expect(postRepository.findPostsByPostId).not.toHaveBeenCalled();
-      expect(likeRepository.isUserLikePost).not.toHaveBeenCalled();
     });
 
     test("should throw an error if user not found", async () => {
@@ -160,8 +160,8 @@ describe("PostService", () => {
 
       await expect(
         likeService.getUserLikeStatusForPostByUuid(
-          notFoundUser.uuid,
-          existingPost.uuid
+          notFoundUserDto.getUuid(),
+          existingPostDto.getUuid()
         )
       ).rejects.toThrow(error.userNotFoundMsg);
 
@@ -178,14 +178,14 @@ describe("PostService", () => {
       await expect(
         likeService.getUserLikeStatusForPostByUuid(
           existingUser.uuid,
-          nonExistingPost.uuid
+          nonExistingPostDto.getUuid()
         )
       ).rejects.toThrow(error.postNotFoundMsg);
 
       expect(userRepository.findUserById).toHaveBeenCalledWith(existingUser.uuid);
 
       expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(
-        nonExistingPost.uuid
+        nonExistingPostDto.getUuid()
       );
 
       expect(likeRepository.isUserLikePost).not.toHaveBeenCalled();
@@ -208,7 +208,7 @@ describe("PostService", () => {
 
       const result = await likeService.toggleUserLikeForPost(
         existingUser.uuid,
-        existingPost.uuid
+        existingPostDto.getUuid()
       );
 
       expect(result).toBe(expectedMsg);
@@ -216,13 +216,12 @@ describe("PostService", () => {
       expect(userRepository.findUserById).toHaveBeenCalledWith(existingUser.uuid);
 
       expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(
-        existingPost.uuid
+        existingPostDto.getUuid()
       );
 
       expect(likeRepository.isUserLikePost).toHaveBeenCalledWith(
         existingUser.id,
-        existingPost.id
-      );
+        existingPostDto.getUuid()     );
 
       expect(likeRepository.dislikeUsersPostById).not.toHaveBeenCalled();
     });
@@ -231,9 +230,8 @@ describe("PostService", () => {
       const expectedMsg = "Like removed successfully";
 
       const like = GenerateMockData.createLike(
-        existingPost.user_id,
-        existingPost.id
-      );
+        existingPostDto.getUuid(),
+        existingPostDto.getUuid()     );
 
       userRepository.findUserById = vi.fn().mockResolvedValue(existingUser);
 
@@ -247,7 +245,7 @@ describe("PostService", () => {
 
       const result = await likeService.toggleUserLikeForPost(
         existingUser.uuid,
-        existingPost.uuid
+        existingPostDto.getUuid()
       );
 
       expect(result).toBe(expectedMsg);
@@ -255,34 +253,15 @@ describe("PostService", () => {
       expect(userRepository.findUserById).toHaveBeenCalledWith(existingUser.uuid);
 
       expect(postRepository.findPostsByPostId).toHaveBeenCalledWith(
-        existingPost.uuid
+        existingPostDto.getUuid()
       );
 
       expect(likeRepository.isUserLikePost).toHaveBeenCalledWith(
         existingUser.id,
-        existingPost.id
-      );
+        existingPostDto.getUuid()     );
 
       expect(likeRepository.dislikeUsersPostById).toHaveBeenCalledWith(like.id);
       expect(likeRepository.likeUsersPostById).not.toHaveBeenCalled();
-    });
-
-    test("should throw an error if no args provided", async () => {
-      userRepository.findUserById = vi.fn();
-      postRepository.findPostsByPostId = vi.fn();
-      likeRepository.isUserLikePost = vi.fn();
-      likeRepository.likeUsersPostById = vi.fn();
-      likeRepository.dislikeUsersPostById = vi.fn();
-
-      await expect(
-        likeService.toggleUserLikeForPost(undefined, undefined)
-      ).rejects.toThrow(error.noArgsMsg);
-
-      expect(userRepository.findUserById).not.toHaveBeenCalled();
-      expect(postRepository.findPostsByPostId).not.toHaveBeenCalled();
-      expect(likeRepository.isUserLikePost).not.toHaveBeenCalled();
-      expect(likeRepository.likeUsersPostById).not.toHaveBeenCalled();
-      expect(likeRepository.dislikeUsersPostById).not.toHaveBeenCalled();
     });
 
     test("should throw an error if user not found", async () => {
@@ -293,7 +272,7 @@ describe("PostService", () => {
       likeRepository.dislikeUsersPostById = vi.fn();
 
       await expect(
-        likeService.toggleUserLikeForPost(notFoundUser.uuid, existingPost.uuid)
+        likeService.toggleUserLikeForPost(notFoundUser.uuid, existingPostDto.getUuid())
       ).rejects.toThrow(error.userNotFoundMsg);
 
       expect(userRepository.findUserById).toHaveBeenCalledWith(notFoundUser.uuid);

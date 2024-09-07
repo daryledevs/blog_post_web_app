@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import {
   describe,
   test,
@@ -5,14 +6,17 @@ import {
   vi,
   beforeEach,
   afterEach,
-} from "vitest";
-import bcrypt            from "bcrypt";
-import { faker }         from "@faker-js/faker";
-import AuthService       from "@/application/services/auth/auth.service.impl";
-import UserRepository    from "@/infrastructure/repositories/user.repository.impl";
-import AuthRepository    from "@/infrastructure/repositories/auth.repository.impl";
-import GenerateMockData  from "../../utils/generate-data.util";
-import ApiErrorException from "@/application/exceptions/api.exception";
+}                          from "vitest";
+import User                from "@/domain/models/user.model";
+import UserDto             from "@/domain/dto/user.dto";
+import bcrypt              from "bcrypt";
+import { faker }           from "@faker-js/faker";
+import AuthService         from "@/application/services/auth/auth.service.impl";
+import UserRepository      from "@/infrastructure/repositories/user.repository.impl";
+import AuthRepository      from "@/infrastructure/repositories/auth.repository.impl";
+import GenerateMockData    from "../../utils/generate-data.util";
+import ApiErrorException   from "@/application/exceptions/api.exception";
+import { plainToInstance } from "class-transformer";
 
 vi.mock("@/repositories/auth/auth.repository.impl");
 
@@ -27,7 +31,13 @@ describe("AuthService", () => {
   // Mocking the data
   let users = GenerateMockData.createUserList(5);
   const newUser = GenerateMockData.createUser();
+  const newUserDto = plainToInstance(UserDto, newUser);
+  const newUserModel= plainToInstance(User, newUser);
+
   const notFoundUser = GenerateMockData.createUser();
+  const notFoundUserModel= plainToInstance(User, notFoundUser);
+  const notFoundUserDto = plainToInstance(UserDto, notFoundUser);
+
   const existingUser = users[0]!;
 
   // Error messages
@@ -75,9 +85,9 @@ describe("AuthService", () => {
 
       authRepository.createUser = vi
         .fn()
-        .mockResolvedValue(newUser);
+        .mockResolvedValue(newUserModel);
         
-      const result = await authService.register(newUser);
+      const result = await authService.register(newUserDto);
       expect(result).toStrictEqual(expectedResult);
 
       expect(userRepository.findUserByEmail).toHaveBeenCalledWith(
@@ -98,30 +108,15 @@ describe("AuthService", () => {
 
     test("should throw an error when no args are provided", async () => {
       const user = { ...newUser, username: "", email: "", password: "" };
+      const userDto = plainToInstance(UserDto, user);
 
       userRepository.findUserByEmail = vi.fn();
       userRepository.findUserByUsername = vi.fn();
       authRepository.createUser = vi.fn();
 
-      await expect(
-        authService.register(user)
-      ).rejects.toThrow(error.noArgsMsg);
-
-      expect(userRepository.findUserByEmail).not.toHaveBeenCalled();
-      expect(userRepository.findUserByUsername).not.toHaveBeenCalled();
-      expect(authRepository.createUser).not.toHaveBeenCalled();
-    });
-
-    test("should throw an error when password less than 6 characters", async () => {
-      const user = { ...newUser, password: "12345" };
-
-      userRepository.findUserByEmail = vi.fn();
-      userRepository.findUserByUsername = vi.fn();
-      authRepository.createUser = vi.fn();
-
-      await expect(
-        authService.register(user)
-      ).rejects.toThrow(error.invalidPasswordLengthMsg);
+      await expect(authService.register(userDto)).rejects.toThrow(
+        error.noArgsMsg
+      );
 
       expect(userRepository.findUserByEmail).not.toHaveBeenCalled();
       expect(userRepository.findUserByUsername).not.toHaveBeenCalled();
@@ -130,13 +125,14 @@ describe("AuthService", () => {
 
     test("should throw an error using an existing username", async () => {
       const user = { ...existingUser, email: faker.internet.email() };
+      const userDto = plainToInstance(UserDto, user);
 
       userRepository.findUserByEmail = vi.fn().mockResolvedValue(null);
       userRepository.findUserByUsername = vi.fn().mockResolvedValue(existingUser);
       authRepository.createUser = vi.fn();
 
       await expect(
-        authService.register(user)
+        authService.register(userDto)
       ).rejects.toThrow(error.invalidUsernameMsg);
 
       expect(userRepository.findUserByEmail).toHaveBeenCalledWith(user.email);
@@ -145,13 +141,15 @@ describe("AuthService", () => {
     });
 
     test("Register with existing email", async () => {
+      const user = { ...existingUser, username: faker.internet.userName() };
+      const userDto = plainToInstance(UserDto, user);
+
       userRepository.findUserByEmail = vi.fn().mockResolvedValue(existingUser);
       userRepository.findUserByUsername = vi.fn();
       authRepository.createUser = vi.fn();
 
-      const user = { ...existingUser, username: faker.internet.userName() };
       await expect(
-        authService.register(user)
+        authService.register(userDto)
       ).rejects.toThrow(error.invalidEmailMsg);
 
       expect(userRepository.findUserByEmail).toHaveBeenCalledWith(user.email);

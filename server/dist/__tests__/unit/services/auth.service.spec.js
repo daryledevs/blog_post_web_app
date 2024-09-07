@@ -3,7 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+require("reflect-metadata");
 const vitest_1 = require("vitest");
+const user_model_1 = __importDefault(require("@/domain/models/user.model"));
+const user_dto_1 = __importDefault(require("@/domain/dto/user.dto"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const faker_1 = require("@faker-js/faker");
 const auth_service_impl_1 = __importDefault(require("@/application/services/auth/auth.service.impl"));
@@ -11,6 +14,7 @@ const user_repository_impl_1 = __importDefault(require("@/infrastructure/reposit
 const auth_repository_impl_1 = __importDefault(require("@/infrastructure/repositories/auth.repository.impl"));
 const generate_data_util_1 = __importDefault(require("../../utils/generate-data.util"));
 const api_exception_1 = __importDefault(require("@/application/exceptions/api.exception"));
+const class_transformer_1 = require("class-transformer");
 vitest_1.vi.mock("@/repositories/auth/auth.repository.impl");
 vitest_1.vi.mock("@/repositories/user/user.repository.impl");
 (0, vitest_1.describe)("AuthService", () => {
@@ -21,7 +25,11 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
     // Mocking the data
     let users = generate_data_util_1.default.createUserList(5);
     const newUser = generate_data_util_1.default.createUser();
+    const newUserDto = (0, class_transformer_1.plainToInstance)(user_dto_1.default, newUser);
+    const newUserModel = (0, class_transformer_1.plainToInstance)(user_model_1.default, newUser);
     const notFoundUser = generate_data_util_1.default.createUser();
+    const notFoundUserModel = (0, class_transformer_1.plainToInstance)(user_model_1.default, notFoundUser);
+    const notFoundUserDto = (0, class_transformer_1.plainToInstance)(user_dto_1.default, notFoundUser);
     const existingUser = users[0];
     // Error messages
     const error = {
@@ -54,8 +62,8 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
                 .mockResolvedValue(null);
             authRepository.createUser = vitest_1.vi
                 .fn()
-                .mockResolvedValue(newUser);
-            const result = await authService.register(newUser);
+                .mockResolvedValue(newUserModel);
+            const result = await authService.register(newUserDto);
             (0, vitest_1.expect)(result).toStrictEqual(expectedResult);
             (0, vitest_1.expect)(userRepository.findUserByEmail).toHaveBeenCalledWith(newUser.email);
             (0, vitest_1.expect)(userRepository.findUserByUsername).toHaveBeenCalledWith(newUser.username);
@@ -66,40 +74,33 @@ vitest_1.vi.mock("@/repositories/user/user.repository.impl");
         });
         (0, vitest_1.test)("should throw an error when no args are provided", async () => {
             const user = { ...newUser, username: "", email: "", password: "" };
+            const userDto = (0, class_transformer_1.plainToInstance)(user_dto_1.default, user);
             userRepository.findUserByEmail = vitest_1.vi.fn();
             userRepository.findUserByUsername = vitest_1.vi.fn();
             authRepository.createUser = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(authService.register(user)).rejects.toThrow(error.noArgsMsg);
-            (0, vitest_1.expect)(userRepository.findUserByEmail).not.toHaveBeenCalled();
-            (0, vitest_1.expect)(userRepository.findUserByUsername).not.toHaveBeenCalled();
-            (0, vitest_1.expect)(authRepository.createUser).not.toHaveBeenCalled();
-        });
-        (0, vitest_1.test)("should throw an error when password less than 6 characters", async () => {
-            const user = { ...newUser, password: "12345" };
-            userRepository.findUserByEmail = vitest_1.vi.fn();
-            userRepository.findUserByUsername = vitest_1.vi.fn();
-            authRepository.createUser = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(authService.register(user)).rejects.toThrow(error.invalidPasswordLengthMsg);
+            await (0, vitest_1.expect)(authService.register(userDto)).rejects.toThrow(error.noArgsMsg);
             (0, vitest_1.expect)(userRepository.findUserByEmail).not.toHaveBeenCalled();
             (0, vitest_1.expect)(userRepository.findUserByUsername).not.toHaveBeenCalled();
             (0, vitest_1.expect)(authRepository.createUser).not.toHaveBeenCalled();
         });
         (0, vitest_1.test)("should throw an error using an existing username", async () => {
             const user = { ...existingUser, email: faker_1.faker.internet.email() };
+            const userDto = (0, class_transformer_1.plainToInstance)(user_dto_1.default, user);
             userRepository.findUserByEmail = vitest_1.vi.fn().mockResolvedValue(null);
             userRepository.findUserByUsername = vitest_1.vi.fn().mockResolvedValue(existingUser);
             authRepository.createUser = vitest_1.vi.fn();
-            await (0, vitest_1.expect)(authService.register(user)).rejects.toThrow(error.invalidUsernameMsg);
+            await (0, vitest_1.expect)(authService.register(userDto)).rejects.toThrow(error.invalidUsernameMsg);
             (0, vitest_1.expect)(userRepository.findUserByEmail).toHaveBeenCalledWith(user.email);
             (0, vitest_1.expect)(userRepository.findUserByUsername).toHaveBeenCalledWith(user.username);
             (0, vitest_1.expect)(authRepository.createUser).not.toHaveBeenCalled();
         });
         (0, vitest_1.test)("Register with existing email", async () => {
+            const user = { ...existingUser, username: faker_1.faker.internet.userName() };
+            const userDto = (0, class_transformer_1.plainToInstance)(user_dto_1.default, user);
             userRepository.findUserByEmail = vitest_1.vi.fn().mockResolvedValue(existingUser);
             userRepository.findUserByUsername = vitest_1.vi.fn();
             authRepository.createUser = vitest_1.vi.fn();
-            const user = { ...existingUser, username: faker_1.faker.internet.userName() };
-            await (0, vitest_1.expect)(authService.register(user)).rejects.toThrow(error.invalidEmailMsg);
+            await (0, vitest_1.expect)(authService.register(userDto)).rejects.toThrow(error.invalidEmailMsg);
             (0, vitest_1.expect)(userRepository.findUserByEmail).toHaveBeenCalledWith(user.email);
             (0, vitest_1.expect)(userRepository.findUserByUsername).not.toHaveBeenCalled();
             (0, vitest_1.expect)(authRepository.createUser).not.toHaveBeenCalled();

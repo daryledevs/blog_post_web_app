@@ -1,13 +1,21 @@
-import UserRepository                                        from "@/infrastructure/repositories/user.repository.impl";
-import FollowService                                         from "@/application/services/follow/follow.service.impl";
-import IEFollowService                                       from "@/application/services/follow/follow.service";
-import FollowRepository                                      from "@/infrastructure/repositories/follow.repository.impl";
-import GenerateMockData                                      from "@/__tests__/utils/generate-data.util";
-import IEUserRepository                                      from "@/domain/repositories/user.repository";
-import ApiErrorException                                     from "@/application/exceptions/api.exception";
-import IEFollowRepository                                    from "@/domain/repositories/follow.repository";
-import { SelectFollowers, SelectUsers }                      from "@/domain/types/table.types";
-import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
+import "reflect-metadata";
+import {
+  describe,
+  test,
+  expect,
+  vi,
+  beforeEach,
+  afterEach,
+}                                       from "vitest";
+import UserRepository                   from "@/infrastructure/repositories/user.repository.impl";
+import FollowService                    from "@/application/services/follow/follow.service.impl";
+import IEFollowService                  from "@/application/services/follow/follow.service";
+import FollowRepository                 from "@/infrastructure/repositories/follow.repository.impl";
+import GenerateMockData                 from "@/__tests__/utils/generate-data.util";
+import IEUserRepository                 from "@/domain/repositories/user.repository";
+import ApiErrorException                from "@/application/exceptions/api.exception";
+import IEFollowRepository               from "@/domain/repositories/follow.repository";
+import { SelectFollowers, SelectUsers } from "@/domain/types/table.types";
 
 vi.mock("@/repositories/user/user.repository.impl");
 
