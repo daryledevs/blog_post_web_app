@@ -11,9 +11,10 @@ const class_transformer_1 = require("class-transformer");
 class AuthRepository {
     database;
     wrap = new async_wrapper_util_1.default();
-    constructor() { this.database = db_database_1.default; }
-    ;
-    createUser = this.wrap.repoWrap(async (user) => {
+    constructor() {
+        this.database = db_database_1.default;
+    }
+    createUser = async (user) => {
         const { insertId } = await this.database
             .insertInto("users")
             .values(user)
@@ -37,8 +38,8 @@ class AuthRepository {
             .where("id", "=", insertId)
             .executeTakeFirst();
         return this.plainToClass(newUser);
-    });
-    findResetTokenById = this.wrap.repoWrap(async (token_id) => {
+    };
+    findResetTokenById = async (token_id) => {
         return await this.database
             .selectFrom("reset_password_token")
             .select([
@@ -50,22 +51,22 @@ class AuthRepository {
         ])
             .where("reference_token", "=", token_id)
             .executeTakeFirst();
-    });
-    saveResetToken = this.wrap.repoWrap(async (token) => {
+    };
+    saveResetToken = async (token) => {
         await this.database
             .insertInto("reset_password_token")
             .values(token)
             .execute();
-    });
-    deleteResetToken = this.wrap.repoWrap(async (token_id) => {
+    };
+    deleteResetToken = async (token_id) => {
         await this.database
             .deleteFrom("reset_password_token")
             .where("reference_token", "=", token_id)
             .execute();
-    });
-    plainToClass = this.wrap.repoWrap(async (user) => {
+    };
+    plainToClass = async (user) => {
         return user ? (0, class_transformer_1.plainToInstance)(user_model_1.default, user) : undefined;
-    });
+    };
 }
 ;
 exports.default = AuthRepository;

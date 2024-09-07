@@ -16,77 +16,75 @@ class AuthRepository implements IEAuthRepository {
   private database: Kysely<DB>;
   private wrap: AsyncWrapper = new AsyncWrapper();
 
-  constructor() { this.database = db; };
+  constructor() {
+    this.database = db;
+  }
 
-  public createUser = this.wrap.repoWrap(
-    async (user: NewUsers): Promise<User | undefined> => {
-      const { insertId } = await this.database
-        .insertInto("users")
-        .values(user)
-        .executeTakeFirst();
+  public createUser = async (user: NewUsers): Promise<User | undefined> => {
+    const { insertId } = await this.database
+      .insertInto("users")
+      .values(user)
+      .executeTakeFirst();
 
-      const newUser = await this.database
-        .selectFrom("users")
-        .select([
-          "id",
-          sql`BIN_TO_UUID(uuid)`.as("uuid"),
-          "username",
-          "email",
-          "password",
-          "roles",
-          "avatar_url",
-          "first_name",
-          "last_name",
-          "birthday",
-          "age",
-          "created_at",
-        ])
-        .where("id", "=", insertId as any)
-        .executeTakeFirst();
-      
-      return this.plainToClass(newUser);
-    }
-  );
+    const newUser = await this.database
+      .selectFrom("users")
+      .select([
+        "id",
+        sql`BIN_TO_UUID(uuid)`.as("uuid"),
+        "username",
+        "email",
+        "password",
+        "roles",
+        "avatar_url",
+        "first_name",
+        "last_name",
+        "birthday",
+        "age",
+        "created_at",
+      ])
+      .where("id", "=", insertId as any)
+      .executeTakeFirst();
 
-  public findResetTokenById = this.wrap.repoWrap(
-    async (token_id: string): Promise<SelectResetPasswordToken | undefined> => {
-      return await this.database
-        .selectFrom("reset_password_token")
-        .select([
-          "id",
-          sql`BIN_TO_UUID(uuid)`.as("uuid"),
-          "encrypted",
-          "reference_token",
-          "created_at",
-        ])
-        .where("reference_token", "=", token_id)
-        .executeTakeFirst();
-    }
-  );
+    return this.plainToClass(newUser);
+  };
 
-  public saveResetToken = this.wrap.repoWrap(
-    async (token: NewResetPasswordToken): Promise<void> => {
-      await this.database
-        .insertInto("reset_password_token")
-        .values(token)
-        .execute();
-    }
-  );
+  public findResetTokenById = async (
+    token_id: string
+  ): Promise<SelectResetPasswordToken | undefined> => {
+    return await this.database
+      .selectFrom("reset_password_token")
+      .select([
+        "id",
+        sql`BIN_TO_UUID(uuid)`.as("uuid"),
+        "encrypted",
+        "reference_token",
+        "created_at",
+      ])
+      .where("reference_token", "=", token_id)
+      .executeTakeFirst();
+  };
 
-  public deleteResetToken = this.wrap.repoWrap(
-    async (token_id: string): Promise<void> => {
-      await this.database
-        .deleteFrom("reset_password_token")
-        .where("reference_token", "=", token_id)
-        .execute();
-    }
-  );
+  public saveResetToken = async (
+    token: NewResetPasswordToken
+  ): Promise<void> => {
+    await this.database
+      .insertInto("reset_password_token")
+      .values(token)
+      .execute();
+  };
 
-  private plainToClass = this.wrap.repoWrap(
-    async (user: SelectUsers): Promise<User | undefined> => {
-      return user ? plainToInstance(User, user) : undefined;
-    }
-  );
+  public deleteResetToken = async (token_id: string): Promise<void> => {
+    await this.database
+      .deleteFrom("reset_password_token")
+      .where("reference_token", "=", token_id)
+      .execute();
+  };
+
+  private plainToClass = async (
+    user: SelectUsers | undefined
+  ): Promise<User | undefined> => {
+    return user ? plainToInstance(User, user) : undefined;
+  };
 };
 
 export default AuthRepository;
