@@ -69,7 +69,7 @@ class PostsController {
 
   public checkUserLikeStatusForPost = async (req: Request, res: Response) => {
     const user_uuid = req.params?.user_uuid!;
-    const post_uuid = req.params?.uuid;
+    const post_uuid = req.params?.uuid!;
 
     const data = await this.likeService.getUserLikeStatusForPostByUuid(
       user_uuid,
@@ -81,7 +81,7 @@ class PostsController {
 
   public toggleUserLikeForPost = async (req: Request, res: Response) => {
     const user_uuid = req.params?.user_uuid!;
-    const post_uuid = req.params?.uuid;
+    const post_uuid = req.params?.uuid!;
 
     const data = await this.likeService.toggleUserLikeForPost(
       user_uuid,
