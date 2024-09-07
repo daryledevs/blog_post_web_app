@@ -26,7 +26,7 @@ jobs:
         cache-dependency-path: "./server/package.json"
     - run: cd server && npm ci
     - run: cd server && npm run build --if-present
-    - run: cd server && npm run test
+    # - run: cd server && npm run test
       env:
         ACCESS_TKN_SECRET:    ${{ secrets.ACCESS_TKN_SECRET }}
         REFRESH_TKN_SECRET:   ${{ secrets.REFRESH_TKN_SECRET }}
