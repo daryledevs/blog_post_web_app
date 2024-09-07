@@ -70,7 +70,6 @@ class PostRepository {
         await this.database.insertInto("posts").values(post).execute();
     };
     editPostByPostId = async (uuid, post) => {
-        console.log(post);
         await this.database
             .updateTable("posts")
             .set(post)

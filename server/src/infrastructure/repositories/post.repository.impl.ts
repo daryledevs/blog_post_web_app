@@ -91,7 +91,6 @@ class PostRepository implements IEPostRepository {
     uuid: string,
     post: UpdatePosts
   ): Promise<void> => {
-    console.log(post);
     await this.database
       .updateTable("posts")
       .set(post)
