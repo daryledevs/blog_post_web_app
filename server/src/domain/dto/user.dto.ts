@@ -45,6 +45,7 @@ class UserDto extends UserDetailsDto {
   private confirmPassword?: string | undefined;
 
   @Expose()
+  @ValidateIf((o) => o.confirmPassword)
   @IsString({ message: "Roles must be a string" })
   @IsIn(["user", "admin"], { message: "invalid role" })
   private roles: string | null | undefined;

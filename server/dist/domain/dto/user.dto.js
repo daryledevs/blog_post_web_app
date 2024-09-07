@@ -116,6 +116,7 @@ __decorate([
 ], UserDto.prototype, "confirmPassword", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
+    (0, class_validator_1.ValidateIf)((o) => o.confirmPassword),
     (0, class_validator_1.IsString)({ message: "Roles must be a string" }),
     (0, class_validator_1.IsIn)(["user", "admin"], { message: "invalid role" }),
     __metadata("design:type", Object)
