@@ -7,32 +7,32 @@ import Chat         from "../models/chat.model";
 import Conversation from "../models/conversation.model";
 
 export interface MessageDataType {
-  conversation_id: string;
-  sender_id: string;
-  receiver_id: string;
+  conversation_uuid: string;
+  sender_uuid: string;
+  receiver_uuid: string;
   text_message: string;
 };
 
 interface IEChatRepository {
-  findAllConversationByUserId: (user_id: number, conversations: number[]) => Promise<Chat[]>;
+  findAllConversationByUserId: (userId: number, conversationIds: string[]) => Promise<Conversation[]>;
 
-  findAllMessagesById: (conversation_id: number, ids: number[] | number) => Promise<Chat[]>;
+  findAllMessagesById: (conversationId: number, messageUuids: string[]) => Promise<Chat[]>;
 
-  findOneConversationById: (uuid: string) => Promise<Conversation | undefined>;
+  findOneConversationByUuId: (uuid: string) => Promise<Conversation | undefined>;
 
-  findOneConversationByMembersId: (member_id: number[]) => Promise<Conversation | undefined>;
+  findOneConversationByMembersId: (membersIds: number[]) => Promise<Conversation | undefined>;
 
   findOneMessageById: (uuid: string) => Promise<Chat | undefined>;
 
   saveNewConversation: (conversation: NewConversations) => Promise<number | bigint | undefined>;
 
-  saveMultipleChatMembers: (message: NewChatMembers[]) => Promise<void>;
+  saveMultipleChatMembers: (chatMembers: NewChatMembers[]) => Promise<void>;
 
   saveNewChatMember: (message: NewChatMembers) => Promise<void>;
 
   saveNewMessage: (message: NewMessages) => Promise<void>;
 
-  deleteConversationById: (conversation_id: number) => Promise<void>;
+  deleteConversationById: (conversation_uuid: number) => Promise<void>;
 }
 
 export default IEChatRepository;

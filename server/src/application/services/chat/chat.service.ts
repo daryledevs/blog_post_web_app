@@ -1,14 +1,15 @@
-import Chat            from "@/domain/models/chat.model";
-import { NewMessages } from "@/domain/types/table.types";
+import Chat                from "@/domain/models/chat.model";
+import Conversation        from "@/domain/models/conversation.model";
+import { MessageDataType } from "@/domain/repositories/chat.repository";
 
 interface IEChatService {
-  getChatHistory: (uuid: string | undefined, listId: number[]) => Promise<Chat[]>;
+  getChatHistory: (uuid: string, conversationIds: string[]) => Promise<Conversation[]>;
 
-  getChatMessages: (uuid: string | undefined, listId: number[]) => Promise<Chat[]>;
+  getChatMessages: (uuid: string, messageUuids: string[]) => Promise<Chat[]>;
 
-  newMessageAndConversation: (messageData: NewMessages | undefined) => Promise<string>;
+  newMessageAndConversation: (messageData: MessageDataType) => Promise<string>;
 
-  deleteConversationById: (uuid: string | undefined) => Promise<string>;
+  deleteConversationById: (uuid: string) => Promise<string>;
 };
 
 export default IEChatService;
