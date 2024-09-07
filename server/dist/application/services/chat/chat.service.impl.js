@@ -12,13 +12,11 @@ class ChatServices {
         this.userRepository = userRepository;
     }
     getChatHistory = async (uuid, conversationIds) => {
-        // If no user id is provided, return an error
-        if (!uuid)
-            throw api_exception_1.default.HTTP400Error("No arguments provided");
         // If the user is not found, return an error
         const user = await this.userRepository.findUserById(uuid);
-        if (!user)
+        if (!user) {
             throw api_exception_1.default.HTTP404Error("User not found");
+        }
         // Return the chat history
         return await this.chatRepository.findAllConversationByUserId(user.getId(), conversationIds);
     };
