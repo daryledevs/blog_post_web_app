@@ -12,7 +12,7 @@ class FeedController {
     getUserFeed = async (req, res) => {
         const { post_ids, user_id } = req.body;
         const values = post_ids.length ? post_ids : [0];
-        const data = await this.feedService.getUserFeed(values, user_id);
+        const data = await this.feedService.getUserFeed(user_id, values);
         res.status(200).send({ feed: data });
     };
     getExploreFeed = async (req, res) => {
