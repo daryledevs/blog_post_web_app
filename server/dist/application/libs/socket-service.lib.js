@@ -38,19 +38,24 @@ class SocketService {
             this.removeUser(socket.id);
         });
     }
-    addUser = this.wrap.serviceWrap(async (userId, socketId) => {
-        if (userId === null || userId === undefined) {
-            throw api_exception_1.default.HTTP400Error("User ID is required");
+    addUser = async (userId, socketId) => {
+        try {
+            if (userId === null || userId === undefined) {
+                throw api_exception_1.default.HTTP400Error("User ID is required");
+            }
+            if (!this.users.some((user) => user.userId === userId)) {
+                this.users.push({ userId, socketId });
+            }
         }
-        if (!this.users.some((user) => user.userId === userId)) {
-            this.users.push({ userId, socketId });
+        catch (error) {
+            throw api_exception_1.default.HTTP500Error(error);
         }
-    });
+    };
     removeUser(socketId) {
         this.users = this.users.filter((user) => user.socketId !== socketId);
     }
     getUser(userId) {
-        return this.users.find((user) => user.userId === userId);
+        return this.users?.find((user) => user.userId === userId);
     }
 }
 exports.default = SocketService;

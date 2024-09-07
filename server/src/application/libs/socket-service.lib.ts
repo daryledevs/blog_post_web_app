@@ -43,8 +43,8 @@ class SocketService {
     });
   }
 
-  private addUser = this.wrap.serviceWrap(
-    async (userId: any, socketId: any) => {
+  private addUser = async (userId: any, socketId: any) => {
+    try {
       if (userId === null || userId === undefined) {
         throw ApiErrorException.HTTP400Error("User ID is required");
       }
@@ -52,15 +52,17 @@ class SocketService {
       if (!this.users.some((user) => user.userId === userId)) {
         this.users.push({ userId, socketId });
       }
+    } catch (error) {
+      throw ApiErrorException.HTTP500Error(error as unknown as string);
     }
-  );
+  };
 
   private removeUser(socketId: any) {
     this.users = this.users.filter((user) => user.socketId !== socketId);
   }
 
   private getUser(userId: any) {
-    return this.users.find((user) => user.userId === userId);
+    return this.users?.find((user) => user.userId === userId);
   }
 }
 
