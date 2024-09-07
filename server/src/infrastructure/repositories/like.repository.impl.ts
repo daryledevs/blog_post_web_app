@@ -15,58 +15,53 @@ class LikeRepository implements IELikeRepository {
     this.database = db;
   }
 
-  public findPostsLikeCount = this.wrap.repoWrap(
-    async (post_id: number): Promise<number> => {
-      const query = this.database
-        .selectFrom("likes")
-        .select((eb) => eb.fn.count<number>("likes.post_id").as("count"))
-        .where("likes.post_id", "=", post_id);
+  public findPostsLikeCount = async (post_id: number): Promise<number> => {
+    const query = this.database
+      .selectFrom("likes")
+      .select((eb) => eb.fn.count<number>("likes.post_id").as("count"))
+      .where("likes.post_id", "=", post_id);
 
-      const { count } = await this.database
-        .selectNoFrom((eb) => eb.fn.coalesce(query, eb.lit(0)).as("count"))
-        .executeTakeFirstOrThrow();
+    const { count } = await this.database
+      .selectNoFrom((eb) => eb.fn.coalesce(query, eb.lit(0)).as("count"))
+      .executeTakeFirstOrThrow();
 
-      return count;
-    }
-  );
+    return count;
+  };
 
-  public isUserLikePost = this.wrap.repoWrap(
-    async (user_id: number, post_id: number): Promise<Like | undefined> => {
-      const data = await this.database
-        .selectFrom("likes")
-        .select([
-          "likes.id",
-          "likes.post_id",
-          sql`BIN_TO_UUID(posts.uuid)`.as("post_uuid"),
-          "likes.user_id",
-          sql`BIN_TO_UUID(users.uuid)`.as("user_uuid"),
-          "likes.created_at",
+  public isUserLikePost = async (
+    user_id: number,
+    post_id: number
+  ): Promise<Like | undefined> => {
+    const data = await this.database
+      .selectFrom("likes")
+      .select([
+        "likes.id",
+        "likes.post_id",
+        sql`BIN_TO_UUID(posts.uuid)`.as("post_uuid"),
+        "likes.user_id",
+        sql`BIN_TO_UUID(users.uuid)`.as("user_uuid"),
+        "likes.created_at",
+      ])
+      .leftJoin("posts", "likes.post_id", "posts.id")
+      .leftJoin("users", "likes.user_id", "users.id")
+      .where((eb) =>
+        eb.and([
+          eb("likes.user_id", "=", user_id),
+          eb("likes.post_id", "=", post_id),
         ])
-        .leftJoin("posts", "likes.post_id", "posts.id")
-        .leftJoin("users", "likes.user_id", "users.id")
-        .where((eb) =>
-          eb.and([
-            eb("likes.user_id", "=", user_id),
-            eb("likes.post_id", "=", post_id),
-          ])
-        )
-        .executeTakeFirst();
+      )
+      .executeTakeFirst();
 
-      return plainToInstance(Like, data);
-    }
-  );
+    return plainToInstance(Like, data);
+  };
 
-  public likeUsersPostById = this.wrap.repoWrap(
-    async (like: NewLikes): Promise<void> => {
-      await this.database.insertInto("likes").values(like).execute();
-    }
-  );
+  public likeUsersPostById = async (like: NewLikes): Promise<void> => {
+    await this.database.insertInto("likes").values(like).execute();
+  };
 
-  public dislikeUsersPostById = this.wrap.repoWrap(
-    async (id: number): Promise<void> => {
-      await this.database.deleteFrom("likes").where("id", "=", id).execute();
-    }
-  );
+  public dislikeUsersPostById = async (id: number): Promise<void> => {
+    await this.database.deleteFrom("likes").where("id", "=", id).execute();
+  };
 };
 
 export default LikeRepository;

@@ -14,7 +14,7 @@ class LikeRepository {
     constructor() {
         this.database = db_database_1.default;
     }
-    findPostsLikeCount = this.wrap.repoWrap(async (post_id) => {
+    findPostsLikeCount = async (post_id) => {
         const query = this.database
             .selectFrom("likes")
             .select((eb) => eb.fn.count("likes.post_id").as("count"))
@@ -23,8 +23,8 @@ class LikeRepository {
             .selectNoFrom((eb) => eb.fn.coalesce(query, eb.lit(0)).as("count"))
             .executeTakeFirstOrThrow();
         return count;
-    });
-    isUserLikePost = this.wrap.repoWrap(async (user_id, post_id) => {
+    };
+    isUserLikePost = async (user_id, post_id) => {
         const data = await this.database
             .selectFrom("likes")
             .select([
@@ -43,13 +43,13 @@ class LikeRepository {
         ]))
             .executeTakeFirst();
         return (0, class_transformer_1.plainToInstance)(like_model_1.default, data);
-    });
-    likeUsersPostById = this.wrap.repoWrap(async (like) => {
+    };
+    likeUsersPostById = async (like) => {
         await this.database.insertInto("likes").values(like).execute();
-    });
-    dislikeUsersPostById = this.wrap.repoWrap(async (id) => {
+    };
+    dislikeUsersPostById = async (id) => {
         await this.database.deleteFrom("likes").where("id", "=", id).execute();
-    });
+    };
 }
 ;
 exports.default = LikeRepository;
