@@ -5,9 +5,9 @@ import AuthTokensUtil, {
 import dotenv                              from "dotenv";
 import ApiException                        from "@/application/exceptions/api.exception";
 import isTokenValid                        from "@/application/utils/token-invalid.util";
+import cookieOptions                       from "@/config/cookie-options.config";
 import routeException                      from "@/application/utils/route-exception.util";
 import UserRepository                      from "@/infrastructure/repositories/user.repository.impl";
-import { SelectUsers }                     from "@/domain/types/table.types";
 import { Request, Response, NextFunction } from "express";
 dotenv.config();
 
@@ -53,12 +53,14 @@ const tokenHandler = async (req: Request, res: Response, next: NextFunction) => 
       return next(ApiException.HTTP401Error("Token is not valid"));
     }
 
-    const result: SelectUsers | undefined = await userRepository.findUserById(
+    const user = await userRepository.findUserById(
       refreshDecode.tkn_user_uuid
     );
 
     // if user is not found, return an error
-    if (!result) return next(ApiException.HTTP404Error("User not found"));
+    if (!user?.getId()) {
+      return next(ApiException.HTTP404Error("User not found"));
+    }
 
     const isTokenExpired = [refreshError, accessError].some(
       (status) => status === "TokenExpiredError"
@@ -96,16 +98,15 @@ const tokenHandler = async (req: Request, res: Response, next: NextFunction) => 
       const ACCESS_TOKEN = AuthTokensUtil.generateToken(args.accessToken);
 
       return res
-        .cookie("REFRESH_TOKEN", REFRESH_TKN, req.body.cookieOptions)
+        .cookie("REFRESH_TOKEN", REFRESH_TKN, cookieOptions)
         .status(200)
         .send({ accessToken: ACCESS_TOKEN });
     }
 
     // if the access token is not provided but refresh token is exists
     if (!accessToken) {
-      const { uuid: tkn_user_uuid, roles } = result;
       const ACCESS_TOKEN = AuthTokensUtil.generateToken({
-        payload: { tkn_user_uuid, roles },
+        payload: { user_uuid: user.getUuid(), role: user.getRoles() },
         secret: TokenSecret.ACCESS_SECRET,
         expiration: Expiration.ACCESS_TOKEN_EXPIRATION,
       });

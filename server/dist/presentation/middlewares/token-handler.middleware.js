@@ -30,6 +30,7 @@ const auth_token_util_1 = __importStar(require("@/application/utils/auth-token.u
 const dotenv_1 = __importDefault(require("dotenv"));
 const api_exception_1 = __importDefault(require("@/application/exceptions/api.exception"));
 const token_invalid_util_1 = __importDefault(require("@/application/utils/token-invalid.util"));
+const cookie_options_config_1 = __importDefault(require("@/config/cookie-options.config"));
 const route_exception_util_1 = __importDefault(require("@/application/utils/route-exception.util"));
 const user_repository_impl_1 = __importDefault(require("@/infrastructure/repositories/user.repository.impl"));
 dotenv_1.default.config();
@@ -61,10 +62,11 @@ const tokenHandler = async (req, res, next) => {
         else if (!isRefreshTokenInvalid && refreshError === "JsonWebTokenError") {
             return next(api_exception_1.default.HTTP401Error("Token is not valid"));
         }
-        const result = await userRepository.findUserById(refreshDecode.tkn_user_uuid);
+        const user = await userRepository.findUserById(refreshDecode.tkn_user_uuid);
         // if user is not found, return an error
-        if (!result)
+        if (!user?.getId()) {
             return next(api_exception_1.default.HTTP404Error("User not found"));
+        }
         const isTokenExpired = [refreshError, accessError].some((status) => status === "TokenExpiredError");
         // if the refresh token is expired, generate a new token
         if (isTokenExpired) {
@@ -95,15 +97,14 @@ const tokenHandler = async (req, res, next) => {
             const REFRESH_TKN = auth_token_util_1.default.generateToken(args.refreshToken);
             const ACCESS_TOKEN = auth_token_util_1.default.generateToken(args.accessToken);
             return res
-                .cookie("REFRESH_TOKEN", REFRESH_TKN, req.body.cookieOptions)
+                .cookie("REFRESH_TOKEN", REFRESH_TKN, cookie_options_config_1.default)
                 .status(200)
                 .send({ accessToken: ACCESS_TOKEN });
         }
         // if the access token is not provided but refresh token is exists
         if (!accessToken) {
-            const { uuid: tkn_user_uuid, roles } = result;
             const ACCESS_TOKEN = auth_token_util_1.default.generateToken({
-                payload: { tkn_user_uuid, roles },
+                payload: { user_uuid: user.getUuid(), role: user.getRoles() },
                 secret: auth_token_util_1.TokenSecret.ACCESS_SECRET,
                 expiration: auth_token_util_1.Expiration.ACCESS_TOKEN_EXPIRATION,
             });
