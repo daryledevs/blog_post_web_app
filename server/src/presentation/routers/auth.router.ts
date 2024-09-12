@@ -30,7 +30,7 @@ router
 
 router
   .route("/login")
-  .all(validateLoginCredentials)
+  .all(validateLoginCredentials())
   .post(wrap.asyncErrorHandler(controller.login));
 
 router

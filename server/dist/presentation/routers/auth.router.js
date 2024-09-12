@@ -23,7 +23,7 @@ router
     .post(wrap.asyncErrorHandler(controller.register));
 router
     .route("/login")
-    .all(validate_login_credentials_validation_1.default)
+    .all((0, validate_login_credentials_validation_1.default)())
     .post(wrap.asyncErrorHandler(controller.login));
 router
     .route("/forgot-password")
