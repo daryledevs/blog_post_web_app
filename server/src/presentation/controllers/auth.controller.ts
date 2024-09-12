@@ -21,8 +21,8 @@ class AuthController {
   };
 
   public login = async (req: Request, res: Response) => {
-    const { userCredential, password } = req.body;
-    const result = await this.authService.login(userCredential, password);
+    const { userCredentials, password } = req.body;
+    const result = await this.authService.login(userCredentials, password);
     res
       .cookie("REFRESH_TOKEN", result.refreshToken, cookieOptions)
       .status(200)

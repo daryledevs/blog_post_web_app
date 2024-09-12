@@ -43,8 +43,8 @@ class AuthController {
         res.status(201).send(result);
     };
     login = async (req, res) => {
-        const { userCredential, password } = req.body;
-        const result = await this.authService.login(userCredential, password);
+        const { userCredentials, password } = req.body;
+        const result = await this.authService.login(userCredentials, password);
         res
             .cookie("REFRESH_TOKEN", result.refreshToken, cookie_options_config_1.default)
             .status(200)
