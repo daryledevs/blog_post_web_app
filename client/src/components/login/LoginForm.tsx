@@ -3,14 +3,10 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import LoginFormFields            from "./LoginFormFields";
 import ForgotPasswordLink         from "./ForgotPasswordLink";
 import LoginSubmitBtn from "./LoginSubmitBtn";
+import { IPostLogin } from "@/redux/api/authApi";
 
 type LoginFormTypes = {
-  onSubmit: SubmitHandler<any>;
-};
-
-export type Inputs = {
-  userCredential: string;
-  password: string;
+  onSubmit: SubmitHandler<IPostLogin>;
 };
 
 function LoginForm({ onSubmit }: LoginFormTypes) {
@@ -19,7 +15,7 @@ function LoginForm({ onSubmit }: LoginFormTypes) {
     register,
     handleSubmit,
     formState: { errors, isValid },
-  } = useForm<Inputs>();
+  } = useForm<IPostLogin>();
 
   return (
     <form

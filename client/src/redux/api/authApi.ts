@@ -1,14 +1,14 @@
 import baseApi from "./baseApi";
 
-interface PostLogin {
-  username?: string;
-  password?: string;
+export interface IPostLogin {
+  userCredentials: string;
+  password: string;
 }
 
 const authApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     login: build.mutation<any, any>({
-      query: (body: PostLogin) => ({
+      query: (body: IPostLogin) => ({
         url: "/auth/login",
         method: "POST",
         body,
