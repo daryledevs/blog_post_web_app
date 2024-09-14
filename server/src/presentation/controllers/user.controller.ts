@@ -21,7 +21,7 @@ class UsersController {
 
   public getUserData = async (req: Request, res: Response) => {
     let user: UserDto | undefined;
-    const uuid = req.params.uuid!;
+    const uuid = req.session?.user?.uuid;
     const username = req.query.username || "";
 
     if (username) {
@@ -34,8 +34,8 @@ class UsersController {
   };
 
   public searchUsersByQuery = async (req: Request, res: Response) => {
-    const search: any = req.query.search;
-    const users = await this.userService.searchUserByFields(search);
+    const searchQuery: any = req.query.searchQuery;
+    const users = await this.userService.searchUserByFields(searchQuery);
     res.status(200).send({ users });
   };
 

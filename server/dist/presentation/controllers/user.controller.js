@@ -11,7 +11,7 @@ class UsersController {
     }
     getUserData = async (req, res) => {
         let user;
-        const uuid = req.params.uuid;
+        const uuid = req.session?.user?.uuid;
         const username = req.query.username || "";
         if (username) {
             user = await this.userService.getUserByUsername(username);
@@ -22,8 +22,8 @@ class UsersController {
         res.status(200).send({ user });
     };
     searchUsersByQuery = async (req, res) => {
-        const search = req.query.search;
-        const users = await this.userService.searchUserByFields(search);
+        const searchQuery = req.query.searchQuery;
+        const users = await this.userService.searchUserByFields(searchQuery);
         res.status(200).send({ users });
     };
     deleteUser = async (req, res) => {
