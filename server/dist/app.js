@@ -30,6 +30,7 @@ require("reflect-metadata");
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
 const morgan_1 = __importDefault(require("morgan"));
+const express_session_1 = __importDefault(require("express-session"));
 const express_1 = __importDefault(require("express"));
 const path_util_1 = __importDefault(require("./application/utils/path.util"));
 const body_parser_1 = __importDefault(require("body-parser"));
@@ -46,6 +47,7 @@ const helmet_config_1 = __importDefault(require("./config/helmet.config"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const error_handler_helper_1 = __importDefault(require("./presentation/helpers/error-handler.helper"));
 const token_handler_middleware_1 = __importDefault(require("./presentation/middlewares/token-handler.middleware"));
+const session_options_config_1 = __importDefault(require("./config/session-options.config"));
 dotenv.config();
 const app = (0, express_1.default)();
 const API = process.env.API;
@@ -58,6 +60,7 @@ app.use((0, cors_1.default)(cors_option_config_1.default));
 app.use((0, compression_1.default)());
 app.use(body_parser_1.default.json({ limit: "50kb" }));
 app.use(body_parser_1.default.urlencoded({ extended: true }));
+app.use((0, express_session_1.default)(session_options_config_1.default));
 app.use(token_handler_middleware_1.default);
 app.set("views", path_util_1.default); // Set the views directory
 app.set('view engine', 'ejs'); // Set EJS as the template engine

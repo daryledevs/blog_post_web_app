@@ -1,23 +1,26 @@
-import               'reflect-metadata';
-import cors          from "cors";
-import helmet        from "helmet";
-import morgan        from "morgan";
-import express       from "express";
-import rootPath      from "./application/utils/path.util";
-import bodyParser    from "body-parser";
-import authRoutes    from "./presentation/routers/auth.router";
-import userRoutes    from './presentation/routers/user.router';
-import chatRoutes    from "./presentation/routers/chat.router";
-import postRouter    from "./presentation/routers/post.router";
-import feedRouter    from "./presentation/routers/feed.router";
-import compression   from "compression";
-import * as dotenv   from "dotenv";
-import rateLimiter   from './presentation/middlewares/rate-limiter.middleware';
-import corsOptions   from "./config/cors-option.config";
-import helmetConfig  from './config/helmet.config';
-import cookieParser  from 'cookie-parser';
-import errorHandler  from "./presentation/helpers/error-handler.helper";
-import tokenHandler  from "./presentation/middlewares/token-handler.middleware";
+import                'reflect-metadata';
+import cors           from "cors";
+import helmet         from "helmet";
+import morgan         from "morgan";
+import session        from 'express-session';
+import express        from "express";
+import rootPath       from "./application/utils/path.util";
+import bodyParser     from "body-parser";
+import authRoutes     from "./presentation/routers/auth.router";
+import userRoutes     from './presentation/routers/user.router';
+import chatRoutes     from "./presentation/routers/chat.router";
+import postRouter     from "./presentation/routers/post.router";
+import feedRouter     from "./presentation/routers/feed.router";
+import compression    from "compression";
+import * as dotenv    from "dotenv";
+import rateLimiter    from './presentation/middlewares/rate-limiter.middleware';
+import corsOptions    from "./config/cors-option.config";
+import helmetConfig   from './config/helmet.config';
+import cookieParser   from 'cookie-parser';
+import errorHandler   from "./presentation/helpers/error-handler.helper";
+import tokenHandler   from "./presentation/middlewares/token-handler.middleware";
+import sessionOptions from './config/session-options.config';
+
 dotenv.config();
 
 const app = express();
@@ -32,6 +35,7 @@ app.use(cors(corsOptions));
 app.use(compression());
 app.use(bodyParser.json({ limit: "50kb" }));
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(session(sessionOptions));
 app.use(tokenHandler);
 app.set("views", rootPath); // Set the views directory
 app.set('view engine', 'ejs'); // Set EJS as the template engine
