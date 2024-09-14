@@ -49,7 +49,7 @@ class UserRepository {
             "created_at",
         ])
             .select([(0, kysely_1.sql) `BIN_TO_UUID(uuid)`.as("uuid")])
-            .where("username", "like", username + "%")
+            .where("username", "=", username)
             .executeTakeFirst();
         return this.plainToModel(user);
     };

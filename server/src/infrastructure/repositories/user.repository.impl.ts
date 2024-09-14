@@ -54,7 +54,7 @@ class UserRepository implements IUserRepository {
         "created_at",
       ])
       .select([sql`BIN_TO_UUID(uuid)`.as("uuid")])
-      .where("username", "like", username + "%")
+      .where("username", "=", username)
       .executeTakeFirst();
 
     return this.plainToModel(user);
