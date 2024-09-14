@@ -12,9 +12,9 @@ class UsersController {
     getUserData = async (req, res) => {
         let user;
         const uuid = req.params.uuid;
-        const person = req.query.person || "";
-        if (person) {
-            user = await this.userService.getUserByUsername(person);
+        const username = req.query.username || "";
+        if (username) {
+            user = await this.userService.getUserByUsername(username);
         }
         else {
             user = await this.userService.getUserById(uuid);

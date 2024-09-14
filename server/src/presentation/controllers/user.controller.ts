@@ -22,10 +22,10 @@ class UsersController {
   public getUserData = async (req: Request, res: Response) => {
     let user: UserDto | undefined;
     const uuid = req.params.uuid!;
-    const person = req.query.person || "";
+    const username = req.query.username || "";
 
-    if (person) {
-      user = await this.userService.getUserByUsername(person as string);
+    if (username) {
+      user = await this.userService.getUserByUsername(username as string);
     } else {
       user = await this.userService.getUserById(uuid);
     }
