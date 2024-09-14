@@ -31,8 +31,7 @@ const controller: UsersController = new UsersController(
 
 // user endpoints
 router
-  .route("/:uuid?")
-  .all(validateParamOrQuery("uuid", "username"))
+  .route("/")
   .get(wrap.asyncErrorHandler(controller.getUserData));
 
 router
@@ -42,7 +41,7 @@ router
   
 router
   .route("/search")
-  .all(validateRequestQuery("search"))
+  .all(validateRequestQuery("searchQuery"))
   .get(wrap.asyncErrorHandler(controller.searchUsersByQuery)); 
 
 // follow endpoints

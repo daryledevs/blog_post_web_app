@@ -10,7 +10,6 @@ const follow_service_impl_1 = __importDefault(require("@/application/services/fo
 const user_repository_impl_1 = __importDefault(require("@/infrastructure/repositories/user.repository.impl"));
 const user_controller_1 = __importDefault(require("@/presentation/controllers/user.controller"));
 const follow_repository_impl_1 = __importDefault(require("@/infrastructure/repositories/follow.repository.impl"));
-const validate_param_query_validation_1 = __importDefault(require("../validations/validate-param-query.validation"));
 const search_history_service_impl_1 = __importDefault(require("@/application/services/search-history/search-history.service.impl"));
 const validate_request_query_validation_1 = __importDefault(require("../validations/validate-request-query.validation"));
 const search_history_repository_impl_1 = __importDefault(require("@/infrastructure/repositories/search-history.repository.impl"));
@@ -21,8 +20,7 @@ const wrap = new async_wrapper_util_1.default();
 const controller = new user_controller_1.default(new user_service_impl_1.default(new user_repository_impl_1.default()), new follow_service_impl_1.default(new user_repository_impl_1.default(), new follow_repository_impl_1.default()), new search_history_service_impl_1.default(new user_repository_impl_1.default(), new search_history_repository_impl_1.default()));
 // user endpoints
 router
-    .route("/:uuid?")
-    .all((0, validate_param_query_validation_1.default)("uuid", "username"))
+    .route("/")
     .get(wrap.asyncErrorHandler(controller.getUserData));
 router
     .route("/:uuid")
@@ -30,7 +28,7 @@ router
     .delete(wrap.asyncErrorHandler(controller.deleteUser));
 router
     .route("/search")
-    .all((0, validate_request_query_validation_1.default)("search"))
+    .all((0, validate_request_query_validation_1.default)("searchQuery"))
     .get(wrap.asyncErrorHandler(controller.searchUsersByQuery));
 // follow endpoints
 router
