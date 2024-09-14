@@ -110,6 +110,8 @@ const tokenHandler = async (req, res, next) => {
             });
             return res.status(200).send({ accessToken: ACCESS_TOKEN });
         }
+        // if the access token is provided, set the user in the session
+        req.session.user = user;
         next();
     }
     catch (error) {
