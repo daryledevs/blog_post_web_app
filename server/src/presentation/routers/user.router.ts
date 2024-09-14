@@ -5,11 +5,12 @@ import FollowService             from "@/application/services/follow/follow.serv
 import UserRepository            from "@/infrastructure/repositories/user.repository.impl";
 import UsersController           from "@/presentation/controllers/user.controller";
 import FollowRepository          from "@/infrastructure/repositories/follow.repository.impl";
+import validateParamOrQuery      from "../validations/validate-param-query.validation";
 import SearchHistoryService      from "@/application/services/search-history/search-history.service.impl";
 import validateRequestQuery      from "../validations/validate-request-query.validation";
 import SearchHistoryRepository   from "@/infrastructure/repositories/search-history.repository.impl";
 import validateUUIDRequestBody   from "../validations/validate-uuid-body.validation";
-import validateUUIDRequestParams from "../validations/validate-uuid-params.validation";
+import validateUUIDRequestParams from './../validations/validate-uuid-params.validation';
 
 const router = express.Router();
 const wrap = new AsyncWrapper();
@@ -30,9 +31,13 @@ const controller: UsersController = new UsersController(
 
 // user endpoints
 router
+  .route("/:uuid?")
+  .all(validateParamOrQuery("uuid", "username"))
+  .get(wrap.asyncErrorHandler(controller.getUserData));
+
+router
   .route("/:uuid")
   .all(validateUUIDRequestParams("uuid"))
-  .get(wrap.asyncErrorHandler(controller.getUserData))
   .delete(wrap.asyncErrorHandler(controller.deleteUser));
   
 router
