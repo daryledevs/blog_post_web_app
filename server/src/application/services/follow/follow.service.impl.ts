@@ -22,9 +22,6 @@ class FollowService implements IEFollowService {
   }
 
   public getFollowStats = async (uuid: string): Promise<FollowStatsType> => {
-    // If no arguments are provided, return an error
-    if (!uuid) throw ApiErrorException.HTTP400Error("No arguments provided");
-
     // If the user is not found, return an error
     const user = await this.userRepository.findUserById(uuid);
     if (!user) throw ApiErrorException.HTTP404Error("User not found");
@@ -33,20 +30,17 @@ class FollowService implements IEFollowService {
   };
 
   public getFollowerFollowingLists = async (
-    uuid: string | undefined,
-    fetch: string,
-    listsId: number[]
+    uuid: string,
+    fetchFollowType: string,
+    followListIds: number[]
   ): Promise<FollowerDto[] | FollowingDto[]> => {
-    // If no arguments are provided, return an error
-    if (!uuid) throw ApiErrorException.HTTP400Error("No arguments provided");
-
     // If the user is not found, return an error
     const user = await this.userRepository.findUserById(uuid);
     if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
-    const listIdsToExclude = listsId?.length ? listsId : [0];
+    const listIdsToExclude = followListIds?.length ? followListIds : [0];
 
-    switch (fetch) {
+    switch (fetchFollowType) {
       case "followers":
         const followers = await this.getFollowers(
           user.getId(),
@@ -66,7 +60,9 @@ class FollowService implements IEFollowService {
         });
 
       default:
-        throw ApiErrorException.HTTP400Error("Invalid fetch parameter");
+        throw ApiErrorException.HTTP400Error(
+          "Invalid fetch follow type parameter"
+        );
     }
   };
 
@@ -74,11 +70,6 @@ class FollowService implements IEFollowService {
     follower_uuid: string,
     followed_uuid: string
   ): Promise<string> => {
-    // If no arguments are provided, return an error
-    if (!follower_uuid || !followed_uuid) {
-      throw ApiErrorException.HTTP400Error("No arguments provided");
-    }
-
     // If the user is not found, return an error
     const user = await this.userRepository.findUserById(follower_uuid);
     if (!user) throw ApiErrorException.HTTP404Error("User not found");

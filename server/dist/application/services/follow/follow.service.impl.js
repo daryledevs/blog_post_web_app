@@ -15,25 +15,19 @@ class FollowService {
         this.followRepository = followRepository;
     }
     getFollowStats = async (uuid) => {
-        // If no arguments are provided, return an error
-        if (!uuid)
-            throw api_exception_1.default.HTTP400Error("No arguments provided");
         // If the user is not found, return an error
         const user = await this.userRepository.findUserById(uuid);
         if (!user)
             throw api_exception_1.default.HTTP404Error("User not found");
         return await this.followRepository.findUserFollowStatsById(user.getId());
     };
-    getFollowerFollowingLists = async (uuid, fetch, listsId) => {
-        // If no arguments are provided, return an error
-        if (!uuid)
-            throw api_exception_1.default.HTTP400Error("No arguments provided");
+    getFollowerFollowingLists = async (uuid, fetchFollowType, followListIds) => {
         // If the user is not found, return an error
         const user = await this.userRepository.findUserById(uuid);
         if (!user)
             throw api_exception_1.default.HTTP404Error("User not found");
-        const listIdsToExclude = listsId?.length ? listsId : [0];
-        switch (fetch) {
+        const listIdsToExclude = followListIds?.length ? followListIds : [0];
+        switch (fetchFollowType) {
             case "followers":
                 const followers = await this.getFollowers(user.getId(), listIdsToExclude);
                 return (0, class_transformer_1.plainToInstance)(follower_dto_1.default, followers, {
@@ -45,14 +39,10 @@ class FollowService {
                     excludeExtraneousValues: true,
                 });
             default:
-                throw api_exception_1.default.HTTP400Error("Invalid fetch parameter");
+                throw api_exception_1.default.HTTP400Error("Invalid fetch follow type parameter");
         }
     };
     toggleFollow = async (follower_uuid, followed_uuid) => {
-        // If no arguments are provided, return an error
-        if (!follower_uuid || !followed_uuid) {
-            throw api_exception_1.default.HTTP400Error("No arguments provided");
-        }
         // If the user is not found, return an error
         const user = await this.userRepository.findUserById(follower_uuid);
         if (!user)
