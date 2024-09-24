@@ -76,16 +76,20 @@ class ChatsRepository implements IEChatRepository {
     const uuidsToBin = sqlUuidsToBin(messageUuids);
 
     const chats = await this.database
-      .selectFrom("messages")
-      .leftJoin("conversations as c", "messages.conversation_id", "c.id")
+      .selectFrom("messages as m")
+      .leftJoin("conversations as c", "m.conversation_id", "c.id")
+      .leftJoin("users as sender", "m.sender_id", "sender.id")
       .select([
         "id",
-        sql`BIN_TO_UUID(u.uuid)`.as("uuid"),
+        sql`BIN_TO_UUID(m.uuid)`.as("uuid"),
         "conversation_id",
         sql`BIN_TO_UUID(c.uuid)`.as("conversation_uuid"),
-        sql`BIN_TO_UUID(u.uuid)`.as("uuid"),
         "sender_id",
         sql`BIN_TO_UUID(sender.uuid)`.as("sender_uuid"),
+        "sender.username",
+        "sender.first_name",
+        "sender.last_name",
+        "sender.avatar_url",
         "text_message",
         "time_sent",
       ])
@@ -96,7 +100,7 @@ class ChatsRepository implements IEChatRepository {
         ])
       )
       .limit(30)
-      .orderBy("messages.id", "desc")
+      .orderBy("m.id", "desc")
       .execute();
 
     return plainToInstance(Chat, chats);
@@ -107,7 +111,25 @@ class ChatsRepository implements IEChatRepository {
   ): Promise<Conversation | undefined> => {
     const conversation = await this.database
       .selectFrom("conversations")
-      .select(["id", sql`BIN_TO_BINARY(uuid)`.as("uuid"), "created_at"])
+      .leftJoin(
+        (eb) =>
+          eb
+            .selectFrom("conversation_members")
+            .select(["conversation_id", "user_id"])
+            .as("cm"),
+        (join) => join.onRef("conversations.id", "=", "cm.conversation_id")
+      )
+      .leftJoin("users", "cm.user_id", "users.id")
+      .select([
+        "id",
+        sql`BIN_TO_BINARY(uuid)`.as("uuid"),
+        "created_at",
+        sql`BIN_TO_UUID(users.uuid)`.as("user_uuid"),
+        "users.username",
+        "users.first_name",
+        "users.last_name",
+        "users.avatar_url",
+      ])
       .where("uuid", "=", sql`UUID_TO_BIN(${uuid})`)
       .executeTakeFirst();
 
@@ -119,16 +141,20 @@ class ChatsRepository implements IEChatRepository {
   ): Promise<Conversation | undefined> => {
     const conversation = await this.database
       .selectFrom("conversations as c")
-      .select(["c.id", sql`BIN_TO_BINARY(c.uuid)`.as("uuid"), "c.created_at"])
       .leftJoin(
         (eb) =>
           eb
             .selectFrom("conversation_members as cm")
+            .leftJoin("users as u", "cm.user_id", "u.id")
             .select([
               "cm.id",
               sql`BIN_TO_UUID(cm.uuid)`.as("uuid"),
               "cm.conversation_id",
               "cm.user_id",
+              "u.username",
+              "u.first_name",
+              "u.last_name",
+              "u.avatar_url",
             ])
             .as("cm"),
         (join) => join.onRef("cm.conversation_id", "=", "c.id")
@@ -141,6 +167,16 @@ class ChatsRepository implements IEChatRepository {
             .as("u"),
         (join) => join.onRef("u.id", "=", "cm.user_id")
       )
+      .select([
+        "c.id",
+        sql`BIN_TO_BINARY(c.uuid)`.as("uuid"),
+        sql`BIN_TO_UUID(u.uuid)`.as("user_uuid"),
+        "cm.username",
+        "cm.first_name",
+        "cm.last_name",
+        "cm.avatar_url",
+        "c.created_at",
+      ])
       .where("u.id", "in", memberIds)
       .executeTakeFirst();
 
@@ -153,12 +189,17 @@ class ChatsRepository implements IEChatRepository {
   ): Promise<Chat | undefined> => {
     const chat = await this.database
       .selectFrom("messages")
+      .leftJoin("users as user", "messages.sender_id", "user.id")
       .select([
         "id",
         sql`BIN_TO_BINARY(uuid)`.as("uuid"),
         "conversation_id",
         "sender_id",
         sql`BIN_TO_UUID(user.uuid)`.as("user_uuid"),
+        "user.username",
+        "user.first_name",
+        "user.last_name",
+        "user.avatar_url",
         "text_message",
         "time_sent",
       ])
@@ -210,6 +251,6 @@ class ChatsRepository implements IEChatRepository {
       .where("id", "=", conversationId)
       .execute();
   };
-};
+}
 
 export default ChatsRepository;
