@@ -37,7 +37,7 @@ router
     .get(wrap.asyncErrorHandler(controller.getFollowStats));
 router
     .route("/:uuid/follow-lists")
-    .all((0, validate_uuid_body_validation_1.default)("listsId"), (0, validate_uuid_params_validation_1.default)("uuid"))
+    .all((0, validate_uuid_params_validation_1.default)("uuid"), (0, validate_uuid_body_validation_1.default)("followListIds"), (0, validate_request_query_validation_1.default)("fetchFollowType"))
     .post(wrap.asyncErrorHandler(controller.getFollowerFollowingLists));
 router
     .route("/:follower_uuid/follow/:followed_uuid")

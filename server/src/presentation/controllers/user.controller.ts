@@ -52,14 +52,14 @@ class UsersController {
   };
 
   public getFollowerFollowingLists = async (req: Request, res: Response) => {
-    const id = req.params.id;
-    const fetch = req.query.fetch;
-    const listsId = req.body.listsId;
+    const uuid = req.params.uuid!;
+    const fetchFollowType = req.query.fetchFollowType;
+    const followListIds = req.body.followListIds;
 
     const stats = await this.followService.getFollowerFollowingLists(
-      id,
-      fetch as string,
-      listsId
+      uuid,
+      fetchFollowType as string,
+      followListIds
     );
 
     res.status(200).send(stats);

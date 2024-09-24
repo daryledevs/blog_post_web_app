@@ -52,7 +52,11 @@ router
 
 router
   .route("/:uuid/follow-lists")
-  .all(validateUUIDRequestBody("listsId"), validateUUIDRequestParams("uuid"))
+  .all(
+    validateUUIDRequestParams("uuid"),
+    validateUUIDRequestBody("followListIds"),
+    validateRequestQuery("fetchFollowType")
+  )
   .post(wrap.asyncErrorHandler(controller.getFollowerFollowingLists));
 
 router

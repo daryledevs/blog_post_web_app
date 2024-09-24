@@ -37,10 +37,10 @@ class UsersController {
         res.status(200).send(stats);
     };
     getFollowerFollowingLists = async (req, res) => {
-        const id = req.params.id;
-        const fetch = req.query.fetch;
-        const listsId = req.body.listsId;
-        const stats = await this.followService.getFollowerFollowingLists(id, fetch, listsId);
+        const uuid = req.params.uuid;
+        const fetchFollowType = req.query.fetchFollowType;
+        const followListIds = req.body.followListIds;
+        const stats = await this.followService.getFollowerFollowingLists(uuid, fetchFollowType, followListIds);
         res.status(200).send(stats);
     };
     toggleFollow = async (req, res) => {
