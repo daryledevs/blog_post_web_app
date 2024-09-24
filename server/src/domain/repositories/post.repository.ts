@@ -1,7 +1,7 @@
 import Post                      from "@/domain/models/post.model";
 import { NewPosts, UpdatePosts } from "@/domain/types/table.types";
 
-interface IEPostRepository {
+interface IPostRepository {
   findPostsByPostId: (uuid: string) => Promise<Post | undefined>;
 
   findAllPostsByUserId: (user_id: number) => Promise<Post[]>;
@@ -15,4 +15,4 @@ interface IEPostRepository {
   deletePostById: (post_id: number) => Promise<void>;
 }
 
-export default IEPostRepository;
+export default IPostRepository;

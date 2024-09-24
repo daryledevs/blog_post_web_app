@@ -7,11 +7,11 @@ import db                  from "@/infrastructure/database/db.database";
 import Post                from "@/domain/models/post.model";
 import { DB }              from "@/domain/types/schema.types";
 import { Kysely, sql }     from "kysely";
-import IEPostRepository    from "@/domain/repositories/post.repository";
+import IPostRepository    from "@/domain/repositories/post.repository";
 import CloudinaryService   from "@/application/libs/cloudinary-service.lib";
 import { plainToInstance } from "class-transformer";
 
-class PostRepository implements IEPostRepository {
+class PostRepository implements IPostRepository {
   private database: Kysely<DB>;
   private cloudinary: CloudinaryService;
 

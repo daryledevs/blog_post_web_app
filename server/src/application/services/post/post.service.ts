@@ -1,7 +1,7 @@
 import PostDto                   from "@/domain/dto/post.dto";
 import { NewPosts, UpdatePosts } from "@/domain/types/table.types";
 
-interface IEPostService {
+interface IPostService {
   getPostByUuid: (uuid: string) => Promise<PostDto | undefined>;
 
   getAllPostsByUsersUuid: (user_uuid: string) => Promise<PostDto[]>;
@@ -15,4 +15,4 @@ interface IEPostService {
   deletePostByUuid: (uuid: string) => Promise<string>;
 }
 
-export default IEPostService;
+export default IPostService;

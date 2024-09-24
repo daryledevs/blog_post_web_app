@@ -1,16 +1,16 @@
 import PostDto               from "@/domain/dto/post.dto";
 import * as dotenv           from "dotenv";
-import IEPostService         from "@/application/services/post/post.service";
+import IPostService         from "@/application/services/post/post.service";
 import IELikeService         from "@/application/services/like/like.service";
 import { plainToInstance }   from "class-transformer";
 import { Response, Request } from "express";
 dotenv.config();
 
 class PostsController {
-  private postService: IEPostService;
+  private postService: IPostService;
   private likeService: IELikeService;
 
-  constructor(postService: IEPostService, likeService: IELikeService) {
+  constructor(postService: IPostService, likeService: IELikeService) {
     this.postService = postService;
     this.likeService = likeService;
   }

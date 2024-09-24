@@ -1,20 +1,20 @@
 import Post                from "@/domain/models/post.model";
 import PostDto             from "@/domain/dto/post.dto";
 import { join }            from "path";
-import IEPostService       from "./post.service";
-import IEPostRepository    from "@/domain/repositories/post.repository";
+import IPostService       from "./post.service";
+import IPostRepository    from "@/domain/repositories/post.repository";
 import IEUserRepository    from "@/domain/repositories/user.repository";
 import ApiErrorException   from "@/application/exceptions/api.exception";
 import CloudinaryService   from "@/application/libs/cloudinary-service.lib";
 import { plainToInstance } from "class-transformer";
 
-class PostService implements IEPostService {
-  private postRepository: IEPostRepository;
+class PostService implements IPostService {
+  private postRepository: IPostRepository;
   private userRepository: IEUserRepository;
   private cloudinary: CloudinaryService;
 
   constructor(
-    postRepository: IEPostRepository,
+    postRepository: IPostRepository,
     userRepository: IEUserRepository,
     cloudinary: CloudinaryService
   ) {
