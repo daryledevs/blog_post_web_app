@@ -2,18 +2,18 @@ import LikeDto             from "@/domain/dto/like.dto";
 import IELikeService       from "./like.service";
 import IEUserRepository    from "@/domain/repositories/user.repository";
 import IELikeRepository    from "@/domain/repositories/like.repository";
-import IEPostRepository    from "@/domain/repositories/post.repository";
+import IPostRepository    from "@/domain/repositories/post.repository";
 import ApiErrorException   from "@/application/exceptions/api.exception";
 import { plainToInstance } from "class-transformer";
 
 class LikeService implements IELikeService {
   private likeRepository: IELikeRepository;
-  private postRepository: IEPostRepository;
+  private postRepository: IPostRepository;
   private userRepository: IEUserRepository;
 
   constructor(
     likeRepository: IELikeRepository,
-    postRepository: IEPostRepository,
+    postRepository: IPostRepository,
     userRepository: IEUserRepository
   ) {
     this.likeRepository = likeRepository;
