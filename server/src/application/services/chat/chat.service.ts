@@ -1,11 +1,11 @@
-import Chat                from "@/domain/models/chat.model";
-import Conversation        from "@/domain/models/conversation.model";
+import ChatDto             from "@/domain/dto/chat.dto";
+import ConversationDto     from "@/domain/dto/conversation.dto";
 import { MessageDataType } from "@/domain/repositories/chat.repository";
 
 interface IEChatService {
-  getChatHistory: (uuid: string, conversationIds: string[]) => Promise<Conversation[]>;
+  getChatHistory: (uuid: string, conversationIds: string[]) => Promise<ConversationDto[]>;
 
-  getChatMessages: (uuid: string, messageUuids: string[]) => Promise<Chat[]>;
+  getChatMessages: (uuid: string, messageUuids: string[]) => Promise<ChatDto[]>;
 
   newMessageAndConversation: (messageData: MessageDataType) => Promise<string>;
 

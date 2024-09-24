@@ -3,6 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const chat_dto_1 = __importDefault(require("@/domain/dto/chat.dto"));
+const class_transformer_1 = require("class-transformer");
+const conversation_dto_1 = __importDefault(require("@/domain/dto/conversation.dto"));
 const api_exception_1 = __importDefault(require("@/application/exceptions/api.exception"));
 class ChatServices {
     chatRepository;
@@ -18,7 +21,8 @@ class ChatServices {
             throw api_exception_1.default.HTTP404Error("User not found");
         }
         // Return the chat history
-        return await this.chatRepository.findAllConversationByUserId(user.getId(), conversationIds);
+        const conversations = await this.chatRepository.findAllConversationByUserId(user.getId(), conversationIds);
+        return conversations.map((conversation) => (0, class_transformer_1.plainToClass)(conversation_dto_1.default, conversation));
     };
     getChatMessages = async (uuid, messageUuids) => {
         // Check if the chat exists, if does not exist, return an error
@@ -27,7 +31,8 @@ class ChatServices {
             throw api_exception_1.default.HTTP404Error("Chat not found");
         }
         // Return the chat messages
-        return await this.chatRepository.findAllMessagesById(conversation.getId(), messageUuids);
+        const chats = await this.chatRepository.findAllMessagesById(conversation.getId(), messageUuids);
+        return chats.map((chat) => (0, class_transformer_1.plainToClass)(chat_dto_1.default, chat));
     };
     newMessageAndConversation = async (messageData) => {
         // destructure the necessary properties from messageData

@@ -1,9 +1,11 @@
 import IEChatRepository, {
   MessageDataType,
 }                        from "@/domain/repositories/chat.repository";
-import Chat              from "@/domain/models/chat.model";
+import ChatDto           from "@/domain/dto/chat.dto";
 import Conversation      from "@/domain/models/conversation.model";
 import IEChatService     from "./chat.service";
+import { plainToClass }  from "class-transformer";
+import ConversationDto   from "@/domain/dto/conversation.dto";
 import IEUserRepository  from "@/domain/repositories/user.repository";
 import ApiErrorException from "@/application/exceptions/api.exception";
 
@@ -22,7 +24,7 @@ class ChatServices implements IEChatService {
   public getChatHistory = async (
     uuid: string,
     conversationIds: string[]
-  ): Promise<Conversation[]> => {
+  ): Promise<ConversationDto[]> => {
     // If the user is not found, return an error
     const user = await this.userRepository.findUserById(uuid);
     if (!user) {
@@ -30,16 +32,20 @@ class ChatServices implements IEChatService {
     }
 
     // Return the chat history
-    return await this.chatRepository.findAllConversationByUserId(
+    const conversations = await this.chatRepository.findAllConversationByUserId(
       user.getId(),
       conversationIds
+    );
+
+    return conversations.map((conversation) =>
+      plainToClass(ConversationDto, conversation)
     );
   };
 
   public getChatMessages = async (
     uuid: string,
     messageUuids: string[]
-  ): Promise<Chat[]> => {
+  ): Promise<ChatDto[]> => {
     // Check if the chat exists, if does not exist, return an error
     const conversation = await this.chatRepository.findOneConversationByUuId(
       uuid
@@ -50,10 +56,12 @@ class ChatServices implements IEChatService {
     }
 
     // Return the chat messages
-    return await this.chatRepository.findAllMessagesById(
+    const chats =  await this.chatRepository.findAllMessagesById(
       conversation.getId(),
       messageUuids
     );
+
+    return chats.map((chat) => plainToClass(ChatDto, chat)); 
   };
 
   public newMessageAndConversation = async (
