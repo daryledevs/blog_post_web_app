@@ -8,29 +8,26 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
-class ChatDto {
+const user_details_dto_1 = __importDefault(require("./user-details.dto"));
+class ChatDto extends user_details_dto_1.default {
     id;
     uuid;
     conversation_id;
     conversation_uuid;
     user_uuid;
-    username;
-    first_name;
-    last_name;
-    avatar_url;
     constructor(id, uuid, conversation_id, conversation_uuid, user_uuid, username, first_name, last_name, avatar_url) {
+        super(username, first_name, last_name, avatar_url);
         this.id = id;
         this.uuid = uuid;
         this.conversation_id = conversation_id;
         this.conversation_uuid = conversation_uuid;
         this.user_uuid = user_uuid;
-        this.username = username;
-        this.first_name = first_name || null;
-        this.last_name = last_name || null;
-        this.avatar_url = avatar_url || null;
     }
     // getters
     getId() {
@@ -48,18 +45,6 @@ class ChatDto {
     getUserUuid() {
         return this.user_uuid;
     }
-    getUsername() {
-        return this.username;
-    }
-    getFirstName() {
-        return this.first_name;
-    }
-    getLastName() {
-        return this.last_name;
-    }
-    getAvatarUrl() {
-        return this.avatar_url;
-    }
     // setters
     setId(id) {
         this.id = id;
@@ -72,21 +57,6 @@ class ChatDto {
     }
     setConversationUuid(conversation_uuid) {
         this.conversation_uuid = conversation_uuid;
-    }
-    setUserUuid(user_uuid) {
-        this.user_uuid = user_uuid;
-    }
-    setUsername(username) {
-        this.username = username;
-    }
-    setFirstName(first_name) {
-        this.first_name = first_name;
-    }
-    setLastName(last_name) {
-        this.last_name = last_name;
-    }
-    setAvatarUrl(avatar_url) {
-        this.avatar_url = avatar_url;
     }
 }
 __decorate([
@@ -115,21 +85,4 @@ __decorate([
     (0, class_validator_1.IsUUID)(4, { message: "invalid UUID" }),
     __metadata("design:type", Object)
 ], ChatDto.prototype, "user_uuid", void 0);
-__decorate([
-    (0, class_transformer_1.Expose)(),
-    (0, class_validator_1.IsNotEmpty)({ message: "username is required" }),
-    __metadata("design:type", Object)
-], ChatDto.prototype, "username", void 0);
-__decorate([
-    (0, class_transformer_1.Expose)(),
-    __metadata("design:type", Object)
-], ChatDto.prototype, "first_name", void 0);
-__decorate([
-    (0, class_transformer_1.Expose)(),
-    __metadata("design:type", Object)
-], ChatDto.prototype, "last_name", void 0);
-__decorate([
-    (0, class_transformer_1.Expose)(),
-    __metadata("design:type", Object)
-], ChatDto.prototype, "avatar_url", void 0);
 exports.default = ChatDto;

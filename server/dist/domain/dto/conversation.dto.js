@@ -17,6 +17,7 @@ const class_transformer_1 = require("class-transformer");
 class ConversationDto extends user_details_dto_1.default {
     id;
     uuid;
+    user_uuid;
     created_at;
     constructor(id, uuid, username, created_at, first_name, last_name, avatar_url) {
         super(username, first_name, last_name, avatar_url);
@@ -31,6 +32,9 @@ class ConversationDto extends user_details_dto_1.default {
     getUuid() {
         return this.uuid;
     }
+    getUserUuid() {
+        return this.user_uuid;
+    }
     getCreatedAt() {
         return this.created_at;
     }
@@ -40,6 +44,9 @@ class ConversationDto extends user_details_dto_1.default {
     }
     setUuid(uuid) {
         this.uuid = uuid;
+    }
+    setUserUuid(user_uuid) {
+        this.user_uuid = user_uuid;
     }
     setCreatedAt(created_at) {
         this.created_at = created_at;

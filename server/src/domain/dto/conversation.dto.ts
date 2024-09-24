@@ -9,6 +9,8 @@ class ConversationDto extends UserDetailsDto {
   @Expose()
   private uuid: any;
 
+  private user_uuid: any;
+
   @Expose()
   private created_at: Date | null;
 
@@ -36,6 +38,10 @@ class ConversationDto extends UserDetailsDto {
     return this.uuid;
   }
 
+  getUserUuid(): any {
+    return this.user_uuid;
+  }
+
   getCreatedAt(): Date | null {
     return this.created_at;
   }
@@ -49,6 +55,10 @@ class ConversationDto extends UserDetailsDto {
     this.uuid = uuid;
   }
 
+  setUserUuid(user_uuid: any) {
+    this.user_uuid = user_uuid;
+  }
+  
   setCreatedAt(created_at: Date | null) {
     this.created_at = created_at;
   }
