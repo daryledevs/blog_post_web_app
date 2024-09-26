@@ -79,6 +79,20 @@ class UserDto extends UserDetailsDto {
     this.confirmPassword = confirmPassword!;
   }
 
+  getUsers() {
+    return {
+      id: this.id,
+      uuid: this.uuid,
+      username: this.username,
+      email: this.email,
+      roles: this.roles,
+      avatarUrl: this.avatar_url,
+      age: this.age,
+      birthday: this.birthday,
+      createdAt: this.created_at,
+    };
+  }
+
   // Getters
   getId(): number {
     return this.id;

@@ -24,6 +24,16 @@ class FollowingDto extends UserDetailsDto {
     this.followed_uuid = followed_uuid;
   }
 
+  getFollowing() {
+    return {
+      followedUuid: this.followed_uuid,
+      username: this.username,
+      firstName: this.first_name,
+      lastName: this.last_name,
+      avatarUrl: this.avatar_url,
+    };
+  }
+
   // getters
   public getFollowedId(): number {
     return this.followed_id;

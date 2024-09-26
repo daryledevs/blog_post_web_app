@@ -23,6 +23,15 @@ class FollowerDto extends user_details_dto_1.default {
         this.follower_id = follower_id;
         this.follower_uuid = follower_uuid;
     }
+    getFollowers() {
+        return {
+            followerUuid: this.follower_uuid,
+            username: this.username,
+            firstName: this.first_name,
+            lastName: this.last_name,
+            avatarUrl: this.avatar_url,
+        };
+    }
     // getters
     getFollowerId() {
         return this.follower_id;

@@ -47,6 +47,18 @@ class LikeDto {
     this.created_at = created_at;
   }
 
+  getLikes() {
+    return {
+      id: this.id,
+      uuid: this.uuid,
+      postId: this.post_id,
+      postUuid: this.post_uuid,
+      userId: this.user_id,
+      userUuid: this.user_uuid,
+      createdAt: this.created_at,
+    };
+  }
+
   // Getters
   public getId(): number {
     return this.id;

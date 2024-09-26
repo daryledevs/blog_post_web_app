@@ -1,6 +1,6 @@
+import UserDetailsDto         from "./user-details.dto";
 import { Exclude, Expose }    from "class-transformer";
 import { IsNotEmpty, IsUUID } from "class-validator";
-import UserDetailsDto from "./user-details.dto";
 
 class ChatDto extends UserDetailsDto {
   @Exclude({ toPlainOnly: true })
@@ -41,6 +41,17 @@ class ChatDto extends UserDetailsDto {
     this.conversation_id = conversation_id;
     this.conversation_uuid = conversation_uuid;
     this.user_uuid = user_uuid;
+  }
+
+  getChats() {
+    return {
+      id: this.id,
+      uuid: this.uuid,
+      conversationId: this.conversation_id,
+      conversationUuid: this.conversation_uuid,
+      userUuid: this.user_uuid,
+      ...super.getUserDetails(),
+    };
   }
 
   // getters

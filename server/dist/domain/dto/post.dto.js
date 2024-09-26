@@ -34,6 +34,20 @@ class PostDto {
         this.privacy_level = privacy_level;
         this.created_at = created_at;
     }
+    getPosts() {
+        return {
+            id: this.id,
+            uuid: this.uuid,
+            imageId: this.image_id,
+            imageUrl: this.image_url,
+            files: this.files,
+            userId: this.user_id,
+            userUuid: this.user_uuid,
+            caption: this.caption,
+            privacyLevel: this.privacy_level,
+            createdAt: this.created_at,
+        };
+    }
     // getters
     getId() {
         return this.id;

@@ -63,6 +63,17 @@ class UserDetailsDto {
     this.birthday = birthday;
   }
 
+  getUserDetails() {
+    return {
+      username: this.username,
+      firstName: this.first_name,
+      lastName: this.last_name,
+      avatarUrl: this.avatar_url,
+      age: this.age,
+      birthday: this.birthday,
+    };
+  }
+
   // getters
   public getUsername(): string {
     return this.username;

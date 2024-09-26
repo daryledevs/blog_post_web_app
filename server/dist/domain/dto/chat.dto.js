@@ -12,9 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const user_details_dto_1 = __importDefault(require("./user-details.dto"));
 const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
-const user_details_dto_1 = __importDefault(require("./user-details.dto"));
 class ChatDto extends user_details_dto_1.default {
     id;
     uuid;
@@ -28,6 +28,16 @@ class ChatDto extends user_details_dto_1.default {
         this.conversation_id = conversation_id;
         this.conversation_uuid = conversation_uuid;
         this.user_uuid = user_uuid;
+    }
+    getChats() {
+        return {
+            id: this.id,
+            uuid: this.uuid,
+            conversationId: this.conversation_id,
+            conversationUuid: this.conversation_uuid,
+            userUuid: this.user_uuid,
+            ...super.getUserDetails(),
+        };
     }
     // getters
     getId() {

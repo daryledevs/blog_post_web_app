@@ -23,6 +23,15 @@ class FollowingDto extends user_details_dto_1.default {
         this.followed_id = followed_id;
         this.followed_uuid = followed_uuid;
     }
+    getFollowing() {
+        return {
+            followedUuid: this.followed_uuid,
+            username: this.username,
+            firstName: this.first_name,
+            lastName: this.last_name,
+            avatarUrl: this.avatar_url,
+        };
+    }
     // getters
     getFollowedId() {
         return this.followed_id;

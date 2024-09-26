@@ -1,5 +1,5 @@
-import { Exclude, Expose }    from "class-transformer";
-import {IsEmpty, IsNotEmpty, IsUUID, ValidateIf }  from "class-validator";
+import { Exclude, Expose }             from "class-transformer";
+import {IsEmpty, IsUUID, ValidateIf }  from "class-validator";
 
 class PostDto {
   @Exclude({ toPlainOnly: true })
@@ -63,6 +63,21 @@ class PostDto {
     this.caption = caption;
     this.privacy_level = privacy_level;
     this.created_at = created_at;
+  }
+
+  getPosts() {
+    return {
+      id: this.id,
+      uuid: this.uuid,
+      imageId: this.image_id,
+      imageUrl: this.image_url,
+      files: this.files,
+      userId: this.user_id,
+      userUuid: this.user_uuid,
+      caption: this.caption,
+      privacyLevel: this.privacy_level,
+      createdAt: this.created_at,
+    };
   }
 
   // getters
