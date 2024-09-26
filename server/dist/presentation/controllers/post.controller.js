@@ -39,13 +39,14 @@ class PostsController {
     }
     getPostByUuid = async (req, res) => {
         const uuid = req.params?.uuid;
-        const data = await this.postService.getPostByUuid(uuid);
-        res.status(200).send({ post: data });
+        const post = await this.postService.getPostByUuid(uuid);
+        res.status(200).send({ post: post?.getPosts() });
     };
     getUserPosts = async (req, res) => {
         const user_uuid = req.params?.user_uuid;
-        const data = await this.postService.getAllPostsByUsersUuid(user_uuid);
-        res.status(200).send({ post: data });
+        const posts = await this.postService.getAllPostsByUsersUuid(user_uuid);
+        const postLists = posts.map((post) => post.getPosts());
+        res.status(200).send({ posts: postLists });
     };
     getUserTotalPosts = async (req, res) => {
         const user_uuid = req.params?.user_uuid;
@@ -80,8 +81,8 @@ class PostsController {
     checkUserLikeStatusForPost = async (req, res) => {
         const user_uuid = req.params?.user_uuid;
         const post_uuid = req.params?.uuid;
-        const data = await this.likeService.getUserLikeStatusForPostByUuid(user_uuid, post_uuid);
-        res.status(200).send({ status: data ? true : false });
+        const like = await this.likeService.getUserLikeStatusForPostByUuid(user_uuid, post_uuid);
+        res.status(200).send({ status: like?.getId() ? true : false });
     };
     toggleUserLikeForPost = async (req, res) => {
         const user_uuid = req.params?.user_uuid;

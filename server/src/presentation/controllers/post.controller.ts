@@ -1,6 +1,6 @@
 import PostDto               from "@/domain/dto/post.dto";
 import * as dotenv           from "dotenv";
-import IPostService         from "@/application/services/post/post.service";
+import IPostService          from "@/application/services/post/post.service";
 import IELikeService         from "@/application/services/like/like.service";
 import { plainToInstance }   from "class-transformer";
 import { Response, Request } from "express";
@@ -17,14 +17,15 @@ class PostsController {
 
   public getPostByUuid = async (req: Request, res: Response) => {
     const uuid = req.params?.uuid!;
-    const data = await this.postService.getPostByUuid(uuid);
-    res.status(200).send({ post: data });
+    const post = await this.postService.getPostByUuid(uuid);
+    res.status(200).send({ post: post?.getPosts() });
   };
 
   public getUserPosts = async (req: Request, res: Response) => {
     const user_uuid = req.params?.user_uuid!;
-    const data = await this.postService.getAllPostsByUsersUuid(user_uuid);
-    res.status(200).send({ post: data });
+    const posts = await this.postService.getAllPostsByUsersUuid(user_uuid);
+    const postLists = posts.map((post) => post.getPosts());
+    res.status(200).send({ posts: postLists });
   };
 
   public getUserTotalPosts = async (req: Request, res: Response) => {
@@ -71,12 +72,12 @@ class PostsController {
     const user_uuid = req.params?.user_uuid!;
     const post_uuid = req.params?.uuid!;
 
-    const data = await this.likeService.getUserLikeStatusForPostByUuid(
+    const like = await this.likeService.getUserLikeStatusForPostByUuid(
       user_uuid,
       post_uuid
     );
 
-    res.status(200).send({ status: data ? true : false });
+    res.status(200).send({ status: like?.getId() ? true : false });
   };
 
   public toggleUserLikeForPost = async (req: Request, res: Response) => {

@@ -1,4 +1,6 @@
 import UserDto                from "@/domain/dto/user.dto";
+import FollowerDto            from "@/domain/dto/follower.dto";
+import FollowingDto           from "@/domain/dto/following.dto";
 import IEUserService          from "@/application/services/user/user.service";
 import IEFollowService        from "@/application/services/follow/follow.service";
 import { Request, Response }  from "express";
@@ -30,13 +32,14 @@ class UsersController {
       user = await this.userService.getUserById(uuid);
     }
 
-    res.status(200).send({ user });
+    res.status(200).send({ user: user?.getUsers() });
   };
 
   public searchUsersByQuery = async (req: Request, res: Response) => {
     const searchQuery: any = req.query.searchQuery;
     const users = await this.userService.searchUserByFields(searchQuery);
-    res.status(200).send({ users });
+    const usersList = users.map((user) => user.getUsers());
+    res.status(200).send({ users: usersList });
   };
 
   public deleteUser = async (req: Request, res: Response) => {
@@ -56,13 +59,27 @@ class UsersController {
     const fetchFollowType = req.query.fetchFollowType;
     const followListIds = req.body.followListIds;
 
-    const stats = await this.followService.getFollowerFollowingLists(
+    const followLists = await this.followService.getFollowerFollowingLists(
       uuid,
       fetchFollowType as string,
       followListIds
     );
 
-    res.status(200).send(stats);
+    let followList: FollowerDto[] | FollowingDto[] = [];
+
+    if (fetchFollowType === "followers") {
+      // Type assertion is used to convert the type of the followLists array to FollowerDto[]
+      followList = (followLists as FollowerDto[]).map((follower: FollowerDto) =>
+        follower.getFollowers()
+      ) as unknown as FollowerDto[];
+    } else {
+      // Type assertion is used to convert the type of the followLists array to FollowingDto[]
+      followList = (followLists as FollowingDto[]).map(
+        (follower: FollowingDto) => follower.getFollowing()
+      ) as unknown as FollowingDto[];
+    }
+
+    res.status(200).send({ followList });
   };
 
   public toggleFollow = async (req: Request, res: Response) => {
@@ -91,12 +108,12 @@ class UsersController {
     const searcher_uuid = req.params.searcher_uuid;
     const searched_uuid = req.params.searched_uuid;
 
-    const messages = await this.searchHistoryService.saveUsersSearch(
+    const message = await this.searchHistoryService.saveUsersSearch(
       searcher_uuid,
       searched_uuid
     );
 
-    res.status(200).send({ messages });
+    res.status(200).send({ message });
   };
 
   public removeRecentSearches = async (req: Request, res: Response) => {

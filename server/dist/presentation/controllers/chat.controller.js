@@ -9,17 +9,19 @@ class ChatsController {
         const user_uuid = req.query.user_uuid;
         const emptyData = [0];
         const conversationIds = req.body.conversationIds || emptyData;
-        const listId = conversationIds.length ? conversationIds : emptyData;
-        const data = await this.chatsService.getChatHistory(user_uuid, listId);
-        res.status(200).send({ chats: data });
+        const conversationListId = conversationIds.length ? conversationIds : emptyData;
+        const conversations = await this.chatsService.getChatHistory(user_uuid, conversationListId);
+        const conversationList = conversations.map((conversation) => conversation.getConversations());
+        res.status(200).send({ conversations: conversationList });
     };
     getChatMessages = async (req, res) => {
         let uuid = req.params.uuid;
         const emptyData = [0];
         const messageIds = req.body.messageIds || emptyData;
-        const listIds = messageIds.length ? messageIds : emptyData;
-        const messages = await this.chatsService.getChatMessages(uuid, listIds);
-        res.status(200).send({ messages: messages });
+        const messageListIds = messageIds.length ? messageIds : emptyData;
+        const messages = await this.chatsService.getChatMessages(uuid, messageListIds);
+        const messageList = messages.map((message) => message.getChats());
+        res.status(200).send({ messages: messageList });
     };
     newMessageAndConversation = async (req, res) => {
         const body = req.body;

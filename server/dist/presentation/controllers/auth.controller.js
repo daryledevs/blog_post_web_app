@@ -40,7 +40,7 @@ class AuthController {
         const data = req.body;
         const userDto = (0, class_transformer_1.plainToInstance)(user_dto_1.default, data);
         const result = await this.authService.register(userDto);
-        res.status(201).send(result);
+        res.status(201).send({ message: result.message, user: result.user?.getUserDetails() });
     };
     login = async (req, res) => {
         const { userCredentials, password } = req.body;

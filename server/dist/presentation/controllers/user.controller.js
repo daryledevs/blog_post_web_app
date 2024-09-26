@@ -19,12 +19,13 @@ class UsersController {
         else {
             user = await this.userService.getUserById(uuid);
         }
-        res.status(200).send({ user });
+        res.status(200).send({ user: user?.getUsers() });
     };
     searchUsersByQuery = async (req, res) => {
         const searchQuery = req.query.searchQuery;
         const users = await this.userService.searchUserByFields(searchQuery);
-        res.status(200).send({ users });
+        const usersList = users.map((user) => user.getUsers());
+        res.status(200).send({ users: usersList });
     };
     deleteUser = async (req, res) => {
         const uuid = req.params.uuid;
@@ -40,8 +41,17 @@ class UsersController {
         const uuid = req.params.uuid;
         const fetchFollowType = req.query.fetchFollowType;
         const followListIds = req.body.followListIds;
-        const stats = await this.followService.getFollowerFollowingLists(uuid, fetchFollowType, followListIds);
-        res.status(200).send(stats);
+        const followLists = await this.followService.getFollowerFollowingLists(uuid, fetchFollowType, followListIds);
+        let followList = [];
+        if (fetchFollowType === "followers") {
+            // Type assertion is used to convert the type of the followLists array to FollowerDto[]
+            followList = followLists.map((follower) => follower.getFollowers());
+        }
+        else {
+            // Type assertion is used to convert the type of the followLists array to FollowingDto[]
+            followList = followLists.map((follower) => follower.getFollowing());
+        }
+        res.status(200).send({ followList });
     };
     toggleFollow = async (req, res) => {
         const follower_uuid = req.params.follower_uuid;
@@ -57,8 +67,8 @@ class UsersController {
     saveRecentSearches = async (req, res) => {
         const searcher_uuid = req.params.searcher_uuid;
         const searched_uuid = req.params.searched_uuid;
-        const messages = await this.searchHistoryService.saveUsersSearch(searcher_uuid, searched_uuid);
-        res.status(200).send({ messages });
+        const message = await this.searchHistoryService.saveUsersSearch(searcher_uuid, searched_uuid);
+        res.status(200).send({ message });
     };
     removeRecentSearches = async (req, res) => {
         const uuid = req.params.uuid;
