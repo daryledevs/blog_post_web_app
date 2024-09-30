@@ -30,7 +30,7 @@ router
 router
   .route("/chat-history")
   .all(
-    validateUUIDRequestParams("user_uuid"),
+    validateUUIDRequestParams("userUuid"),
     validateUUIDRequestBody("conversationIds")
   )
   .post(wrap.asyncErrorHandler(controller.getChatHistory));

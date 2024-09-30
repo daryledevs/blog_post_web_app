@@ -6,11 +6,11 @@ class ChatsController {
         this.chatsService = chatsService;
     }
     getChatHistory = async (req, res) => {
-        const user_uuid = req.query.user_uuid;
+        const userUuid = req.query.userUuid;
         const emptyData = [0];
         const conversationIds = req.body.conversationIds || emptyData;
         const conversationListId = conversationIds.length ? conversationIds : emptyData;
-        const conversations = await this.chatsService.getChatHistory(user_uuid, conversationListId);
+        const conversations = await this.chatsService.getChatHistory(userUuid, conversationListId);
         const conversationList = conversations.map((conversation) => conversation.getConversations());
         res.status(200).send({ conversations: conversationList });
     };

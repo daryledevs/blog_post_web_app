@@ -21,7 +21,7 @@ router
     .delete(wrap.asyncErrorHandler(controller.deleteConversationById));
 router
     .route("/chat-history")
-    .all((0, validate_uuid_params_validation_1.default)("user_uuid"), (0, validate_uuid_body_validation_1.default)("conversationIds"))
+    .all((0, validate_uuid_params_validation_1.default)("userUuid"), (0, validate_uuid_body_validation_1.default)("conversationIds"))
     .post(wrap.asyncErrorHandler(controller.getChatHistory));
 router
     .route("/")
