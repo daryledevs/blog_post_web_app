@@ -26,9 +26,8 @@ router
 router
     .route("/")
     .all((0, validate_uuid_body_validation_1.default)([
-    "conversation_uuid",
-    "sender_uuid",
-    "receiver_uuid"
+    "senderUuid",
+    "receiverUuid"
 ]))
     .post(wrap.asyncErrorHandler(controller.newMessageAndConversation));
 exports.default = router;
