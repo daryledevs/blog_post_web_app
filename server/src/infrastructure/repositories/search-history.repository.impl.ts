@@ -5,9 +5,9 @@ import db                        from "@/infrastructure/database/db.database";
 import { DB }                    from "@/domain/types/schema.types";
 import { Kysely, sql }           from "kysely";
 import { plainToInstance }       from "class-transformer";
-import IESearchHistoryRepository from "@/domain/repositories/search-history.repository";
+import ISearchHistoryRepository from "@/domain/repositories/search-history.repository";
 
-class SearchHistoryRepository implements IESearchHistoryRepository {
+class SearchHistoryRepository implements ISearchHistoryRepository {
   private database: Kysely<DB>;
 
   constructor() {

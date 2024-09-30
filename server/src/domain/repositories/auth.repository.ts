@@ -6,7 +6,7 @@ import {
 import User from "@/domain/models/user.model";
 
 
-interface IEAuthRepository {
+interface IAuthRepository {
   createUser: (user: NewUsers) => Promise<User | undefined>;
 
   findResetTokenById: (token_id: string) => Promise<SelectResetPasswordToken | undefined>;
@@ -16,4 +16,4 @@ interface IEAuthRepository {
   deleteResetToken: (token_id: string) => Promise<void>;
 };
 
-export default IEAuthRepository;
+export default IAuthRepository;

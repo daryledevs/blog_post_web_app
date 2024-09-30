@@ -7,7 +7,7 @@ export type FollowStatsType = {
   following: number;
 };
 
-interface IEFollowRepository {
+interface IFollowRepository {
   findUserFollowStatsById: (id: number) => Promise<FollowStatsType>;
 
   findAllFollowersById: (id: number, listsId: number[]) => Promise<Follower[]>;
@@ -21,4 +21,4 @@ interface IEFollowRepository {
   unfollowUser: (identifier: NewFollowers) => Promise<void>;
 }
 
-export default IEFollowRepository;
+export default IFollowRepository;

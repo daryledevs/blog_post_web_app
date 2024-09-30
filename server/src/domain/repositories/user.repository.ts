@@ -1,7 +1,7 @@
 import User            from "@/domain/models/user.model";
 import { UpdateUsers } from "@/domain/types/table.types";
 
-interface IEUserRepository {
+interface IUserRepository {
   findUserById: (uuid: string) => Promise<User | undefined>;
 
   findUserByUsername: (username: string) => Promise<User | undefined>;
@@ -17,4 +17,4 @@ interface IEUserRepository {
   deleteUserById: (id: number) => Promise<void>;
 };
 
-export default IEUserRepository;
+export default IUserRepository;

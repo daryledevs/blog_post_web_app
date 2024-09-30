@@ -1,7 +1,7 @@
 import Like         from "@/domain/models/like.model";
 import { NewLikes } from "@/domain/types/table.types";
 
-interface IELikeRepository {
+interface ILikeRepository {
   findPostsLikeCount: (post_id: number) => Promise<number>;
 
   isUserLikePost: (user_id: number, post_id: number) => Promise<Like | undefined>;
@@ -11,4 +11,4 @@ interface IELikeRepository {
   dislikeUsersPostById: (id: number) => Promise<void>;
 }
 
-export default IELikeRepository;
+export default ILikeRepository;

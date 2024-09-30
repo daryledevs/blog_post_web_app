@@ -4,10 +4,10 @@ import { DB }              from "@/domain/types/schema.types";
 import { NewLikes }        from "@/domain/types/table.types";
 import AsyncWrapper        from "@/application/utils/async-wrapper.util";
 import { Kysely, sql }     from "kysely";
-import IELikeRepository    from "@/domain/repositories/like.repository";
+import ILikeRepository    from "@/domain/repositories/like.repository";
 import { plainToInstance } from "class-transformer";
 
-class LikeRepository implements IELikeRepository {
+class LikeRepository implements ILikeRepository {
   private database: Kysely<DB>;
   private wrap: AsyncWrapper = new AsyncWrapper();
 

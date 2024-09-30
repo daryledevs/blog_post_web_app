@@ -1,6 +1,6 @@
 import SearchHistory from "@/domain/models/search-history.model";
 
-interface IESearchHistoryRepository {
+interface ISearchHistoryRepository {
   findUsersSearchById: (uuid: string) => Promise<SearchHistory | undefined>;
 
   findSearchHistoryById: (searcher_id: number) => Promise<SearchHistory[]>;
@@ -12,4 +12,4 @@ interface IESearchHistoryRepository {
   deleteUsersSearchById: (id: number) => Promise<void>;
 };
 
-export default IESearchHistoryRepository;
+export default ISearchHistoryRepository;

@@ -1,6 +1,6 @@
 import { SelectPosts } from "@/domain/types/table.types";
 
-interface IEFeedRepository {
+interface IFeedRepository {
   getTotalFeed: () => Promise<number>;
 
   getUserFeed: (user_id: number, post_uuids: string[]) => Promise<SelectPosts[]>;
@@ -8,4 +8,4 @@ interface IEFeedRepository {
   getExploreFeed: (user_id: number) => Promise<SelectPosts[]>;
 };
 
-export default IEFeedRepository;
+export default IFeedRepository;

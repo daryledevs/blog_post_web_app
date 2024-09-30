@@ -9,10 +9,10 @@ import User                from "@/domain/models/user.model";
 import { DB }              from "@/domain/types/schema.types";
 import AsyncWrapper        from "@/application/utils/async-wrapper.util";
 import { Kysely, sql }     from "kysely";
-import IEAuthRepository    from "@/domain/repositories/auth.repository";
+import IAuthRepository    from "@/domain/repositories/auth.repository";
 import { plainToInstance } from "class-transformer";
 
-class AuthRepository implements IEAuthRepository {
+class AuthRepository implements IAuthRepository {
   private database: Kysely<DB>;
   private wrap: AsyncWrapper = new AsyncWrapper();
 

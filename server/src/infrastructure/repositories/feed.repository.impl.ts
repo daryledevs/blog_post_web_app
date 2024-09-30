@@ -3,9 +3,9 @@ import { DB }           from "@/domain/types/schema.types";
 import sqlUuidsToBin    from "@/application/utils/uuid-to-bin";
 import { Kysely, sql }  from "kysely";
 import { SelectPosts }  from "@/domain/types/table.types";
-import IEFeedRepository from "@/domain/repositories/feed.repository";
+import IFeedRepository from "@/domain/repositories/feed.repository";
 
-class FeedRepository implements IEFeedRepository {
+class FeedRepository implements IFeedRepository {
   private database: Kysely<DB>;
 
   constructor() { this.database = db; }
