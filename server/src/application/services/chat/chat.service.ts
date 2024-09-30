@@ -2,7 +2,7 @@ import ChatDto             from "@/domain/dto/chat.dto";
 import ConversationDto     from "@/domain/dto/conversation.dto";
 import { MessageDataType } from "@/domain/repositories/chat.repository";
 
-interface IEChatService {
+interface IChatService {
   getChatHistory: (uuid: string, conversationIds: string[]) => Promise<ConversationDto[]>;
 
   getChatMessages: (uuid: string, messageUuids: string[]) => Promise<ChatDto[]>;
@@ -12,4 +12,4 @@ interface IEChatService {
   deleteConversationById: (uuid: string) => Promise<string>;
 };
 
-export default IEChatService;
+export default IChatService;

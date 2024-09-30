@@ -4,10 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const chat_dto_1 = __importDefault(require("@/domain/dto/chat.dto"));
-const class_transformer_1 = require("class-transformer");
 const conversation_dto_1 = __importDefault(require("@/domain/dto/conversation.dto"));
+const class_transformer_1 = require("class-transformer");
 const api_exception_1 = __importDefault(require("@/application/exceptions/api.exception"));
-class ChatServices {
+class ChatService {
     chatRepository;
     userRepository;
     constructor(chatRepository, userRepository) {
@@ -34,41 +34,37 @@ class ChatServices {
         const chats = await this.chatRepository.findAllMessagesById(conversation.getId(), messageUuids);
         return chats.map((chat) => (0, class_transformer_1.plainToClass)(chat_dto_1.default, chat));
     };
-    newMessageAndConversation = async (messageData) => {
-        // destructure the necessary properties from messageData
-        const { conversation_uuid, sender_uuid, receiver_uuid, text_message } = messageData ?? {};
-        // fetch the sender and receiver from the user repository
-        const sender = await this.userRepository.findUserById(sender_uuid);
-        if (!sender) {
-            throw api_exception_1.default.HTTP404Error("user not found");
+    newMessageAndConversation = async ({ conversationUuid, senderUuid, receiverUuid, textMessage, }) => {
+        // Validate sender and receiver existence in parallel
+        const [sender, receiver] = await Promise.all([
+            this.userRepository.findUserById(senderUuid),
+            this.userRepository.findUserById(receiverUuid),
+        ]);
+        if (!sender || !receiver) {
+            throw api_exception_1.default.HTTP404Error("Sender or receiver not found");
         }
-        const receiver = await this.userRepository.findUserById(receiver_uuid);
-        if (!receiver) {
-            throw api_exception_1.default.HTTP404Error("user not found");
-        }
-        const sender_id = sender.getId();
-        const receiver_id = receiver.getId();
-        const conversation = await this.isConversationExist(conversation_uuid, sender_id, receiver_id);
-        let new_conversation_id = conversation?.getId();
-        // if the provided id doesn't exist, then it is a new message
-        if (!new_conversation_id) {
-            new_conversation_id = await this.createConversation(sender.getId(), receiver.getId());
-        }
-        // save the new message in the chat repository
+        const senderId = sender.getId();
+        const receiverId = receiver.getId();
+        // Fetch existing conversation or create a new one
+        const conversation = await this.isConversationExist(conversationUuid, senderId, receiverId);
+        // Get the conversation ID
+        const conversationId = conversation?.getId() ??
+            (await this.createConversation(senderId, receiverId));
+        // Save the new message
         await this.chatRepository.saveNewMessage({
-            conversation_id: new_conversation_id,
-            sender_id: sender_id,
-            text_message,
+            conversation_id: conversationId,
+            sender_id: senderId,
+            text_message: textMessage,
         });
-        return "message sent successfully";
+        return "Message sent successfully";
     };
     createConversation = async (senderId, receiverId) => {
-        const newConversationId = await this.chatRepository.saveNewConversation({});
+        const conversationId = await this.chatRepository.saveNewConversation({});
         await this.chatRepository.saveMultipleChatMembers([
-            { conversation_id: newConversationId, user_id: senderId },
-            { conversation_id: newConversationId, user_id: receiverId },
+            { conversation_id: conversationId, user_id: senderId },
+            { conversation_id: conversationId, user_id: receiverId },
         ]);
-        return newConversationId;
+        return conversationId;
     };
     deleteConversationById = async (uuid) => {
         // Check if the conversation exists
@@ -81,23 +77,21 @@ class ChatServices {
         await this.chatRepository.deleteConversationById(conversation.getId());
         return "Conversation deleted successfully";
     };
-    isConversationExist = async (conversation_uuid, senderId, receiverId) => {
-        if (!conversation_uuid) {
+    isConversationExist = async (conversationUuid, senderId, receiverId) => {
+        if (!conversationUuid) {
+            // Fetch conversation by member IDs if no UUID is provided
+            const conversation = await this.chatRepository.findOneConversationByMembersId([
+                senderId,
+                receiverId,
+            ]);
+            // If a conversation is found, throw an error
+            if (conversation) {
+                throw api_exception_1.default.HTTP404Error("The provided conversation ID is invalid or conversation not found");
+            }
             return undefined;
         }
-        // Attempt to fetch the conversation by its UUID
-        const conversation = await this.chatRepository.findOneConversationByUuId(conversation_uuid);
-        // If not found by UUID, try fetching by member IDs
-        const conversationByMembers = await this.chatRepository.findOneConversationByMembersId([
-            senderId,
-            receiverId,
-        ]);
-        // If conversation fetched by members ID does not match the UUID, throw error
-        if (conversationByMembers?.getUuid() !== conversation?.getId()) {
-            throw api_exception_1.default.HTTP404Error("the provided conversation ID is invalid or conversation not found");
-        }
-        return conversation;
+        // Fetch conversation by UUID
+        return await this.chatRepository.findOneConversationByUuId(conversationUuid);
     };
 }
-;
-exports.default = ChatServices;
+exports.default = ChatService;
