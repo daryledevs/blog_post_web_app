@@ -78,23 +78,23 @@ class ChatsRepository {
     };
     findOneConversationByUuId = async (uuid) => {
         const conversation = await this.database
-            .selectFrom("conversations")
+            .selectFrom("conversations as c")
             .leftJoin((eb) => eb
             .selectFrom("conversation_members")
             .select(["conversation_id", "user_id"])
-            .as("cm"), (join) => join.onRef("conversations.id", "=", "cm.conversation_id"))
+            .as("cm"), (join) => join.onRef("c.id", "=", "cm.conversation_id"))
             .leftJoin("users", "cm.user_id", "users.id")
             .select([
-            "id",
-            (0, kysely_1.sql) `BIN_TO_BINARY(uuid)`.as("uuid"),
-            "created_at",
+            "c.id",
+            (0, kysely_1.sql) `BIN_TO_UUID(c.uuid)`.as("uuid"),
             (0, kysely_1.sql) `BIN_TO_UUID(users.uuid)`.as("user_uuid"),
             "users.username",
             "users.first_name",
             "users.last_name",
             "users.avatar_url",
+            "c.created_at",
         ])
-            .where("uuid", "=", (0, kysely_1.sql) `UUID_TO_BIN(${uuid})`)
+            .where("c.uuid", "=", (0, kysely_1.sql) `UUID_TO_BIN(${uuid})`)
             .executeTakeFirst();
         return (0, class_transformer_1.plainToInstance)(conversation_model_1.default, conversation);
     };
@@ -105,31 +105,27 @@ class ChatsRepository {
             .selectFrom("conversation_members as cm")
             .leftJoin("users as u", "cm.user_id", "u.id")
             .select([
-            "cm.id",
-            (0, kysely_1.sql) `BIN_TO_UUID(cm.uuid)`.as("uuid"),
-            "cm.conversation_id",
+            "cm.id as cm_id",
+            (0, kysely_1.sql) `BIN_TO_UUID(cm.uuid)`.as("cm_uuid"),
+            "conversation_id",
             "cm.user_id",
             "u.username",
             "u.first_name",
             "u.last_name",
             "u.avatar_url",
         ])
-            .as("cm"), (join) => join.onRef("cm.conversation_id", "=", "c.id"))
-            .leftJoin((eb) => eb
-            .selectFrom("users as u")
-            .select(["u.id", (0, kysely_1.sql) `BIN_TO_UUID(u.uuid)`.as("uuid")])
-            .as("u"), (join) => join.onRef("u.id", "=", "cm.user_id"))
+            .where("u.id", "in", memberIds)
+            .as("cm"), (join) => join.onRef("conversation_id", "=", "id"))
             .select([
             "c.id",
-            (0, kysely_1.sql) `BIN_TO_BINARY(c.uuid)`.as("uuid"),
-            (0, kysely_1.sql) `BIN_TO_UUID(u.uuid)`.as("user_uuid"),
+            (0, kysely_1.sql) `BIN_TO_UUID(c.uuid)`.as("uuid"),
             "cm.username",
+            "cm.user_id",
             "cm.first_name",
             "cm.last_name",
             "cm.avatar_url",
             "c.created_at",
         ])
-            .where("u.id", "in", memberIds)
             .executeTakeFirst();
         return (0, class_transformer_1.plainToInstance)(conversation_model_1.default, conversation);
     };
@@ -140,7 +136,7 @@ class ChatsRepository {
             .leftJoin("users as user", "messages.sender_id", "user.id")
             .select([
             "id",
-            (0, kysely_1.sql) `BIN_TO_BINARY(uuid)`.as("uuid"),
+            (0, kysely_1.sql) `BIN_TO_UUID(uuid)`.as("uuid"),
             "conversation_id",
             "sender_id",
             (0, kysely_1.sql) `BIN_TO_UUID(user.uuid)`.as("user_uuid"),
