@@ -62,7 +62,8 @@ class UsersController {
     getSearchHistory = async (req, res) => {
         const searcherUuid = req.params.searcherUuid;
         const searches = await this.searchHistoryService.getUsersSearchHistoryById(searcherUuid);
-        res.status(200).send({ searches });
+        const searchesList = searches.map((search) => search?.getSearchHistories());
+        res.status(200).send({ searches: searchesList });
     };
     saveRecentSearches = async (req, res) => {
         const searcherUuid = req.params.searcherUuid;

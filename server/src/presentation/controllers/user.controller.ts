@@ -1,10 +1,11 @@
-import UserDto                from "@/domain/dto/user.dto";
-import FollowerDto            from "@/domain/dto/follower.dto";
-import FollowingDto           from "@/domain/dto/following.dto";
-import IEUserService          from "@/application/services/user/user.service";
-import IEFollowService        from "@/application/services/follow/follow.service";
-import { Request, Response }  from "express";
-import IESearchHistoryService from "@/application/services/search-history/search-history.service";
+import UserDto                   from "@/domain/dto/user.dto";
+import FollowerDto               from "@/domain/dto/follower.dto";
+import FollowingDto              from "@/domain/dto/following.dto";
+import IEUserService             from "@/application/services/user/user.service";
+import IEFollowService           from "@/application/services/follow/follow.service";
+import { Request, Response }     from "express";
+import IESearchHistoryService    from "@/application/services/search-history/search-history.service";
+import { IFollower, IFollowing } from "@/domain/types/follower.interface";
 
 class UsersController {
   private userService: IEUserService;
@@ -65,18 +66,18 @@ class UsersController {
       followIds
     );
 
-    let followList: FollowerDto[] | FollowingDto[] = [];
+    let followList: IFollower[] | IFollowing[] = [];
 
     if (fetchFollowType === "followers") {
       // Type assertion is used to convert the type of the followLists array to FollowerDto[]
       followList = (followLists as FollowerDto[]).map((follower: FollowerDto) =>
         follower.getFollowers()
-      ) as unknown as FollowerDto[];
+      ) as unknown as IFollower[];
     } else {
       // Type assertion is used to convert the type of the followLists array to FollowingDto[]
       followList = (followLists as FollowingDto[]).map(
         (follower: FollowingDto) => follower.getFollowing()
-      ) as unknown as FollowingDto[];
+      ) as unknown as IFollowing[];
     }
 
     res.status(200).send({ followList });
@@ -101,7 +102,9 @@ class UsersController {
       searcherUuid
     );
 
-    res.status(200).send({ searches });
+    const searchesList = searches.map((search) => search?.getSearchHistories());
+
+    res.status(200).send({ searches: searchesList });
   };
 
   public saveRecentSearches = async (req: Request, res: Response) => {
