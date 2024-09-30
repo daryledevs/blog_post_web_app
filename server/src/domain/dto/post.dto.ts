@@ -1,3 +1,4 @@
+import { IPost }                       from "../types/post.interface";
 import { Exclude, Expose }             from "class-transformer";
 import {IsEmpty, IsUUID, ValidateIf }  from "class-validator";
 
@@ -65,7 +66,7 @@ class PostDto {
     this.created_at = created_at;
   }
 
-  getPosts() {
+  getPosts(): IPost {
     return {
       id: this.id,
       uuid: this.uuid,

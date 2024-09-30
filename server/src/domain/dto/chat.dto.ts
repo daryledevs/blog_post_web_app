@@ -1,3 +1,4 @@
+import { IChat }              from "../types/chat.interface";
 import UserDetailsDto         from "./user-details.dto";
 import { Exclude, Expose }    from "class-transformer";
 import { IsNotEmpty, IsUUID } from "class-validator";
@@ -43,7 +44,7 @@ class ChatDto extends UserDetailsDto {
     this.user_uuid = user_uuid;
   }
 
-  getChats() {
+  getChats(): IChat {
     return {
       id: this.id,
       uuid: this.uuid,

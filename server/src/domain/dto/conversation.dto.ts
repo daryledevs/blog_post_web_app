@@ -1,5 +1,6 @@
 
 import UserDetailsDto      from "./user-details.dto";
+import { IConversation }   from "../types/conversation.interface";
 import { Exclude, Expose } from "class-transformer";
 
 class ConversationDto extends UserDetailsDto {
@@ -21,7 +22,7 @@ class ConversationDto extends UserDetailsDto {
     created_at: Date | null,
     first_name?: string | null,
     last_name?: string | null,
-    avatar_url?: string | null,
+    avatar_url?: string | null
   ) {
     super(username, first_name, last_name, avatar_url);
     this.id = id;
@@ -29,7 +30,7 @@ class ConversationDto extends UserDetailsDto {
     this.created_at = created_at || null;
   }
 
-  getConversations() {
+  getConversations(): IConversation {
     return {
       id: this.id,
       uuid: this.uuid,
@@ -68,7 +69,7 @@ class ConversationDto extends UserDetailsDto {
   setUserUuid(user_uuid: any) {
     this.user_uuid = user_uuid;
   }
-  
+
   setCreatedAt(created_at: Date | null) {
     this.created_at = created_at;
   }

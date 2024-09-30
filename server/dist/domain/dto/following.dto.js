@@ -27,9 +27,9 @@ class FollowingDto extends user_details_dto_1.default {
         return {
             followedUuid: this.followed_uuid,
             username: this.username,
-            firstName: this.first_name,
-            lastName: this.last_name,
-            avatarUrl: this.avatar_url,
+            firstName: this?.first_name ?? null,
+            lastName: this?.last_name ?? null,
+            avatarUrl: this?.avatar_url ?? null,
         };
     }
     // getters

@@ -1,3 +1,4 @@
+import { IFollower }          from "../types/follower.interface";
 import UserDetailsDto         from "./user-details.dto";
 import { Exclude, Expose }    from "class-transformer";
 import { IsNotEmpty, IsUUID } from "class-validator";
@@ -24,13 +25,13 @@ class FollowerDto extends UserDetailsDto {
     this.follower_uuid = follower_uuid;
   }
 
-  getFollowers() {
+  getFollowers(): IFollower {
     return {
       followerUuid: this.follower_uuid,
       username: this.username,
-      firstName: this.first_name,
-      lastName: this.last_name,
-      avatarUrl: this.avatar_url,
+      firstName: this.first_name ?? null,
+      lastName: this.last_name ?? null,
+      avatarUrl: this.avatar_url ?? null,
     };
   }
 

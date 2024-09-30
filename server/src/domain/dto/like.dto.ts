@@ -1,3 +1,4 @@
+import { ILike }              from "../types/likes.interface";
 import { Exclude, Expose }    from "class-transformer";
 import { IsNotEmpty, IsUUID } from "class-validator";
 
@@ -47,7 +48,7 @@ class LikeDto {
     this.created_at = created_at;
   }
 
-  getLikes() {
+  getLikes(): ILike {
     return {
       id: this.id,
       uuid: this.uuid,

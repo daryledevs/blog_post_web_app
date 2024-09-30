@@ -6,6 +6,7 @@ import {
   MaxDate,
 }                       from "class-validator";
 import { Expose, Type } from "class-transformer";
+import { IUserDetails } from "../types/user.interface";
 
 class UserDetailsDto {
   @Expose()
@@ -63,7 +64,7 @@ class UserDetailsDto {
     this.birthday = birthday;
   }
 
-  getUserDetails() {
+  getUserDetails(): IUserDetails {
     return {
       username: this.username,
       firstName: this.first_name,

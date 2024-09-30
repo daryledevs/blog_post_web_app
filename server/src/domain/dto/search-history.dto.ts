@@ -1,4 +1,5 @@
 import UserDetailsDto                             from "./user-details.dto";
+import { ISearchHistory }                         from "../types/search.interface";
 import { Exclude, Expose }                        from "class-transformer";
 import { IsDate, IsNotEmpty, IsOptional, IsUUID } from "class-validator";
 
@@ -47,7 +48,7 @@ class SearchHistoryDto extends UserDetailsDto {
     this.created_at = created_at;
   }
 
-  getSearchHistories() {
+  getSearchHistories(): ISearchHistory {
     return {
       id: this.id,
       uuid: this.uuid,

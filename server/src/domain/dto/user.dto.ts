@@ -8,6 +8,7 @@ import {
   IsStrongPassword,
   Validate,
 }                          from "class-validator";
+import { IUser }           from "../types/user.interface";
 import PasswordMatch       from "@/presentation/validations/validate-password-match.validation";
 import UserDetailsDto      from "./user-details.dto";
 import { Exclude, Expose } from "class-transformer";
@@ -52,7 +53,7 @@ class UserDto extends UserDetailsDto {
 
   @Expose()
   @IsOptional()
-  private created_at: Date | null | undefined;
+  private created_at: Date | null;
 
   constructor(
     id: number,
@@ -79,12 +80,14 @@ class UserDto extends UserDetailsDto {
     this.confirmPassword = confirmPassword!;
   }
 
-  getUsers() {
+  getUsers(): IUser {
     return {
       id: this.id,
       uuid: this.uuid,
       username: this.username,
       email: this.email,
+      firstName: this.first_name,
+      lastName: this.last_name,
       roles: this.roles,
       avatarUrl: this.avatar_url,
       age: this.age,
