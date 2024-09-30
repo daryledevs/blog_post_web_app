@@ -69,12 +69,12 @@ class PostRepository implements IPostRepository {
   };
 
   public findUserTotalPostsByUserId = async (
-    user_id: number
+    userId: number
   ): Promise<string | number | bigint> => {
     const query = this.database
       .selectFrom("posts")
       .select((eb) => eb.fn.count<number>("posts.id").as("count"))
-      .where("user_id", "=", user_id);
+      .where("user_id", "=", userId);
 
     const { count } = await this.database
       .selectNoFrom((eb) => eb.fn.coalesce(query, eb.lit(0)).as("count"))

@@ -32,7 +32,7 @@ class SearchHistoryRepository {
             .executeTakeFirst();
         return this.plainToModel(search);
     };
-    findSearchHistoryById = async (searcher_id) => {
+    findSearchHistoryById = async (searcherId) => {
         const searches = await this.database
             .selectFrom("search_history as sh")
             .leftJoin("users as u", "u.id", "sh.searched_id")
@@ -48,12 +48,12 @@ class SearchHistoryRepository {
             "u.avatar_url",
             "sh.created_at",
         ])
-            .where("sh.searcher_id", "=", searcher_id)
+            .where("sh.searcher_id", "=", searcherId)
             .limit(30)
             .execute();
         return (0, class_transformer_1.plainToInstance)(search_history_model_1.default, searches);
     };
-    findUsersSearchByUsersId = async (searcher_id, searched_id) => {
+    findUsersSearchByUsersId = async (searcherId, searchedId) => {
         const search = await this.database
             .selectFrom("search_history as sh")
             .leftJoin("users as u", "u.id", "sh.searched_id")
@@ -70,16 +70,19 @@ class SearchHistoryRepository {
             "sh.created_at",
         ])
             .where((eb) => eb.and([
-            eb("sh.searcher_id", "=", searcher_id),
-            eb("sh.searched_id", "=", searched_id),
+            eb("sh.searcher_id", "=", searcherId),
+            eb("sh.searched_id", "=", searchedId),
         ]))
             .executeTakeFirst();
         return this.plainToModel(search);
     };
-    saveUsersSearch = async (searcher_id, searched_id) => {
+    saveUsersSearch = async (searcherId, searchedId) => {
         await this.database
             .insertInto("search_history")
-            .values({ searcher_id, searched_id })
+            .values({
+            searcher_id: searcherId,
+            searched_id: searchedId
+        })
             .execute();
     };
     deleteUsersSearchById = async (id) => {

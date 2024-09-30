@@ -57,12 +57,12 @@ class UsersController {
   public getFollowerFollowingLists = async (req: Request, res: Response) => {
     const uuid = req.params.uuid!;
     const fetchFollowType = req.query.fetchFollowType;
-    const followListIds = req.body.followListIds;
+    const followIds = req.body.followIds;
 
     const followLists = await this.followService.getFollowerFollowingLists(
       uuid,
       fetchFollowType as string,
-      followListIds
+      followIds
     );
 
     let followList: FollowerDto[] | FollowingDto[] = [];
@@ -83,41 +83,41 @@ class UsersController {
   };
 
   public toggleFollow = async (req: Request, res: Response) => {
-    const follower_uuid = req.params.follower_uuid!;
-    const followed_uuid = req.params.followed_uuid!;
+    const followerUuid = req.params.followerUuid!;
+    const followedUuid = req.params.followedUuid!;
 
     const message = await this.followService.toggleFollow(
-      follower_uuid,
-      followed_uuid
+      followerUuid,
+      followedUuid
     );
 
     res.status(200).send(message);
   };
 
   public getSearchHistory = async (req: Request, res: Response) => {
-    const searcher_uuid = req.params.searcher_uuid;
+    const searcherUuid = req.params.searcherUuid!;
 
     const searches = await this.searchHistoryService.getUsersSearchHistoryById(
-      searcher_uuid
+      searcherUuid
     );
 
     res.status(200).send({ searches });
   };
 
   public saveRecentSearches = async (req: Request, res: Response) => {
-    const searcher_uuid = req.params.searcher_uuid;
-    const searched_uuid = req.params.searched_uuid;
+    const searcherUuid = req.params.searcherUuid!;
+    const searchedUuid = req.params.searchedUuid!;
 
     const message = await this.searchHistoryService.saveUsersSearch(
-      searcher_uuid,
-      searched_uuid
+      searcherUuid,
+      searchedUuid
     );
 
     res.status(200).send({ message });
   };
 
   public removeRecentSearches = async (req: Request, res: Response) => {
-    const uuid = req.params.uuid;
+    const uuid = req.params.uuid!;
 
     const message = await this.searchHistoryService.removeRecentSearchesById(
       uuid

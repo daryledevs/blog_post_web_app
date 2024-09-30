@@ -56,11 +56,11 @@ class PostRepository {
             .execute();
         return (0, class_transformer_1.plainToInstance)(post_model_1.default, data);
     };
-    findUserTotalPostsByUserId = async (user_id) => {
+    findUserTotalPostsByUserId = async (userId) => {
         const query = this.database
             .selectFrom("posts")
             .select((eb) => eb.fn.count("posts.id").as("count"))
-            .where("user_id", "=", user_id);
+            .where("user_id", "=", userId);
         const { count } = await this.database
             .selectNoFrom((eb) => eb.fn.coalesce(query, eb.lit(0)).as("count"))
             .executeTakeFirstOrThrow();

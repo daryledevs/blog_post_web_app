@@ -40,17 +40,17 @@ router
     .all((0, validate_uuid_params_validation_1.default)("uuid"), (0, validate_uuid_body_validation_1.default)("followListIds"), (0, validate_request_query_validation_1.default)("fetchFollowType"))
     .post(wrap.asyncErrorHandler(controller.getFollowerFollowingLists));
 router
-    .route("/:follower_uuid/follow/:followed_uuid")
-    .all((0, validate_uuid_params_validation_1.default)(["follower_uuid", "followed_uuid"]))
+    .route("/:followerUuid/follow/:followedUuid")
+    .all((0, validate_uuid_params_validation_1.default)(["followerUuid", "followedUuid"]))
     .post(wrap.asyncErrorHandler(controller.toggleFollow));
 // search endpoints
 router
-    .route("/:searcher_uuid/searches")
-    .all((0, validate_uuid_params_validation_1.default)("searcher_uuid"))
+    .route("/:searcherUuid/searches")
+    .all((0, validate_uuid_params_validation_1.default)("searcherUuid"))
     .get(wrap.asyncErrorHandler(controller.getSearchHistory));
 router
-    .route("/:searcher_uuid/searches/:searched_uuid")
-    .all((0, validate_uuid_params_validation_1.default)(["searcher_uuid", "searched_uuid"]))
+    .route("/:searcherUuid/searches/:searchedUuid")
+    .all((0, validate_uuid_params_validation_1.default)(["searcherUuid", "searchedUuid"]))
     .post(wrap.asyncErrorHandler(controller.saveRecentSearches));
 router
     .route("/:uuid/searches")

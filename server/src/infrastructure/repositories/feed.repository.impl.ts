@@ -8,7 +8,9 @@ import IFeedRepository from "@/domain/repositories/feed.repository";
 class FeedRepository implements IFeedRepository {
   private database: Kysely<DB>;
 
-  constructor() { this.database = db; }
+  constructor() {
+    this.database = db;
+  }
 
   public getTotalFeed = async (): Promise<number> => {
     const query = this.database
@@ -26,10 +28,10 @@ class FeedRepository implements IFeedRepository {
   };
 
   public getUserFeed = async (
-    user_id: number,
-    post_uuids: string[]
+    userId: number,
+    postListUuids: string[]
   ): Promise<SelectPosts[]> => {
-    const postUuidsToBinQuery = sqlUuidsToBin(post_uuids);
+    const postUuidsToBinQuery = sqlUuidsToBin(postListUuids);
 
     return await this.database
       .selectFrom("followers")
@@ -58,7 +60,7 @@ class FeedRepository implements IFeedRepository {
       ])
       .where((eb) =>
         eb.and([
-          eb("followers.follower_id", "=", user_id),
+          eb("followers.follower_id", "=", userId),
           eb(
             "posts.created_at",
             ">",
@@ -72,7 +74,7 @@ class FeedRepository implements IFeedRepository {
       .execute();
   };
 
-  public getExploreFeed = async (user_id: number): Promise<any[]> => {
+  public getExploreFeed = async (userId: number): Promise<any[]> => {
     return await this.database
       .selectFrom("posts")
       .innerJoin("users", "users.id", "posts.user_id")
@@ -80,7 +82,7 @@ class FeedRepository implements IFeedRepository {
         join.on((eb) =>
           eb.and([
             eb("followers.followed_id", "=", eb.ref("users.id")),
-            eb("followers.follower_id", "=", user_id),
+            eb("followers.follower_id", "=", userId),
           ])
         )
       )
@@ -112,7 +114,7 @@ class FeedRepository implements IFeedRepository {
             sql<Date>`DATE_SUB(CURDATE(), INTERVAL 3 DAY)`
           ),
           eb("followers.follower_id", "is", eb.lit(null)),
-          eb("users.id", "!=", user_id),
+          eb("users.id", "!=", userId),
         ])
       )
       .orderBy(sql`"RAND()"`)

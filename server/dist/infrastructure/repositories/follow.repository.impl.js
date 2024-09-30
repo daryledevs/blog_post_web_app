@@ -10,9 +10,7 @@ const kysely_1 = require("kysely");
 const class_transformer_1 = require("class-transformer");
 class FollowRepository {
     database;
-    constructor() {
-        this.database = db_database_1.default;
-    }
+    constructor() { this.database = db_database_1.default; }
     findUserFollowStatsById = async (id) => {
         const queryFollowers = this.database
             .selectFrom("followers")
@@ -34,7 +32,7 @@ class FollowRepository {
             .executeTakeFirstOrThrow();
         return { followers, following };
     };
-    findAllFollowersById = async (id, listsId) => {
+    findAllFollowersById = async (id, followIds) => {
         const data = await this.database
             .selectFrom("followers")
             .leftJoin("users", "followers.follower_id", "users.id")
@@ -49,13 +47,13 @@ class FollowRepository {
         ])
             .where((eb) => eb.and([
             eb("followers.followed_id", "=", id),
-            eb("followers.follower_id", "not in", listsId),
+            eb("followers.follower_id", "not in", followIds),
         ]))
             .limit(10)
             .execute();
         return (0, class_transformer_1.plainToInstance)(follower_model_1.default, data);
     };
-    findAllFollowingById = async (id, listsId) => {
+    findAllFollowingById = async (id, followIds) => {
         const data = await this.database
             .selectFrom("followers")
             .leftJoin("users", "followers.followed_id", "users.id")
@@ -70,7 +68,7 @@ class FollowRepository {
         ])
             .where((eb) => eb.and([
             eb("followers.follower_id", "=", id),
-            eb("followers.followed_id", "not in", listsId),
+            eb("followers.followed_id", "not in", followIds),
         ]))
             .limit(10)
             .execute();

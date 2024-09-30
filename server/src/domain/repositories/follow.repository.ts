@@ -10,9 +10,9 @@ export type FollowStatsType = {
 interface IFollowRepository {
   findUserFollowStatsById: (id: number) => Promise<FollowStatsType>;
 
-  findAllFollowersById: (id: number, listsId: number[]) => Promise<Follower[]>;
+  findAllFollowersById: (id: number, followIds: number[]) => Promise<Follower[]>;
 
-  findAllFollowingById: (id: number, listsId: number[]) => Promise<Following[]>;
+  findAllFollowingById: (id: number, followIds: number[]) => Promise<Following[]>;
 
   isUserFollowing: (identifier: NewFollowers) => Promise<boolean>;
 

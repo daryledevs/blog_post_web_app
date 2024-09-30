@@ -14,7 +14,7 @@ export interface MessageDataType {
 };
 
 interface IChatRepository {
-  findAllConversationByUserId: (userId: number, conversationIds: string[]) => Promise<Conversation[]>;
+  findAllConversationByUserId: (userId: number, conversationUuids: string[]) => Promise<Conversation[]>;
 
   findAllMessagesById: (conversationId: number, messageUuids: string[]) => Promise<Chat[]>;
 

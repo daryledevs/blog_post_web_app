@@ -13,8 +13,8 @@ class ChatsRepository {
     database;
     constructor() { this.database = db_database_1.default; }
     // this returns a list of the history of people who have communicated
-    findAllConversationByUserId = async (userId, conversationIds) => {
-        const uuidToBin = (0, uuid_to_bin_1.default)(conversationIds);
+    findAllConversationByUserId = async (userId, conversationUuids) => {
+        const uuidToBin = (0, uuid_to_bin_1.default)(conversationUuids);
         const conversations = await this.database
             .selectFrom("conversations as c")
             .select(["c.id", (0, kysely_1.sql) `BIN_TO_UUID(c.uuid)`.as("uuid")])

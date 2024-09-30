@@ -5,14 +5,12 @@ import Following                               from "@/domain/models/following.m
 import { Kysely, sql }                         from "kysely";
 import { NewFollowers }                        from "@/domain/types/table.types";
 import { plainToInstance }                     from "class-transformer";
-import IEFollowRepository, { FollowStatsType } from "@/domain/repositories/follow.repository";
+import IFollowRepository, { FollowStatsType } from "@/domain/repositories/follow.repository";
 
-class FollowRepository implements IEFollowRepository {
+class FollowRepository implements IFollowRepository {
   private database: Kysely<DB>;
 
-  constructor() {
-    this.database = db;
-  }
+  constructor() { this.database = db; }
 
   public findUserFollowStatsById = async (
     id: number
@@ -45,7 +43,7 @@ class FollowRepository implements IEFollowRepository {
 
   public findAllFollowersById = async (
     id: number,
-    listsId: number[]
+    followIds: number[]
   ): Promise<Follower[]> => {
     const data = await this.database
       .selectFrom("followers")
@@ -62,7 +60,7 @@ class FollowRepository implements IEFollowRepository {
       .where((eb) =>
         eb.and([
           eb("followers.followed_id", "=", id),
-          eb("followers.follower_id", "not in", listsId),
+          eb("followers.follower_id", "not in", followIds),
         ])
       )
       .limit(10)
@@ -73,7 +71,7 @@ class FollowRepository implements IEFollowRepository {
 
   public findAllFollowingById = async (
     id: number,
-    listsId: number[]
+    followIds: number[]
   ): Promise<Following[]> => {
     const data = await this.database
       .selectFrom("followers")
@@ -90,7 +88,7 @@ class FollowRepository implements IEFollowRepository {
       .where((eb) =>
         eb.and([
           eb("followers.follower_id", "=", id),
-          eb("followers.followed_id", "not in", listsId),
+          eb("followers.followed_id", "not in", followIds),
         ])
       )
       .limit(10)

@@ -9,17 +9,16 @@ import { plainToInstance } from "class-transformer";
 
 class LikeRepository implements ILikeRepository {
   private database: Kysely<DB>;
-  private wrap: AsyncWrapper = new AsyncWrapper();
 
   constructor() {
     this.database = db;
   }
 
-  public findPostsLikeCount = async (post_id: number): Promise<number> => {
+  public findPostsLikeCount = async (postId: number): Promise<number> => {
     const query = this.database
       .selectFrom("likes")
       .select((eb) => eb.fn.count<number>("likes.post_id").as("count"))
-      .where("likes.post_id", "=", post_id);
+      .where("likes.post_id", "=", postId);
 
     const { count } = await this.database
       .selectNoFrom((eb) => eb.fn.coalesce(query, eb.lit(0)).as("count"))
@@ -29,8 +28,8 @@ class LikeRepository implements ILikeRepository {
   };
 
   public isUserLikePost = async (
-    user_id: number,
-    post_id: number
+    userId: number,
+    postId: number
   ): Promise<Like | undefined> => {
     const data = await this.database
       .selectFrom("likes")
@@ -46,8 +45,8 @@ class LikeRepository implements ILikeRepository {
       .leftJoin("users", "likes.user_id", "users.id")
       .where((eb) =>
         eb.and([
-          eb("likes.user_id", "=", user_id),
-          eb("likes.post_id", "=", post_id),
+          eb("likes.user_id", "=", userId),
+          eb("likes.post_id", "=", postId),
         ])
       )
       .executeTakeFirst();

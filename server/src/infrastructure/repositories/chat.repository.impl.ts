@@ -20,9 +20,9 @@ class ChatsRepository implements IChatRepository {
   // this returns a list of the history of people who have communicated
   public findAllConversationByUserId = async (
     userId: number,
-    conversationIds: string[]
+    conversationUuids: string[]
   ): Promise<Conversation[]> => {
-    const uuidToBin = sqlUuidsToBin(conversationIds);
+    const uuidToBin = sqlUuidsToBin(conversationUuids);
 
     const conversations = await this.database
       .selectFrom("conversations as c")

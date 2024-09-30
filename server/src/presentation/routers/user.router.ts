@@ -60,19 +60,19 @@ router
   .post(wrap.asyncErrorHandler(controller.getFollowerFollowingLists));
 
 router
-  .route("/:follower_uuid/follow/:followed_uuid")
-  .all(validateUUIDRequestParams(["follower_uuid", "followed_uuid"]))
+  .route("/:followerUuid/follow/:followedUuid")
+  .all(validateUUIDRequestParams(["followerUuid", "followedUuid"]))
   .post(wrap.asyncErrorHandler(controller.toggleFollow));
 
 // search endpoints
 router
-  .route("/:searcher_uuid/searches")
-  .all(validateUUIDRequestParams("searcher_uuid"))
+  .route("/:searcherUuid/searches")
+  .all(validateUUIDRequestParams("searcherUuid"))
   .get(wrap.asyncErrorHandler(controller.getSearchHistory));
 
 router
-  .route("/:searcher_uuid/searches/:searched_uuid")
-  .all(validateUUIDRequestParams(["searcher_uuid", "searched_uuid"]))
+  .route("/:searcherUuid/searches/:searchedUuid")
+  .all(validateUUIDRequestParams(["searcherUuid", "searchedUuid"]))
   .post(wrap.asyncErrorHandler(controller.saveRecentSearches));
 
 router

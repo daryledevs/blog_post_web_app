@@ -1,32 +1,32 @@
-import SearchHistoryDto          from "@/domain/dto/search-history.dto";
-import IEUserRepository          from "@/domain/repositories/user.repository";
-import ApiErrorException         from "@/application/exceptions/api.exception";
-import { plainToInstance }       from "class-transformer";
-import IESearchHistoryService    from "./search-history.service";
-import IESearchHistoryRepository from "@/domain/repositories/search-history.repository";
+import SearchHistoryDto         from "@/domain/dto/search-history.dto";
+import IUserRepository          from "@/domain/repositories/user.repository";
+import ApiErrorException        from "@/application/exceptions/api.exception";
+import { plainToInstance }      from "class-transformer";
+import ISearchHistoryService    from "./search-history.service";
+import ISearchHistoryRepository from "@/domain/repositories/search-history.repository";
 
-class SearchHistoryService implements IESearchHistoryService {
-  private userRepository: IEUserRepository;
-  private searchHistoryRepository: IESearchHistoryRepository;
+class SearchHistoryService implements ISearchHistoryService {
+  private userRepository: IUserRepository;
+  private searchHistoryRepository: ISearchHistoryRepository;
 
   constructor(
-    userRepository: IEUserRepository,
-    searchHistoryRepository: IESearchHistoryRepository
+    userRepository: IUserRepository,
+    searchHistoryRepository: ISearchHistoryRepository
   ) {
     this.userRepository = userRepository;
     this.searchHistoryRepository = searchHistoryRepository;
   }
 
   public getUsersSearchHistoryById = async (
-    searcher_uuid: string | undefined
+    searcherUuid: string
   ): Promise<SearchHistoryDto[]> => {
     // If no parameters are provided, return an error
-    if (!searcher_uuid) {
+    if (!searcherUuid) {
       throw ApiErrorException.HTTP400Error("No arguments provided");
     }
 
     // Check if the user is already following the other user
-    const user = await this.userRepository.findUserById(searcher_uuid);
+    const user = await this.userRepository.findUserById(searcherUuid);
 
     // If the user is not found, return an error
     if (!user) throw ApiErrorException.HTTP404Error("User not found");
@@ -42,20 +42,15 @@ class SearchHistoryService implements IESearchHistoryService {
   };
 
   public saveUsersSearch = async (
-    searcher_uuid: string | undefined,
-    search_uuid: string | undefined
+    searcherUuid: string,
+    searchUuid: string
   ): Promise<string> => {
-    // If no parameters are provided, return an error
-    if (!searcher_uuid || !search_uuid) {
-      throw ApiErrorException.HTTP400Error("No arguments provided");
-    }
-
     // Check if the user is already following the other user
-    const user = await this.userRepository.findUserById(searcher_uuid);
+    const user = await this.userRepository.findUserById(searcherUuid);
     if (!user) throw ApiErrorException.HTTP404Error("User not found");
 
     // Check if the user is already following the other user
-    const searchUser = await this.userRepository.findUserById(search_uuid);
+    const searchUser = await this.userRepository.findUserById(searchUuid);
     if (!searchUser)
       throw ApiErrorException.HTTP404Error("Search user not found");
 
@@ -75,7 +70,7 @@ class SearchHistoryService implements IESearchHistoryService {
   };
 
   public removeRecentSearchesById = async (
-    uuid: string | undefined
+    uuid: string
   ): Promise<string> => {
     // If no parameters are provided, return an error
     if (!uuid) throw ApiErrorException.HTTP400Error("No arguments provided");

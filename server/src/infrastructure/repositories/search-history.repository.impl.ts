@@ -1,10 +1,10 @@
 import SearchHistory, {
   IESearchHistoryData,
-}                                from "@/domain/models/search-history.model";
-import db                        from "@/infrastructure/database/db.database";
-import { DB }                    from "@/domain/types/schema.types";
-import { Kysely, sql }           from "kysely";
-import { plainToInstance }       from "class-transformer";
+}                               from "@/domain/models/search-history.model";
+import db                       from "@/infrastructure/database/db.database";
+import { DB }                   from "@/domain/types/schema.types";
+import { Kysely, sql }          from "kysely";
+import { plainToInstance }      from "class-transformer";
 import ISearchHistoryRepository from "@/domain/repositories/search-history.repository";
 
 class SearchHistoryRepository implements ISearchHistoryRepository {
@@ -39,7 +39,7 @@ class SearchHistoryRepository implements ISearchHistoryRepository {
   };
 
   public findSearchHistoryById = async (
-    searcher_id: number
+    searcherId: number
   ): Promise<SearchHistory[]> => {
     const searches: IESearchHistoryData[] = await this.database
       .selectFrom("search_history as sh")
@@ -56,7 +56,7 @@ class SearchHistoryRepository implements ISearchHistoryRepository {
         "u.avatar_url",
         "sh.created_at",
       ])
-      .where("sh.searcher_id", "=", searcher_id)
+      .where("sh.searcher_id", "=", searcherId)
       .limit(30)
       .execute();
 
@@ -64,8 +64,8 @@ class SearchHistoryRepository implements ISearchHistoryRepository {
   };
 
   public findUsersSearchByUsersId = async (
-    searcher_id: number,
-    searched_id: number
+    searcherId: number,
+    searchedId: number
   ): Promise<SearchHistory | undefined> => {
     const search: IESearchHistoryData | undefined = await this.database
       .selectFrom("search_history as sh")
@@ -84,8 +84,8 @@ class SearchHistoryRepository implements ISearchHistoryRepository {
       ])
       .where((eb) =>
         eb.and([
-          eb("sh.searcher_id", "=", searcher_id),
-          eb("sh.searched_id", "=", searched_id),
+          eb("sh.searcher_id", "=", searcherId),
+          eb("sh.searched_id", "=", searchedId),
         ])
       )
       .executeTakeFirst();
@@ -94,12 +94,15 @@ class SearchHistoryRepository implements ISearchHistoryRepository {
   };
 
   public saveUsersSearch = async (
-    searcher_id: number,
-    searched_id: number
+    searcherId: number,
+    searchedId: number
   ): Promise<void> => {
     await this.database
       .insertInto("search_history")
-      .values({ searcher_id, searched_id })
+      .values({ 
+        searcher_id: searcherId, 
+        searched_id: searchedId 
+      })
       .execute();
   };
 

@@ -2,9 +2,9 @@ import Like         from "@/domain/models/like.model";
 import { NewLikes } from "@/domain/types/table.types";
 
 interface ILikeRepository {
-  findPostsLikeCount: (post_id: number) => Promise<number>;
+  findPostsLikeCount: (postId: number) => Promise<number>;
 
-  isUserLikePost: (user_id: number, post_id: number) => Promise<Like | undefined>;
+  isUserLikePost: (userId: number, postId: number) => Promise<Like | undefined>;
 
   likeUsersPostById: (like: NewLikes) => Promise<void>;
 

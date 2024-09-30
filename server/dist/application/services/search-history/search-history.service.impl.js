@@ -13,13 +13,13 @@ class SearchHistoryService {
         this.userRepository = userRepository;
         this.searchHistoryRepository = searchHistoryRepository;
     }
-    getUsersSearchHistoryById = async (searcher_uuid) => {
+    getUsersSearchHistoryById = async (searcherUuid) => {
         // If no parameters are provided, return an error
-        if (!searcher_uuid) {
+        if (!searcherUuid) {
             throw api_exception_1.default.HTTP400Error("No arguments provided");
         }
         // Check if the user is already following the other user
-        const user = await this.userRepository.findUserById(searcher_uuid);
+        const user = await this.userRepository.findUserById(searcherUuid);
         // If the user is not found, return an error
         if (!user)
             throw api_exception_1.default.HTTP404Error("User not found");
@@ -29,17 +29,13 @@ class SearchHistoryService {
             excludeExtraneousValues: true,
         });
     };
-    saveUsersSearch = async (searcher_uuid, search_uuid) => {
-        // If no parameters are provided, return an error
-        if (!searcher_uuid || !search_uuid) {
-            throw api_exception_1.default.HTTP400Error("No arguments provided");
-        }
+    saveUsersSearch = async (searcherUuid, searchUuid) => {
         // Check if the user is already following the other user
-        const user = await this.userRepository.findUserById(searcher_uuid);
+        const user = await this.userRepository.findUserById(searcherUuid);
         if (!user)
             throw api_exception_1.default.HTTP404Error("User not found");
         // Check if the user is already following the other user
-        const searchUser = await this.userRepository.findUserById(search_uuid);
+        const searchUser = await this.userRepository.findUserById(searchUuid);
         if (!searchUser)
             throw api_exception_1.default.HTTP404Error("Search user not found");
         const isExist = await this.searchHistoryRepository.findUsersSearchByUsersId(user.getId(), searchUser.getId());
