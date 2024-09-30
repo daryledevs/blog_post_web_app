@@ -7,13 +7,13 @@ import Chat         from "../models/chat.model";
 import Conversation from "../models/conversation.model";
 
 export interface MessageDataType {
-  conversation_uuid: string;
-  sender_uuid: string;
-  receiver_uuid: string;
-  text_message: string;
+  conversationUuid: string;
+  senderUuid: string;
+  receiverUuid: string;
+  textMessage: string;
 };
 
-interface IEChatRepository {
+interface IChatRepository {
   findAllConversationByUserId: (userId: number, conversationIds: string[]) => Promise<Conversation[]>;
 
   findAllMessagesById: (conversationId: number, messageUuids: string[]) => Promise<Chat[]>;
@@ -32,7 +32,7 @@ interface IEChatRepository {
 
   saveNewMessage: (message: NewMessages) => Promise<void>;
 
-  deleteConversationById: (conversation_uuid: number) => Promise<void>;
+  deleteConversationById: (conversationUuid: number) => Promise<void>;
 }
 
-export default IEChatRepository;
+export default IChatRepository;
