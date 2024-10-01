@@ -10,7 +10,7 @@ class ChatsController {
   }
 
   public getChatHistory = async (req: Request, res: Response) => {
-    const userUuid: string = req.query.userUuid as string;
+    const userUuid: string = req.params.userUuid as string;
     const emptyData = [0];
     const conversationIds = req.body.conversationIds || emptyData;
     const conversationListId = conversationIds.length ? conversationIds : emptyData;
