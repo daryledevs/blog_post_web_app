@@ -15,7 +15,7 @@ import { plainToInstance } from "class-transformer";
 class ChatsRepository implements IChatRepository {
   private database: Kysely<DB>;
 
-  constructor() { this.database = db;  }
+  constructor() { this.database = db; }
 
   // this returns a list of the history of people who have communicated
   public findAllConversationByUserId = async (
@@ -26,7 +26,6 @@ class ChatsRepository implements IChatRepository {
 
     const conversations = await this.database
       .selectFrom("conversations as c")
-      .select(["c.id", sql`BIN_TO_UUID(c.uuid)`.as("uuid")])
       .leftJoin(
         (eb) =>
           eb
@@ -41,6 +40,7 @@ class ChatsRepository implements IChatRepository {
             .selectFrom("users as u")
             .select([
               "u.id",
+              sql`BIN_TO_UUID(u.uuid)`.as("user_uuid"),
               "u.username",
               "u.first_name",
               "u.last_name",
@@ -48,16 +48,18 @@ class ChatsRepository implements IChatRepository {
             ])
             .as("user"),
         (join) =>
-          join.onRef("user.id", "=", "cm.user_id").on("user.id", "!=", userId)
+          join.onRef("user.id", "=", "cm.user_id")
       )
       .where((eb) =>
         eb.and([
-          eb("cm.user_id", "=", userId),
+          eb("cm.user_id", "!=", userId),
           eb("c.uuid", "not in", uuidToBin),
         ])
       )
       .select([
-        sql`BIN_TO_UUID(user.uuid)`.as("user_uuid"),
+        "c.id", 
+        sql`BIN_TO_UUID(c.uuid)`.as("uuid"),
+        "user_uuid",
         "user.username",
         "user.first_name",
         "user.last_name",

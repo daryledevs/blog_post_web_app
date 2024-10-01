@@ -17,7 +17,6 @@ class ChatsRepository {
         const uuidToBin = (0, uuid_to_bin_1.default)(conversationUuids);
         const conversations = await this.database
             .selectFrom("conversations as c")
-            .select(["c.id", (0, kysely_1.sql) `BIN_TO_UUID(c.uuid)`.as("uuid")])
             .leftJoin((eb) => eb
             .selectFrom("conversation_members as cm")
             .select(["cm.conversation_id", "cm.user_id"])
@@ -26,18 +25,21 @@ class ChatsRepository {
             .selectFrom("users as u")
             .select([
             "u.id",
+            (0, kysely_1.sql) `BIN_TO_UUID(u.uuid)`.as("user_uuid"),
             "u.username",
             "u.first_name",
             "u.last_name",
             "u.avatar_url",
         ])
-            .as("user"), (join) => join.onRef("user.id", "=", "cm.user_id").on("user.id", "!=", userId))
+            .as("user"), (join) => join.onRef("user.id", "=", "cm.user_id"))
             .where((eb) => eb.and([
-            eb("cm.user_id", "=", userId),
+            eb("cm.user_id", "!=", userId),
             eb("c.uuid", "not in", uuidToBin),
         ]))
             .select([
-            (0, kysely_1.sql) `BIN_TO_UUID(user.uuid)`.as("user_uuid"),
+            "c.id",
+            (0, kysely_1.sql) `BIN_TO_UUID(c.uuid)`.as("uuid"),
+            "user_uuid",
             "user.username",
             "user.first_name",
             "user.last_name",
