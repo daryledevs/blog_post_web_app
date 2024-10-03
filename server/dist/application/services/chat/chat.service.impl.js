@@ -24,9 +24,9 @@ class ChatService {
         const conversations = await this.chatRepository.findAllConversationByUserId(user.getId(), conversationIds);
         return conversations.map((conversation) => (0, class_transformer_1.plainToClass)(conversation_dto_1.default, conversation));
     };
-    getChatMessages = async (uuid, messageUuids) => {
+    getChatMessages = async (conversationUuid, messageUuids) => {
         // Check if the chat exists, if does not exist, return an error
-        const conversation = await this.chatRepository.findOneConversationByUuId(uuid);
+        const conversation = await this.chatRepository.findOneConversationByUuId(conversationUuid);
         if (!conversation) {
             throw api_exception_1.default.HTTP404Error("Chat not found");
         }

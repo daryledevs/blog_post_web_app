@@ -43,12 +43,12 @@ class ChatService implements IChatService {
   };
 
   public getChatMessages = async (
-    uuid: string,
+    conversationUuid: string,
     messageUuids: string[]
   ): Promise<ChatDto[]> => {
     // Check if the chat exists, if does not exist, return an error
     const conversation = await this.chatRepository.findOneConversationByUuId(
-      uuid
+      conversationUuid
     );
 
     if (!conversation) {

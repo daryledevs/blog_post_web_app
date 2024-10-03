@@ -5,7 +5,7 @@ import { MessageDataType } from "@/domain/repositories/chat.repository";
 interface IChatService {
   getChatHistory: (uuid: string, conversationIds: string[]) => Promise<ConversationDto[]>;
 
-  getChatMessages: (uuid: string, messageUuids: string[]) => Promise<ChatDto[]>;
+  getChatMessages: (conversationUuid: string, messageUuids: string[]) => Promise<ChatDto[]>;
 
   newMessageAndConversation: (messageData: MessageDataType) => Promise<string>;
 
