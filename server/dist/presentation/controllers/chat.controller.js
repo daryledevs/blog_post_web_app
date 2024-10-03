@@ -24,7 +24,16 @@ class ChatsController {
         res.status(200).send({ messages: messageList });
     };
     newMessageAndConversation = async (req, res) => {
-        const body = req.body;
+        const senderUuid = req.session?.user?.uuid;
+        const receiverUuid = req.params?.receiverUuid;
+        const conversationUuid = req.params?.conversationUuid;
+        const textMessage = req.body?.textMessage;
+        const body = {
+            conversationUuid,
+            senderUuid,
+            receiverUuid,
+            textMessage,
+        };
         const message = await this.chatsService.newMessageAndConversation(body);
         res.status(200).send({ message });
     };

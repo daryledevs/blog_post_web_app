@@ -17,17 +17,17 @@ const controller = new chat_controller_1.default(new chat_service_impl_1.default
 router
     .route("/:conversationUuid/messages")
     .all((0, validate_uuid_params_validation_1.default)("conversationUuid"), (0, validate_uuid_body_validation_1.default)("messageIds"))
-    .post(wrap.asyncErrorHandler(controller.getChatMessages))
+    .post(wrap.asyncErrorHandler(controller.getChatMessages));
+router
+    .route("/:conversationUuid/messages")
+    .all((0, validate_uuid_params_validation_1.default)("conversationUuid"))
     .delete(wrap.asyncErrorHandler(controller.deleteConversationById));
 router
     .route("/:userUuid/conversations")
     .all((0, validate_uuid_params_validation_1.default)("userUuid"), (0, validate_uuid_body_validation_1.default)("conversationUuids"))
     .post(wrap.asyncErrorHandler(controller.getChatHistory));
 router
-    .route("/")
-    .all((0, validate_uuid_body_validation_1.default)([
-    "senderUuid",
-    "receiverUuid"
-]))
+    .route("/:conversationUuid/conversation/:receiverUuid/user")
+    .all((0, validate_uuid_params_validation_1.default)(["conversationUuid", "receiverUuid"]))
     .post(wrap.asyncErrorHandler(controller.newMessageAndConversation));
 exports.default = router;

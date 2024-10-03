@@ -25,6 +25,10 @@ router
     validateUUIDRequestBody("messageIds")
   )
   .post(wrap.asyncErrorHandler(controller.getChatMessages))
+
+router
+  .route("/:conversationUuid/messages")
+  .all(validateUUIDRequestParams("conversationUuid"))
   .delete(wrap.asyncErrorHandler(controller.deleteConversationById));
   
 router
@@ -36,11 +40,8 @@ router
   .post(wrap.asyncErrorHandler(controller.getChatHistory));
 
 router
-  .route("/")
-  .all(validateUUIDRequestBody([
-    "senderUuid", 
-    "receiverUuid"
-  ]))
+  .route("/:conversationUuid/conversation/:receiverUuid/user")
+  .all(validateUUIDRequestParams(["conversationUuid", "receiverUuid"]))
   .post(wrap.asyncErrorHandler(controller.newMessageAndConversation));
 
 export default router;
