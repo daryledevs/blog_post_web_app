@@ -6,6 +6,8 @@ class Chat extends UserDetails {
   private conversation_id: number;
   private conversation_uuid: any;
   private user_uuid: any;
+  private text_message: string | null;
+  private time_sent: Date;
 
   constructor(
     id: number,
@@ -16,6 +18,8 @@ class Chat extends UserDetails {
     username: string,
     first_name: string | null,
     last_name: string | null,
+    text_message: string | null,
+    time_sent: Date,
     avatar_url: string | null,
     age?: number | null,
     birthday?: string | null
@@ -26,6 +30,8 @@ class Chat extends UserDetails {
     this.conversation_id = conversation_id;
     this.conversation_uuid = conversation_uuid;
     this.user_uuid = user_uuid;
+    this.text_message = text_message;
+    this.time_sent = time_sent;
   }
 
   // getters
@@ -49,6 +55,14 @@ class Chat extends UserDetails {
     return this.user_uuid;
   }
 
+  public getTextMessage(): string | null {
+    return this.text_message ?? null;
+  }
+
+  public getTimeSent(): Date {
+    return this.time_sent;
+  }
+
   // setters
   public setId(id: number) {
     this.id = id;
@@ -70,16 +84,12 @@ class Chat extends UserDetails {
     this.user_uuid = user_uuid;
   }
 
-  public setFirstName(first_name: string | null) {
-    this.first_name = first_name;
+  public setTextMessage(text_message: string | null): void {
+    this.text_message = text_message;
   }
 
-  public setLastName(last_name: string | null) {
-    this.last_name = last_name;
-  }
-
-  public setAvatarUrl(avatar_url: string | null) {
-    this.avatar_url = avatar_url;
+  public setTimeSent(time_sent: Date): void {
+    this.time_sent = time_sent;
   }
 }
 

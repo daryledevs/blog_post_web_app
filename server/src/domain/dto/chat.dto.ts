@@ -25,6 +25,12 @@ class ChatDto extends UserDetailsDto {
   @IsUUID(4, { message: "invalid UUID" })
   private user_uuid: any;
 
+  @Expose()
+  private text_message: string | null;
+
+  @Expose()
+  private time_sent: Date;
+
   constructor(
     id: number,
     uuid: any,
@@ -32,6 +38,8 @@ class ChatDto extends UserDetailsDto {
     conversation_uuid: any,
     user_uuid: any,
     username: string,
+    text_message: string | null,
+    time_sent: Date,
     first_name?: string | null,
     last_name?: string | null,
     avatar_url?: string | null
@@ -42,6 +50,8 @@ class ChatDto extends UserDetailsDto {
     this.conversation_id = conversation_id;
     this.conversation_uuid = conversation_uuid;
     this.user_uuid = user_uuid;
+    this.text_message = text_message;
+    this.time_sent = time_sent;
   }
 
   getChats(): IChat {
@@ -51,6 +61,8 @@ class ChatDto extends UserDetailsDto {
       conversationId: this.conversation_id,
       conversationUuid: this.conversation_uuid,
       userUuid: this.user_uuid,
+      textMessage: this.text_message,
+      timeSent: this.time_sent,
       ...super.getUserDetails(),
     };
   }
@@ -76,6 +88,14 @@ class ChatDto extends UserDetailsDto {
     return this.user_uuid;
   }
 
+  public getTextMessage(): string | null {
+    return this.text_message ?? null;
+  }
+
+  public getTimeSent(): Date {
+    return this.time_sent;
+  }
+
   // setters
   setId(id: number) {
     this.id = id;
@@ -91,6 +111,13 @@ class ChatDto extends UserDetailsDto {
 
   setConversationUuid(conversation_uuid: any) {
     this.conversation_uuid = conversation_uuid;
+  }
+  public setTextMessage(text_message: string | null): void {
+    this.text_message = text_message;
+  }
+
+  public setTimeSent(time_sent: Date): void {
+    this.time_sent = time_sent;
   }
 }
 

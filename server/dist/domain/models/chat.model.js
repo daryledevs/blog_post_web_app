@@ -10,13 +10,17 @@ class Chat extends user_details_model_1.default {
     conversation_id;
     conversation_uuid;
     user_uuid;
-    constructor(id, uuid, conversation_id, conversation_uuid, user_uuid, username, first_name, last_name, avatar_url, age, birthday) {
+    text_message;
+    time_sent;
+    constructor(id, uuid, conversation_id, conversation_uuid, user_uuid, username, first_name, last_name, text_message, time_sent, avatar_url, age, birthday) {
         super(username, first_name, last_name, avatar_url, age, birthday);
         this.id = id;
         this.uuid = uuid;
         this.conversation_id = conversation_id;
         this.conversation_uuid = conversation_uuid;
         this.user_uuid = user_uuid;
+        this.text_message = text_message;
+        this.time_sent = time_sent;
     }
     // getters
     getId() {
@@ -34,6 +38,12 @@ class Chat extends user_details_model_1.default {
     getUserUuid() {
         return this.user_uuid;
     }
+    getTextMessage() {
+        return this.text_message ?? null;
+    }
+    getTimeSent() {
+        return this.time_sent;
+    }
     // setters
     setId(id) {
         this.id = id;
@@ -50,14 +60,11 @@ class Chat extends user_details_model_1.default {
     setUserUuid(user_uuid) {
         this.user_uuid = user_uuid;
     }
-    setFirstName(first_name) {
-        this.first_name = first_name;
+    setTextMessage(text_message) {
+        this.text_message = text_message;
     }
-    setLastName(last_name) {
-        this.last_name = last_name;
-    }
-    setAvatarUrl(avatar_url) {
-        this.avatar_url = avatar_url;
+    setTimeSent(time_sent) {
+        this.time_sent = time_sent;
     }
 }
 exports.default = Chat;

@@ -21,13 +21,17 @@ class ChatDto extends user_details_dto_1.default {
     conversation_id;
     conversation_uuid;
     user_uuid;
-    constructor(id, uuid, conversation_id, conversation_uuid, user_uuid, username, first_name, last_name, avatar_url) {
+    text_message;
+    time_sent;
+    constructor(id, uuid, conversation_id, conversation_uuid, user_uuid, username, text_message, time_sent, first_name, last_name, avatar_url) {
         super(username, first_name, last_name, avatar_url);
         this.id = id;
         this.uuid = uuid;
         this.conversation_id = conversation_id;
         this.conversation_uuid = conversation_uuid;
         this.user_uuid = user_uuid;
+        this.text_message = text_message;
+        this.time_sent = time_sent;
     }
     getChats() {
         return {
@@ -36,6 +40,8 @@ class ChatDto extends user_details_dto_1.default {
             conversationId: this.conversation_id,
             conversationUuid: this.conversation_uuid,
             userUuid: this.user_uuid,
+            textMessage: this.text_message,
+            timeSent: this.time_sent,
             ...super.getUserDetails(),
         };
     }
@@ -55,6 +61,12 @@ class ChatDto extends user_details_dto_1.default {
     getUserUuid() {
         return this.user_uuid;
     }
+    getTextMessage() {
+        return this.text_message ?? null;
+    }
+    getTimeSent() {
+        return this.time_sent;
+    }
     // setters
     setId(id) {
         this.id = id;
@@ -67,6 +79,12 @@ class ChatDto extends user_details_dto_1.default {
     }
     setConversationUuid(conversation_uuid) {
         this.conversation_uuid = conversation_uuid;
+    }
+    setTextMessage(text_message) {
+        this.text_message = text_message;
+    }
+    setTimeSent(time_sent) {
+        this.time_sent = time_sent;
     }
 }
 __decorate([
@@ -95,4 +113,12 @@ __decorate([
     (0, class_validator_1.IsUUID)(4, { message: "invalid UUID" }),
     __metadata("design:type", Object)
 ], ChatDto.prototype, "user_uuid", void 0);
+__decorate([
+    (0, class_transformer_1.Expose)(),
+    __metadata("design:type", Object)
+], ChatDto.prototype, "text_message", void 0);
+__decorate([
+    (0, class_transformer_1.Expose)(),
+    __metadata("design:type", Date)
+], ChatDto.prototype, "time_sent", void 0);
 exports.default = ChatDto;
