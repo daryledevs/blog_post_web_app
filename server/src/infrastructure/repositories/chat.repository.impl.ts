@@ -82,9 +82,9 @@ class ChatsRepository implements IChatRepository {
       .leftJoin("conversations as c", "m.conversation_id", "c.id")
       .leftJoin("users as sender", "m.sender_id", "sender.id")
       .select([
-        "id",
+        "m.id",
         sql`BIN_TO_UUID(m.uuid)`.as("uuid"),
-        "conversation_id",
+        "m.conversation_id",
         sql`BIN_TO_UUID(c.uuid)`.as("conversation_uuid"),
         "sender_id",
         sql`BIN_TO_UUID(sender.uuid)`.as("sender_uuid"),
@@ -92,13 +92,13 @@ class ChatsRepository implements IChatRepository {
         "sender.first_name",
         "sender.last_name",
         "sender.avatar_url",
-        "text_message",
-        "time_sent",
+        "m.text_message",
+        "m.time_sent",
       ])
       .where((eb) =>
         eb.and([
           eb("conversation_id", "=", conversationId),
-          eb("uuid", "not in", uuidsToBin),
+          eb("m.uuid", "not in", uuidsToBin),
         ])
       )
       .limit(30)
