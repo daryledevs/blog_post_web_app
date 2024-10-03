@@ -15,8 +15,8 @@ const router = express_1.default.Router();
 const wrap = new async_wrapper_util_1.default();
 const controller = new chat_controller_1.default(new chat_service_impl_1.default(new chat_repository_impl_1.default(), new user_repository_impl_1.default()));
 router
-    .route("/:uuid")
-    .all((0, validate_uuid_params_validation_1.default)("uuid"), (0, validate_uuid_body_validation_1.default)("messageIds"))
+    .route("/:conversationUuid/messages")
+    .all((0, validate_uuid_params_validation_1.default)("conversationUuid"), (0, validate_uuid_body_validation_1.default)("messageIds"))
     .post(wrap.asyncErrorHandler(controller.getChatMessages))
     .delete(wrap.asyncErrorHandler(controller.deleteConversationById));
 router

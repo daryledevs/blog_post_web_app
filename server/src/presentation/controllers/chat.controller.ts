@@ -20,7 +20,7 @@ class ChatsController {
   };
 
   public getChatMessages = async (req: Request, res: Response) => {
-    let uuid = req.params.uuid!;
+    let uuid = req.params.conversationUuid!;
     const emptyData = [0];
     const messageIds = req.body.messageIds || emptyData;
     const messageListIds = messageIds.length ? messageIds : emptyData;

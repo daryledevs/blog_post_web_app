@@ -19,9 +19,9 @@ const controller: ChatsController = new ChatsController(
 );
 
 router
-  .route("/:uuid")
+  .route("/:conversationUuid/messages")
   .all(
-    validateUUIDRequestParams("uuid"), 
+    validateUUIDRequestParams("conversationUuid"),
     validateUUIDRequestBody("messageIds")
   )
   .post(wrap.asyncErrorHandler(controller.getChatMessages))
