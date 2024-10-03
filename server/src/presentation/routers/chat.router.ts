@@ -31,7 +31,7 @@ router
   .route("/:userUuid/conversations")
   .all(
     validateUUIDRequestParams("userUuid"),
-    validateUUIDRequestBody("conversationIds")
+    validateUUIDRequestBody("conversationUuids")
   )
   .post(wrap.asyncErrorHandler(controller.getChatHistory));
 
