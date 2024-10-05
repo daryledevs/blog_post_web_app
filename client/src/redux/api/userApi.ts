@@ -1,50 +1,56 @@
-import baseApi         from "./baseApi";
-import { IEUserState } from "@/interfaces/interface";
+import baseApi   from "./baseApi";
+import { IUser } from "@/interfaces/interface";
 
 const userApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     // get user data
-    getUserData: build.query<{ user: IEUserState }, { person?: string }>({
-      query: ({ person }) => ({
-        url: `/users?person=${person}`,
+    getUserData: build.query<{ user: IUser }, void>({
+      query: () => ({
+        url: `/users`,
+        method: "GET",
+      }),
+    }),
+    getUserDataByUsername: build.query<{ user: IUser }, { username: string }>({
+      query: ({ username }) => ({
+        url: `/users?username=${username}`,
         method: "GET",
       }),
     }),
     // search users
-    searchUsers: build.query<any, { search: string }>({
+    searchUsers: build.query<IUser[], { search: string }>({
       query: ({ search }) => ({
-        url: `/users/search?search=${search}`,
+        url: `/users/search?searchQuery=${search}`,
         method: "GET",
       }),
     }),
     // get recent search user
-    getSearchesUser: build.query<any, { user_id: number }>({
-      query: ({ user_id }) => ({
-        url: `/users/${user_id}/searches`,
+    getSearchesUser: build.query<any, { userUuid: string }>({
+      query: ({ userUuid }) => ({
+        url: `/users/${userUuid}/searches`,
         method: "GET",
       }),
     }),
     // save search user
     saveUsersSearch: build.mutation<
       any,
-      { searcher_id: string; searched_id: string }
+      { searcherUuid: string; searchedUuid: string }
     >({
-      query: ({ searcher_id, searched_id }) => ({
-        url: `/users/${searcher_id}/searches/${searched_id}`,
+      query: ({ searcherUuid, searchedUuid }) => ({
+        url: `/users/${searcherUuid}/searches/${searchedUuid}`,
         method: "POST",
       }),
     }),
     // delete search user
-    delUsersSearch: build.mutation<any, { id: string }>({
-      query: ({ id }) => ({
-        url: `/users/${id}/searches`,
+    delUsersSearch: build.mutation<any, { uuid: string }>({
+      query: ({ uuid }) => ({
+        url: `/users/${uuid}/searches`,
         method: "DELETE",
       }),
     }),
     // get follow stats
-    getFollowStats: build.query<any, { user_id: number }>({
-      query: ({ user_id }) => ({
-        url: `/users/${user_id}/follow-stats`,
+    getFollowStats: build.query<any, { userUuid: string }>({
+      query: ({ userUuid }) => ({
+        url: `/users/${userUuid}/follow-stats`,
         method: "GET",
       }),
     }),
@@ -52,24 +58,24 @@ const userApi = baseApi.injectEndpoints({
     getFollowersAndFollowingLists: build.mutation<
       any,
       {
-        user_id: number;
-        fetch: string;
-        listsId: Array<number> | number;
+        userUuid: string;
+        fetchFollowType: string;
+        followListIds: Array<string>;
       }
     >({
-      query: ({ user_id, fetch, listsId }) => ({
-        url: `/users/${user_id}/follow-lists?fetch=${fetch}`,
+      query: ({ userUuid, fetchFollowType, followListIds }) => ({
+        url: `/users/${userUuid}/follow-lists?fetchFollowType=${fetchFollowType}`,
         method: "POST",
-        body: { listsId },
+        body: { followListIds },
       }),
     }),
     // follow user
     followUser: build.mutation<
       any,
-      { follower_id: number; followed_id: number }
+      { followerUuid: string; followedUuid: string }
     >({
-      query: ({ follower_id, followed_id }) => ({
-        url: `/users/${follower_id}/follow/${followed_id}`,
+      query: ({ followerUuid, followedUuid }) => ({
+        url: `/users/${followerUuid}/follow/${followedUuid}`,
         method: "POST",
       }),
     }),
@@ -78,6 +84,7 @@ const userApi = baseApi.injectEndpoints({
 
 export const {
   useGetUserDataQuery,
+  useLazyGetUserDataByUsernameQuery,
   useSearchUsersQuery,
   useGetFollowersAndFollowingListsMutation,
   useGetFollowStatsQuery,
