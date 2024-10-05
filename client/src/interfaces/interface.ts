@@ -1,7 +1,7 @@
 import { ExcludeUSerProps } from "./types";
 
 interface IUser {
-  uuid: any;
+  uuid: string;
   username: string;
   email: string;
   password: string;
@@ -15,11 +15,11 @@ interface IUser {
 }
 
 interface IFollowers extends ExcludeUSerProps<IUser, "email"> {
-  followerUuid: any;
+  followerUuid: string;
 }
 
 interface IFollowing extends ExcludeUSerProps<IUser, "email"> {
-  followedUuid: any;
+  followedUuid: string;
 }
 
 interface ISearchHistory extends ExcludeUSerProps<IUser, "email"> {
@@ -30,7 +30,7 @@ interface ISearchHistory extends ExcludeUSerProps<IUser, "email"> {
 }
 
 interface IPost {
-  uuid: any;
+  uuid: string;
   image_url: string | null;
   userUuid: number;
   caption: string | null;
@@ -39,14 +39,14 @@ interface IPost {
 }
 
 interface IConversation extends ExcludeUSerProps<IUser, "email"> {
-  uuid: any;
-  userUuid: any;
+  uuid: string;
+  userUuid: string;
 }
 
 interface IBaseChat {
-  uuid: any;
-  conversationUuid: any;
-  senderUuid: any;
+  uuid: string;
+  conversationUuid: string;
+  senderUuid: string;
   textMessage: string;
   timeSent: Date | null;
 }
@@ -54,9 +54,8 @@ interface IBaseChat {
 interface IChat extends IBaseChat, ExcludeUSerProps<IUser, "email"> {
 }
 
-interface MessageType extends Omit<IBaseChat, "uuid" | "timeSent"> {
-  messageUuid: any;
-  receiverUuid: any;
+interface MessageType extends Omit<IBaseChat, "uuid" | "timeSent" | "senderUuid" | "uuid"> {
+  receiverUuid: string;
 }
 
 export type {
