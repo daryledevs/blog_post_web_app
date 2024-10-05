@@ -56,9 +56,7 @@ class ChatDto extends UserDetailsDto {
 
   getChats(): IChat {
     return {
-      id: this.id,
       uuid: this.uuid,
-      conversationId: this.conversation_id,
       conversationUuid: this.conversation_uuid,
       userUuid: this.user_uuid,
       textMessage: this.text_message,

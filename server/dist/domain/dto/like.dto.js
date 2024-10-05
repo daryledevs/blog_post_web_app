@@ -30,11 +30,8 @@ class LikeDto {
     }
     getLikes() {
         return {
-            id: this.id,
             uuid: this.uuid,
-            postId: this.post_id,
             postUuid: this.post_uuid,
-            userId: this.user_id,
             userUuid: this.user_uuid,
             createdAt: this.created_at,
         };

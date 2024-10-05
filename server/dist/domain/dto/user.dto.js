@@ -36,7 +36,6 @@ class UserDto extends user_details_dto_1.default {
     }
     getUsers() {
         return {
-            id: this.id,
             uuid: this.uuid,
             username: this.username,
             email: this.email,

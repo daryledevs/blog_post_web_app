@@ -33,10 +33,7 @@ class SearchHistoryDto extends user_details_dto_1.default {
     }
     getSearchHistories() {
         return {
-            id: this.id,
             uuid: this.uuid,
-            searcherId: this.searcher_id,
-            searchedId: this.searched_id,
             userUuid: this.user_uuid,
             username: this.username,
             firstName: this.first_name,

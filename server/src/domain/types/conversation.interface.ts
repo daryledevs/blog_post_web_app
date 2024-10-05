@@ -1,7 +1,6 @@
 import { IUserDetails } from "./user.interface";
 
 export interface IConversation extends Omit<IUserDetails, "age" | "birthday">{
-  id: number;
   uuid: any;
   userUuid: any;
   username: string;

@@ -36,12 +36,9 @@ class PostDto {
     }
     getPosts() {
         return {
-            id: this.id,
             uuid: this.uuid,
-            imageId: this.image_id,
             imageUrl: this.image_url,
             files: this.files,
-            userId: this.user_id,
             userUuid: this.user_uuid,
             caption: this.caption,
             privacyLevel: this.privacy_level,

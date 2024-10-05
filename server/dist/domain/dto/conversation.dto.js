@@ -27,7 +27,6 @@ class ConversationDto extends user_details_dto_1.default {
     }
     getConversations() {
         return {
-            id: this.id,
             uuid: this.uuid,
             userUuid: this.user_uuid,
             createdAt: this.created_at,

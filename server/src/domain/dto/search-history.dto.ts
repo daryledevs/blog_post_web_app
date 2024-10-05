@@ -50,10 +50,7 @@ class SearchHistoryDto extends UserDetailsDto {
 
   getSearchHistories(): ISearchHistory {
     return {
-      id: this.id,
       uuid: this.uuid,
-      searcherId: this.searcher_id,
-      searchedId: this.searched_id,
       userUuid: this.user_uuid,
       username: this.username,
       firstName: this.first_name,

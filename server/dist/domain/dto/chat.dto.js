@@ -35,9 +35,7 @@ class ChatDto extends user_details_dto_1.default {
     }
     getChats() {
         return {
-            id: this.id,
             uuid: this.uuid,
-            conversationId: this.conversation_id,
             conversationUuid: this.conversation_uuid,
             userUuid: this.user_uuid,
             textMessage: this.text_message,

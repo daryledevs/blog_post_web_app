@@ -32,7 +32,6 @@ class ConversationDto extends UserDetailsDto {
 
   getConversations(): IConversation {
     return {
-      id: this.id,
       uuid: this.uuid,
       userUuid: this.user_uuid,
       createdAt: this.created_at,

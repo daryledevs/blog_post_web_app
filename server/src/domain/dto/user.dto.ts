@@ -82,7 +82,6 @@ class UserDto extends UserDetailsDto {
 
   getUsers(): IUser {
     return {
-      id: this.id,
       uuid: this.uuid,
       username: this.username,
       email: this.email,

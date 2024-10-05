@@ -8,7 +8,6 @@ export interface IUserDetails {
 };
 
 export interface IUser extends IUserDetails {
-  id: number;
   uuid: string;
   email: string;
   roles: string | null | undefined;
