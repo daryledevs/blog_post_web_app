@@ -1,10 +1,8 @@
-import ApiErrorException  from "@/application/exceptions/api.exception";
-import AsyncWrapper       from "@/application/utils/async-wrapper.util";
 import { Socket, Server } from "socket.io";
+import ApiErrorException  from "@/application/exceptions/api.exception";
 
 class SocketService {
-  private users: { userId: any; socketId: any }[] = [];
-  private wrap: AsyncWrapper = new AsyncWrapper();
+  private users: { userUuid: string; socketId: any }[] = [];
 
   public connection(io: Server): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -19,20 +17,20 @@ class SocketService {
   }
 
   private onConnect(socket: Socket) {
-    socket.on("add-user", (userId: string) => {
-      this.addUser(userId, socket.id);
+    socket.on("add-user", (userUuid: string) => {
+      this.addUser(userUuid, socket.id);
       socket.emit("get-users", this.users);
     });
 
     socket.on(
       "send-message",
-      ({ conversation_id, sender_id, receiver_id, text_message }) => {
-        const user = this.getUser(receiver_id);
+      ({ conversationUuid, receiverUuid, textMessage }) => {
+        const user = this.getUser(receiverUuid);
         if (user?.socketId) {
           socket.to(user.socketId).emit("get-message", {
-            conversation_id,
-            sender_id,
-            text_message,
+            conversationUuid,
+            receiverUuid,
+            textMessage,
           });
         }
       }
@@ -43,14 +41,14 @@ class SocketService {
     });
   }
 
-  private addUser = async (userId: any, socketId: any) => {
+  private addUser = async (userUuid: string, socketId: any) => {
     try {
-      if (userId === null || userId === undefined) {
+      if (userUuid === null || userUuid === undefined) {
         throw ApiErrorException.HTTP400Error("User ID is required");
       }
 
-      if (!this.users.some((user) => user.userId === userId)) {
-        this.users.push({ userId, socketId });
+      if (!this.users.some((user) => user.userUuid === userUuid)) {
+        this.users.push({ userUuid, socketId });
       }
     } catch (error) {
       throw ApiErrorException.HTTP500Error(error as unknown as string);
@@ -61,8 +59,8 @@ class SocketService {
     this.users = this.users.filter((user) => user.socketId !== socketId);
   }
 
-  private getUser(userId: any) {
-    return this.users?.find((user) => user.userId === userId);
+  private getUser(userUuid: string) {
+    return this.users?.find((user) => user.userUuid === userUuid);
   }
 }
 

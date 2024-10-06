@@ -4,10 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const api_exception_1 = __importDefault(require("@/application/exceptions/api.exception"));
-const async_wrapper_util_1 = __importDefault(require("@/application/utils/async-wrapper.util"));
 class SocketService {
     users = [];
-    wrap = new async_wrapper_util_1.default();
     connection(io) {
         return new Promise((resolve, reject) => {
             io.on("connection", (socket) => {
@@ -20,17 +18,17 @@ class SocketService {
         });
     }
     onConnect(socket) {
-        socket.on("add-user", (userId) => {
-            this.addUser(userId, socket.id);
+        socket.on("add-user", (userUuid) => {
+            this.addUser(userUuid, socket.id);
             socket.emit("get-users", this.users);
         });
-        socket.on("send-message", ({ conversation_id, sender_id, receiver_id, text_message }) => {
-            const user = this.getUser(receiver_id);
+        socket.on("send-message", ({ conversationUuid, receiverUuid, textMessage }) => {
+            const user = this.getUser(receiverUuid);
             if (user?.socketId) {
                 socket.to(user.socketId).emit("get-message", {
-                    conversation_id,
-                    sender_id,
-                    text_message,
+                    conversationUuid,
+                    receiverUuid,
+                    textMessage,
                 });
             }
         });
@@ -38,13 +36,13 @@ class SocketService {
             this.removeUser(socket.id);
         });
     }
-    addUser = async (userId, socketId) => {
+    addUser = async (userUuid, socketId) => {
         try {
-            if (userId === null || userId === undefined) {
+            if (userUuid === null || userUuid === undefined) {
                 throw api_exception_1.default.HTTP400Error("User ID is required");
             }
-            if (!this.users.some((user) => user.userId === userId)) {
-                this.users.push({ userId, socketId });
+            if (!this.users.some((user) => user.userUuid === userUuid)) {
+                this.users.push({ userUuid, socketId });
             }
         }
         catch (error) {
@@ -54,8 +52,8 @@ class SocketService {
     removeUser(socketId) {
         this.users = this.users.filter((user) => user.socketId !== socketId);
     }
-    getUser(userId) {
-        return this.users?.find((user) => user.userId === userId);
+    getUser(userUuid) {
+        return this.users?.find((user) => user.userUuid === userUuid);
     }
 }
 exports.default = SocketService;
