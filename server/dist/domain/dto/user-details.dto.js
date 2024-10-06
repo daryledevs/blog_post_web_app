@@ -89,6 +89,7 @@ __decorate([
 ], UserDetailsDto.prototype, "avatar_url", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNumber)({
         allowNaN: false,
         allowInfinity: false,
@@ -98,6 +99,7 @@ __decorate([
 ], UserDetailsDto.prototype, "age", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
+    (0, class_validator_1.IsOptional)(),
     (0, class_transformer_1.Type)(() => Date),
     (0, class_validator_1.MaxDate)(() => new Date(), {
         message: () => `maximal allowed date for date of birth is ${new Date().toDateString()}`,

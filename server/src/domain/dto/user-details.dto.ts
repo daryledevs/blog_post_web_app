@@ -30,6 +30,7 @@ class UserDetailsDto {
   protected avatar_url?: string | null;
 
   @Expose()
+  @IsOptional()
   @IsNumber(
     {
       allowNaN: false,
@@ -41,6 +42,7 @@ class UserDetailsDto {
   protected age?: number | null;
 
   @Expose()
+  @IsOptional()
   @Type(() => Date)
   @MaxDate(() => new Date(), {
     message: () =>
