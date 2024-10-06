@@ -22,11 +22,12 @@ class SocketService {
             this.addUser(userUuid, socket.id);
             socket.emit("get-users", this.users);
         });
-        socket.on("send-message", ({ conversationUuid, receiverUuid, textMessage }) => {
+        socket.on("send-message", ({ conversationUuid, senderUuid, receiverUuid, textMessage }) => {
             const user = this.getUser(receiverUuid);
             if (user?.socketId) {
                 socket.to(user.socketId).emit("get-message", {
                     conversationUuid,
+                    senderUuid,
                     receiverUuid,
                     textMessage,
                 });
