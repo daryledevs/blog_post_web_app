@@ -29,7 +29,7 @@
     "start:dev": "SET NODE_ENV=development && nodemon",
     "start:prod": "SET NODE_ENV=production && ts-node -r tsconfig-paths/register src/index.ts",
     "codegen": "kysely-codegen --dialect mysql --out-file ./src/types/schema.types.ts",
-    "migrations": "ts-node ./src/database/migrator.database.ts"
+    "migrations": "ts-node ./src/infrastructure/database/migrator.database.ts"
   },
   "keywords": [],
   "author": "",
