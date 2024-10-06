@@ -28,6 +28,6 @@ router
     .post(wrap.asyncErrorHandler(controller.getChatHistory));
 router
     .route("/:conversationUuid/conversation/:receiverUuid/user")
-    .all((0, validate_uuid_params_validation_1.default)(["conversationUuid", "receiverUuid"]))
+    .all((0, validate_uuid_params_validation_1.default)("receiverUuid"))
     .post(wrap.asyncErrorHandler(controller.newMessageAndConversation));
 exports.default = router;

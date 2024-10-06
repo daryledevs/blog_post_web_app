@@ -41,7 +41,7 @@ router
 
 router
   .route("/:conversationUuid/conversation/:receiverUuid/user")
-  .all(validateUUIDRequestParams(["conversationUuid", "receiverUuid"]))
+  .all(validateUUIDRequestParams("receiverUuid"))
   .post(wrap.asyncErrorHandler(controller.newMessageAndConversation));
 
 export default router;
