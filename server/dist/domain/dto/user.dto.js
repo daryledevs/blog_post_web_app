@@ -37,15 +37,10 @@ class UserDto extends user_details_dto_1.default {
     getUsers() {
         return {
             uuid: this.uuid,
-            username: this.username,
             email: this.email,
-            firstName: this.first_name,
-            lastName: this.last_name,
             roles: this.roles,
-            avatarUrl: this.avatar_url,
-            age: this.age,
-            birthday: this.birthday,
             createdAt: this.created_at,
+            ...this.getUserDetails()
         };
     }
     // Getters
