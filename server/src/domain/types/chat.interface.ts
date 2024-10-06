@@ -1,10 +1,7 @@
-import { IUserDetails } from "./user.interface";
-
-export interface IChat extends Omit<IUserDetails, "age" | "birthday"> {
+export interface IChat {
   uuid: any;
   conversationUuid: any;
-  userUuid: any;
-  username: string;
+  senderUuid: any;
   textMessage: string | null;
   timeSent: Date;
 }

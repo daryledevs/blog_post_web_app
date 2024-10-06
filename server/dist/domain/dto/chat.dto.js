@@ -8,28 +8,23 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const user_details_dto_1 = __importDefault(require("./user-details.dto"));
 const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
-class ChatDto extends user_details_dto_1.default {
+class ChatDto {
     id;
     uuid;
     conversation_id;
     conversation_uuid;
-    user_uuid;
+    sender_uuid;
     text_message;
     time_sent;
-    constructor(id, uuid, conversation_id, conversation_uuid, user_uuid, username, text_message, time_sent, first_name, last_name, avatar_url) {
-        super(username, first_name, last_name, avatar_url);
+    constructor(id, uuid, conversation_id, conversation_uuid, sender_uuid, text_message, time_sent) {
         this.id = id;
         this.uuid = uuid;
         this.conversation_id = conversation_id;
         this.conversation_uuid = conversation_uuid;
-        this.user_uuid = user_uuid;
+        this.sender_uuid = sender_uuid;
         this.text_message = text_message;
         this.time_sent = time_sent;
     }
@@ -37,10 +32,9 @@ class ChatDto extends user_details_dto_1.default {
         return {
             uuid: this.uuid,
             conversationUuid: this.conversation_uuid,
-            userUuid: this.user_uuid,
+            senderUuid: this.sender_uuid,
             textMessage: this.text_message,
             timeSent: this.time_sent,
-            ...super.getUserDetails(),
         };
     }
     // getters
@@ -56,8 +50,8 @@ class ChatDto extends user_details_dto_1.default {
     getConversationUuid() {
         return this.conversation_uuid;
     }
-    getUserUuid() {
-        return this.user_uuid;
+    getSenderUuid() {
+        return this.sender_uuid;
     }
     getTextMessage() {
         return this.text_message ?? null;
@@ -110,7 +104,7 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)({ message: "user UUID is required" }),
     (0, class_validator_1.IsUUID)(4, { message: "invalid UUID" }),
     __metadata("design:type", Object)
-], ChatDto.prototype, "user_uuid", void 0);
+], ChatDto.prototype, "sender_uuid", void 0);
 __decorate([
     (0, class_transformer_1.Expose)(),
     __metadata("design:type", Object)

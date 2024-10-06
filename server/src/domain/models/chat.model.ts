@@ -1,11 +1,9 @@
-import UserDetails from "./user-details.model";
-
-class Chat extends UserDetails {
+class Chat {
   private id: number;
   private uuid: any;
   private conversation_id: number;
   private conversation_uuid: any;
-  private user_uuid: any;
+  private sender_uuid: any;
   private text_message: string | null;
   private time_sent: Date;
 
@@ -14,22 +12,15 @@ class Chat extends UserDetails {
     uuid: any,
     conversation_id: number,
     conversation_uuid: any,
-    user_uuid: any,
-    username: string,
-    first_name: string | null,
-    last_name: string | null,
+    sender_uuid: any,
     text_message: string | null,
     time_sent: Date,
-    avatar_url: string | null,
-    age?: number | null,
-    birthday?: string | null
   ) {
-    super(username, first_name, last_name, avatar_url, age, birthday);
     this.id = id;
     this.uuid = uuid;
     this.conversation_id = conversation_id;
     this.conversation_uuid = conversation_uuid;
-    this.user_uuid = user_uuid;
+    this.sender_uuid = sender_uuid;
     this.text_message = text_message;
     this.time_sent = time_sent;
   }
@@ -51,8 +42,8 @@ class Chat extends UserDetails {
     return this.conversation_uuid;
   }
 
-  public getUserUuid(): any {
-    return this.user_uuid;
+  public getSenderUuid(): any {
+    return this.sender_uuid;
   }
 
   public getTextMessage(): string | null {
@@ -80,8 +71,8 @@ class Chat extends UserDetails {
     this.conversation_uuid = conversation_uuid;
   }
 
-  public setUserUuid(user_uuid: any) {
-    this.user_uuid = user_uuid;
+  public setSenderUuid(sender_uuid: any) {
+    this.sender_uuid = sender_uuid;
   }
 
   public setTextMessage(text_message: string | null): void {

@@ -1,9 +1,8 @@
 import { IChat }              from "../types/chat.interface";
-import UserDetailsDto         from "./user-details.dto";
 import { Exclude, Expose }    from "class-transformer";
 import { IsNotEmpty, IsUUID } from "class-validator";
 
-class ChatDto extends UserDetailsDto {
+class ChatDto {
   @Exclude({ toPlainOnly: true })
   private id: number;
 
@@ -23,7 +22,7 @@ class ChatDto extends UserDetailsDto {
   @Expose()
   @IsNotEmpty({ message: "user UUID is required" })
   @IsUUID(4, { message: "invalid UUID" })
-  private user_uuid: any;
+  private sender_uuid: any;
 
   @Expose()
   private text_message: string | null;
@@ -36,20 +35,15 @@ class ChatDto extends UserDetailsDto {
     uuid: any,
     conversation_id: number,
     conversation_uuid: any,
-    user_uuid: any,
-    username: string,
+    sender_uuid: any,
     text_message: string | null,
     time_sent: Date,
-    first_name?: string | null,
-    last_name?: string | null,
-    avatar_url?: string | null
   ) {
-    super(username, first_name, last_name, avatar_url);
     this.id = id;
     this.uuid = uuid;
     this.conversation_id = conversation_id;
     this.conversation_uuid = conversation_uuid;
-    this.user_uuid = user_uuid;
+    this.sender_uuid = sender_uuid;
     this.text_message = text_message;
     this.time_sent = time_sent;
   }
@@ -58,10 +52,9 @@ class ChatDto extends UserDetailsDto {
     return {
       uuid: this.uuid,
       conversationUuid: this.conversation_uuid,
-      userUuid: this.user_uuid,
+      senderUuid: this.sender_uuid,
       textMessage: this.text_message,
       timeSent: this.time_sent,
-      ...super.getUserDetails(),
     };
   }
 
@@ -82,8 +75,8 @@ class ChatDto extends UserDetailsDto {
     return this.conversation_uuid;
   }
 
-  getUserUuid(): any {
-    return this.user_uuid;
+  getSenderUuid(): any {
+    return this.sender_uuid;
   }
 
   public getTextMessage(): string | null {
