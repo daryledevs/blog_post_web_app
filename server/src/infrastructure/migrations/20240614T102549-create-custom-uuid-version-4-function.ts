@@ -16,27 +16,9 @@ export async function up(db: Kysely<any>): Promise<void> {
     "conversations",
     "comments",
   ].map(async (table) =>
-    await sql`CREATE TRIGGER before_insert_${sql.raw(table)} BEFORE INSERT ON ${sql.raw(table)} FOR EACH ROW BEGIN IF NEW.uuid IS NULL THEN SET NEW.uuid = UUID_TO_BIN(UUID_V4()); END IF; END;`.execute(db)
+    await sql`DROP TRIGGER IF EXISTS before_insert_${sql.raw(table)}; CREATE TRIGGER before_insert_${sql.raw(table)} BEFORE INSERT ON ${sql.raw(table)} FOR EACH ROW BEGIN IF NEW.uuid IS NULL THEN SET NEW.uuid = UUID_TO_BIN(UUID_V4()); END IF; END;`.execute(db)
   )
 
 }
 
-export async function down(db: Kysely<any>): Promise<void> {
-  // drop the custom UUID version 4 function
-  await sql`DROP FUNCTION IF EXISTS UUID_V4`.execute(db);
-
-  // drop the trigger for each table
-  [
-    "users",
-    "search_history",
-    "reset_password_token",
-    "posts",
-    "messages",
-    "likes",
-    "conversation_members",
-    "conversations",
-    "comments",
-  ].map(async (table) =>
-    await sql`DROP TRIGGER IF EXISTS before_insert_${sql.raw(table)}`.execute(db)
-  );
-};
+export async function down(db: Kysely<any>): Promise<void> {};

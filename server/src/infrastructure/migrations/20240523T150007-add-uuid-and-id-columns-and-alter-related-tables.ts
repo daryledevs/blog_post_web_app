@@ -288,7 +288,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addForeignKeyConstraint(
       "fk_members_conversation_id",
       ["conversation_id"],
-      "users",
+      "conversations",
       ["id"]
     )
     .addForeignKeyConstraint("fk_members_user_id", ["user_id"], "users", ["id"])

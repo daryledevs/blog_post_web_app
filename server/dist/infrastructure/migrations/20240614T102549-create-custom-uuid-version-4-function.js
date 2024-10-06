@@ -16,24 +16,9 @@ async function up(db) {
         "conversation_members",
         "conversations",
         "comments",
-    ].map(async (table) => await (0, kysely_1.sql) `CREATE TRIGGER before_insert_${kysely_1.sql.raw(table)} BEFORE INSERT ON ${kysely_1.sql.raw(table)} FOR EACH ROW BEGIN IF NEW.uuid IS NULL THEN SET NEW.uuid = UUID_TO_BIN(UUID_V4()); END IF; END;`.execute(db));
+    ].map(async (table) => await (0, kysely_1.sql) `DROP TRIGGER IF EXISTS before_insert_${kysely_1.sql.raw(table)}; CREATE TRIGGER before_insert_${kysely_1.sql.raw(table)} BEFORE INSERT ON ${kysely_1.sql.raw(table)} FOR EACH ROW BEGIN IF NEW.uuid IS NULL THEN SET NEW.uuid = UUID_TO_BIN(UUID_V4()); END IF; END;`.execute(db));
 }
 exports.up = up;
-async function down(db) {
-    // drop the custom UUID version 4 function
-    await (0, kysely_1.sql) `DROP FUNCTION IF EXISTS UUID_V4`.execute(db);
-    // drop the trigger for each table
-    [
-        "users",
-        "search_history",
-        "reset_password_token",
-        "posts",
-        "messages",
-        "likes",
-        "conversation_members",
-        "conversations",
-        "comments",
-    ].map(async (table) => await (0, kysely_1.sql) `DROP TRIGGER IF EXISTS before_insert_${kysely_1.sql.raw(table)}`.execute(db));
-}
+async function down(db) { }
 exports.down = down;
 ;

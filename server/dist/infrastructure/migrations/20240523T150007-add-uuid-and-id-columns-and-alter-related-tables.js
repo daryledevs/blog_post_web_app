@@ -186,7 +186,7 @@ async function up(db) {
         .addColumn("uuid", "binary(16)", (col) => col.notNull().unique())
         .addColumn("conversation_id", "integer", (col) => col.notNull().unsigned())
         .addColumn("user_id", "integer", (col) => col.notNull().unsigned())
-        .addForeignKeyConstraint("fk_members_conversation_id", ["conversation_id"], "users", ["id"])
+        .addForeignKeyConstraint("fk_members_conversation_id", ["conversation_id"], "conversations", ["id"])
         .addForeignKeyConstraint("fk_members_user_id", ["user_id"], "users", ["id"])
         .addColumn("joined_at", "timestamp", (col) => col.defaultTo((0, kysely_1.sql) `CURRENT_TIMESTAMP`))
         .execute()
