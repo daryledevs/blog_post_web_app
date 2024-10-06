@@ -140,7 +140,7 @@ class ChatService implements IChatService {
     senderId: number,
     receiverId: number
   ): Promise<Conversation | undefined> => {
-    if (!conversationUuid) {
+    if (!conversationUuid || conversationUuid === "undefined") {
       // Fetch conversation by member IDs if no UUID is provided
       const conversation =
         await this.chatRepository.findOneConversationByMembersId([

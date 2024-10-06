@@ -78,7 +78,7 @@ class ChatService {
         return "Conversation deleted successfully";
     };
     isConversationExist = async (conversationUuid, senderId, receiverId) => {
-        if (!conversationUuid) {
+        if (!conversationUuid || conversationUuid === "undefined") {
             // Fetch conversation by member IDs if no UUID is provided
             const conversation = await this.chatRepository.findOneConversationByMembersId([
                 senderId,
