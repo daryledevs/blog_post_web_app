@@ -24,8 +24,8 @@ const feedApi = baseApi.injectEndpoints({
         method: "GET",
       }),
     }),
-    getExploreFeed: build.query<any, void>({
-      query: (userUuid: any) => ({
+    getExploreFeed: build.query<any, { userUuid: string | undefined}>({
+      query: ({ userUuid }: { userUuid: string | undefined }) => ({
         url: `/feeds/explore?userUuid=${userUuid}`,
         method: "GET",
       }),
