@@ -2,7 +2,7 @@ import React from 'react'
 
 interface RenderIconProps {
   isProfile: boolean;
-  profileSrc: string;
+  profileSrc: string | null | undefined;
   IconComponent: React.FC;
 }
 

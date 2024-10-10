@@ -1,7 +1,7 @@
 import React from "react";
 import NewMessageCard from "./NewMessageCard";
 import { useSearchUsersQuery } from "@/redux/api/userApi";
-import { IEUserState } from "@/interfaces/interface";
+import { IUser } from "@/interfaces/interface";
 import { selectMessage } from "@/redux/slices/messageSlice";
 import { useAppSelector } from "@/hooks/reduxHooks";
 
@@ -17,7 +17,7 @@ function NewMessageLists() {
     <div className="new-message-search-list">
       {listsUsersApi?.data?.users?.length ? (
         <React.Fragment>
-          {listsUsersApi?.data?.users?.map((user: IEUserState, index: any) => (
+          {listsUsersApi?.data?.users?.map((user: IUser, index: any) => (
             <NewMessageCard
               key={index}
               user={user}

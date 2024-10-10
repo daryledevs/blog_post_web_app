@@ -1,5 +1,5 @@
 import React                from "react";
-import { IEUserState }      from "@/interfaces/interface";
+import { IUser }      from "@/interfaces/interface";
 import { useAppSelector }   from "@/hooks/reduxHooks";
 import RecipientPersonCard  from "./RecipientPersonCard";
 import { selectMessage } from "@/redux/slices/messageSlice";
@@ -10,7 +10,7 @@ function RecipientsPersonList() {
 
   return (
     <React.Fragment>
-      {recipients?.map((user: IEUserState, index: number) => (
+      {recipients?.map((user: IUser, index: number) => (
         <RecipientPersonCard
           key={index}
           item={user}

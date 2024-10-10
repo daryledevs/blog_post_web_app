@@ -1,13 +1,14 @@
+import { IUser } from '@/interfaces/interface';
 import UserUsername from '../user/UserUsername';
 import UserDetails from '../user/UsersFullName';
 
-function NewMessageCardDetails({ user }: any) {
+function NewMessageCardDetails({ user }: { user: IUser }) {
   return (
     <div className="new-message-card-details">
       <UserUsername username={user.username} />
       <UserDetails
-        first_name={user.first_name}
-        last_name={user.last_name}
+        firstName={user.firstName}
+        lastName={user.lastName}
       />
     </div>
   );

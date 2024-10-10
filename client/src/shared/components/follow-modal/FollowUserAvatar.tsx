@@ -1,10 +1,10 @@
 import avatar from "@/assets/icons/avatar.png";
 
-function FollowUserAvatar({ avatar_url }: { avatar_url: string }) {
+function FollowUserAvatar({ avatarUrl }: { avatarUrl: string }) {
   return (
     <img
       alt=""
-      src={avatar_url ? avatar_url : avatar}
+      src={avatarUrl ? avatarUrl : avatar}
       className="item-card__avatar"
     />
   );

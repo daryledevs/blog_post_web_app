@@ -27,7 +27,7 @@ function ChatBoxMessageCard({
         `}
         >
           <UserAvatar
-            avatar_url={usersPicture}
+            avatarUrl={usersPicture}
             className={`
             chat-box-message-card-image
             chat-box-message-card-${value}-image

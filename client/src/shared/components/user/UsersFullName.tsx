@@ -1,14 +1,14 @@
 type UserFullNameProps = {
-  first_name: string | null;
-  last_name: string | null;
+  firstName: string | null;
+  lastName: string | null;
   className?: string;
 };
 
-function UserFullName({ first_name, last_name, className }: UserFullNameProps) {
+function UserFullName({ firstName, lastName, className }: UserFullNameProps) {
   return (
     <div className={className}>
       <p>
-        {first_name} {last_name}
+        {firstName} {lastName}
       </p>
     </div>
   );

@@ -7,7 +7,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
 
 export interface SidebarProps {
   item: any;
-  avatar: string;
+  avatar: string | null | undefined;
   username: string;
   isClicked: boolean;
 }

@@ -1,19 +1,19 @@
 export type FollowUserInfoProps = {
   username: string;
-  first_name: string;
-  last_name: string;
+  firstName: string;
+  lastName: string;
 };
 
 function FollowUserInfo({
   username,
-  first_name,
-  last_name,
+  firstName,
+  lastName,
 }: FollowUserInfoProps) {
   return (
     <div>
       <p>{username}</p>
       <p>
-        {first_name} {last_name}
+        {firstName} {lastName}
       </p>
     </div>
   );

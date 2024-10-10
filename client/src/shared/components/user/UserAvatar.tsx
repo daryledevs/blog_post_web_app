@@ -1,16 +1,16 @@
 import usersPicture from "@/assets/icons/avatar.png";
 
 type UserAvatarProps = {
-  avatar_url: string | null;
+  avatarUrl: string | null;
   className?: string;
 };
 
-function UserAvatar({ avatar_url, className } : UserAvatarProps) {
+function UserAvatar({ avatarUrl, className } : UserAvatarProps) {
   return (
     <img
       alt=""
       className={className}
-      src={avatar_url ? avatar_url : usersPicture}
+      src={avatarUrl ? avatarUrl : usersPicture}
     />
   );
 };

@@ -5,11 +5,11 @@ import useFetchFeedOnScroll            from "@/hooks/useFetchFeedOnScroll";
 import FeedLoading                     from "@/components/feed/FeedLoading";
 import FeedListPost                    from "@/components/feed/FeedListPost";
 
-import { IEPost }                      from "@/interfaces/interface";
+import { IPost }                      from "@/interfaces/interface";
 import { useGetUserFeedMutation }      from "@/redux/api/feedApi";
 
 type FeedProps = {
-  feeds: { feed: IEPost[] };
+  feeds: { feed: IPost[] };
   userTotalFeedApi: any;
   setAddFeedTrigger: any;
 };

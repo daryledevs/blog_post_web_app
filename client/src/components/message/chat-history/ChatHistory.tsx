@@ -1,8 +1,8 @@
-import { IEConversation }  from "@/interfaces/interface";
+import { IConversation }  from "@/interfaces/interface";
 import ChatHistoryList     from "./ChatHistoryList";
 
 type ChatHistoryProps = {
-  list: IEConversation[];
+  list: IConversation[];
   isLoading: boolean;
 };
 

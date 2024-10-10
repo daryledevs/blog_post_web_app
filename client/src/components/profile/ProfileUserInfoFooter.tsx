@@ -1,11 +1,11 @@
-import { IEUserState }  from "@/interfaces/interface";
+import { IUser }  from "@/interfaces/interface";
 import ProfileUserStats from "./ProfileUserStats";
 
-function ProfileUserInfoFooter({ user }: { user: IEUserState | undefined }) {
+function ProfileUserInfoFooter({ user }: { user: IUser | undefined }) {
   return (
     <div className="profile-user-info-footer">
       <ProfileUserStats
-        user_id={user?.uuid}
+        userUuid={user?.uuid}
         username={user?.username}
         className="profile-user-stats-xs"
       />

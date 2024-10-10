@@ -5,7 +5,7 @@ import { selectSidebar } from "@/redux/slices/sidebarSlice";
 import SidebarTabCard    from "./SidebarTabCard";
 
 type SidebarTabListsProps = {
-  avatar: string;
+  avatar: string | null | undefined;
   username: string;
 };
 

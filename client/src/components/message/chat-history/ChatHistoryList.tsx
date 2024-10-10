@@ -1,10 +1,10 @@
-import { IEConversation }   from '@/interfaces/interface';
+import { IConversation }   from '@/interfaces/interface';
 import HistoryRecipientCard from './HistoryRecipientCard';
 
-function ChatHistoryList({ list }: { list: IEConversation[] }) {
+function ChatHistoryList({ list }: { list: IConversation[] }) {
   return (
     <div className="chat-history-list">
-      {list?.map((chat: IEConversation, index: number) => {
+      {list?.map((chat: IConversation, index: number) => {
         return (
           <HistoryRecipientCard
             key={index}

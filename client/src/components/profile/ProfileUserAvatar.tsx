@@ -1,11 +1,15 @@
 import avatar from "@/assets/images/avatar.png"
 
-function ProfileUserAvatar({ avatar_url }: { avatar_url: string | undefined }) {
+function ProfileUserAvatar({
+  avatarUrl,
+}: {
+  avatarUrl: string | null | undefined;
+}) {
   return (
     <div className="profile-user-avatar">
       <img
         alt="user avatar"
-        src={avatar_url ? avatar_url : avatar}
+        src={avatarUrl ? avatarUrl : avatar}
       />
     </div>
   );

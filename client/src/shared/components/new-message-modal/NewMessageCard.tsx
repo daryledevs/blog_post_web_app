@@ -5,18 +5,18 @@ import {
 }                                         from "@/redux/slices/messageSlice";
 import React, { useEffect }               from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
-import { IEUserState }                    from "@/interfaces/interface";
+import { IUser }                    from "@/interfaces/interface";
 import UserAvatar                         from "../user/UserAvatar";
 import NewMessageCardDetails              from "./NewMessageCardDetails";
 
-function NewMessageCard({ user }: { user: IEUserState }) {
+function NewMessageCard({ user }: { user: IUser }) {
   const dispatch = useAppDispatch();
   const message = useAppSelector(selectMessage);
   const recipients = message.recipients;
 
   const [isRecipient, setIsRecipient] = React.useState<boolean>(false);
 
-  function newMessageHandler(person: IEUserState) {
+  function newMessageHandler(person: IUser) {
     dispatch(setRecipients(person));
     dispatch(setSearch(""));
   }
@@ -38,7 +38,7 @@ function NewMessageCard({ user }: { user: IEUserState }) {
       onClick={() => newMessageHandler(user)}
     >
       <UserAvatar
-        avatar_url={user?.avatar_url}
+        avatarUrl={user?.avatarUrl}
         className="new-message-card-avatar"
       />
       <NewMessageCardDetails user={user} />
