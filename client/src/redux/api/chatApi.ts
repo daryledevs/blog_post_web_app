@@ -1,58 +1,52 @@
-import { IEChatMessage, IEConversation } from "@/interfaces/interface";
 import baseApi from "./baseApi";
+import { IChat, IConversation } from "@/interfaces/interface";
 
+// delete this comment when you get back to code, all of these are updated
+// just change the custom effects and integrate it with the new api
 const chatApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
+    // useGetUserConversationsMutation
     getUserConversations: build.mutation<
-      { chats: IEConversation[] },
-      { user_id: any; conversations: number[] }
+      { conversations: IConversation[] },
+      { userUuid: string; conversationUuids: string[] }
     >({
-      query: ({ user_id, conversations }) => ({
-        url: `/chats/lists?user_id=${user_id}`,
+      query: ({ userUuid, conversationUuids }) => ({
+        url: `/chats/${userUuid}/conversations`,
         method: "POST",
-        body: { conversations },
+        body: { conversationUuids },
       }),
     }),
-    getUserConversationsByUsersId: build.mutation<
-      { conversation: IEConversation },
-      { user_one_id: number; user_two_id: number }
-    >({
-      query: ({ user_one_id, user_two_id }) => ({
-        url: `/chats/users/${user_one_id}/${user_two_id}`,
-        method: "GET",
-      }),
-    }),
+    // useLazyGetChatMessagesQuery
     getChatMessages: build.query<
-      { messages: IEChatMessage[] },
-      { conversation_id?: number; messages?: number[] }
+      { messages: IChat[] },
+      { conversationUuid?: string; messageIds?: string[] }
     >({
-      query: ({ conversation_id, messages }) => ({
-        url: `/chats/${conversation_id}/messages`,
+      query: ({ conversationUuid, messageIds }) => ({
+        url: `/chats/${conversationUuid}/messages`,
         method: "POST",
-        body: { messages },
+        body: { messageIds },
       }),
     }),
+    // useSendNewMessagesMutation
     sendNewMessages: build.mutation<
       any,
       {
-        sender_id: any;
-        receiver_id: number;
-        text_message: string;
-        conversation_id: any;
+        conversationUuid: string;
+        receiverUuid: string;
+        textMessage: any;
       }
     >({
-      query: ({ sender_id, receiver_id, text_message, conversation_id }) => ({
-        url: `/chats`,
+      query: ({ receiverUuid, textMessage, conversationUuid }) => ({
+        url: `/chats/${conversationUuid}/conversation/${receiverUuid}/user`,
         method: "POST",
-        body: { sender_id, receiver_id, text_message, conversation_id },
+        body: { conversationUuid, receiverUuid, textMessage },
       }),
     }),
   }),
 });
 
 export const {
-  useLazyGetChatMessagesQuery,
   useGetUserConversationsMutation,
+  useLazyGetChatMessagesQuery,
   useSendNewMessagesMutation,
-  useGetUserConversationsByUsersIdMutation,
 } = chatApi;
