@@ -5,24 +5,24 @@ import Gallery                  from "@/components/profile/profile-gallery/Galle
 import ProfileHeader            from "@/components/profile/ProfileHeader";
 import ProfileUserInfo          from "@/components/profile/ProfileUserInfo";
 
-import { useGetUserDataQuery, } from "@/redux/api/userApi";
 import { useGetUserPostQuery, } from "@/redux/api/postApi";
+import useFetchUserDataByUsername from "@/hooks/useFetchUserDataByUsername";
 
 function Profile() {
   const { username } = useParams();
 
   // services
-  const { data, isLoading } = useGetUserDataQuery({ person: username || "" });
+  const { user, isLoading } = useFetchUserDataByUsername({ username });
 
   const postDataApi = useGetUserPostQuery(
-    { user_id: data?.user?.uuid },
-    { skip: !data?.user }
+    { userUuid: user?.uuid ?? "" },
+    { skip: !user }
   );
 
   if (
     isLoading || 
     postDataApi.isLoading ||
-    !data
+    !user
   ) return null;
 
   return (
