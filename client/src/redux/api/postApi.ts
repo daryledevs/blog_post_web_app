@@ -3,16 +3,16 @@ import baseApi from "./baseApi";
 const postApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     // get user post
-    getUserPost: build.query<any, { user_id: number }>({
-      query: ({ user_id }) => ({
-        url: `/posts/by-user/${user_id}`,
+    getUserPost: build.query<any, { userUuid: string }>({
+      query: ({ userUuid }) => ({
+        url: `/posts/by-user/${userUuid}`,
         method: "GET",
       }),
     }),
     // get user total posts
-    getUserTotalPosts: build.query<any, { user_id: number }>({
-      query: ({ user_id }) => ({
-        url: `/posts/by-user/${user_id}/stats`,
+    getUserTotalPosts: build.query<any, { userUuid: string }>({
+      query: ({ userUuid }) => ({
+        url: `/posts/by-user/${userUuid}/stats`,
         method: "GET",
       }),
     }),
