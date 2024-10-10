@@ -17,7 +17,7 @@ const userApi = baseApi.injectEndpoints({
       }),
     }),
     // search users
-    searchUsers: build.query<IUser[], { search: string }>({
+    searchUsers: build.query<{ users: IUser[] }, { search: string }>({
       query: ({ search }) => ({
         url: `/users/search?searchQuery=${search}`,
         method: "GET",
