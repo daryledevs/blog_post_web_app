@@ -32,7 +32,7 @@ function PrivateRoute() {
   });
 
   const feedRef = useRef<HTMLDivElement | null>(null);
-  const userDataApi = useGetUserDataQuery({ person: "" });
+  const userDataApi = useGetUserDataQuery();
   const user = userDataApi.data?.user;
 
   // STATES
@@ -47,7 +47,7 @@ function PrivateRoute() {
   });
 
   useFetchFeed({
-    user_id: user?.uuid,
+    userUuid: user?.uuid,
     addFeedTrigger,
     userFeedApi,
     fetchUserFeed,
@@ -56,7 +56,7 @@ function PrivateRoute() {
   });
 
   useEffect(() => {
-    const socketURL = import.meta.env.REACT_APP_SOCKET_URL;
+    const socketURL = import.meta.env.VITE_REACT_SOCKET_URL;
     if (user && socketURL) {
       const socketService = new SocketService(socketURL, user?.uuid);
       setSocket(socketService);
