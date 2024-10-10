@@ -5,13 +5,13 @@ import socketConfig         from "@/config/socketConfig";
 class SocketService {
   private socket: Socket;
 
-  constructor(url: string, user_id: number) {
+  constructor(url: string, userUuid: string) {
     this.socket = socketIO(url, socketConfig);
-    this.addUserId(user_id);
+    this.addUserUuid(userUuid);
   }
 
-  addUserId(userId: any) {
-    this.socket.emit("add-user", userId);
+  addUserUuid(userUuid: string) {
+    this.socket.emit("add-user", userUuid);
   }
 
   sendMessage(message: MessageType) {
