@@ -1,8 +1,9 @@
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useEffect }                      from "react";
+import { useLocation }                    from "react-router-dom";
+
+import { useGetUserDataQuery }            from "@/redux/api/userApi";
+import { navigatedPage, selectSidebar }   from "@/redux/slices/sidebarSlice";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
-import { navigatedPage, selectSidebar } from "@/redux/slices/sidebarSlice";
-import { useGetUserDataQuery } from "@/redux/api/userApi";
 
 interface NavigationStateStatus {
   isLoading: boolean;
@@ -13,7 +14,7 @@ function useUpdateNavigatePage(): NavigationStateStatus {
   const dispatch = useAppDispatch();
   const { pathname } = useLocation();
   const sidebarState = useAppSelector(selectSidebar);
-  const userDataApi = useGetUserDataQuery({ person: "" });
+  const userDataApi = useGetUserDataQuery();
 
   useEffect(() => {
     // If userData is available, determine the path and dispatch navigation action
