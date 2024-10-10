@@ -1,21 +1,21 @@
 import baseApi    from "./baseApi";
-import { IEPost } from "@/interfaces/interface";
+import { IPost } from "@/interfaces/interface";
 
 export interface IEUserFeed {
-  user_id: number;
-  post_ids: number[];
+  userUuid: string;
+  postUuids: string[];
 }
 
 const feedApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     getUserFeed: build.mutation<
-      { feed: Array<IEPost> },
-      { post_ids: Array<number> }
+      { feed: Array<IPost> },
+      { postUuids: Array<string> }
     >({
-      query: ({ user_id, post_ids }: IEUserFeed) => ({
+      query: ({ userUuid, postUuids }: IEUserFeed) => ({
         url: "/feeds/",
         method: "POST",
-        body: { user_id, post_ids },
+        body: { userUuid, postUuids },
       }),
     }),
     getTotalFeed: build.query<any, any>({
@@ -25,8 +25,8 @@ const feedApi = baseApi.injectEndpoints({
       }),
     }),
     getExploreFeed: build.query<any, void>({
-      query: (user_id: any) => ({
-        url: `/feeds/explore?user_id=${user_id}`,
+      query: (userUuid: any) => ({
+        url: `/feeds/explore?userUuid=${userUuid}`,
         method: "GET",
       }),
     }),
