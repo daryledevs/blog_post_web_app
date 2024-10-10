@@ -1,19 +1,8 @@
 import { createSlice, PayloadAction, Slice } from "@reduxjs/toolkit";
-import {
-  IEConversation,
-  IEReduxState,
-  IEUserState,
-} from "@/interfaces/interface";
+import { ConversationState, ReduxState } from "@/interfaces/types";
+import { IConversation, IUser } from "@/interfaces/interface";
 
-export interface IEConversationState {
-  openConversation: IEConversation[];
-  recipients: IEUserState[];
-  search: string;
-  newMessageTrigger: boolean;
-  switchAccountTrigger: boolean;
-}
-
-const initialState: IEConversationState | null = {
+const initialState: ConversationState | null = {
   openConversation: [],
   recipients: [],
   search: "",
@@ -27,7 +16,7 @@ const messageSlice: Slice = createSlice({
   reducers: {
     setOpenConversation: (
       state,
-      action: PayloadAction<IEConversation | IEConversation[]>
+      action: PayloadAction<IConversation | IConversation[]>
     ) => {
       const { payload } = action;
       const isArray = Array.isArray(payload);
@@ -39,7 +28,7 @@ const messageSlice: Slice = createSlice({
     },
     setRecipients: (
       state,
-      action: PayloadAction<IEConversation[] | IEUserState>
+      action: PayloadAction<IConversation[] | IUser>
     ) => {
       return {
         ...state,
@@ -72,7 +61,7 @@ const messageSlice: Slice = createSlice({
   },
 });
 
-export const selectMessage = (state: IEReduxState) => state.messages;
+export const selectMessage = (state: ReduxState) => state.messages;
 
 export const {
   setOpenConversation,
