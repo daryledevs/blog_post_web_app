@@ -1,10 +1,11 @@
 import React, { useCallback }         from 'react';
 import SocketService                  from '@/services/SocketServices';
 import { MessageType }                from '@/interfaces/interface';
+
+import { useAppSelector }             from './reduxHooks';
+import { selectMessage }              from '@/redux/slices/messageSlice';
 import { useGetUserDataQuery }        from '@/redux/api/userApi';
 import { useSendNewMessagesMutation } from "@/redux/api/chatApi"; 
-import { useAppSelector } from './reduxHooks';
-import { selectMessage } from '@/redux/slices/messageSlice';
 
 type useSendMessageProps = {
   socketService: SocketService | null;
@@ -24,37 +25,23 @@ function useSendMessage({
     fixedCacheKey: "send-message-api",
   });
 
-  const userDataApi = useGetUserDataQuery({ person: "" });
+  const userDataApi = useGetUserDataQuery();
+  const senderUuid = userDataApi.data?.user?.uuid;
 
   // returning it, to make an instance of this function
   return useCallback(() => {
-    if (!newMessage?.text_message || !socketService) return;
-    const user = userDataApi?.data?.user;
-    const conversation_id = openConversation[0]?.conversation_id;
-    const user_id = openConversation[0]?.user_id;
-    const user_one_id = openConversation[0]?.user_one_id;
-    const user_two_id = openConversation[0]?.user_two_id;
-  
-    const receiver_id =
-      user_one_id && user_one_id !== user.user_id
-        ? user_one_id
-        : user_two_id
-        ? user_two_id
-        : user_id;
-
+    if (!newMessage?.text_message || !socketService || !senderUuid) return;
     const data = {
-      sender_id: user.user_id,
-      receiver_id: receiver_id,
-      conversation_id: conversation_id || null,
-      text_message: newMessage?.text_message,
-      message_id: newMessage?.message_id || null,
+      conversationUuid: openConversation[0]?.uuid,
+      receiverUuid: openConversation[0]?.userUuid,
+      textMessage: newMessage?.text_message,
     };
 
     sendMessage(data);
-    socketService.sendMessage(data);
+    socketService.sendMessage({ ...data, senderUuid });
     setNewMessage({ text_message: "" });
-    setComingMessage((prev: MessageType[]) => [{ ...data }, ...prev]);
-  }, [newMessage, userDataApi, openConversation, socketService]);
+    setComingMessage((prev: MessageType[]) => [{ ...data, senderUuid }, ...prev]);
+  }, [newMessage, senderUuid, openConversation, socketService]);
 }
 
 export default useSendMessage;
