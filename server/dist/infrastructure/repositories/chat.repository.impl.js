@@ -105,28 +105,57 @@ class ChatsRepository {
             .selectFrom("conversations as c")
             .leftJoin((eb) => eb
             .selectFrom("conversation_members as cm")
-            .leftJoin("users as u", "cm.user_id", "u.id")
+            .leftJoin((eb) => eb.selectFrom("users as u1")
+            .select([
+            "u1.id",
+            (0, kysely_1.sql) `BIN_TO_UUID(u1.uuid)`.as("u1_uuid"),
+            "u1.username",
+            "u1.first_name",
+            "u1.last_name",
+            "u1.avatar_url",
+        ])
+            .as("u1"), (join) => join.on("u1.id", "=", memberIds[0]))
             .select([
             "cm.id as cm_id",
             (0, kysely_1.sql) `BIN_TO_UUID(cm.uuid)`.as("cm_uuid"),
-            "conversation_id",
+            "cm.conversation_id",
             "cm.user_id",
-            "u.username",
-            "u.first_name",
-            "u.last_name",
-            "u.avatar_url",
+            "u1.username",
+            "u1.first_name",
+            "u1.last_name",
+            "u1.avatar_url",
         ])
-            .where("u.id", "in", memberIds)
-            .as("cm"), (join) => join.onRef("conversation_id", "=", "id"))
+            .where("cm.user_id", "=", memberIds[0])
+            .as("cm1"), (join) => join.onRef("c.id", "=", "cm1.conversation_id"))
+            .leftJoin((eb) => eb
+            .selectFrom("conversation_members as cm")
+            .leftJoin((eb) => eb.selectFrom("users as u2")
+            .select([
+            "u2.id",
+            (0, kysely_1.sql) `BIN_TO_UUID(u2.uuid)`.as("u2_uuid"),
+            "u2.username",
+            "u2.first_name",
+            "u2.last_name",
+            "u2.avatar_url",
+        ])
+            .as("u2"), (join) => join.on("u2.id", "=", memberIds[1]))
+            .select([
+            "cm.id as cm_id",
+            (0, kysely_1.sql) `BIN_TO_UUID(cm.uuid)`.as("cm_uuid"),
+            "cm.conversation_id",
+            "cm.user_id",
+            "u2.username",
+            "u2.first_name",
+            "u2.last_name",
+            "u2.avatar_url",
+        ])
+            .where("cm.user_id", "=", memberIds[1])
+            .as("cm2"), (join) => join.onRef("c.id", "=", "cm2.conversation_id"))
+            .whereRef("cm1.conversation_id", "=", "cm2.conversation_id")
             .select([
             "c.id",
             (0, kysely_1.sql) `BIN_TO_UUID(c.uuid)`.as("uuid"),
-            "cm.username",
-            "cm.user_id",
-            "cm.first_name",
-            "cm.last_name",
-            "cm.avatar_url",
-            "c.created_at",
+            "c.created_at"
         ])
             .executeTakeFirst();
         return (0, class_transformer_1.plainToInstance)(conversation_model_1.default, conversation);
