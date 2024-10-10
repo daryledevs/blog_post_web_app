@@ -1,12 +1,7 @@
-import { IEReduxState } from "@/interfaces/interface";
+import { ReduxState, SidebarState } from "@/interfaces/types";
 import { createSlice } from "@reduxjs/toolkit";
 
-export interface IESidebarState {
-  previous: string;
-  current: string;
-}
-
-const initialState: IESidebarState = {
+const initialState: SidebarState = {
   previous: "",
   current: "",
 };
@@ -24,5 +19,5 @@ const sidebarSlice = createSlice({
 });
 
 export const { navigatedPage } = sidebarSlice.actions;
-export const selectSidebar = (state: IEReduxState) => state.sidebar;
+export const selectSidebar = (state: ReduxState) => state.sidebar;
 export default sidebarSlice.reducer;
