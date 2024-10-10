@@ -1,14 +1,17 @@
 import React                    from "react";
-import { selectMessage }        from "@/redux/slices/messageSlice";
+
+import { MessageType }          from "@/interfaces/interface";
 import { useAppSelector }       from "@/hooks/reduxHooks";
 import { useGetUserDataQuery }  from "@/redux/api/userApi";
+import { selectMessage }        from "@/redux/slices/messageSlice";
+
 import ChatBoxMessage           from "./ChatBoxMessageCard";
 import ChatBoxStartConversation from "./ChatBoxStartConversation";
 
 type ChatBoxMessageListProps = {
   isLoading: boolean;
   chatListRef: React.RefObject<HTMLDivElement> | null;
-  comingMessage: any;
+  comingMessage: MessageType[];
   observerRef: (node?: Element | null | undefined) => void;
 };
 
@@ -20,10 +23,16 @@ function ChatBoxMessageList({
 }: ChatBoxMessageListProps) {
   const messages = useAppSelector(selectMessage);
   const username = messages.openConversation?.[0]?.username;
-  const userDataApi = useGetUserDataQuery({ person: "" });
+  const userDataApi = useGetUserDataQuery();
 
-  const classNameChecker = (user_id: any) => {
-    return user_id === userDataApi?.data?.user?.uuid ? "own" : "other";
+  const classNameChecker = (
+    senderUuid: string,
+    receiverUuid: string
+  ): string => {
+    const myUserUuid = userDataApi?.data?.user?.uuid;
+    return senderUuid === receiverUuid || receiverUuid === myUserUuid
+      ? "other"
+      : "own";
   };
 
   return (
@@ -34,22 +43,29 @@ function ChatBoxMessageList({
       />
       {comingMessage.length ? (
         <React.Fragment>
-          {comingMessage?.map((data: any, index: number) => (
+          {comingMessage?.map((message: MessageType, index: number) => (
             <ChatBoxMessage
-              key={data.message_id}
+              key={index}
               observerRef={observerRef}
-              text_message={data?.text_message}
-              value={classNameChecker(data.sender_id)}
+              text_message={message?.textMessage}
+              value={classNameChecker(
+                message?.senderUuid,
+                message?.receiverUuid
+              )}
             />
           ))}
         </React.Fragment>
       ) : (
         <React.Fragment>
           {isLoading ? (
-            <div style={{ 
-              width: "100%", 
-              textAlign: "center" 
-            }}>Loading...</div>
+            <div
+              style={{
+                width: "100%",
+                textAlign: "center",
+              }}
+            >
+              Loading...
+            </div>
           ) : (
             <ChatBoxStartConversation username={username} />
           )}
