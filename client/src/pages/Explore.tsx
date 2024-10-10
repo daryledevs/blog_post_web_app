@@ -21,7 +21,7 @@ function Explore() {
     isError: isUserApiError,
     error: userApiError,
     isSuccess: isUserApiSuccess,
-  } = useGetUserDataQuery({ person: "" });
+  } = useGetUserDataQuery()
 
   const {
     data: exploreApiData,
@@ -29,9 +29,12 @@ function Explore() {
     isError: isExploreApiError,
     error: exploreApiError,
     isSuccess: isExploreApiSuccess,
-  } = useGetExploreFeedQuery(userApiData?.user?.uuid, {
-    skip: !isUserApiSuccess,
-  });
+  } = useGetExploreFeedQuery(
+    { userUuid: userApiData?.user?.uuid },
+    {
+      skip: !isUserApiSuccess,
+    }
+  );
 
   useEffect(() => {
     if (isExploreApiLoading || isUserApiLoading) return;

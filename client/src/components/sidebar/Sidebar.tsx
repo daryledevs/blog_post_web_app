@@ -9,7 +9,7 @@ import SidebarTabLists         from "./SidebarTabLists";
 function Sidebar() {
   const sidebarState = useSelector(selectSidebar);
 
-  const userDataApi = useGetUserDataQuery({ person: "" });
+  const userDataApi = useGetUserDataQuery();
   const user = userDataApi?.data?.user;
 
   if (userDataApi.isLoading || !user) return null;
@@ -24,7 +24,7 @@ function Sidebar() {
       <SidebarLogo />
       <div className="sidebar-tab-lists">
         <SidebarTabLists
-          avatar={user?.avatar_url}
+          avatar={user?.avatarUrl}
           username={user?.username}
         />
       </div>

@@ -12,7 +12,7 @@ type useFetchRouterProps = {
 
 function useFetchRouter({ setRoute }: useFetchRouterProps) {
   const [, loginApiData] = useLoginMutation({ fixedCacheKey: "login-api" });
-  const userDataApi = useGetUserDataQuery({ person: "" });
+  const userDataApi = useGetUserDataQuery();
 
   useEffect(() => {
     const LOGIN_STATUS = "Login successfully";

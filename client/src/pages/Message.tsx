@@ -12,7 +12,7 @@ import { setOpenConversation } from "@/redux/slices/messageSlice";
 
 function Message({ socketService }: { socketService: SocketService | null }) {
   const dispatch = useAppDispatch();
-  const userApiData = useGetUserDataQuery({ person: "" });
+  const userApiData = useGetUserDataQuery();
 
   // Reset open conversation when component unmount
   useEffect(() => {

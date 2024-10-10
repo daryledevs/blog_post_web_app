@@ -18,7 +18,7 @@ function SearchBarBody({
   search,
   setSearch,
 }: SearchBarBodyProps) {
-  const userApiData = useGetUserDataQuery({ person: "" });
+  const userApiData = useGetUserDataQuery();
 
   const searchesApiData = useSearchUsersQuery({ search }, { skip: !search });
   
@@ -34,7 +34,7 @@ function SearchBarBody({
 
   const user = userApiData?.data?.user;
   const recentSearchesDataApi = useGetSearchesUserQuery(
-    { user_id: user?.uuid },
+    { userUuid: user?.uuid ?? "" },
     { skip: !user?.uuid }
   );
 

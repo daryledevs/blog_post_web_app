@@ -1,13 +1,14 @@
-import {
-  useGetUserConversationsByUsersIdMutation,
-  useLazyGetChatMessagesQuery,
-}                                     from "@/redux/api/chatApi";
 import React, { useState, useEffect } from "react";
-import SocketService                  from "@/services/SocketServices";
-import { MessageType }                from "@/interfaces/interface";
-import { selectMessage }              from "@/redux/slices/messageSlice";
-import { useAppSelector }             from "./reduxHooks";
-import { useGetUserDataQuery }        from "@/redux/api/userApi";
+import { IChat, MessageType } from "@/interfaces/interface";
+
+import {
+  useGetUserConversationsMutation,
+  useLazyGetChatMessagesQuery,
+} from "@/redux/api/chatApi";
+import SocketService from "@/services/SocketServices";
+import { selectMessage } from "@/redux/slices/messageSlice";
+import { useAppSelector } from "./reduxHooks";
+import { useGetUserDataQuery } from "@/redux/api/userApi";
 
 type useFetchMessageProps = {
   inView: boolean;
@@ -16,7 +17,7 @@ type useFetchMessageProps = {
 };
 
 type useFetchMessageReturn = {
-  comingMessage: MessageType[] | null[];
+  comingMessage: MessageType[];
   setComingMessage: any;
   isLoading: boolean;
 };
@@ -25,30 +26,20 @@ function useFetchMessage({
   inView,
   socketService,
 }: useFetchMessageProps): useFetchMessageReturn {
+  const userDataApi = useGetUserDataQuery();
   const { openConversation, recipients } = useAppSelector(selectMessage);
-  const conversationId = openConversation?.[0]?.conversation_id;
   const [comingMessage, setComingMessage] = useState<MessageType[]>([]);
-
-  const userDataApi = useGetUserDataQuery(
-    { person: "" },
-    { skip: !!conversationId }
-  );
+  const userUuid = userDataApi?.data?.user.uuid;
 
   const [
     getChatMessages,
-    {
-      data: allChatMessages,
-      isLoading: chatMessagesLoading,
-    },
+    { data: messagesData, isLoading: chatMessagesLoading },
   ] = useLazyGetChatMessagesQuery();
 
   const [
     getConversations,
-    {
-      data: conversationData,
-      isLoading: conversationLoading,
-    },
-  ] = useGetUserConversationsByUsersIdMutation({
+    { data: conversationData, isLoading: conversationLoading },
+  ] = useGetUserConversationsMutation({
     fixedCacheKey: "conversation-api",
   });
 
@@ -57,78 +48,72 @@ function useFetchMessage({
     if (!socketService) return;
 
     const handleMessageReceived = (message: MessageType) => {
-      setComingMessage(
-        (prev: MessageType[]) => [message, ...prev] as MessageType[]
-      );
+      setComingMessage((prev: MessageType[]) => [message, ...prev]);
     };
 
     socketService.onMessageReceived(handleMessageReceived);
   }, [socketService]);
 
   // UseEffect to reset the chat messages when a new conversation is opened
+  // and switch between the conversations
   useEffect(() => {
     if (openConversation.length) {
       setComingMessage([]);
     }
-  }, [openConversation]);
+  }, [openConversation, messagesData]);
 
   // UseEffect to fetch conversation data if from new message modal
-  useEffect(() => {
-    if (!conversationId && userDataApi.data?.user) {
-      const person = userDataApi.data.user;
-      const otherPerson = openConversation[0];
-
+    useEffect(() => {
+    if (userUuid) {
       getConversations({
-        user_one_id: person.user_id,
-        user_two_id: otherPerson.user_id,
+        userUuid: userUuid,
+        conversationUuids: []
       });
     }
-  }, [openConversation, conversationId, userDataApi.data?.user]);
+  }, [openConversation, userUuid]);
 
   // UseEffect to fetch chat messages when the user scrolls to the top
   // and fetch the initial data when the user opens the conversation
   useEffect(() => {
-    const ids = comingMessage
-      .map((item) => item?.message_id)
-      .filter((id) => id !== null) as number[];
-
-    if (conversationData?.conversation) {
-      const newId = conversationData.conversation.conversation_id;
-      getChatMessages({ conversation_id: newId, messages: ids });
-    } else if (inView && conversationId) {
+    if (inView && openConversation.length === 1) {
       getChatMessages({
-        conversation_id: conversationId,
-        messages: ids,
+        conversationUuid: openConversation[0].uuid,
+        messageIds: comingMessage
+          .map((item) => item?.conversationUuid)
+          .filter((id) => id !== null) as string[],
       });
     }
     // 'conversationData' as a dependency to perform the fetch request with new id
     // 'inView' as a dependency to trigger the fetch request when the user scrolls
-  }, [inView, conversationData?.conversation, conversationId]);
+  }, [inView, conversationData?.conversations, openConversation]);
+
+  useEffect(() => {
+    if (openConversation.length === 1) {
+      const conversation = openConversation[0];
+      getChatMessages({
+        conversationUuid: conversation.uuid,
+        messageIds: [],
+      });
+    }
+  }, [openConversation]);  
 
   // useEffect to set/update the chat messages data when the user scrolls
   useEffect(() => {
-    if (allChatMessages?.messages.length) {
+    const data = messagesData?.messages;
+    if (data?.length && openConversation?.length) {
       setComingMessage((prev: MessageType[]) => [
         ...prev,
-        ...allChatMessages.messages,
+        ...data.map((data, index) => ({
+          ...data,
+          receiverUuid: openConversation[0].userUuid,
+        })),
       ]);
     }
     // 'inView' as a dependency to set//update the fetch response's data
-  }, [allChatMessages?.messages]);
-
-  // UseEffect to fetch conversation data when the user opens a new conversation
-  useEffect(() => {
-    if (conversationData?.conversation) {
-      const conversation = conversationData.conversation;
-      getChatMessages({
-        conversation_id: conversation.conversation_id,
-        messages: [],
-      });
-    }
-  }, [conversationData?.conversation]);
+  }, [messagesData?.messages, openConversation, userUuid]);
 
   return {
-    comingMessage: comingMessage as MessageType[] | null[],
+    comingMessage,
     setComingMessage,
     isLoading: chatMessagesLoading || conversationLoading,
   };

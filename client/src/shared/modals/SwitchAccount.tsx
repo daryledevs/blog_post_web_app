@@ -8,7 +8,7 @@ import { useAppDispatch, useAppSelector }         from '@/hooks/reduxHooks';
 import { selectMessage, setSwitchAccountTrigger } from '@/redux/slices/messageSlice';
 
 function SwitchAccount() {
-  const userDataApi = useGetUserDataQuery({ person: "" });
+  const userDataApi = useGetUserDataQuery();
   const user = userDataApi.data?.user;
   const dispatch = useAppDispatch();
   const messages = useAppSelector(selectMessage);
@@ -39,7 +39,7 @@ function SwitchAccount() {
         </div>
         <div className="switch-account__existing-account">
           <img
-            src={user?.avatar_url ? user.avatar_url : avatar}
+            src={user?.avatarUrl ? user.avatarUrl : avatar}
             alt=""
           />
           {user?.username}

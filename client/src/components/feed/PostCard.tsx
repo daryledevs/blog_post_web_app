@@ -7,12 +7,12 @@ import commentIcon             from "@/assets/icons/comment.png";
 import heartIcon_uncheck       from "@/assets/icons/heart_uncheck.png";
 import { useGetUserDataQuery } from "@/redux/api/userApi";
 
-interface IEPostCard{
+interface IPostCard{
   postData:any;
 }
 
-function PostCard({ postData }: IEPostCard) {
-  const userApiData = useGetUserDataQuery({ person: "" });
+function PostCard({ postData }: IPostCard) {
+  const userApiData = useGetUserDataQuery();
   if(userApiData.isLoading) return null;
   return (
     <div className="post-card-container">

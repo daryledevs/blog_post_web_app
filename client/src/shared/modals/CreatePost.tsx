@@ -28,7 +28,7 @@ function CreatePost() {
   const dispatch = useAppDispatch();
   const sidebarState = useAppSelector(selectSidebar);
 
-  const userDataApi = useGetUserDataQuery({ person: "" });
+  const userDataApi = useGetUserDataQuery();
   const user = userDataApi?.data?.user;
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -119,10 +119,14 @@ function CreatePost() {
 
   async function onSubmit() {
     try {
+      if (!user?.uuid) {
+        throw new Error("User not found");
+      }
+
       const form = new FormData();
       form.append("img", imageToUpload.image as File);
       form.append("caption", caption);
-      form.append("user_id", user.user_id.toString());
+      form.append("userUuid", user?.uuid);
       await api.post("/posts", form, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -136,7 +140,7 @@ function CreatePost() {
         })
       );
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 
@@ -282,11 +286,11 @@ function CreatePost() {
                 <div className="create-post__post-user">
                   <div>
                     <img
-                      src={user.avatar_url ? user.avatar_url : avatar}
+                      src={user?.avatarUrl ? user?.avatarUrl : avatar}
                       alt=""
                     />
                   </div>
-                  <p>{user.username}</p>
+                  <p>{user?.username}</p>
                 </div>
                 <textarea
                   defaultValue={caption}
