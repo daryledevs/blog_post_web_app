@@ -54,7 +54,7 @@ interface IBaseChat {
 interface IChat extends IBaseChat, ExcludeUSerProps<IUser, "email"> {
 }
 
-interface MessageType extends Omit<IBaseChat, "uuid" | "timeSent" | "senderUuid" | "uuid"> {
+interface MessageType extends Omit<IBaseChat, "uuid" | "timeSent" | "uuid"> {
   receiverUuid: string;
 }
 
