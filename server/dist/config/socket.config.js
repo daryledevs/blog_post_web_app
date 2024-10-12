@@ -28,6 +28,7 @@ dotenv.config();
 const socketConfig = {
     cors: {
         origin: [
+            `${process.env.CLIENT_URL_NGINX}`,
             `${process.env.CLIENT_URL_ONE}`,
             `${process.env.CLIENT_URL_TWO}`,
             `${process.env.CLIENT_URL_THREE}`,
