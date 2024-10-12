@@ -1,6 +1,5 @@
 import {
   useGetFollowersAndFollowingListsMutation,
-  useGetUserDataQuery,
 }                                 from "@/redux/api/userApi";
 
 import { useState, useEffect }    from "react";
@@ -8,22 +7,28 @@ import { useLocation, useParams } from "react-router";
 
 import FollowLists                from "@/shared/components/follow-modal/FollowLists";
 import FollowModalTitle           from "@/shared/components/follow-modal/FollowModalTitle";
+import useFetchUserDataByUsername from "@/hooks/useFetchUserDataByUsername";
 
 function FollowModal() {
+  const { username } = useParams();
   const location = useLocation();
   const pathType = location?.pathname?.split("/")[2];
-  const { username } = useParams();
-  const userApiData = useGetUserDataQuery({ person: username || "" });
+  
+  const { user, isLoading: isUserLoading } = useFetchUserDataByUsername({ username });
   const [removedUsers, setRemovedUsers] = useState<Array<number>>([]);
+  const userUuid = user?.uuid;
 
   const [fetchFollowsLists, { data: follows, isLoading }] =
     useGetFollowersAndFollowingListsMutation();
 
   useEffect(() => {
-    if (userApiData.isLoading) return;
-    const user_id = userApiData.data?.user?.uuid;
-    fetchFollowsLists({ user_id: user_id, fetch: pathType, listsId: 0 });
-  }, [userApiData.data]);
+    if (isUserLoading || !userUuid) return;
+    fetchFollowsLists({
+      userUuid: userUuid,
+      fetchFollowType: pathType,
+      followListIds: [],
+    });
+  }, [userUuid, isUserLoading]);
 
   return (
     <div className="follow-modal__container">
@@ -32,9 +37,9 @@ function FollowModal() {
         <div className="follow-modal__list-container">
           <FollowLists
             path={pathType}
-            follower_id={userApiData?.data?.user?.uuid}
+            followerUuid={userUuid}
             isLoading={isLoading}
-            lists={follows?.lists}
+            lists={follows?.followList}
             removedUsers={removedUsers}
             setRemovedUsers={setRemovedUsers}
           />
