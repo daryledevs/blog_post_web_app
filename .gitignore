@@ -13,6 +13,7 @@ node_modules
 
 # production
 build
+client/dist/assets
 
 # misc
 .DS_Store
