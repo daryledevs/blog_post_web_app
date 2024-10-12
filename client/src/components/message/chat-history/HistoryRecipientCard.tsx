@@ -1,13 +1,15 @@
 import {
   selectMessage,
   setOpenConversation,
-}                                         from "@/redux/slices/messageSlice";
+} from "@/redux/slices/messageSlice";
+import { IConversation } from "@/interfaces/interface";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
-import { IEConversation }                 from "@/interfaces/interface";
-import UserAvatar                         from "@/shared/components/user/UserAvatar";
-import UserFullName                       from "@/shared/components/user/UsersFullName";
 
-function HistoryRecipientCard({ chat }: { chat: IEConversation }) {
+import UserAvatar from "@/shared/components/user/UserAvatar";
+import UserFullName from "@/shared/components/user/UsersFullName";
+import UserUsername from "@/shared/components/user/UserUsername";
+
+function HistoryRecipientCard({ chat }: { chat: IConversation }) {
   const chatState = useAppSelector(selectMessage);
   const { openConversation } = chatState;
   const dispatch = useAppDispatch();
@@ -24,14 +26,18 @@ function HistoryRecipientCard({ chat }: { chat: IEConversation }) {
       onClick={() => dispatch(setOpenConversation(chat))}
     >
       <UserAvatar
-        avatar_url={chat?.avatar_url}
+        avatarUrl={chat?.avatarUrl}
         className="history-recipient-card-avatar"
       />
-      <UserFullName
-        first_name={chat?.first_name}
-        last_name={chat?.last_name}
-        className="history-recipient-name"
-      />
+      {chat?.firstName || chat?.lastName ? (
+        <UserFullName
+          firstName={chat?.firstName}
+          lastName={chat?.lastName}
+          className="history-recipient-name"
+        />
+      ) : (
+        <UserUsername username={chat?.username} />
+      )}
     </div>
   );
 }

@@ -1,11 +1,11 @@
 import React, { useCallback }    from "react";
-import FollowUserCard            from "./FollowUserCard";
 import { useFollowUserMutation } from "@/redux/api/userApi";
+import FollowUserCard            from "./FollowUserCard";
 
 type FollowListsProps = {
   path: string;
   lists: any;
-  follower_id: number;
+  followerUuid: string | undefined;
   isLoading: boolean;
   removedUsers: any;
   setRemovedUsers: React.Dispatch<React.SetStateAction<any>>;
@@ -14,7 +14,7 @@ type FollowListsProps = {
 function FollowLists({
   path,
   lists,
-  follower_id,
+  followerUuid,
   isLoading,
   removedUsers,
   setRemovedUsers,
@@ -22,34 +22,37 @@ function FollowLists({
   const [followUser] = useFollowUserMutation({ fixedCacheKey: "follows-api" });
 
   const followUserHandler = useCallback(
-    (userFollowId: number) => {
-      const userInRemoved = removedUsers.includes(userFollowId);
-      const isUserInList = (user_id: number) => user_id === userFollowId;
+    (userFollowUuid: string) => {
+      const userInRemoved = removedUsers.includes(userFollowUuid);
+      const isUserInList = (userUuid: string) => userUuid === userFollowUuid;
       const userInList = lists?.some(
         (item: any) =>
-          isUserInList(item.follower_id) || isUserInList(item.followed_id)
+          isUserInList(item.followerUuid) || isUserInList(item.followedUuid)
       );
 
       if (!userInRemoved && userInList) {
-        setRemovedUsers((prev: number[]) => [...prev, userFollowId]);
+        setRemovedUsers((prev: string[]) => [...prev, userFollowUuid]);
       } else {
-        setRemovedUsers((prev: number[]) =>
-          prev.filter((id) => id !== userFollowId)
+        setRemovedUsers((prev: string[]) =>
+          prev.filter((id) => id !== userFollowUuid)
         );
       }
 
-      const argOne = path === "following" ? follower_id : userFollowId;
-      const argTwo = path === "following" ? userFollowId : follower_id;
-      followUser({ follower_id: argOne, followed_id: argTwo });
+      const argOne = path === "following" ? followerUuid : userFollowUuid;
+      const argTwo = path === "following" ? userFollowUuid : followerUuid;
+      
+      if (argOne && argTwo) {
+        followUser({ followerUuid: argOne, followedUuid: argTwo });
+      }
     },
-    [lists, removedUsers, setRemovedUsers]
+    [followerUuid, lists, removedUsers, setRemovedUsers]
   );
 
   if (isLoading) return null;
 
   return (
     <React.Fragment>
-      {lists?.map((item: any, index: number) => (
+      {lists?.map((item: any, index: string) => (
         <FollowUserCard
           key={index}
           item={item}

@@ -3,12 +3,12 @@ import ProfileSocialStats  from "./ProfileSocialStats";
 import useUserDetailsStats from "@/hooks/useUserDetailsStats";
 
 interface ProfileUserStatsProps {
-  user_id: string | undefined;
+  userUuid: string | undefined;
   username: string | undefined;
   className?: string;
 };
 
-function ProfileUserStats({ user_id, username, className }: ProfileUserStatsProps) {
+function ProfileUserStats({ userUuid, username, className }: ProfileUserStatsProps) {
   const navigate = useNavigate();
   
   const { 
@@ -17,7 +17,7 @@ function ProfileUserStats({ user_id, username, className }: ProfileUserStatsProp
     following, 
     isLoading, 
     isFetching 
-  } = useUserDetailsStats({ user_id: user_id });
+  } = useUserDetailsStats({ user_uuid: userUuid });
   
   if (isLoading || isFetching) return null;
 

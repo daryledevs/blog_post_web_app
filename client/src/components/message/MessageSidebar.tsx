@@ -3,11 +3,11 @@ import {
   useSendNewMessagesMutation,
 }                      from "@/redux/api/chatApi";
 import { useEffect }   from "react";
-import { IEUserState } from "@/interfaces/interface";
+import { IUser }       from "@/interfaces/interface";
 import ChatHeader      from "./chat-header/ChatHeader";
 import ChatHistory     from "./chat-history/ChatHistory";
 
-function MessageSidebar({ user }: { user: IEUserState }) {
+function MessageSidebar({ user }: { user: IUser }) {
   const [getUsersConversations, chatHistory] =
     useGetUserConversationsMutation();
 
@@ -17,8 +17,8 @@ function MessageSidebar({ user }: { user: IEUserState }) {
 
   useEffect(() => {
     getUsersConversations({
-      user_id: user?.uuid,
-      conversations: [],
+      userUuid: user?.uuid,
+      conversationUuids: [],
     });
   }, [sendMessages]);
 
@@ -26,8 +26,8 @@ function MessageSidebar({ user }: { user: IEUserState }) {
     <div className="message-sidebar">
       <ChatHeader user={user} />
       <ChatHistory
-        isLoading={chatHistory.isLoading || !chatHistory.data}
-        list={chatHistory?.data?.chats || []}
+        isLoading={chatHistory.isLoading}
+        list={chatHistory?.data?.conversations || []}
       />
     </div>
   );

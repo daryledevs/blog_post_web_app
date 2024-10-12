@@ -6,7 +6,7 @@ type FollowUserCardProps = {
   item: any;
   path: any;
   removedUsers: any;
-  onClick: (userFollowId: number) => void;
+  onClick: (userFollowUuid: string) => void;
 };
 
 function FollowUserCard({
@@ -17,18 +17,18 @@ function FollowUserCard({
 }: FollowUserCardProps) {
   return (
     <div className="item-card">
-      <FollowUserAvatar avatar_url={item?.avatar_url} />
+      <FollowUserAvatar avatarUrl={item?.avatarUrl} />
       <div className="item-card__item">
         <FollowUserInfo
           username={item.username}
-          first_name={item.first_name}
-          last_name={item.last_name}
+          firstName={item.firstName}
+          lastName={item.lastName}
         />
         <FollowToggleButton
-          followId={item.user_id}
+          followId={item.userUuid}
           fetchType={path}
           removedUsers={removedUsers}
-          onClick={() => onClick(item.user_id)}
+          onClick={() => onClick(item.userUuid)}
         />
       </div>
     </div>
