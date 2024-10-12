@@ -33,8 +33,8 @@ function SearchBarUserCard({
     // If the user is not a recent search, save the search
     if (!isRecentSearch) {
       onClick({
-        user_id: person.user_id,
-        searched_id: user.user_id,
+        user_uuid: person.userUuid,
+        searched_id: user.userUuid,
       });
     }
 
@@ -58,12 +58,12 @@ function SearchBarUserCard({
     >
       <img
         alt="avatar"
-        src={user.avatar_url || avatar}
+        src={user.avatarUrl || avatar}
       />
       <div>
         <p>{user.username}</p>
         <p>
-          {user.first_name} {user.last_name}
+          {user.firstName} {user.lastName}
         </p>
       </div>
       {isRecentSearch ? (

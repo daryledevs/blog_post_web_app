@@ -5,24 +5,27 @@ import {
 import { useEffect }                 from "react";
 import { useGetUserTotalPostsQuery } from "@/redux/api/postApi";
 
-function useUserDetailsStats({ user_id }: any) {
+function useUserDetailsStats({ userUuid }: any) {
   const [, followsListsApi] = useFollowUserMutation({
     fixedCacheKey: "follows-api",
   });
 
   const totalPostsApi = useGetUserTotalPostsQuery(
-    { user_id },
-    { skip: !user_id }
+    { userUuid },
+    { skip: !userUuid }
   );
   
   const followStatsDataApi = useGetFollowStatsQuery(
-    { user_id },
-    { skip: !user_id }
+    { userUuid },
+    { skip: !userUuid }
   );
 
   useEffect(() => {
-    followStatsDataApi.refetch();
-  }, [followsListsApi.data]);
+    console.log(followsListsApi.status, followStatsDataApi.data);
+    if (followsListsApi?.data?.length) {
+      followStatsDataApi.refetch();
+    }
+  }, [followsListsApi.status, followStatsDataApi.data]);
 
   return {
     totalPosts: totalPostsApi.data?.totalPost,
