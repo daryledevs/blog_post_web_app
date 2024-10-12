@@ -26,8 +26,8 @@
     "build": "tsc",
     "clean:dist": "rimraf dist",
     "clean:modules": "rimraf node_modules",
-    "start:dev": "SET NODE_ENV=development && nodemon",
-    "start:prod": "SET NODE_ENV=production && ts-node -r tsconfig-paths/register src/index.ts",
+    "start:dev": "cross-env NODE_ENV=development && nodemon",
+    "start:prod": "cross-env NODE_ENV=production && ts-node -r tsconfig-paths/register src/index.ts",
     "codegen": "kysely-codegen --dialect mysql --out-file ./src/types/schema.types.ts",
     "migrations": "ts-node ./src/infrastructure/database/migrator.database.ts"
   },
@@ -90,6 +90,7 @@
     "@types/supertest": "^6.0.2",
     "@vitest/coverage-v8": "^1.4.0",
     "@vitest/ui": "^1.4.0",
+    "cross-env": "^7.0.3",
     "esm": "^3.2.25",
     "kysely-codegen": "^0.14.1",
     "nodemon": "^3.1.0",
