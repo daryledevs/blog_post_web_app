@@ -1,13 +1,15 @@
-import { useParams }           from "react-router-dom";
-import { useGetUserDataQuery } from "@/redux/api/userApi";
+import { useParams } from "react-router-dom";
+import useFetchUserDataByUsername from "@/hooks/useFetchUserDataByUsername";
 
 function ProfileHeader() {
   const { username } = useParams();
-  const { data } = useGetUserDataQuery({ person: username || "" });
+  const { user, isLoading } = useFetchUserDataByUsername({ username });
+
+  if (isLoading) return null;
 
   return (
     <div className="profile-header">
-      <p>{data?.user?.username}</p>
+      <p>{user?.username}</p>
     </div>
   );
 }

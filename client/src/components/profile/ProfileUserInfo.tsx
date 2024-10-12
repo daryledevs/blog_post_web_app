@@ -1,25 +1,25 @@
-import { useParams }           from 'react-router-dom';
+import { useParams }              from 'react-router-dom';
+import useFetchUserDataByUsername from '@/hooks/useFetchUserDataByUsername';
+
 import ProfileUserStats        from './ProfileUserStats';
 import ProfileUserAvatar       from './ProfileUserAvatar';
 import ProfileUserControls     from './ProfileUserControls';
 import ProfileUserInfoFooter   from './ProfileUserInfoFooter';
-import { useGetUserDataQuery } from '@/redux/api/userApi';
 
 function ProfileUserInfo() {
   const { username } = useParams();
-  const { data, isLoading } = useGetUserDataQuery({ person: username || "" });
-  const user = data?.user;
+  const { user, isLoading } = useFetchUserDataByUsername({ username });
 
   if (isLoading) return null;
 
   return (
     <div className="profile-user-info">
       <div className="profile-user-info-header">
-        <ProfileUserAvatar avatar_url={user?.avatar_url} />
+        <ProfileUserAvatar avatarUrl={user?.avatarUrl} />
         <div className="profile-user-info-controls">
           <ProfileUserControls username={user?.username} />
           <ProfileUserStats
-            user_id={user?.uuid}
+            userUuid={user?.uuid}
             username={user?.username}
             className="profile-user-stats-md"
           />
