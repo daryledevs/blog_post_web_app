@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    volumes:
+      - ./client:/app
+      # Persisting node_modules to avoid rebuilding
+      - /app/node_modules  
+    ports:
+      - "3000:80"
+    environment:
+      VITE_REACT_SOCKET_URL: ${VITE_REACT_SOCKET_URL}
+      VITE_REACT_APP_API_NGINX: ${VITE_REACT_APP_API_NGINX}
+      VITE_REACT_APP_API_URL1: ${VITE_REACT_APP_API_URL1}
+      VITE_REACT_APP_API_URL2: ${VITE_REACT_APP_API_URL2}
+
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    volumes:
+      - ./server:/usr/src/app
+      # Persisting node_modules to avoid rebuilding
+      - /usr/src/app/node_modules
+    ports:
+      - "5000:5000"
+    command: npm run start:dev
+    environment:
+      DATABASE_HOST: ${MYSQL_DATABASE_HOST}  
+      DATABASE: ${MYSQL_DATABASE}
+      USER: ${MYSQL_USER} 
+      PASSWORD: ${MYSQL_PASSWORD}  
+      DATABASE_CONNECTION_LIMIT: ${MYSQL_DATABASE_CONNECTION_LIMIT}
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx.conf
+      - ./client/build:/usr/share/nginx/html
+    depends_on:
+      - client
+      - server
+
+  mysql:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}  
+      MYSQL_DATABASE: ${MYSQL_DATABASE}            
+      MYSQL_USER: ${MYSQL_USER}                          
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}                     
+    ports:
+      - "3307:3306"
